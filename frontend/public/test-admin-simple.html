@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin Simple</title>
+</head>
+<body>
+    <h1>Test Admin Simple</h1>
+    <button onclick="testBackend()">Probar Backend</button>
+    <div id="result"></div>
+
+    <script>
+        async function testBackend() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Probando...';
+            
+            try {
+                // Simular token de admin
+                const token = 'test-token';
+                
+                const response = await fetch('/api/admin/invitados', {
+                    headers: { 'Authorization': token }
+                });
+                
+                console.log('Status:', response.status);
+                console.log('StatusText:', response.statusText);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Datos recibidos:', data);
+                    resultDiv.innerHTML = `
+                        <h3>✅ Backend funcionando</h3>
+                        <p>Status: ${response.status}</p>
+                        <p>Invitados encontrados: ${data.length}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    const errorData = await response.json();
+                    resultDiv.innerHTML = `
+                        <h3>❌ Error del backend</h3>
+                        <p>Status: ${response.status}</p>
+                        <p>Error: ${errorData.error}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML = `
+                    <h3>❌ Error de conexión</h3>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+

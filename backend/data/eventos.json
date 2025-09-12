@@ -1,0 +1,81 @@
+{
+  "eventos": [
+    {
+      "id": 1756290658875,
+      "icono": "fas fa-glass-cheers",
+      "titulo": "Cocktail de Bienvenida",
+      "descripcion": "Celebración informal para dar la bienvenida a todos los invitados.",
+      "fecha": "2026-06-05",
+      "horaInicio": "21:00",
+      "horaFin": "23:00",
+      "lugar": "Hotel Palace Madrid",
+      "direccion": "Plaza de las Cortes, 7, Madrid",
+      "coordenadas": {
+        "lat": 40.4155461,
+        "lng": -3.6971087
+      },
+      "subeventos": [
+        {
+          "id": 1756312860749,
+          "icono": "fas fa-glass-cheers",
+          "titulo": "Brindis inicial",
+          "descripcion": "Bebidas para todos los invitados para que se vayan conociendo.",
+          "horaInicio": "21:00",
+          "horaFin": "22:00",
+          "lugar": "Sala de reuniones del hotel",
+          "direccion": "Planta baja, puerta 4",
+          "coordenadas": {
+            "lat": 36.5178597,
+            "lng": -4.9065509
+          }
+        },
+        {
+          "id": 1756313969093,
+          "icono": "fas fa-gifts",
+          "titulo": "Entrega de recuerdos",
+          "descripcion": "Se entregarán regalos significativos del enlace como recuerdo",
+          "horaInicio": "22:00",
+          "horaFin": "23:00",
+          "lugar": "Sala de juegos del hotel",
+          "direccion": "Planta baja, puerta 3",
+          "coordenadas": {
+            "lat": 40,
+            "lng": -2.99
+          }
+        }
+      ]
+    },
+    {
+      "id": 1756297392300,
+      "icono": "fas fa-church",
+      "titulo": "Ceremonia de Boda",
+      "descripcion": "Ceremonia religiosa de Iluminada y George.",
+      "fecha": "2026-06-06",
+      "horaInicio": "14:00",
+      "horaFin": "16:00",
+      "lugar": "Iglesia de San Miguel",
+      "direccion": "Plaza Mayor, 1, Madrid",
+      "coordenadas": {
+        "lat": 40.41537777412996,
+        "lng": -3.706722218980047
+      },
+      "subeventos": []
+    },
+    {
+      "id": 1756337404556,
+      "icono": "fas fa-music",
+      "titulo": "Banquete y Baile",
+      "descripcion": "Celebración principal con comida y baile.",
+      "fecha": "2026-06-06",
+      "horaInicio": "17:00",
+      "horaFin": "06:00",
+      "lugar": "Comedor y sala de fiestas",
+      "direccion": "Planta baja, puertas 8 y 9.",
+      "coordenadas": {
+        "lat": 40.4,
+        "lng": -3.6
+      },
+      "subeventos": []
+    }
+  ]
+}

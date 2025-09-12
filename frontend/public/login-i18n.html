@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="login:title">Acceso invitados - Boda</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* Estilos para el header con selector de idiomas */
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      position: relative;
+      overflow: visible;
+    }
+    
+    .header-left {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+    
+    .header-left .home-link {
+      flex-shrink: 0;
+      order: -1;
+    }
+    
+    .header-left h1 {
+      margin: 0;
+      flex: 1;
+    }
+    
+    /* Estilos para el selector de idiomas */
+    .language-selector {
+      position: relative;
+      margin-left: 20px;
+      z-index: 1000;
+      overflow: visible;
+    }
+    
+    .language-selector-wrapper {
+      position: relative;
+      overflow: visible;
+    }
+    
+    .language-selector-dropdown {
+      position: relative;
+      display: inline-block;
+      overflow: visible;
+    }
+    
+    .language-selector-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      min-width: 120px;
+    }
+    
+    .language-selector-toggle:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .language-selector-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+      background: white;
+      border: 1px solid #e1e5e9;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      backdrop-filter: blur(20px);
+      min-width: 160px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10000;
+      overflow: visible;
+    }
+    
+    .language-selector-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    .language-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #333;
+      font-size: 14px;
+      font-weight: 500;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    
+    .language-option:last-child {
+      border-bottom: none;
+    }
+    
+    .language-option:hover {
+      background: #f8f9fa;
+      color: #007bff;
+    }
+    
+    .language-option.active {
+      background: #e3f2fd;
+      color: #1976d2;
+      font-weight: 600;
+    }
+    
+    /* Asegurar que el header tenga el espacio correcto */
+    header {
+      position: relative;
+      padding: 60px 20px 40px 20px;
+      min-height: 120px;
+      z-index: 1000;
+      overflow: visible !important;
+    }
+
+    /* Asegurar que el body permita overflow visible */
+    body {
+      overflow-x: hidden;
+      overflow-y: visible;
+    }
+
+    /* Espaciado para el formulario de login */
+    main {
+      margin-top: 40px;
+      padding: 20px;
+    }
+
+    /* Centrar el formulario */
+    #loginForm {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    /* Estilos para los pasos del formulario */
+    .login-step {
+      display: block; /* Por defecto, el primer paso es visible */
+      margin-bottom: 20px;
+    }
+
+    .email-display {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .email-display label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .email-display span {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .back-btn {
+      background-color: #f0f0f0;
+      color: #333;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      border: 1px solid #e0e0e0;
+    }
+
+    .back-btn:hover {
+      background-color: #e0e0e0;
+    }
+
+    .password-input-container {
+      position: relative;
+    }
+
+    .password-input-container input {
+      width: calc(100% - 40px); /* Ajustar para el botón de toggle */
+      padding-right: 40px; /* Espacio para el botón de toggle */
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      color: #888;
+      font-size: 18px;
+      transition: color 0.3s ease;
+    }
+
+    .password-toggle:hover {
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <a href="index-i18n-fixed.html" class="home-link">
+          <i class="fas fa-home"></i>
+          <span data-i18n="common:home">Inicio</span>
+        </a>
+        <h1 data-i18n="login:title">Acceso para invitados</h1>
+      </div>
+      <div class="language-selector">
+        <div class="language-selector-wrapper">
+          <div class="language-selector-dropdown">
+            <button class="language-selector-toggle" id="language-toggle" aria-label="Select language">
+              <span class="current-language">
+                <span class="flag">🇪🇸</span>
+                <span class="name">Español</span>
+              </span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="language-selector-menu" id="language-menu">
+              <button class="language-option active" data-lang="es">
+                <span class="flag">🇪🇸</span>
+                <span class="name">Español</span>
+              </button>
+              <button class="language-option" data-lang="en">
+                <span class="flag">🇬🇧</span>
+                <span class="name">English</span>
+              </button>
+              <button class="language-option" data-lang="fr">
+                <span class="flag">🇫🇷</span>
+                <span class="name">Français</span>
+              </button>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main>
+    <form id="loginForm" autocomplete="off">
+      <div id="step1" class="login-step">
+        <label for="email" data-i18n="login:emailLabel">Email:</label>
+        <input type="email" id="email" name="email" autocomplete="off" data-i18n-placeholder="login:emailPlaceholder" placeholder="Introduce tu email" required>
+        <button type="button" id="continueBtn" data-i18n="login:continueButton">Acceder</button>
+      </div>
+      
+      <div id="step2" class="login-step" style="display: none;">
+        <div class="email-display">
+          <label data-i18n="login:emailLabel">Email:</label>
+          <span id="emailDisplay"></span>
+          <button type="button" id="backBtn" class="back-btn" data-i18n="login:backButton">← Volver</button>
+        </div>
+        
+        <div id="passwordSection" style="display: none;">
+          <label for="password" data-i18n="login:passwordLabel">Contraseña:</label>
+          <div class="password-input-container">
+            <input type="password" id="password" name="password" autocomplete="off" data-i18n-placeholder="login:passwordPlaceholder" placeholder="Introduce tu contraseña" required>
+            <button type="button" class="password-toggle" id="togglePassword">
+              <i class="fas fa-eye-slash"></i>
+            </button>
+          </div>
+        </div>
+        
+        <button type="submit" id="loginBtn" data-i18n="login:submitButton">Acceder</button>
+      </div>
+    </form>
+    <div id="loginMessage" style="margin-top:1em;"></div>
+  </main>
+
+  <script>
+    // Datos de traducción para login
+    const translations = {
+      es: {
+        'login:title': 'Acceso para invitados',
+        'login:emailLabel': 'Email:',
+        'login:emailPlaceholder': 'Introduce tu email',
+        'login:submitButton': 'Acceder',
+        'login:successMessage': 'Acceso exitoso. Redirigiendo...',
+        'login:errorEmailRequired': 'Por favor, introduce tu email.',
+        'login:errorEmailNotFound': 'Email no encontrado en la lista de invitados',
+        'login:errorConnection': 'Error de conexión con el servidor',
+        'login:continueButton': 'Acceder',
+        'login:backButton': '← Volver',
+        'login:passwordLabel': 'Contraseña:',
+        'login:passwordPlaceholder': 'Introduce tu contraseña',
+        'login:accessButton': 'Acceder',
+        'login:adminSuccessMessage': 'Acceso de administrador exitoso. Redirigiendo...',
+        'login:errorPasswordRequired': 'Por favor, introduce tu contraseña.',
+        'login:errorLogin': 'Error en el acceso'
+      },
+      en: {
+        'login:title': 'Guest Access',
+        'login:emailLabel': 'Email:',
+        'login:emailPlaceholder': 'Enter your email',
+        'login:submitButton': 'Access',
+        'login:successMessage': 'Access successful. Redirecting...',
+        'login:errorEmailRequired': 'Please enter your email.',
+        'login:errorEmailNotFound': 'Email not found in guest list',
+        'login:errorConnection': 'Server connection error',
+        'login:continueButton': 'Access',
+        'login:backButton': '← Back',
+        'login:passwordLabel': 'Password:',
+        'login:passwordPlaceholder': 'Enter your password',
+        'login:accessButton': 'Access',
+        'login:adminSuccessMessage': 'Administrator access successful. Redirecting...',
+        'login:errorPasswordRequired': 'Please enter your password.',
+        'login:errorLogin': 'Login error'
+      },
+      fr: {
+        'login:title': 'Accès invités',
+        'login:emailLabel': 'Email:',
+        'login:emailPlaceholder': 'Entrez votre email',
+        'login:submitButton': 'Accéder',
+        'login:successMessage': 'Accès réussi. Redirection...',
+        'login:errorEmailRequired': 'Veuillez entrer votre email.',
+        'login:errorEmailNotFound': 'Email non trouvé dans la liste des invités',
+        'login:errorConnection': 'Erreur de connexion au serveur',
+        'login:continueButton': 'Accéder',
+        'login:backButton': '← Retour',
+        'login:passwordLabel': 'Mot de passe:',
+        'login:passwordPlaceholder': 'Entrez votre mot de passe',
+        'login:accessButton': 'Accéder',
+        'login:adminSuccessMessage': 'Accès administrateur réussi. Redirection...',
+        'login:errorPasswordRequired': 'Veuillez entrer votre mot de passe.',
+        'login:errorLogin': 'Erreur de connexion'
+      },
+
+    };
+
+    // Configuración de idiomas
+    const languages = {
+      es: { name: 'Español', flag: '🇪🇸', rtl: false },
+      en: { name: 'English', flag: '🇬🇧', rtl: false },
+      fr: { name: 'Français', flag: '🇫🇷', rtl: false },
+
+    };
+
+    let currentLanguage = 'es';
+
+    function translate(key, lang = currentLanguage) {
+      const translation = translations[lang]?.[key];
+      return translation || key;
+    }
+
+    function updatePageContent() {
+      document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const translation = translate(key);
+        if (translation !== key) {
+          element.textContent = translation;
+        }
+      });
+
+      // Actualizar placeholders
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const key = element.getAttribute('data-i18n-placeholder');
+        const translation = translate(key);
+        if (translation !== key) {
+          element.placeholder = translation;
+        }
+      });
+    }
+
+    function updateLanguageSelector() {
+      const toggle = document.getElementById('language-toggle');
+      const currentLang = languages[currentLanguage];
+      
+      if (toggle) {
+        toggle.innerHTML = `
+          <span class="current-language">
+            <span class="flag">${currentLang.flag}</span>
+            <span class="name">${currentLang.name}</span>
+          </span>
+          <i class="fas fa-chevron-down"></i>
+        `;
+      }
+      
+      // Actualizar opciones activas
+      document.querySelectorAll('.language-option').forEach(option => {
+        const lang = option.getAttribute('data-lang');
+        if (lang === currentLanguage) {
+          option.classList.add('active');
+        } else {
+          option.classList.remove('active');
+        }
+      });
+    }
+
+    function updateDocumentDirection() {
+      const isRTL = languages[currentLanguage].rtl;
+      document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+      document.documentElement.lang = currentLanguage;
+    }
+
+    async function changeLanguage(lang) {
+      if (!languages[lang]) {
+        console.warn(`Language ${lang} is not supported`);
+        return false;
+      }
+
+      try {
+        currentLanguage = lang;
+        
+        // Guardar preferencia
+        localStorage.setItem('i18nextLng', lang);
+        
+        // Actualizar dirección del documento
+        updateDocumentDirection();
+        
+        // Actualizar contenido
+        updatePageContent();
+        
+        // Actualizar selector
+        updateLanguageSelector();
+        
+        console.log(`Language changed to: ${lang}`);
+        return true;
+      } catch (error) {
+        console.error(`Error changing language: ${error.message}`);
+        return false;
+      }
+    }
+
+    // Configurar event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded, initializing i18n system...');
+      
+      // Configurar selector de idiomas
+      const toggle = document.getElementById('language-toggle');
+      const menu = document.getElementById('language-menu');
+      
+      if (toggle && menu) {
+        toggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          menu.classList.toggle('show');
+          toggle.setAttribute('aria-expanded', menu.classList.contains('show'));
+        });
+        
+        // Cerrar al hacer clic fuera
+        document.addEventListener('click', (e) => {
+          if (!toggle.contains(e.target)) {
+            menu.classList.remove('show');
+            toggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+        
+        // Opciones de idioma
+        document.querySelectorAll('.language-option').forEach(option => {
+          option.addEventListener('click', (e) => {
+            e.preventDefault();
+            const lang = option.getAttribute('data-lang');
+            changeLanguage(lang);
+            menu.classList.remove('show');
+            toggle.setAttribute('aria-expanded', 'false');
+          });
+        });
+      }
+      
+      // Cargar idioma preferido
+      const savedLang = localStorage.getItem('i18nextLng');
+      if (savedLang && languages[savedLang]) {
+        currentLanguage = savedLang;
+      }
+      
+      // Inicializar
+      updateDocumentDirection();
+      updatePageContent();
+      updateLanguageSelector();
+      
+      console.log(`i18n system initialized, language: ${currentLanguage}`);
+    });
+  </script>
+  <script src="js/login-i18n.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prueba - Centrado de Eventos Corregido</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    .test-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .iframe-container {
+      width: 100%;
+      height: 800px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    
+    .iframe-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .test-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 0.5rem;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .test-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1><i class="fas fa-check-circle"></i> Prueba - Centrado de Eventos Corregido</h1>
+    <p>Esta página verifica que los eventos ahora aparecen correctamente centrados en la página de inicio.</p>
+    
+    <a href="frontend/public/index-i18n-fixed.html" target="_blank" class="test-btn">
+      <i class="fas fa-external-link-alt"></i> Abrir Página de Inicio en Nueva Pestaña
+    </a>
+    
+    <div class="iframe-container">
+      <iframe src="frontend/public/index-i18n-fixed.html" id="homePage"></iframe>
+    </div>
+    
+    <p><strong>✅ Cambios aplicados:</strong></p>
+    <ul>
+      <li>Agregados estilos CSS específicos con <code>!important</code> para forzar el centrado</li>
+      <li>Configurado <code>.info-grid</code> como flexbox con centrado</li>
+      <li>Agregado <code>.events-container</code> y <code>.events-row</code> para centrado perfecto</li>
+      <li>Configurado <code>justify-content: center</code> para centrar eventos horizontalmente</li>
+      <li>Agregado <code>flex-wrap: wrap</code> para responsividad</li>
+    </ul>
+    
+    <p><strong>🎯 Verificar:</strong></p>
+    <ul>
+      <li>Los eventos deben estar centrados horizontalmente</li>
+      <li>Funciona con cualquier número de eventos (1, 2, 3+)</li>
+      <li>La tarjeta de ubicación también está centrada</li>
+      <li>El espaciado es uniforme entre elementos</li>
+    </ul>
+  </div>
+</body>
+</html>

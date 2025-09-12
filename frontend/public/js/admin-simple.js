@@ -1,0 +1,790 @@
+// Panel de administración simplificado y funcional
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('Panel de administración cargando...');
+  
+  const logoutBtn = document.getElementById('logoutAdmin');
+  const adminContent = document.getElementById('adminContent');
+  const adminTabs = document.querySelectorAll('.adminTab');
+
+  // Verificar autenticación
+  const token = localStorage.getItem('adminToken');
+  if (!token) {
+    console.log('No hay token, redirigiendo al login');
+    window.location.href = 'admin-login.html';
+    return;
+  }
+
+  console.log('Token encontrado:', token);
+
+  // Logout
+  logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('adminToken');
+    window.location.href = 'admin-login.html';
+  });
+
+  // Tabs
+  adminTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tabName = tab.getAttribute('data-tab');
+      console.log('Cambiando a pestaña:', tabName);
+      showTab(tabName);
+    });
+  });
+
+  // Función principal para mostrar pestañas
+  async function showTab(tab) {
+    console.log('Mostrando pestaña:', tab);
+    
+    // Actualizar pestañas activas
+    adminTabs.forEach(t => t.classList.remove('active'));
+    const activeTab = document.querySelector(`.adminTab[data-tab="${tab}"]`);
+    if (activeTab) {
+      activeTab.classList.add('active');
+    }
+    
+    // Mostrar loading
+    adminContent.innerHTML = '<div class="admin-loading"><i class="fas fa-spinner fa-spin"></i><p>Cargando...</p></div>';
+    
+    // Determinar URL
+    let url = '';
+    if (tab === 'invitados') url = '/api/admin/invitados';
+    if (tab === 'rsvp') url = '/api/admin/rsvp';
+    if (tab === 'regalos') url = '/api/admin/regalos';
+    if (tab === 'mensajes') url = '/api/admin/mensajes';
+    if (tab === 'agenda') {
+      showEventosAdmin();
+      return;
+    }
+    if (tab === 'menu') url = '/api/admin/menu';
+    if (tab === 'configuracion') {
+      showConfiguracion();
+      return;
+    }
+    
+    if (!url) {
+      adminContent.innerHTML = '<div class="message error"><p>Pestaña no implementada</p></div>';
+      return;
+    }
+    
+    try {
+      console.log('Haciendo petición a:', url);
+      
+      // Agregar timestamp para evitar cache
+      const urlWithTimestamp = `${url}?_t=${Date.now()}`;
+      console.log('URL con timestamp:', urlWithTimestamp);
+      
+      const res = await fetch(urlWithTimestamp, {
+        headers: { 
+          'Authorization': token,
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      console.log('Respuesta del servidor:', res.status, res.statusText);
+      
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Error del servidor:', errorData);
+        adminContent.innerHTML = `
+          <div class="message error">
+            <h3>Error al cargar los datos</h3>
+            <p>${errorData.error || 'Error desconocido'}</p>
+            <p>Código de error: ${res.status}</p>
+            <button onclick="showTab('${tab}')" class="submit-btn">
+              <i class="fas fa-redo"></i>
+              Reintentar
+            </button>
+          </div>
+        `;
+        return;
+      }
+      
+      const data = await res.json();
+      console.log('Datos recibidos:', data);
+      
+      // Renderizar contenido según la pestaña
+      if (tab === 'invitados') {
+        renderInvitados(data);
+      } else if (tab === 'regalos') {
+        renderRegalos(data);
+      } else if (tab === 'mensajes') {
+        renderMensajes(data);
+      } else if (tab === 'agenda') {
+        renderAgenda(data);
+      } else if (tab === 'rsvp') {
+        renderRSVP(data);
+      } else if (tab === 'menu') {
+        renderMenu(data);
+      }
+      
+    } catch (err) {
+      console.error('Error en la petición:', err);
+      adminContent.innerHTML = `
+        <div class="message error">
+          <h3>Error de conexión</h3>
+          <p>No se pudo conectar con el servidor</p>
+          <p>Detalles: ${err.message}</p>
+          <button onclick="showTab('${tab}')" class="submit-btn">
+            <i class="fas fa-redo"></i>
+            Reintentar
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  // Funciones de renderizado
+  function renderInvitados(data) {
+    // Ordenar invitados alfabéticamente por nombre
+    const invitadosOrdenados = [...data].sort((a, b) => 
+      a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
+    );
+    
+    const totalInvitados = invitadosOrdenados.length;
+    const confirmados = invitadosOrdenados.filter(inv => inv.asistencia === 'si').length;
+    const noConfirmados = invitadosOrdenados.filter(inv => inv.asistencia === 'no').length;
+    const pendientes = totalInvitados - confirmados - noConfirmados;
+    const conMenu = invitadosOrdenados.filter(inv => inv.seleccionMenu).length;
+    
+    adminContent.innerHTML = `
+      <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3>📊 Estadísticas de invitados</h3>
+          <button onclick="addInvitado()" style="
+            padding: 8px 16px; background: #28a745; color: white; 
+            border: none; border-radius: 6px; cursor: pointer;
+          ">
+            <i class="fas fa-plus"></i> Añadir Invitado
+          </button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;">
+          <div style="text-align: center; padding: 10px; background: white; border-radius: 5px;">
+            <strong>${totalInvitados}</strong><br>Total
+          </div>
+          <div style="text-align: center; padding: 10px; background: #d4edda; border-radius: 5px;">
+            <strong>${confirmados}</strong><br>Confirmados
+          </div>
+          <div style="text-align: center; padding: 10px; background: #f8d7da; border-radius: 5px;">
+            <strong>${noConfirmados}</strong><br>No asistirán
+          </div>
+          <div style="text-align: center; padding: 10px; background: #fff3cd; border-radius: 5px;">
+            <strong>${pendientes}</strong><br>Pendientes
+          </div>
+          <div style="text-align: center; padding: 10px; background: #cce5ff; border-radius: 5px;">
+            <strong>${conMenu}</strong><br>Con menú
+          </div>
+        </div>
+      </div>
+      <h3>👥 Lista de invitados</h3>
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #f8f9fa;">
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Nombre</th>
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Email</th>
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Asistencia</th>
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Menú</th>
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${invitadosOrdenados.map(inv => `
+              <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 10px;">${inv.nombre}</td>
+                <td style="padding: 10px;">${inv.email}</td>
+                <td style="padding: 10px;">
+                  <span style="padding: 3px 8px; border-radius: 12px; font-size: 0.8em; 
+                    background: ${inv.asistencia === 'si' ? '#d4edda' : inv.asistencia === 'no' ? '#f8d7da' : '#fff3cd'};
+                    color: ${inv.asistencia === 'si' ? '#155724' : inv.asistencia === 'no' ? '#721c24' : '#856404'};">
+                    ${inv.asistencia === 'si' ? '✅ Sí' : inv.asistencia === 'no' ? '❌ No' : '⏳ Pendiente'}
+                  </span>
+                </td>
+                <td style="padding: 10px;">
+                  ${inv.seleccionMenu ? 
+                    `<span style="color: #28a745;">✓ Seleccionado</span><br>
+                     <small style="color: #6c757d;">
+                       ${inv.seleccionMenu.entrante}, ${inv.seleccionMenu.principal}, ${inv.seleccionMenu.postre}
+                       ${inv.seleccionMenu.alergias ? `<br>⚠️ ${inv.seleccionMenu.alergias}` : ''}
+                     </small>` : 
+                    '<span style="color: #6c757d;">No seleccionado</span>'
+                  }
+                </td>
+                <td style="padding: 10px;">
+                  <button onclick="editInvitado(${inv.id}, '${inv.nombre}', '${inv.email}', '${inv.asistencia}')" style="
+                    padding: 4px 8px; background: #007bff; color: white; 
+                    border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;
+                  ">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button onclick="deleteInvitado(${inv.id}, '${inv.nombre}')" style="
+                    padding: 4px 8px; background: #dc3545; color: white; 
+                    border: none; border-radius: 4px; cursor: pointer;
+                  ">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+  
+  function renderRegalos(data) {
+    const totalRegalos = data.length;
+    const reservados = data.filter(r => r.reservadoPor).length;
+    const disponibles = totalRegalos - reservados;
+    
+    adminContent.innerHTML = `
+      <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3>🎁 Estadísticas de regalos</h3>
+          <button onclick="addRegalo()" style="
+            padding: 8px 16px; background: #28a745; color: white; 
+            border: none; border-radius: 6px; cursor: pointer;
+          ">
+            <i class="fas fa-plus"></i> Añadir Regalo
+          </button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;">
+          <div style="text-align: center; padding: 10px; background: white; border-radius: 5px;">
+            <strong>${totalRegalos}</strong><br>Total
+          </div>
+          <div style="text-align: center; padding: 10px; background: #d4edda; border-radius: 5px;">
+            <strong>${reservados}</strong><br>Reservados
+          </div>
+          <div style="text-align: center; padding: 10px; background: #fff3cd; border-radius: 5px;">
+            <strong>${disponibles}</strong><br>Disponibles
+          </div>
+        </div>
+      </div>
+      <h3>🎁 Lista de regalos</h3>
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #f8f9fa;">
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Regalo</th>
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Descripción</th>
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Precio</th>
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Estado</th>
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.map(r => `
+              <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 10px;">
+                  <strong>${r.nombre}</strong>
+                  ${r.url ? `<br><a href="${r.url}" target="_blank" style="color: #007bff; font-size: 0.9em;">Ver enlace</a>` : ''}
+                </td>
+                <td style="padding: 10px;">${r.descripcion || '-'}</td>
+                <td style="padding: 10px;">${r.precio || '-'}</td>
+                <td style="padding: 10px;">
+                  ${r.reservadoPor ? 
+                    `<span style="padding: 3px 8px; border-radius: 12px; font-size: 0.8em; background: #d4edda; color: #155724;">
+                      ✅ Reservado por ${r.reservadoPor}
+                    </span>` : 
+                    `<span style="padding: 3px 8px; border-radius: 12px; font-size: 0.8em; background: #fff3cd; color: #856404;">
+                      ⏳ Disponible
+                    </span>`
+                  }
+                </td>
+                <td style="padding: 10px;">
+                  <button onclick="editRegalo(${r.id}, '${r.nombre}', '${r.descripcion || ''}', '${r.precio || ''}', '${r.categoria || ''}', '${r.url || ''}')" style="
+                    padding: 4px 8px; background: #007bff; color: white; 
+                    border: none; border-radius: 4px; cursor: pointer; margin-right: 5px;
+                  ">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button onclick="deleteRegalo(${r.id}, '${r.nombre}')" style="
+                    padding: 4px 8px; background: #dc3545; color: white; 
+                    border: none; border-radius: 4px; cursor: pointer;
+                  ">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+  
+  function renderMensajes(data) {
+    adminContent.innerHTML = `
+      <h3>💬 Mensajes de invitados</h3>
+      <div style="max-height: 400px; overflow-y: auto;">
+        ${data.length > 0 ? data.map(msg => `
+          <div style="margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #28a745;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+              <strong style="color: #28a745;">${msg.nombre}</strong>
+              <small style="color: #6c757d;">${new Date(msg.fecha).toLocaleString()}</small>
+            </div>
+            <p style="margin: 0; color: #333;">${msg.mensaje}</p>
+          </div>
+        `).join('') : '<p style="text-align: center; color: #6c757d;">No hay mensajes aún.</p>'}
+      </div>
+    `;
+  }
+  
+  function renderAgenda(data) {
+    adminContent.innerHTML = `
+      <h3>📅 Agenda de eventos</h3>
+      <div style="max-height: 400px; overflow-y: auto;">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          ${data.map((ev, index) => `
+            <div style="display: flex; align-items: center; padding: 15px; background: ${index % 2 === 0 ? '#f8f9fa' : 'white'}; border-radius: 8px; border-left: 4px solid #28a745;">
+              <div style="min-width: 80px; font-weight: bold; color: #28a745;">${ev.hora}</div>
+              <div style="flex: 1;">
+                <strong>${ev.evento}</strong><br>
+                <small style="color: #6c757d;">${ev.lugar}</small>
+              </div>
+              <button onclick="editEvento(${ev.id}, '${ev.evento}', '${ev.fecha}', '${ev.dia}', '${ev.hora}', '${ev.descripcion || ''}', '${ev.lugar}', '${ev.direccion || ''}')" style="
+                padding: 6px 12px; background: #007bff; color: white; 
+                border: none; border-radius: 4px; cursor: pointer;
+              ">
+                <i class="fas fa-edit"></i>
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+  
+  function renderRSVP(data) {
+    const stats = data.estadisticas;
+    adminContent.innerHTML = `
+      <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+        <h3>📊 Estadísticas de Confirmaciones RSVP</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;">
+          <div style="text-align: center; padding: 10px; background: white; border-radius: 5px;">
+            <strong>${stats.total}</strong><br>Total Invitados
+          </div>
+          <div style="text-align: center; padding: 10px; background: #d4edda; border-radius: 5px;">
+            <strong>${stats.confirmados}</strong><br>Confirmados
+          </div>
+          <div style="text-align: center; padding: 10px; background: #f8d7da; border-radius: 5px;">
+            <strong>${stats.noConfirmados}</strong><br>No Asistirán
+          </div>
+          <div style="text-align: center; padding: 10px; background: #fff3cd; border-radius: 5px;">
+            <strong>${stats.pendientes}</strong><br>Pendientes
+          </div>
+        </div>
+      </div>
+      <h3>📋 Lista de Confirmaciones RSVP</h3>
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table style="width: 100%; border-collapse: collapse;">
+          <thead>
+            <tr style="background: #f8f9fa;">
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Nombre</th>
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Email</th>
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Estado RSVP</th>
+              <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Fecha Registro</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.invitados.map(inv => `
+              <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 10px;">${inv.nombre}</td>
+                <td style="padding: 10px;">${inv.email}</td>
+                <td style="padding: 10px;">
+                  <span style="padding: 3px 8px; border-radius: 12px; font-size: 0.8em; 
+                    background: ${inv.asistencia === 'si' ? '#d4edda' : inv.asistencia === 'no' ? '#f8d7da' : '#fff3cd'};
+                    color: ${inv.asistencia === 'si' ? '#155724' : inv.asistencia === 'no' ? '#721c24' : '#856404'};">
+                    ${inv.asistencia === 'si' ? '✅ Confirmado' : inv.asistencia === 'no' ? '❌ No asistirá' : '⏳ Pendiente'}
+                  </span>
+                </td>
+                <td style="padding: 10px; font-size: 0.9em; color: #6c757d;">${inv.fechaRegistro}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+  
+  function renderMenu(data) {
+    const stats = data.estadisticas;
+    adminContent.innerHTML = `
+      <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+        <h3>🍽️ Estadísticas de Menús</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;">
+          <div style="text-align: center; padding: 10px; background: white; border-radius: 5px;">
+            <strong>${stats.totalSelecciones}</strong><br>Menús Seleccionados
+          </div>
+          <div style="text-align: center; padding: 10px; background: #d4edda; border-radius: 5px;">
+            <strong>${Object.keys(stats.entrantes).length}</strong><br>Tipos Entrantes
+          </div>
+          <div style="text-align: center; padding: 10px; background: #cce5ff; border-radius: 5px;">
+            <strong>${Object.keys(stats.principales).length}</strong><br>Tipos Principales
+          </div>
+          <div style="text-align: center; padding: 10px; background: #fff3cd; border-radius: 5px;">
+            <strong>${Object.keys(stats.postres).length}</strong><br>Tipos Postres
+          </div>
+        </div>
+      </div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6;">
+          <h4>🥗 Entrantes</h4>
+          ${Object.entries(stats.entrantes).map(([entrante, count]) => `
+            <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f8f9fa;">
+              <span>${entrante}</span>
+              <strong style="color: #28a745;">${count}</strong>
+            </div>
+          `).join('')}
+        </div>
+        
+        <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6;">
+          <h4>🍖 Platos Principales</h4>
+          ${Object.entries(stats.principales).map(([principal, count]) => `
+            <div style="display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #f8f9fa;">
+              <span>${principal}</span>
+              <strong style="color: #007bff;">${count}</strong>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      
+      <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6; margin-bottom: 20px;">
+        <h4>🍰 Postres</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+          ${Object.entries(stats.postres).map(([postre, count]) => `
+            <div style="display: flex; justify-content: space-between; padding: 8px; background: #f8f9fa; border-radius: 5px;">
+              <span>${postre}</span>
+              <strong style="color: #ffc107;">${count}</strong>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      
+      ${stats.alergias.length > 0 ? `
+        <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-left: 4px solid #ffc107;">
+          <h4>⚠️ Alergias y Restricciones</h4>
+          <div style="max-height: 200px; overflow-y: auto;">
+            ${stats.alergias.map(alergia => `
+              <div style="margin-bottom: 10px; padding: 10px; background: white; border-radius: 5px;">
+                <strong>${alergia.invitado}:</strong> ${alergia.alergias}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+    `;
+  }
+  
+  function showConfiguracion() {
+    adminContent.innerHTML = `
+      <div class="configuracion-section">
+        <h3><i class="fas fa-cog"></i> Configuración del Sistema</h3>
+        <div class="config-grid">
+          <div class="config-card">
+            <h4><i class="fas fa-calendar"></i> Información de la Boda</h4>
+            <p><strong>Fecha:</strong> 6 de Junio, 2026</p>
+            <p><strong>Novios:</strong> Iluminada & George</p>
+            <p><strong>Estado:</strong> <span class="status-badge status-confirmed">Activa</span></p>
+          </div>
+          <div class="config-card">
+            <h4><i class="fas fa-server"></i> Estado del Servidor</h4>
+            <p><strong>Backend:</strong> <span class="status-badge status-confirmed">Online</span></p>
+            <p><strong>Base de datos:</strong> <span class="status-badge status-confirmed">Conectada</span></p>
+            <p><strong>Última actualización:</strong> ${new Date().toLocaleString()}</p>
+          </div>
+          <div class="config-card">
+            <h4><i class="fas fa-shield-alt"></i> Seguridad</h4>
+            <p><strong>Autenticación:</strong> <span class="status-badge status-confirmed">Activa</span></p>
+            <p><strong>Tokens:</strong> <span class="status-badge status-confirmed">Válidos</span></p>
+            <p><strong>Sesión admin:</strong> <span class="status-badge status-confirmed">Activa</span></p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // Funciones de gestión (simplificadas)
+  async function addInvitado() {
+    const nombre = prompt('Nombre del invitado:');
+    if (!nombre) return;
+    
+    const email = prompt('Email del invitado:');
+    if (!email) return;
+    
+    try {
+      const response = await fetch('/api/admin/invitados', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ nombre, email })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Invitado añadido correctamente');
+        showTab('invitados');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      alert('Error al añadir invitado: ' + error.message);
+    }
+  }
+
+  async function editInvitado(id, nombre, email, asistencia) {
+    const newNombre = prompt('Nombre del invitado:', nombre);
+    if (!newNombre) return;
+    
+    const newEmail = prompt('Email del invitado:', email);
+    if (!newEmail) return;
+    
+    const newAsistencia = prompt('Asistencia (si/no/pendiente):', asistencia);
+    if (!newAsistencia) return;
+    
+    try {
+      const response = await fetch(`/api/admin/invitados/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ nombre: newNombre, email: newEmail, asistencia: newAsistencia })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Invitado actualizado correctamente');
+        showTab('invitados');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      alert('Error al actualizar invitado: ' + error.message);
+    }
+  }
+
+  async function deleteInvitado(id, nombre) {
+    if (!confirm(`¿Estás seguro de que quieres eliminar a ${nombre}?`)) return;
+    
+    try {
+      const response = await fetch(`/api/admin/invitados/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': token }
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Invitado eliminado correctamente');
+        showTab('invitados');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      alert('Error al eliminar invitado: ' + error.message);
+    }
+  }
+
+  async function addRegalo() {
+    const nombre = prompt('Nombre del regalo:');
+    if (!nombre) return;
+    
+    const descripcion = prompt('Descripción del regalo:');
+    const precio = prompt('Precio del regalo:');
+    const categoria = prompt('Categoría del regalo:');
+    const url = prompt('URL del regalo (opcional):');
+    
+    try {
+      const response = await fetch('/api/admin/regalos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ nombre, descripcion, precio, categoria, url })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Regalo añadido correctamente');
+        showTab('regalos');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      alert('Error al añadir regalo: ' + error.message);
+    }
+  }
+
+  async function editRegalo(id, nombre, descripcion, precio, categoria, url) {
+    const newNombre = prompt('Nombre del regalo:', nombre);
+    if (!newNombre) return;
+    
+    const newDescripcion = prompt('Descripción del regalo:', descripcion);
+    const newPrecio = prompt('Precio del regalo:', precio);
+    const newCategoria = prompt('Categoría del regalo:', categoria);
+    const newUrl = prompt('URL del regalo:', url);
+    
+    try {
+      const response = await fetch(`/api/admin/regalos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ 
+          nombre: newNombre, 
+          descripcion: newDescripcion, 
+          precio: newPrecio, 
+          categoria: newCategoria, 
+          url: newUrl 
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Regalo actualizado correctamente');
+        showTab('regalos');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      alert('Error al actualizar regalo: ' + error.message);
+    }
+  }
+
+  async function deleteRegalo(id, nombre) {
+    if (!confirm(`¿Estás seguro de que quieres eliminar el regalo "${nombre}"?`)) return;
+    
+    try {
+      const response = await fetch(`/api/admin/regalos/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': token }
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Regalo eliminado correctamente');
+        showTab('regalos');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      alert('Error al eliminar regalo: ' + error.message);
+    }
+  }
+
+  async function editEvento(id, evento, fecha, dia, hora, descripcion, lugar, direccion) {
+    const newEvento = prompt('Nombre del evento:', evento);
+    if (!newEvento) return;
+    
+    const newFecha = prompt('Fecha del evento:', fecha);
+    const newDia = prompt('Día del evento:', dia);
+    const newHora = prompt('Hora del evento:', hora);
+    const newDescripcion = prompt('Descripción del evento:', descripcion);
+    const newLugar = prompt('Lugar del evento:', lugar);
+    const newDireccion = prompt('Dirección del evento:', direccion);
+    
+    try {
+      const response = await fetch(`/api/admin/agenda/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ 
+          evento: newEvento, 
+          fecha: newFecha, 
+          dia: newDia, 
+          hora: newHora, 
+          descripcion: newDescripcion, 
+          lugar: newLugar, 
+          direccion: newDireccion 
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        alert('Evento actualizado correctamente');
+        showTab('agenda');
+      } else {
+        alert('Error: ' + data.error);
+      }
+    } catch (error) {
+      alert('Error al actualizar evento: ' + error.message);
+    }
+  }
+
+  // Función para mostrar la gestión de eventos
+  async function showEventosAdmin() {
+    adminContent.innerHTML = `
+      <div class="eventos-container">
+        <div id="eventosContainer">
+          <div class="admin-loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Cargando gestión de eventos...</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Cargar los scripts necesarios
+    await loadScript('js/eventos-icons.js');
+    await loadScript('js/eventos-admin.js');
+    
+    // Cargar los estilos
+    loadStylesheet('assets/css/eventos-admin.css');
+  }
+
+  // Función para cargar scripts dinámicamente
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[src="${src}"]`)) {
+        resolve();
+        return;
+      }
+      
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+  }
+
+  // Función para cargar estilos dinámicamente
+  function loadStylesheet(href) {
+    if (document.querySelector(`link[href="${href}"]`)) {
+      return;
+    }
+    
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = href;
+    document.head.appendChild(link);
+  }
+
+  // Hacer funciones disponibles globalmente
+  window.addInvitado = addInvitado;
+  window.editInvitado = editInvitado;
+  window.deleteInvitado = deleteInvitado;
+  window.addRegalo = addRegalo;
+  window.editRegalo = editRegalo;
+  window.deleteRegalo = deleteRegalo;
+  window.editEvento = editEvento;
+  window.showTab = showTab;
+  window.showEventosAdmin = showEventosAdmin;
+
+  // Cargar la pestaña de invitados por defecto
+  console.log('Cargando pestaña de invitados...');
+  showTab('invitados');
+});

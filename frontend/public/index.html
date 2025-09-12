@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boda de Iluminada & George</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Iluminada & George</h1>
+      <p>Nos casamos</p>
+      <div class="wedding-date">
+        <i class="fas fa-calendar-alt"></i>
+        <span>6 de Junio, 2026</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-section fade-in-up">
+      <div class="hero-content">
+        <h2>¡Te invitamos a celebrar nuestro amor!</h2>
+        <p class="hero-description">
+          Después de 5 años de amor y aventuras juntos, hemos decidido dar el paso más importante de nuestras vidas. 
+          Queremos que formes parte de este momento tan especial para Iluminada y George.
+        </p>
+        <div class="countdown-container">
+          <div class="countdown-item">
+            <span class="countdown-number" id="days">00</span>
+            <span class="countdown-label">Días</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-number" id="hours">00</span>
+            <span class="countdown-label">Horas</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-number" id="minutes">00</span>
+            <span class="countdown-label">Minutos</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-number" id="seconds">00</span>
+            <span class="countdown-label">Segundos</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-section fade-in-up">
+      <div class="info-grid" id="eventosGrid">
+        <!-- Los eventos se cargarán dinámicamente aquí -->
+        <div class="info-card">
+          <div class="info-icon">
+            <i class="fas fa-spinner fa-spin"></i>
+          </div>
+          <h3>Cargando eventos...</h3>
+          <p>Por favor espera mientras cargamos la información de los eventos.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="dress-code-section fade-in-up">
+      <h3><i class="fas fa-tshirt"></i> Dress Code</h3>
+      <p>Elegante Sport</p>
+      <div class="dress-code-tips">
+        <div class="tip">
+          <i class="fas fa-check"></i>
+          <span>Traje o vestido elegante</span>
+        </div>
+        <div class="tip">
+          <i class="fas fa-check"></i>
+          <span>Colores suaves y elegantes</span>
+        </div>
+        <div class="tip">
+          <i class="fas fa-check"></i>
+          <span>Zapatos cómodos para bailar</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="actions-section fade-in-up">
+      <h3>Acceso a la web de la boda</h3>
+      <div class="button-grid">
+        <button onclick="window.location.href='login.html'" class="primary-action">
+          <i class="fas fa-user"></i>
+          Acceso con email
+        </button>
+        <button onclick="window.location.href='admin-login.html'" class="secondary-action">
+          <i class="fas fa-cog"></i>
+          Panel administrador
+        </button>
+      </div>
+    </section>
+
+    <section class="contact-section fade-in-up">
+      <h3><i class="fas fa-phone"></i> Contacto</h3>
+      <p>Si tienes alguna pregunta o necesitas información adicional, no dudes en contactar a Iluminada y George:</p>
+      <div class="contact-info">
+        <div class="contact-item">
+          <i class="fas fa-envelope"></i>
+          <span>rsvp@iluminada-y-george.com</span>
+        </div>
+        <div class="contact-item">
+          <i class="fas fa-phone"></i>
+          <span>+34 722 709 225</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2026 Boda de Iluminada & George</p>
+      <p>Hecho con <i class="fas fa-heart" style="color: #e74c3c;"></i> para celebrar nuestro amor</p>
+    </div>
+  </footer>
+
+  <script>
+    // Contador regresivo
+    function updateCountdown() {
+      const weddingDate = new Date('2026-06-06T12:00:00').getTime();
+      const now = new Date().getTime();
+      const distance = weddingDate - now;
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById('days').textContent = days.toString().padStart(2, '0');
+      document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+      document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+      document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+
+      if (distance < 0) {
+        document.querySelector('.countdown-container').innerHTML = '<h3>¡Hoy es el gran día!</h3>';
+      }
+    }
+
+    // Actualizar contador cada segundo
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // Función para cargar eventos dinámicamente
+    async function cargarEventos() {
+      try {
+        const response = await fetch('/api/agenda');
+        const eventos = await response.json();
+        
+        const eventosGrid = document.getElementById('eventosGrid');
+        
+        if (response.ok && eventos.length > 0) {
+          // Ordenar eventos por fecha y hora
+          const eventosOrdenados = eventos.sort((a, b) => {
+            const fechaA = new Date(`${a.fecha} ${a.hora}`);
+            const fechaB = new Date(`${b.fecha} ${b.hora}`);
+            return fechaA - fechaB;
+          });
+          
+          // Mostrar solo los primeros 3 eventos más importantes
+          const eventosPrincipales = eventosOrdenados.slice(0, 3);
+          
+          let eventosHTML = '';
+          
+          eventosPrincipales.forEach(evento => {
+            const icono = obtenerIconoEvento(evento.titulo);
+            eventosHTML += `
+              <div class="info-card">
+                <div class="info-icon">
+                  <i class="${icono}"></i>
+                </div>
+                <h3>${evento.titulo}</h3>
+                <p><strong>${evento.lugar}</strong></p>
+                <p>${evento.direccion}</p>
+                <p class="time">
+                  <i class="fas fa-calendar"></i> ${evento.dia}
+                </p>
+                <p class="time">
+                  <i class="fas fa-clock"></i> ${evento.hora}
+                </p>
+                ${evento.descripcion ? `<p class="evento-descripcion">${evento.descripcion}</p>` : ''}
+              </div>
+            `;
+          });
+          
+          // Agregar tarjeta de ubicación si hay eventos
+          eventosHTML += `
+            <div class="info-card">
+              <div class="info-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <h3>Ubicación</h3>
+              <p>Los eventos se celebrarán en diferentes ubicaciones de Madrid, con fácil acceso en transporte público.</p>
+              <button class="secondary" onclick="openMap()">
+                <i class="fas fa-map"></i> Ver en mapa
+              </button>
+            </div>
+          `;
+          
+          eventosGrid.innerHTML = eventosHTML;
+        } else {
+          // Mostrar eventos por defecto si no hay datos
+          eventosGrid.innerHTML = `
+            <div class="info-card">
+              <div class="info-icon">
+                <i class="fas fa-church"></i>
+              </div>
+              <h3>Ceremonia</h3>
+              <p><strong>Iglesia de San Miguel</strong></p>
+              <p>Plaza Mayor, 1</p>
+              <p>Madrid, España</p>
+              <p class="time"><i class="fas fa-clock"></i> 12:00 h</p>
+            </div>
+            
+            <div class="info-card">
+              <div class="info-icon">
+                <i class="fas fa-glass-cheers"></i>
+              </div>
+              <h3>Celebración</h3>
+              <p><strong>Palacio de los Duques</strong></p>
+              <p>Calle Gran Vía, 28</p>
+              <p>Madrid, España</p>
+              <p class="time"><i class="fas fa-clock"></i> 14:00 h</p>
+            </div>
+            
+            <div class="info-card">
+              <div class="info-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <h3>Ubicación</h3>
+              <p>Ambos eventos se celebrarán en el centro de Madrid, con fácil acceso en transporte público.</p>
+              <button class="secondary" onclick="openMap()">
+                <i class="fas fa-map"></i> Ver en mapa
+              </button>
+            </div>
+          `;
+        }
+      } catch (error) {
+        console.error('Error al cargar eventos:', error);
+        // Mostrar eventos por defecto en caso de error
+        const eventosGrid = document.getElementById('eventosGrid');
+        eventosGrid.innerHTML = `
+          <div class="info-card">
+            <div class="info-icon">
+              <i class="fas fa-church"></i>
+            </div>
+            <h3>Ceremonia</h3>
+            <p><strong>Iglesia de San Miguel</strong></p>
+            <p>Plaza Mayor, 1</p>
+            <p>Madrid, España</p>
+            <p class="time"><i class="fas fa-clock"></i> 12:00 h</p>
+          </div>
+          
+          <div class="info-card">
+            <div class="info-icon">
+              <i class="fas fa-glass-cheers"></i>
+            </div>
+            <h3>Celebración</h3>
+            <p><strong>Palacio de los Duques</strong></p>
+            <p>Calle Gran Vía, 28</p>
+            <p>Madrid, España</p>
+            <p class="time"><i class="fas fa-clock"></i> 14:00 h</p>
+          </div>
+          
+          <div class="info-card">
+            <div class="info-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h3>Ubicación</h3>
+            <p>Ambos eventos se celebrarán en el centro de Madrid, con fácil acceso en transporte público.</p>
+            <button class="secondary" onclick="openMap()">
+              <i class="fas fa-map"></i> Ver en mapa
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    // Función para obtener el icono apropiado según el tipo de evento
+    function obtenerIconoEvento(titulo) {
+      const tituloLower = titulo.toLowerCase();
+      
+      if (tituloLower.includes('ceremonia') || tituloLower.includes('iglesia')) {
+        return 'fas fa-church';
+      } else if (tituloLower.includes('cocktail') || tituloLower.includes('brindis')) {
+        return 'fas fa-glass-cheers';
+      } else if (tituloLower.includes('recepción') || tituloLower.includes('celebración') || tituloLower.includes('banquete')) {
+        return 'fas fa-utensils';
+      } else if (tituloLower.includes('brunch') || tituloLower.includes('desayuno')) {
+        return 'fas fa-coffee';
+      } else if (tituloLower.includes('fiesta') || tituloLower.includes('baile')) {
+        return 'fas fa-music';
+      } else if (tituloLower.includes('fotos') || tituloLower.includes('sesión')) {
+        return 'fas fa-camera';
+      } else {
+        return 'fas fa-calendar-alt';
+      }
+    }
+
+    // Función para abrir mapa
+    function openMap() {
+      const address = encodeURIComponent('Plaza Mayor, 1, Madrid, España');
+      window.open(`https://www.google.com/maps/search/?api=1&query=${address}`, '_blank');
+    }
+
+    // Animaciones al hacer scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observar elementos con animación
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      observer.observe(el);
+    });
+
+    // Cargar eventos dinámicamente
+    cargarEventos();
+  </script>
+</body>
+</html> 

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Agenda - Boda de Iluminada & George</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .result {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      white-space: pre-wrap;
+    }
+    input {
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test de Funcionalidad de Agenda</h1>
+  
+  <div class="test-section">
+    <h3>1. Login de Invitado</h3>
+    <input type="email" id="testEmail" placeholder="Email del invitado" value="luis@ejemplo.com">
+    <button onclick="testLogin()">Login</button>
+    <div id="loginResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>2. Obtener Agenda</h3>
+    <button onclick="testGetAgenda()">Obtener Agenda</button>
+    <div id="agendaResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>3. Obtener Confirmaciones</h3>
+    <button onclick="testGetConfirmaciones()">Obtener Confirmaciones</button>
+    <div id="confirmacionesResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>4. Confirmar Evento</h3>
+    <input type="number" id="eventoId" placeholder="ID del evento" value="1">
+    <button onclick="testConfirmarEvento(true)">Confirmar Evento</button>
+    <button onclick="testConfirmarEvento(false)">Cancelar Evento</button>
+    <div id="confirmarResult" class="result"></div>
+  </div>
+
+  <script>
+    let testToken = '';
+
+    async function testLogin() {
+      const email = document.getElementById('testEmail').value;
+      const resultDiv = document.getElementById('loginResult');
+      
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        resultDiv.textContent = `Status: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`;
+        
+        if (response.ok) {
+          testToken = data.token;
+        }
+      } catch (err) {
+        resultDiv.textContent = `Error: ${err.message}`;
+      }
+    }
+
+    async function testGetAgenda() {
+      const resultDiv = document.getElementById('agendaResult');
+      
+      try {
+        const response = await fetch('/api/agenda');
+        const data = await response.json();
+        resultDiv.textContent = `Status: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`;
+      } catch (err) {
+        resultDiv.textContent = `Error: ${err.message}`;
+      }
+    }
+
+    async function testGetConfirmaciones() {
+      const resultDiv = document.getElementById('confirmacionesResult');
+      
+      if (!testToken) {
+        resultDiv.textContent = 'Error: Primero debes hacer login';
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/agenda/confirmaciones', {
+          headers: { 'Authorization': testToken }
+        });
+        const data = await response.json();
+        resultDiv.textContent = `Status: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`;
+      } catch (err) {
+        resultDiv.textContent = `Error: ${err.message}`;
+      }
+    }
+
+    async function testConfirmarEvento(confirmar) {
+      const eventoId = document.getElementById('eventoId').value;
+      const resultDiv = document.getElementById('confirmarResult');
+      
+      if (!testToken) {
+        resultDiv.textContent = 'Error: Primero debes hacer login';
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/agenda/confirmar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': testToken
+          },
+          body: JSON.stringify({
+            eventoId: parseInt(eventoId),
+            confirmar: confirmar
+          })
+        });
+        
+        const data = await response.json();
+        resultDiv.textContent = `Status: ${response.status}\nAction: ${confirmar ? 'Confirmar' : 'Cancelar'}\nResponse: ${JSON.stringify(data, null, 2)}`;
+      } catch (err) {
+        resultDiv.textContent = `Error: ${err.message}`;
+      }
+    }
+  </script>
+</body>
+</html> 

@@ -1,0 +1,127 @@
+{
+  "entrantes": [
+    {
+      "id": "plato_1",
+      "nombre": "Ensalada de langostinos",
+      "descripcion": "Ensalada fresca con langostinos, aguacate y vinagreta de limón",
+      "alergenos": [
+        "Mariscos",
+        "Gluten"
+      ]
+    },
+    {
+      "id": "plato_2",
+      "nombre": "Sopa de melón con jamón",
+      "descripcion": "Sopa fría de melón con jamón ibérico y hierbas aromáticas",
+      "alergenos": []
+    },
+    {
+      "id": "plato_3",
+      "nombre": "Tabla de quesos variados",
+      "descripcion": "Selección de quesos artesanos con miel y frutos secos",
+      "alergenos": [
+        "Lactosa",
+        "Frutos secos"
+      ]
+    },
+    {
+      "id": "plato_1755882788744",
+      "nombre": "Tabla de Embutidos variados de Extremadura",
+      "descripcion": "Selección Gourmet de los mejores embutidos del planeta Tierra procedentes de Extremadura",
+      "alergenos": [
+        "Esto no produce alergia",
+        "la cura"
+      ]
+    }
+  ],
+  "principales": [
+    {
+      "id": "plato_4",
+      "nombre": "Solomillo de ternera",
+      "descripcion": "Solomillo de ternera a la parrilla con salsa de vino tinto y patatas",
+      "alergenos": [
+        "Gluten"
+      ]
+    },
+    {
+      "id": "plato_5",
+      "nombre": "Lubina al horno",
+      "descripcion": "Lubina fresca al horno con hierbas provenzales y verduras",
+      "alergenos": [
+        "Pescado"
+      ]
+    },
+    {
+      "id": "plato_6",
+      "nombre": "Risotto de setas",
+      "descripcion": "Risotto cremoso con setas silvestres y parmesano (vegetariano)",
+      "alergenos": [
+        "Lactosa",
+        "Gluten"
+      ]
+    },
+    {
+      "id": "plato_1756128030102",
+      "nombre": "Chuletón de Retinto Extremeño",
+      "descripcion": "Chuletón de Retinto Extremeño",
+      "alergenos": [
+        "Esto no produce alergia",
+        "la cura"
+      ]
+    }
+  ],
+  "postres": [
+    {
+      "id": "plato_7",
+      "nombre": "Tarta nupcial",
+      "descripcion": "Tarta tradicional de boda con crema pastelera y frutas",
+      "alergenos": [
+        "Gluten",
+        "Lactosa",
+        "Huevos"
+      ]
+    },
+    {
+      "id": "plato_8",
+      "nombre": "Fruta fresca",
+      "descripcion": "Selección de frutas frescas de temporada",
+      "alergenos": []
+    },
+    {
+      "id": "plato_9",
+      "nombre": "Helado artesanal",
+      "descripcion": "Helado artesanal con tres sabores a elegir",
+      "alergenos": [
+        "Lactosa"
+      ]
+    },
+    {
+      "id": "plato_1755884750593",
+      "nombre": "Bizcocho de la Vieja del Visillo",
+      "descripcion": "Bizcocho a las esencias del cotilleo del portal de la Vieja del Visillo",
+      "alergenos": [
+        "Contiene huevo"
+      ]
+    }
+  ],
+  "bebidas": [
+    {
+      "id": "plato_10",
+      "nombre": "Vino tinto",
+      "descripcion": "Vino tinto de la región con crianza de 12 meses",
+      "alergenos": []
+    },
+    {
+      "id": "plato_11",
+      "nombre": "Vino blanco",
+      "descripcion": "Vino blanco joven y fresco",
+      "alergenos": []
+    },
+    {
+      "id": "plato_12",
+      "nombre": "Agua mineral",
+      "descripcion": "Agua mineral natural con gas o sin gas",
+      "alergenos": []
+    }
+  ]
+}

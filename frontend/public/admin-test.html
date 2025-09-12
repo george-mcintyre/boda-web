@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Panel Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Panel de Administración</h1>
+    
+    <div class="test-section">
+        <h3>Test de Carga</h3>
+        <button onclick="testLoad()">Probar Carga</button>
+        <button onclick="testFetch()">Probar Fetch Invitados</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script>
+        console.log('🚀 Test Panel Admin - Script cargado');
+        
+        function testLoad() {
+            console.log('✅ Función testLoad ejecutada');
+            document.getElementById('results').innerHTML = '<p>✅ JavaScript funciona correctamente</p>';
+        }
+        
+        async function testFetch() {
+            try {
+                console.log('🔍 Probando fetch a /api/admin/invitados...');
+                const response = await fetch('/api/admin/invitados', {
+                    headers: { 'Authorization': 'test-token' }
+                });
+                console.log('📡 Respuesta:', response.status, response.statusText);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📊 Datos de invitados:', data);
+                    document.getElementById('results').innerHTML = `
+                        <h3>✅ Fetch exitoso</h3>
+                        <p>Cantidad de invitados: ${Array.isArray(data) ? data.length : 'No es array'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    document.getElementById('results').innerHTML = `
+                        <h3>❌ Error en fetch</h3>
+                        <p>Status: ${response.status}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('💥 Error:', error);
+                document.getElementById('results').innerHTML = `
+                    <h3>💥 Error en fetch</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎯 DOM cargado - Test Panel Admin');
+        });
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Confirmaciones - Boda de Iluminada & George</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    button {
+      padding: 10px 15px;
+      margin: 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .result {
+      margin-top: 10px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+    input {
+      padding: 8px;
+      margin: 5px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .confirmacion-item {
+      margin: 10px 0;
+      padding: 10px;
+      background: #e9ecef;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Test de Confirmaciones de Agenda</h1>
+  
+  <div class="test-section">
+    <h3>1. Login de Invitado</h3>
+    <input type="email" id="testEmail" placeholder="Email del invitado" value="josejimenez@example.com">
+    <button onclick="testLogin()">Login</button>
+    <div id="loginResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>2. Obtener Confirmaciones</h3>
+    <button onclick="testGetConfirmaciones()">Obtener Confirmaciones</button>
+    <div id="confirmacionesResult" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h3>3. Probar Diferentes Emails</h3>
+    <button onclick="testWithEmail('josejimenez@example.com')">José Jiménez (todas confirmadas)</button>
+    <button onclick="testWithEmail('mcl@example.com')">MCL (mixtas)</button>
+    <button onclick="testWithEmail('fbb@example.com')">FBB (ninguna confirmada)</button>
+    <div id="comparisonResult" class="result"></div>
+  </div>
+
+  <script>
+    let testToken = '';
+
+    async function testLogin() {
+      const email = document.getElementById('testEmail').value;
+      const resultDiv = document.getElementById('loginResult');
+      
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        
+        const data = await response.json();
+        resultDiv.textContent = `Status: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`;
+        
+        if (response.ok) {
+          testToken = data.token;
+        }
+      } catch (err) {
+        resultDiv.textContent = `Error: ${err.message}`;
+      }
+    }
+
+    async function testGetConfirmaciones() {
+      const resultDiv = document.getElementById('confirmacionesResult');
+      
+      if (!testToken) {
+        resultDiv.textContent = 'Error: Primero debes hacer login';
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/agenda/confirmaciones', {
+          headers: { 'Authorization': testToken }
+        });
+        const data = await response.json();
+        
+        let resultText = `Status: ${response.status}\n`;
+        resultText += `Response: ${JSON.stringify(data, null, 2)}\n\n`;
+        
+        if (data.confirmaciones) {
+          resultText += 'Confirmaciones por evento:\n';
+          Object.keys(data.confirmaciones).forEach(eventoId => {
+            const confirmado = data.confirmaciones[eventoId];
+            resultText += `Evento ${eventoId}: ${confirmado ? 'CONFIRMADO' : 'NO CONFIRMADO'}\n`;
+          });
+        }
+        
+        resultDiv.textContent = resultText;
+      } catch (err) {
+        resultDiv.textContent = `Error: ${err.message}`;
+      }
+    }
+
+    async function testWithEmail(email) {
+      const resultDiv = document.getElementById('comparisonResult');
+      
+      try {
+        // Login con el email
+        const loginResponse = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        
+        const loginData = await loginResponse.json();
+        
+        if (!loginResponse.ok) {
+          resultDiv.textContent = `Error en login con ${email}: ${loginData.error}`;
+          return;
+        }
+        
+        // Obtener confirmaciones
+        const confirmacionesResponse = await fetch('/api/agenda/confirmaciones', {
+          headers: { 'Authorization': loginData.token }
+        });
+        
+        const confirmacionesData = await confirmacionesResponse.json();
+        
+        let resultText = `=== ${email} ===\n`;
+        resultText += `Token: ${loginData.token.substring(0, 20)}...\n`;
+        resultText += `Confirmaciones: ${JSON.stringify(confirmacionesData.confirmaciones, null, 2)}\n\n`;
+        
+        if (confirmacionesData.confirmaciones) {
+          resultText += 'Estado de eventos:\n';
+          Object.keys(confirmacionesData.confirmaciones).forEach(eventoId => {
+            const confirmado = confirmacionesData.confirmaciones[eventoId];
+            resultText += `  Evento ${eventoId}: ${confirmado ? '✅ CONFIRMADO' : '❌ NO CONFIRMADO'}\n`;
+          });
+        }
+        
+        resultDiv.textContent = resultText;
+      } catch (err) {
+        resultDiv.textContent = `Error con ${email}: ${err.message}`;
+      }
+    }
+  </script>
+</body>
+</html>

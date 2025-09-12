@@ -1,0 +1,3588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="wedding:admin.title">Panel de Administración - Boda de Iluminada & George</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/i18n-selector.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      /* Estilos para el sistema de pestañas */
+      .tabs-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: var(--white);
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+      }
+      
+      .tabs-header {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+        border-bottom: 2px solid var(--accent-color);
+        background: var(--white);
+        border-radius: 15px 15px 0 0;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
+      
+      .tab-btn {
+        flex: 1;
+        padding: 20px 30px;
+        border: none;
+        background: transparent;
+        color: var(--text-light);
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        position: relative;
+      }
+      
+      .tab-btn:hover {
+        background: var(--accent-color);
+        color: var(--primary-color);
+      }
+      
+      .tab-btn.active {
+        background: var(--gradient-primary);
+        color: var(--white);
+        box-shadow: 0 4px 15px rgba(139, 90, 150, 0.3);
+      }
+      
+      .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--white);
+      }
+      
+      .tab-btn i {
+        font-size: 1.1em;
+      }
+      
+      /* Variables CSS para colores */
+      :root {
+        --primary-color: #8B5A96;
+        --secondary-color: #D4A5A5;
+        --accent-color: #F4E4D6;
+        --text-color: #333;
+        --text-light: #6c757d;
+        --white: #ffffff;
+        --gradient-primary: linear-gradient(135deg, #8B5A96 0%, #D4A5A5 100%);
+      }
+
+      /* Header con el mismo estilo que la página de invitados */
+      header {
+        background: var(--gradient-primary);
+        color: var(--white);
+        text-align: center;
+        padding: 3rem 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
+      }
+      
+      /* Estilos para el contenido del admin */
+      main {
+        margin-top: 20px;
+      }
+      
+      #adminContent {
+        padding: 30px;
+        background: var(--white);
+        border-radius: 0 0 15px 15px;
+      }
+      
+      .admin-section {
+        background: var(--white);
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+      }
+      
+      .admin-header {
+        padding: 20px 30px;
+        border-bottom: 1px solid var(--accent-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+      }
+      
+      .admin-welcome {
+        flex: 1;
+        text-align: center;
+      }
+      
+      .admin-welcome h2 {
+        margin: 0 0 10px 0;
+        color: var(--primary-color);
+        font-size: 1.8em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      
+      .admin-welcome p {
+        margin: 0;
+        color: var(--text-light);
+        font-size: 1em;
+      }
+      
+      #logoutAdmin {
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      
+      .admin-header-section {
+        padding: 20px 30px;
+        border-bottom: 1px solid var(--accent-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .admin-actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      
+      .admin-header-section h3 {
+        margin: 0;
+        color: var(--primary-color);
+        font-size: 1.3em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .admin-loading {
+        text-align: center;
+        padding: 50px;
+        color: var(--text-light);
+      }
+      
+      .admin-loading i {
+        font-size: 2em;
+        margin-bottom: 15px;
+        color: var(--primary-color);
+      }
+
+      /* Estilos para tablas */
+      .admin-table-container {
+        padding: 20px 30px;
+        overflow-x: auto;
+      }
+
+      .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+      }
+
+      .admin-table th,
+      .admin-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--accent-color);
+      }
+
+      .admin-table th {
+        background: var(--accent-color);
+        font-weight: 600;
+        color: var(--primary-color);
+      }
+
+      .admin-table tr:hover {
+        background: rgba(139, 90, 150, 0.05);
+      }
+
+      /* Estilos para botones */
+      .admin-action {
+        background: var(--gradient-primary);
+        color: var(--white);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .admin-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(139, 90, 150, 0.3);
+      }
+
+      .admin-action.small {
+        padding: 6px 12px;
+        font-size: 0.9em;
+      }
+
+      .admin-action.danger {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+      }
+
+      /* Estilos para badges de estado */
+      .status-badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: 600;
+      }
+
+      .status-confirmed {
+        background: rgba(76, 175, 80, 0.1);
+        color: #4caf50;
+      }
+
+      .status-cancelled {
+        background: rgba(220, 53, 69, 0.1);
+        color: #dc3545;
+      }
+
+      .status-pending {
+        background: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+      }
+
+      /* Estilos para mensajes */
+      .message-card {
+        background: var(--white);
+        border: 1px solid var(--accent-color);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+      }
+
+      .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+        color: var(--text-light);
+        font-size: 0.9em;
+      }
+
+      .message-content {
+        color: var(--text-color);
+        line-height: 1.6;
+      }
+
+      /* Estilos para platos */
+      
+      /* ===== ESTILOS PARA CONTROL DE BLOQUEO DE AGENDA ===== */
+      
+      .agenda-controls {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+      }
+      
+      .bloqueo-section {
+        border-bottom: 1px solid #e9ecef;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+      }
+      
+      .bloqueo-section h4 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .bloqueo-status {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+      }
+      
+      .status-label {
+        font-weight: 600;
+        color: var(--text-color);
+      }
+      
+      .status-value {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .status-value.bloqueada {
+        background: #ff6b6b;
+        color: white;
+      }
+      
+      .status-value.desbloqueada {
+        background: #28a745;
+        color: white;
+      }
+      
+      .bloqueo-info {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+      
+      .bloqueo-info p {
+        margin: 0.25rem 0;
+        font-size: 0.9rem;
+        color: #856404;
+      }
+      
+      .bloqueo-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+      
+      .btn-bloquear {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .btn-bloquear:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+      }
+      
+      .btn-desbloquear {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .btn-desbloquear:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.3);
+      }
+      
+      .form-help {
+        background: #e3f2fd;
+        border: 1px solid #bbdefb;
+        border-radius: 6px;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: #1976d2;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      
+      .form-help i {
+        color: #2196f3;
+      }
+
+      /* Estilos para regalos en efectivo */
+      .cash-gifts-cell {
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      .cash-gifts-loading {
+        color: var(--text-light);
+        font-size: 0.9em;
+      }
+
+      .no-gifts {
+        color: var(--text-light);
+        font-style: italic;
+        font-size: 0.9em;
+      }
+
+      .cash-gifts-summary {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .gift-amount {
+        font-weight: 700;
+        color: var(--primary-color);
+        font-size: 1.1em;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .gift-count {
+        font-size: 0.8em;
+        color: var(--text-light);
+      }
+
+      .view-details-btn {
+        background: var(--accent-color);
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        color: var(--primary-color);
+        cursor: pointer;
+        font-size: 0.8em;
+        transition: all 0.2s ease;
+      }
+
+      .view-details-btn:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: scale(1.1);
+      }
+      .menu-category {
+        margin-bottom: 30px;
+      }
+      
+      .menu-category h4 {
+        color: var(--primary-color);
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--accent-color);
+      }
+      
+      .dishes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      
+      .dish-card {
+        background: var(--white);
+        border: 1px solid var(--accent-color);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease;
+      }
+      
+      .dish-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      }
+      
+      .dish-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      
+      .dish-header h5 {
+        margin: 0;
+        color: var(--primary-color);
+        font-size: 1.1em;
+      }
+      
+
+      
+      .dish-description {
+        color: var(--text-color);
+        margin-bottom: 10px;
+        line-height: 1.5;
+      }
+      
+      .dish-allergens {
+        background: rgba(255, 193, 7, 0.1);
+        border: 1px solid rgba(255, 193, 7, 0.3);
+        border-radius: 6px;
+        padding: 8px;
+        margin-bottom: 15px;
+      }
+      
+      .dish-allergens small {
+        color: #856404;
+      }
+      
+      .dish-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+      
+      .no-dishes {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-light);
+      }
+      
+      .no-dishes i {
+        font-size: 3em;
+        margin-bottom: 15px;
+        opacity: 0.5;
+      }
+
+      /* Estilos para eventos */
+      .evento-card {
+        background: var(--white);
+        border: 1px solid var(--accent-color);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+      }
+
+      .evento-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .evento-header h4 {
+        margin: 0;
+        color: var(--primary-color);
+      }
+
+      .evento-fecha {
+        color: var(--text-light);
+        font-size: 0.9em;
+      }
+
+      .evento-content p {
+        margin: 5px 0;
+        color: var(--text-color);
+      }
+
+      /* Estilos para configuración */
+      .config-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 20px 30px;
+      }
+
+      .config-card {
+        background: var(--white);
+        border: 1px solid var(--accent-color);
+        border-radius: 10px;
+        padding: 20px;
+      }
+
+      .config-card h4 {
+        margin: 0 0 15px 0;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .config-card p {
+        margin: 8px 0;
+        color: var(--text-color);
+      }
+
+      /* Estilos para estadísticas de menú */
+      .menu-stats {
+        padding: 20px 30px;
+      }
+
+      .menu-stats h4 {
+        color: var(--primary-color);
+        margin-bottom: 15px;
+      }
+
+      .menu-stats p {
+        color: var(--text-color);
+        font-size: 1.1em;
+      }
+
+      /* Estilos para resumen de menú */
+      .menu-summary {
+        font-size: 0.85em;
+        color: var(--text-light);
+      }
+      
+      /* Estilos para resumen de asistencia */
+      .attendance-summary {
+        font-size: 0.85em;
+        color: var(--text-light);
+      }
+      
+      .event-attendance {
+        display: block;
+        margin-bottom: 3px;
+        padding: 2px 6px;
+        background: rgba(139, 90, 150, 0.1);
+        border-radius: 4px;
+        border-left: 3px solid var(--primary-color);
+      }
+      
+      .event-attendance i {
+        color: var(--primary-color);
+        margin-right: 4px;
+      }
+      
+      .no-events {
+        font-size: 0.85em;
+        color: var(--text-light);
+        font-style: italic;
+      }
+      
+      .no-events i {
+        color: #6c757d;
+        margin-right: 4px;
+      }
+
+      /* Estilos para mensajes de error */
+      .message.error {
+        background: rgba(220, 53, 69, 0.1);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px;
+        text-align: center;
+      }
+
+      .message.error h3 {
+        color: #dc3545;
+        margin-bottom: 10px;
+      }
+
+      .message.error p {
+        color: var(--text-color);
+        margin: 5px 0;
+      }
+
+      .submit-btn {
+        background: var(--gradient-primary);
+        color: var(--white);
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        margin-top: 15px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      /* Estilos para el modal de añadir invitados */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: modalSlideIn 0.3s ease-out;
+      }
+
+      .image-selector {
+        margin-top: 10px;
+      }
+
+      .image-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        max-height: 500px;
+        overflow-y: auto;
+        border: 2px solid #e1e5e9;
+        border-radius: 8px;
+        padding: 15px;
+      }
+
+      .image-option {
+        position: relative;
+        cursor: pointer;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 3px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .image-option:hover {
+        border-color: var(--primary-color);
+        transform: scale(1.05);
+      }
+
+      .image-option.selected {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(139, 90, 150, 0.3);
+      }
+
+      .image-option img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+        display: block;
+        border-radius: 6px;
+      }
+
+      .image-option .image-label {
+        display: none;
+      }
+
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-50px) scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e0e0e0;
+        background: var(--gradient-primary);
+        color: white;
+        border-radius: 12px 12px 0 0;
+      }
+
+      .modal-header h3 {
+        margin: 0;
+        font-size: 1.3rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 50%;
+        transition: background-color 0.3s ease;
+      }
+
+      .modal-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .modal-body {
+        padding: 1.5rem;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.8rem;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        box-sizing: border-box;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(139, 90, 150, 0.1);
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+      }
+
+      .btn-primary {
+        background: var(--gradient-primary);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(139, 90, 150, 0.3);
+      }
+
+      .btn-secondary {
+        background: #f5f5f5;
+        color: var(--text-color);
+        border: 2px solid #e0e0e0;
+      }
+
+      .btn-secondary:hover {
+        background: #e0e0e0;
+        transform: translateY(-2px);
+      }
+
+      /* Responsive para el modal */
+      @media (max-width: 768px) {
+        .modal-content {
+          width: 95%;
+          margin: 1rem;
+        }
+        
+        .modal-header {
+          padding: 1rem;
+        }
+        
+        .modal-body {
+          padding: 1rem;
+        }
+        
+        .form-actions {
+          flex-direction: column;
+        }
+        
+        .btn-primary,
+        .btn-secondary {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      /* Estilos para el header con selector de idiomas */
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
+        position: relative;
+        z-index: 10;
+      }
+      
+      .header-left {
+        flex: 1;
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      
+      /* Estilos para el selector de idiomas */
+      .language-selector {
+        position: relative;
+        z-index: 1000;
+      }
+
+      /* Estilos para el botón de acceso a invitados */
+      .guests-access-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        font-size: 18px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      .guests-access-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .guests-access-btn:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+      }
+      
+      .language-selector-wrapper {
+        position: relative;
+      }
+      
+      .language-selector-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+      
+      .language-selector-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+        min-width: 120px;
+      }
+      
+      .language-selector-toggle:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      
+      .language-selector-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 8px;
+        background: white;
+        border: 1px solid #e1e5e9;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+        backdrop-filter: blur(20px);
+        min-width: 160px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1001;
+        overflow: hidden;
+      }
+      
+      .language-selector-menu.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      
+      .language-option {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: #333;
+        font-size: 14px;
+        font-weight: 500;
+        border-bottom: 1px solid #f5f5f5;
+      }
+      
+      .language-option:last-child {
+        border-bottom: none;
+      }
+      
+      .language-option:hover {
+        background: #f8f9fa;
+        color: #007bff;
+      }
+      
+      .language-option.active {
+        background: #e3f2fd;
+        color: #1976d2;
+        font-weight: 600;
+      }
+    </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <a href="index-i18n-fixed.html" class="home-link">
+          <i class="fas fa-home"></i>
+          <span data-i18n="wedding:admin.home">Inicio</span>
+        </a>
+        <h1 data-i18n="wedding:admin.title">Panel de Administración</h1>
+      </div>
+      <div class="header-right">
+        <div class="language-selector">
+          <div class="language-selector-wrapper">
+            <div class="language-selector-dropdown">
+              <button class="language-selector-toggle" id="language-toggle" aria-label="Select language">
+                <span class="current-language">
+                  <span class="flag">🇪🇸</span>
+                  <span class="name">Español</span>
+                </span>
+                <i class="fas fa-chevron-down"></i>
+              </button>
+              <div class="language-selector-menu" id="language-menu">
+                <button class="language-option active" data-lang="es">
+                  <span class="flag">🇪🇸</span>
+                  <span class="name">Español</span>
+                </button>
+                <button class="language-option" data-lang="en">
+                  <span class="flag">🇬🇧</span>
+                  <span class="name">English</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <a href="login-i18n.html" class="guests-access-btn" title="Acceso para invitados" aria-label="Acceso para invitados">
+          <i class="fas fa-user"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="adminPanelSection">
+      <div class="admin-header">
+        <div class="admin-welcome">
+          <h2><i class="fas fa-user-shield"></i> <span data-i18n="wedding:admin.welcome">Bienvenido, Administrador</span></h2>
+          <p data-i18n="wedding:admin.welcomeMessage">Gestiona toda la información de la boda de Iluminada y George</p>
+        </div>
+        <button id="logoutAdmin" class="admin-action">
+          <i class="fas fa-sign-out-alt"></i>
+          <span data-i18n="wedding:admin.logout">Cerrar sesión</span>
+        </button>
+      </div>
+      
+      <!-- Sistema de pestañas -->
+      <div class="tabs-container">
+        <div class="tabs-header">
+          <button class="tab-btn active" data-tab="invitados">
+            <i class="fas fa-users"></i>
+            <span data-i18n="wedding:admin.guests">Invitados</span>
+          </button>
+          <button class="tab-btn" data-tab="agenda">
+            <i class="fas fa-calendar-alt"></i>
+            <span data-i18n="wedding:admin.agenda">Agenda de Eventos</span>
+          </button>
+          <button class="tab-btn" data-tab="menu">
+            <i class="fas fa-utensils"></i>
+            <span data-i18n="wedding:admin.menu">Gestión de Menús</span>
+          </button>
+          <button class="tab-btn" data-tab="efectivo">
+            <i class="fas fa-money-bill-wave"></i>
+            <span data-i18n="wedding:admin.cashGifts">Regalos</span>
+          </button>
+          <button class="tab-btn" data-tab="comentarios">
+            <i class="fas fa-comment-dots"></i>
+            <span data-i18n="wedding:admin.comments">Comentarios</span>
+          </button>
+        </div>
+        
+        <div id="adminContent">
+          <div class="admin-loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p data-i18n="wedding:admin.loading">Cargando panel de administración...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2026 Boda de Iluminada & George</p>
+      <p data-i18n="wedding:admin.title">Panel de administración</p>
+    </div>
+  </footer>
+
+  <!-- Scripts del sistema i18n -->
+  <script src="js/i18n-common.js"></script>
+  
+  <script>
+    // Traducciones específicas del admin
+    const adminTranslations = {
+      es: {
+        "wedding:admin.title": "Panel de Administración",
+        "wedding:admin.welcome": "Bienvenido, Administrador",
+        "wedding:admin.welcomeMessage": "Gestiona toda la información de la boda de Iluminada y George",
+        "wedding:admin.guests": "Invitados",
+        "wedding:admin.gifts": "Lista de Regalos",
+        "wedding:admin.messages": "Mensajes",
+        "wedding:admin.comments": "Comentarios",
+        "wedding:admin.cashGifts": "Regalos",
+        "wedding:admin.addCard": "Agregar Tarjeta",
+        "wedding:admin.agenda": "Agenda de Eventos",
+        "wedding:admin.menu": "Gestión de Menús",
+
+        "wedding:admin.logout": "Cerrar sesión",
+        "wedding:admin.home": "Inicio",
+        "wedding:admin.accessGuests": "Acceso Invitados",
+        "wedding:admin.loading": "Cargando panel de administración...",
+        "wedding:admin.loadingGeneric": "Cargando...",
+        "wedding:admin.guestsList": "Lista de Invitados",
+        "wedding:admin.addGuest": "Añadir Invitado",
+        "wedding:admin.giftsList": "Lista de Regalos",
+        "wedding:admin.addGift": "Añadir Regalo",
+        "wedding:admin.guestMessages": "Mensajes de Invitados",
+        "wedding:admin.guestComments": "Comentarios de Invitados",
+        "wedding:admin.eventSchedule": "Agenda de Eventos",
+        "wedding:admin.menuManagement": "Gestión de Menús",
+
+        "wedding:admin.name": "Nombre",
+        "wedding:admin.email": "Email",
+        "wedding:admin.attendance": "Asistencia",
+        "wedding:admin.menu": "Menú",
+        "wedding:admin.cashGifts": "Regalos",
+        "wedding:admin.actions": "Acciones",
+        "wedding:admin.description": "Descripción",
+        "wedding:admin.price": "Precio",
+        "wedding:admin.category": "Categoría",
+        "wedding:admin.confirmed": "✅ Confirmado",
+        "wedding:admin.notAttending": "❌ No asistirá",
+        "wedding:admin.pending": "⏳ Pendiente",
+        "wedding:admin.notSelected": "No seleccionado",
+        "wedding:admin.edit": "Editar",
+        "wedding:admin.delete": "Eliminar",
+        "wedding:admin.date": "Fecha",
+        "wedding:admin.location": "Lugar",
+        "wedding:admin.address": "Dirección",
+        "wedding:admin.menuStats": "Estadísticas de Selección de Menús",
+        "wedding:admin.totalMenuSelections": "Total de invitados con menú seleccionado",
+
+
+
+
+        "wedding:admin.active": "Activa",
+
+
+        "wedding:admin.connectionError": "Error de conexión",
+        "wedding:admin.serverConnectionError": "No se pudo conectar con el servidor",
+        "wedding:admin.details": "Detalles",
+        "wedding:admin.retry": "Reintentar",
+        "wedding:admin.loadDataError": "Error al cargar los datos",
+        "wedding:admin.unknownError": "Error desconocido",
+        "wedding:admin.errorCode": "Código de error",
+        "wedding:admin.tabNotImplemented": "Pestaña no implementada",
+        "wedding:admin.confirmDeleteGuest": "¿Estás seguro de eliminar a",
+        "wedding:admin.confirmDeleteGift": "¿Estás seguro de eliminar este regalo?",
+        "wedding:admin.functionInDevelopment": "Función en desarrollo",
+        "wedding:admin.eventSchedule": "Agenda de Eventos",
+        "wedding:admin.addEvent": "Agregar Evento",
+        "wedding:admin.event": "Evento",
+        "wedding:admin.time": "Hora",
+        "wedding:admin.confirmDeleteEvent": "¿Estás seguro de que quieres eliminar este evento?",
+        "wedding:admin.eventDeleted": "Evento eliminado correctamente",
+        "wedding:admin.eventUpdated": "Evento actualizado correctamente",
+        "wedding:admin.eventAdded": "Evento agregado correctamente",
+        "wedding:admin.errorLoadingEvent": "Error al cargar el evento",
+        "wedding:admin.errorDeletingEvent": "Error al eliminar el evento",
+        "wedding:admin.errorSavingEvent": "Error al guardar el evento",
+        "wedding:admin.addEventTitle": "Agregar Evento",
+        "wedding:admin.editEventTitle": "Editar Evento",
+        "wedding:admin.eventDate": "Fecha (YYYY-MM-DD):",
+        "wedding:admin.eventTime": "Hora:",
+        "wedding:admin.eventTitle": "Título del Evento:",
+        "wedding:admin.eventDescription": "Descripción:",
+        "wedding:admin.eventLocation": "Lugar:",
+        "wedding:admin.eventAddress": "Dirección:",
+        "wedding:admin.cancel": "Cancelar",
+        "wedding:admin.save": "Guardar",
+        "wedding:admin.addGuestTitle": "Añadir Nuevo Invitado",
+        "wedding:admin.fullName": "Nombre completo",
+        "wedding:admin.phone": "Teléfono",
+        "wedding:admin.attendanceStatus": "Estado de asistencia",
+        "wedding:admin.companions": "Número de acompañantes",
+        "wedding:admin.notes": "Notas adicionales",
+        "wedding:admin.notesPlaceholder": "Alergias, preferencias especiales, etc.",
+        "wedding:admin.saveGuest": "Guardar Invitado",
+        "wedding:admin.requiredFieldsError": "Por favor, completa todos los campos obligatorios",
+        "wedding:admin.invalidEmailError": "Por favor, introduce una dirección de email válida",
+        "wedding:admin.authError": "Error de autenticación",
+        "wedding:admin.duplicateEmailError": "Ya existe un invitado con este email",
+        "wedding:admin.addGuestError": "Error al añadir el invitado",
+        "wedding:admin.guestAddedSuccess": "Invitado añadido correctamente",
+        "wedding:admin.editGuestTitle": "Editar Invitado",
+        "wedding:admin.updateGuest": "Actualizar Invitado",
+        "wedding:admin.guestUpdatedSuccess": "Invitado actualizado correctamente",
+        "wedding:admin.deleteGuestConfirm": "¿Estás seguro de que quieres eliminar este invitado?",
+        "wedding:admin.guestDeletedSuccess": "Invitado eliminado correctamente",
+        "wedding:admin.errorUpdatingGuest": "Error al actualizar el invitado",
+        "wedding:admin.errorDeletingGuest": "Error al eliminar el invitado",
+        "wedding:admin.addDishTitle": "Añadir Plato",
+        "wedding:admin.editDishTitle": "Editar Plato",
+        "wedding:admin.dishName": "Nombre del Plato",
+        "wedding:admin.dishDescription": "Descripción",
+        "wedding:admin.dishCategory": "Categoría",
+
+        "wedding:admin.dishAllergens": "Alérgenos",
+        "wedding:admin.addDish": "Añadir Plato",
+        "wedding:admin.updateDish": "Actualizar Plato",
+        "wedding:admin.dishAddedSuccess": "Plato añadido correctamente",
+        "wedding:admin.dishUpdatedSuccess": "Plato actualizado correctamente",
+        "wedding:admin.dishDeletedSuccess": "Plato eliminado correctamente",
+        "wedding:admin.deleteDishConfirm": "¿Estás seguro de que quieres eliminar este plato?",
+        "wedding:admin.errorAddingDish": "Error al añadir el plato",
+        "wedding:admin.errorUpdatingDish": "Error al actualizar el plato",
+        "wedding:admin.errorDeletingDish": "Error al eliminar el plato",
+        "wedding:admin.entrantes": "Entrantes",
+        "wedding:admin.principales": "Platos Principales",
+        "wedding:admin.postres": "Postres",
+        "wedding:admin.bebidas": "Bebidas",
+        "wedding:admin.connectionError": "Error de conexión",
+        "wedding:admin.noEventsConfirmed": "Sin eventos confirmados"
+      },
+      en: {
+        "wedding:admin.title": "Administration Panel",
+        "wedding:admin.welcome": "Welcome, Administrator",
+        "wedding:admin.welcomeMessage": "Manage all the information for Iluminada and George's wedding",
+        "wedding:admin.guests": "Guests",
+        "wedding:admin.gifts": "Gift Registry",
+        "wedding:admin.comments": "Comments",
+        "wedding:admin.cashGifts": "Cash Gifts",
+        "wedding:admin.addCard": "Add Card",
+        "wedding:admin.messages": "Messages",
+        "wedding:admin.agenda": "Event Schedule",
+        "wedding:admin.menu": "Menu Management",
+        "wedding:admin.settings": "Settings",
+        "wedding:admin.logout": "Logout",
+        "wedding:admin.home": "Home",
+        "wedding:admin.accessGuests": "Guest Access",
+        "wedding:admin.loading": "Loading administration panel...",
+        "wedding:admin.loadingGeneric": "Loading...",
+        "wedding:admin.guestsList": "Guest List",
+        "wedding:admin.addGuest": "Add Guest",
+        "wedding:admin.giftsList": "Gift List",
+        "wedding:admin.addGift": "Add Gift",
+        "wedding:admin.guestMessages": "Guest Messages",
+        "wedding:admin.eventSchedule": "Event Schedule",
+        "wedding:admin.menuManagement": "Menu Management",
+        "wedding:admin.systemConfig": "System Configuration",
+        "wedding:admin.name": "Name",
+        "wedding:admin.email": "Email",
+        "wedding:admin.attendance": "Attendance",
+        "wedding:admin.menu": "Menu",
+        "wedding:admin.cashGifts": "Cash Gifts",
+        "wedding:admin.actions": "Actions",
+        "wedding:admin.description": "Description",
+        "wedding:admin.price": "Price",
+        "wedding:admin.category": "Category",
+        "wedding:admin.confirmed": "✅ Confirmed",
+        "wedding:admin.notAttending": "❌ Not attending",
+        "wedding:admin.pending": "⏳ Pending",
+        "wedding:admin.notSelected": "Not selected",
+        "wedding:admin.edit": "Edit",
+        "wedding:admin.delete": "Delete",
+        "wedding:admin.date": "Date",
+        "wedding:admin.location": "Location",
+        "wedding:admin.address": "Address",
+        "wedding:admin.menuStats": "Menu Selection Statistics",
+        "wedding:admin.totalMenuSelections": "Total guests with menu selection",
+
+
+        "wedding:admin.connectionError": "Connection error",
+        "wedding:admin.serverConnectionError": "Could not connect to server",
+        "wedding:admin.details": "Details",
+        "wedding:admin.retry": "Retry",
+        "wedding:admin.loadDataError": "Error loading data",
+        "wedding:admin.unknownError": "Unknown error",
+        "wedding:admin.errorCode": "Error code",
+        "wedding:admin.tabNotImplemented": "Tab not implemented",
+        "wedding:admin.confirmDeleteGuest": "Are you sure you want to delete",
+        "wedding:admin.confirmDeleteGift": "Are you sure you want to delete this gift?",
+        "wedding:admin.functionInDevelopment": "Function in development",
+        "wedding:admin.eventSchedule": "Event Schedule",
+        "wedding:admin.addEvent": "Add Event",
+        "wedding:admin.event": "Event",
+        "wedding:admin.time": "Time",
+        "wedding:admin.confirmDeleteEvent": "Are you sure you want to delete this event?",
+        "wedding:admin.eventDeleted": "Event deleted successfully",
+        "wedding:admin.eventUpdated": "Event updated successfully",
+        "wedding:admin.eventAdded": "Event added successfully",
+        "wedding:admin.errorLoadingEvent": "Error loading event",
+        "wedding:admin.errorDeletingEvent": "Error deleting event",
+        "wedding:admin.errorSavingEvent": "Error saving event",
+        "wedding:admin.addEventTitle": "Add Event",
+        "wedding:admin.editEventTitle": "Edit Event",
+        "wedding:admin.eventDate": "Date (YYYY-MM-DD):",
+        "wedding:admin.eventTime": "Time:",
+        "wedding:admin.eventTitle": "Event Title:",
+        "wedding:admin.eventDescription": "Description:",
+        "wedding:admin.eventLocation": "Location:",
+        "wedding:admin.eventAddress": "Address:",
+        "wedding:admin.cancel": "Cancel",
+        "wedding:admin.save": "Save",
+        "wedding:admin.addGuestTitle": "Add New Guest",
+        "wedding:admin.fullName": "Full name",
+        "wedding:admin.phone": "Phone",
+        "wedding:admin.attendanceStatus": "Attendance status",
+        "wedding:admin.companions": "Number of companions",
+        "wedding:admin.notes": "Additional notes",
+        "wedding:admin.notesPlaceholder": "Allergies, special preferences, etc.",
+        "wedding:admin.saveGuest": "Save Guest",
+        "wedding:admin.requiredFieldsError": "Please fill in all required fields",
+        "wedding:admin.invalidEmailError": "Please enter a valid email address",
+        "wedding:admin.authError": "Authentication error",
+        "wedding:admin.duplicateEmailError": "A guest with this email already exists",
+        "wedding:admin.addGuestError": "Error adding guest",
+        "wedding:admin.guestAddedSuccess": "Guest added successfully",
+        "wedding:admin.connectionError": "Connection error",
+        "wedding:admin.noEventsConfirmed": "No events confirmed"
+      },
+      fr: {
+        "wedding:admin.title": "Panneau d'Administration",
+        "wedding:admin.welcome": "Bienvenue, Administrateur",
+        "wedding:admin.welcomeMessage": "Gérez toutes les informations du mariage d'Iluminada et George",
+        "wedding:admin.guests": "Invités",
+        "wedding:admin.gifts": "Liste de Cadeaux",
+        "wedding:admin.comments": "Commentaires",
+        "wedding:admin.cashGifts": "Cadeaux en Espèces",
+        "wedding:admin.addCard": "Ajouter une Carte",
+        "wedding:admin.messages": "Messages",
+        "wedding:admin.agenda": "Programme des Événements",
+        "wedding:admin.menu": "Gestion des Menus",
+        "wedding:admin.settings": "Paramètres",
+        "wedding:admin.logout": "Se déconnecter",
+        "wedding:admin.home": "Accueil",
+        "wedding:admin.accessGuests": "Accès Invités",
+        "wedding:admin.loading": "Chargement du panneau d'administration...",
+        "wedding:admin.loadingGeneric": "Chargement...",
+        "wedding:admin.guestsList": "Liste des Invités",
+        "wedding:admin.addGuest": "Ajouter un Invité",
+        "wedding:admin.giftsList": "Liste de Cadeaux",
+        "wedding:admin.addGift": "Ajouter un Cadeau",
+        "wedding:admin.guestMessages": "Messages des Invités",
+        "wedding:admin.eventSchedule": "Programme des Événements",
+        "wedding:admin.noEventsConfirmed": "Aucun événement confirmé"
+      }
+    };
+
+    // Inicializar el sistema i18n
+    const i18n = new I18nSystem(adminTranslations);
+
+    // Función para cambiar idioma
+    window.changeLanguage = async (lang) => {
+      const success = await i18n.changeLanguage(lang);
+      if (success) {
+        // Actualizar el formulario si está abierto
+        updateModalContent();
+      }
+    };
+
+    // Función para actualizar el contenido del modal si está abierto
+    function updateModalContent() {
+      const modal = document.querySelector('.modal-overlay');
+      if (modal) {
+        const modalContent = modal.querySelector('.modal-content');
+        if (modalContent) {
+          // Actualizar el título
+          const title = modalContent.querySelector('h3');
+          if (title) {
+            title.innerHTML = `<i class="fas fa-user-plus"></i> ${i18n.translate('wedding:admin.addGuestTitle')}`;
+          }
+          
+          // Actualizar las etiquetas
+          const labels = modalContent.querySelectorAll('label');
+          labels.forEach(label => {
+            const forAttr = label.getAttribute('for');
+            if (forAttr === 'nombre') {
+              label.textContent = `${i18n.translate('wedding:admin.fullName')} *`;
+            } else if (forAttr === 'email') {
+              label.textContent = `${i18n.translate('wedding:admin.email')} *`;
+                        } else if (forAttr === 'telefono') {
+              label.textContent = i18n.translate('wedding:admin.phone');
+            }
+          });
+          
+
+          
+          // Actualizar el placeholder del textarea
+          const textarea = modalContent.querySelector('#notas');
+          if (textarea) {
+            textarea.placeholder = i18n.translate('wedding:admin.notesPlaceholder');
+          }
+          
+          // Actualizar los botones
+          const cancelBtn = modalContent.querySelector('.btn-secondary');
+          if (cancelBtn) {
+            cancelBtn.textContent = i18n.translate('wedding:admin.cancel');
+          }
+          
+          const saveBtn = modalContent.querySelector('.btn-primary');
+          if (saveBtn) {
+            saveBtn.innerHTML = `<i class="fas fa-save"></i> ${i18n.translate('wedding:admin.saveGuest')}`;
+          }
+        }
+      }
+    }
+
+            // Panel de administración con i18n
+        document.addEventListener('DOMContentLoaded', () => {
+          console.log('🚀 Panel de administración cargando...');
+          console.log('🚀 Script admin-i18n.html iniciado');
+      
+      const logoutBtn = document.getElementById('logoutAdmin');
+      const adminContent = document.getElementById('adminContent');
+      const adminTabs = document.querySelectorAll('.tab-btn');
+
+      // Verificar autenticación
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        console.log('No hay token, redirigiendo al login');
+        window.location.href = 'admin-login.html';
+        return;
+      }
+
+      console.log('Token encontrado:', token);
+
+      // Logout
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('adminToken');
+        window.location.href = 'admin-login.html';
+      });
+
+              // Tabs
+        adminTabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            const tabName = tab.getAttribute('data-tab');
+            console.log('🖱️ Click en pestaña:', tabName);
+            console.log('🖱️ Elemento clickeado:', tab);
+            console.log('🖱️ Data-tab attribute:', tab.getAttribute('data-tab'));
+            console.log('🖱️ Pestaña ya activa:', tab.classList.contains('active'));
+            
+            // Siempre ejecutar showTab, incluso si la pestaña ya está activa
+            showTab(tabName);
+          });
+        });
+
+      // Función principal para mostrar pestañas
+      async function showTab(tab) {
+        console.log('🚀 showTab() ejecutándose con tab:', tab);
+        console.log('🚀 Tipo de tab:', typeof tab);
+        console.log('🚀 Tab es igual a "invitados":', tab === 'invitados');
+        console.log('🚀 Timestamp de ejecución:', new Date().toISOString());
+        
+        // Actualizar pestañas activas
+        adminTabs.forEach(t => t.classList.remove('active'));
+        const activeTab = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+        if (activeTab) {
+          activeTab.classList.add('active');
+        }
+        
+        // Mostrar loading
+        adminContent.innerHTML = `<div class="admin-loading"><i class="fas fa-spinner fa-spin"></i><p data-i18n="wedding:admin.loadingGeneric">Cargando...</p></div>`;
+        i18n.updatePageContent();
+        
+        // Determinar URL
+        let url = '';
+        if (tab === 'invitados') url = '/api/admin/invitados';
+        if (tab === 'regalos') url = '/api/admin/regalos';
+        if (tab === 'mensajes') url = '/api/admin/mensajes';
+        if (tab === 'comentarios') url = '/api/admin/comentarios';
+        if (tab === 'efectivo') url = '/api/admin/efectivo';
+        if (tab === 'agenda') url = '/api/admin/agenda';
+        if (tab === 'menu') url = '/api/admin/menu';
+        
+        
+        console.log('🔍 Debug - Tab seleccionada:', tab);
+        console.log('🔍 Debug - URL a consultar:', url);
+        
+        if (!url) {
+          adminContent.innerHTML = `<div class="message error"><p data-i18n="wedding:admin.tabNotImplemented">Pestaña no implementada</p></div>`;
+          i18n.updatePageContent();
+          return;
+        }
+        
+        try {
+          console.log('🔍 Debug - Haciendo petición a:', url);
+          console.log('🔍 Debug - Token usado:', token);
+          
+          // Agregar timestamp para evitar cache
+          const urlWithTimestamp = `${url}?_t=${Date.now()}`;
+          console.log('🔍 Debug - URL con timestamp:', urlWithTimestamp);
+          
+          const res = await fetch(urlWithTimestamp, {
+            headers: { 
+              'Authorization': token,
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          });
+          console.log('🔍 Debug - Respuesta del servidor:', res.status, res.statusText);
+          
+          if (!res.ok) {
+            const errorData = await res.json();
+            console.error('Error del servidor:', errorData);
+            adminContent.innerHTML = `
+              <div class="message error">
+                <h3 data-i18n="wedding:admin.loadDataError">Error al cargar los datos</h3>
+                <p>${errorData.error || i18n.translate('wedding:admin.unknownError')}</p>
+                <p data-i18n="wedding:admin.errorCode">Código de error: ${res.status}</p>
+                <button onclick="showTab('${tab}')" class="submit-btn">
+                  <i class="fas fa-redo"></i>
+                  <span data-i18n="wedding:admin.retry">Reintentar</span>
+                </button>
+              </div>
+            `;
+            i18n.updatePageContent();
+            return;
+          }
+          
+          const data = await res.json();
+          console.log('🔍 Debug - Datos recibidos:', data);
+          console.log('🔍 Debug - Tipo de datos:', typeof data);
+          console.log('🔍 Debug - Es array:', Array.isArray(data));
+          if (Array.isArray(data)) {
+            console.log('🔍 Debug - Cantidad de elementos:', data.length);
+            // Mostrar estructura del primer invitado
+            if (data.length > 0) {
+              console.log('🔍 Debug - Primer invitado:', data[0]);
+              console.log('🔍 Debug - Propiedades del primer invitado:', Object.keys(data[0]));
+            }
+          }
+          
+                      // Renderizar contenido según la pestaña
+            console.log('🔍 Debug - Renderizando pestaña:', tab);
+            if (tab === 'invitados') {
+                      console.log('🔍 Debug - Llamando a renderInvitados');
+        console.log('🔍 Debug - Datos que se pasan a renderInvitados:', data);
+        await renderInvitados(data);
+            } else if (tab === 'regalos') {
+              renderRegalos(data);
+            } else if (tab === 'efectivo') {
+              renderEfectivo(data);
+            } else if (tab === 'mensajes') {
+              renderMensajes(data);
+            } else if (tab === 'comentarios') {
+              renderComentarios(data);
+            } else if (tab === 'agenda') {
+              showEventosAdmin();
+            } else if (tab === 'menu') {
+              renderMenu(data);
+            }
+          
+        } catch (error) {
+          console.error('Error en la petición:', error);
+          adminContent.innerHTML = `
+            <div class="message error">
+              <h3 data-i18n="wedding:admin.connectionError">Error de conexión</h3>
+              <p data-i18n="wedding:admin.serverConnectionError">No se pudo conectar con el servidor</p>
+              <p data-i18n="wedding:admin.details">Detalles: ${error.message}</p>
+              <button onclick="showTab('${tab}')" class="submit-btn">
+                <i class="fas fa-redo"></i>
+                <span data-i18n="wedding:admin.retry">Reintentar</span>
+              </button>
+            </div>
+          `;
+          i18n.updatePageContent();
+        }
+      }
+
+      // Variable global para almacenar los eventos
+      let eventosDisponibles = {};
+
+      // Función para cargar los eventos disponibles
+      async function cargarEventosDisponibles() {
+        try {
+          const response = await fetch('/api/eventos');
+          const data = await response.json();
+          const eventos = data.eventos || [];
+          
+          // Crear un mapa de ID a nombre de evento
+          eventosDisponibles = {};
+          eventos.forEach(evento => {
+            eventosDisponibles[evento.id] = evento.titulo;
+          });
+          
+          console.log('Eventos disponibles cargados:', eventosDisponibles);
+        } catch (error) {
+          console.error('Error al cargar eventos:', error);
+          // Fallback a mapeo hardcodeado si falla la carga
+          eventosDisponibles = {
+            '1': 'Cocktail de Bienvenida',
+            '2': 'Ceremonia de Boda',
+            '3': 'Recepción de Invitados',
+            '4': 'Brunch de Despedida'
+          };
+        }
+      }
+
+      // Funciones de renderizado
+      async function renderInvitados(invitados) {
+        console.log('🎯 FUNCIÓN renderInvitados EJECUTADA');
+        console.log('🎯 Datos de invitados recibidos:', invitados);
+
+        // Cargar eventos disponibles si no están cargados
+        if (Object.keys(eventosDisponibles).length === 0) {
+          await cargarEventosDisponibles();
+        }
+        
+        // Ordenar invitados alfabéticamente por nombre
+        const invitadosOrdenados = [...invitados].sort((a, b) => 
+          a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
+        );
+        
+        // Log detallado de la estructura de cada invitado
+        invitadosOrdenados.forEach((inv, index) => {
+          console.log(`Invitado ${index + 1} - ${inv.nombre}:`, {
+            seleccionMenu: inv.seleccionMenu,
+            seleccionEventos: inv.seleccionEventos,
+            eventosAsistencia: inv.eventosAsistencia,
+            eventos: inv.eventos,
+            asistenciaEventos: inv.asistenciaEventos,
+            eventosConfirmados: inv.eventosConfirmados,
+            todasLasPropiedades: Object.keys(inv)
+          });
+        });
+        
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-users"></i> <span data-i18n="wedding:admin.guestsList">Lista de Invitados</span> (${invitadosOrdenados.length})</h3>
+              <button onclick="addInvitado()" class="admin-action">
+                <i class="fas fa-plus"></i> <span data-i18n="wedding:admin.addGuest">Añadir Invitado</span>
+              </button>
+            </div>
+            <div class="admin-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="wedding:admin.name">Nombre</th>
+                    <th data-i18n="wedding:admin.email">Email</th>
+                    <th data-i18n="wedding:admin.attendance">Asistencia</th>
+                    <th data-i18n="wedding:admin.menu">Menú</th>
+                    <th data-i18n="wedding:admin.cashGifts">Regalos en Efectivo</th>
+                    <th data-i18n="wedding:admin.actions">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${invitadosOrdenados.map(inv => `
+                    <tr>
+                      <td>${inv.nombre}</td>
+                      <td>${inv.email}</td>
+                      <td>
+                        ${(() => {
+                          // Usar confirmacionesEventos para mostrar eventos confirmados (nueva estructura)
+                          let eventosMostrar = [];
+                          
+                          // Verificar confirmacionesEventos primero, luego confirmacionesAgenda como fallback
+                          const confirmaciones = inv.confirmacionesEventos || inv.confirmacionesAgenda || {};
+                          
+                          if (confirmaciones && typeof confirmaciones === 'object') {
+                            // Mapear IDs de eventos a nombres usando los eventos reales
+                            const eventosConfirmados = Object.keys(confirmaciones).filter(id => confirmaciones[id] === true);
+                            
+                            if (eventosConfirmados.length > 0) {
+                              eventosMostrar = eventosConfirmados
+                                .map(id => {
+                                  // Solo incluir eventos que realmente existen
+                                  return eventosDisponibles[id];
+                                })
+                                .filter(evento => evento); // Filtrar eventos undefined/null
+                            }
+                          }
+                          
+                          console.log(`Eventos confirmados para ${inv.nombre}:`, eventosMostrar);
+                          console.log(`Confirmaciones de ${inv.nombre}:`, confirmaciones);
+                          
+                          if (eventosMostrar.length > 0) {
+                            return `
+                              <div class="attendance-summary">
+                                ${eventosMostrar.map(evento => `
+                                  <small class="event-attendance">
+                                    <i class="fas fa-calendar-check"></i> ${evento}
+                                  </small>
+                                `).join('<br>')}
+                              </div>
+                            `;
+                          } else {
+                            return `
+                              <span class="no-events">
+                                <i class="fas fa-calendar-times"></i> ${i18n.translate('wedding:admin.noEventsConfirmed') || 'Sin eventos confirmados'}
+                              </span>
+                            `;
+                          }
+                        })()}
+                      </td>
+                      <td>
+                        ${inv.seleccionMenu ? `
+                          <div class="menu-summary">
+                            <small><strong>Entrante:</strong> ${inv.seleccionMenu.entrante}</small><br>
+                            <small><strong>Principal:</strong> ${inv.seleccionMenu.principal}</small><br>
+                            <small><strong>Postre:</strong> ${inv.seleccionMenu.postre}</small>
+                            ${inv.seleccionMenu.alergias ? `<br><small style="color: #dc3545; font-weight: 600;"><strong>⚠️ Alergias:</strong> ${inv.seleccionMenu.alergias}</small>` : ''}
+                          </div>
+                        ` : i18n.translate('wedding:admin.notSelected')}
+                      </td>
+                      <td class="cash-gifts-cell" data-email="${inv.email}">
+                        <div class="cash-gifts-loading">
+                          <i class="fas fa-spinner fa-spin"></i> Cargando...
+                        </div>
+                      </td>
+                      <td>
+                        <button onclick="editInvitado('${inv.email}')" class="admin-action small">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteInvitado('${inv.email}')" class="admin-action small danger">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        i18n.updatePageContent();
+        
+        // Cargar regalos en efectivo después de renderizar la tabla
+        loadCashGifts();
+      }
+
+      // Función para cargar regalos en efectivo
+      async function loadCashGifts() {
+        try {
+          const response = await fetch('/api/regalos-efectivo');
+          const cashGifts = await response.json();
+          
+          // Agrupar regalos por email del donante
+          const giftsByEmail = {};
+          cashGifts.forEach(gift => {
+            if (!giftsByEmail[gift.donorEmail]) {
+              giftsByEmail[gift.donorEmail] = [];
+            }
+            giftsByEmail[gift.donorEmail].push(gift);
+          });
+          
+          // Actualizar cada celda de regalos en efectivo
+          document.querySelectorAll('.cash-gifts-cell').forEach(cell => {
+            const email = cell.getAttribute('data-email');
+            const gifts = giftsByEmail[email] || [];
+            
+            if (gifts.length === 0) {
+              cell.innerHTML = '<span class="no-gifts">Sin regalos</span>';
+            } else {
+              const totalAmount = gifts.reduce((sum, gift) => sum + (gift.amount / 100), 0);
+              const giftCount = gifts.length;
+              
+              cell.innerHTML = `
+                <div class="cash-gifts-summary">
+                  <div class="gift-amount">
+                    <i class="fas fa-euro-sign"></i> ${totalAmount.toFixed(2)}
+                  </div>
+                  <div class="gift-count">
+                    ${giftCount} regalo${giftCount > 1 ? 's' : ''}
+                  </div>
+                  <button onclick="showCashGiftDetails('${email}')" class="view-details-btn" title="Ver detalles">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              `;
+            }
+          });
+          
+        } catch (error) {
+          console.error('Error loading cash gifts:', error);
+          document.querySelectorAll('.cash-gifts-cell').forEach(cell => {
+            cell.innerHTML = '<span class="error">Error al cargar</span>';
+          });
+        }
+      }
+
+      // Función para mostrar detalles de regalos en efectivo
+      function showCashGiftDetails(email) {
+        // Esta función se implementará para mostrar un modal con los detalles
+        alert(`Detalles de regalos en efectivo para ${email}`);
+      }
+
+      function renderRegalos(regalos) {
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-gift"></i> <span data-i18n="wedding:admin.giftsList">Lista de Regalos</span> (${regalos.length})</h3>
+              <button onclick="addRegalo()" class="admin-action">
+                <i class="fas fa-plus"></i> <span data-i18n="wedding:admin.addGift">Añadir Regalo</span>
+              </button>
+            </div>
+            <div class="admin-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="wedding:admin.name">Nombre</th>
+                    <th data-i18n="wedding:admin.description">Descripción</th>
+                    <th data-i18n="wedding:admin.price">Precio</th>
+                    <th data-i18n="wedding:admin.category">Categoría</th>
+                    <th data-i18n="wedding:admin.actions">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${regalos.map(reg => `
+                    <tr>
+                      <td>${reg.nombre}</td>
+                      <td>${reg.descripcion || '-'}</td>
+                      <td>${reg.precio ? `€${reg.precio}` : '-'}</td>
+                      <td>${reg.categoria || '-'}</td>
+                      <td>
+                        <button onclick="editRegalo('${reg.id}')" class="admin-action small">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteRegalo('${reg.id}')" class="admin-action small danger">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        i18n.updatePageContent();
+      }
+
+      function renderMensajes(mensajes) {
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-comments"></i> <span data-i18n="wedding:admin.guestMessages">Mensajes de Invitados</span> (${mensajes.length})</h3>
+            </div>
+            <div class="messages-container">
+              ${mensajes.map(msg => `
+                <div class="message-card">
+                  <div class="message-header">
+                    <strong>${msg.nombre}</strong>
+                    <span class="message-date">${new Date(msg.fecha).toLocaleDateString()}</span>
+                  </div>
+                  <div class="message-content">
+                    ${msg.mensaje}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+        i18n.updatePageContent();
+      }
+
+      function renderComentarios(comentarios) {
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-comment-dots"></i> <span data-i18n="wedding:admin.guestComments">Comentarios de Invitados</span> (${comentarios.length}) <small style="color: #6c757d; font-size: 0.8rem;">🕒 Más recientes primero</small></h3>
+            </div>
+            <div class="messages-container">
+              ${comentarios.sort((a, b) => new Date(b.fecha) - new Date(a.fecha)).map(comment => {
+                const reacciones = comment.reacciones || {};
+                const reaccionesHTML = Object.entries(reacciones).map(([emoji, users]) => 
+                  `<span class="admin-reaction" title="${users.join(', ')}">${emoji} ${users.length}</span>`
+                ).join('');
+                
+                return `
+                <div class="message-card">
+                  <div class="message-header">
+                    <strong>${comment.nombre}</strong>
+                    <span class="message-date">${new Date(comment.fecha).toLocaleDateString()}</span>
+                  </div>
+                  <div class="message-content">
+                    ${comment.comentario}
+                  </div>
+                  ${reaccionesHTML ? `<div class="message-reactions">${reaccionesHTML}</div>` : ''}
+                  <div class="message-actions">
+                    <button onclick="deleteComment('${comment.id}')" class="admin-action small danger">
+                      <i class="fas fa-trash"></i> <span data-i18n="wedding:admin.delete">Eliminar</span>
+                    </button>
+                  </div>
+                </div>
+              `}).join('')}
+            </div>
+          </div>
+        `;
+        i18n.updatePageContent();
+      }
+
+      function renderAgenda(agenda) {
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-calendar-alt"></i> <span data-i18n="wedding:admin.eventSchedule">Agenda de Eventos</span></h3>
+              <button onclick="addNewEvent()" class="admin-action">
+                <i class="fas fa-plus"></i> <span data-i18n="wedding:admin.addEvent">Agregar Evento</span>
+              </button>
+            </div>
+            <div class="admin-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th data-i18n="wedding:admin.date">Fecha</th>
+                    <th data-i18n="wedding:admin.time">Hora</th>
+                    <th data-i18n="wedding:admin.event">Evento</th>
+                    <th data-i18n="wedding:admin.location">Lugar</th>
+                    <th data-i18n="wedding:admin.address">Dirección</th>
+                    <th data-i18n="wedding:admin.actions">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${agenda.map(evento => `
+                    <tr>
+                      <td>${evento.fecha} (${evento.dia})</td>
+                      <td>${evento.hora}</td>
+                      <td>
+                        <strong>${evento.titulo}</strong><br>
+                        <small style="color: #6c757d;">${evento.descripcion}</small>
+                      </td>
+                      <td>${evento.lugar}</td>
+                      <td>${evento.direccion}</td>
+                      <td>
+                        <button onclick="editEvento(${evento.id})" class="admin-action small">
+                          <i class="fas fa-edit"></i> <span data-i18n="wedding:admin.edit">Editar</span>
+                        </button>
+                        <button onclick="deleteEvento(${evento.id})" class="admin-action small danger">
+                          <i class="fas fa-trash"></i> <span data-i18n="wedding:admin.delete">Eliminar</span>
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        i18n.updatePageContent();
+      }
+
+      function renderMenu(data) {
+        const opcionesMenu = data.opcionesMenu || {};
+        const estadisticas = data.estadisticas || {};
+        
+        // Generar HTML para cada categoría de platos
+        let menuHTML = '';
+        const categorias = ['entrantes', 'principales', 'postres', 'bebidas'];
+        
+        categorias.forEach(categoria => {
+          const platos = opcionesMenu[categoria] || [];
+          if (platos.length > 0) {
+            menuHTML += `
+              <div class="menu-category">
+                <h4>${i18n.translate(`wedding:admin.${categoria}`)}</h4>
+                <div class="dishes-grid">
+                  ${platos.map(plato => `
+                    <div class="dish-card">
+                      <div class="dish-header">
+                        <h5>${plato.nombre}</h5>
+                      </div>
+                      <p class="dish-description">${plato.descripcion}</p>
+                      ${plato.alergenos && plato.alergenos.length > 0 ? `
+                        <div class="dish-allergens">
+                          <small><strong>Alérgenos:</strong> ${plato.alergenos.join(', ')}</small>
+                        </div>
+                      ` : ''}
+                      <div class="dish-actions">
+                        <button onclick="editPlato('${plato.id}')" class="admin-action small">
+                          <i class="fas fa-edit"></i> ${i18n.translate('wedding:admin.edit')}
+                        </button>
+                        <button onclick="deletePlato('${plato.id}')" class="admin-action small danger">
+                          <i class="fas fa-trash"></i> ${i18n.translate('wedding:admin.delete')}
+                        </button>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          }
+        });
+        
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-utensils"></i> <span data-i18n="wedding:admin.menuManagement">Gestión de Menús</span></h3>
+              <button onclick="addPlato()" class="admin-action">
+                <i class="fas fa-plus"></i> ${i18n.translate('wedding:admin.addDish')}
+              </button>
+            </div>
+            
+            ${menuHTML || `
+              <div class="no-dishes">
+                <i class="fas fa-utensils"></i>
+                <p>No hay platos en el menú. ¡Añade el primer plato!</p>
+              </div>
+            `}
+            
+            <div class="menu-stats">
+              <h4 data-i18n="wedding:admin.menuStats">Estadísticas de Selección de Menús</h4>
+              <p data-i18n="wedding:admin.totalMenuSelections">Total de invitados con menú seleccionado: ${estadisticas.totalSelecciones || 0}</p>
+            </div>
+          </div>
+        `;
+        i18n.updatePageContent();
+      }
+
+
+
+      // Hacer funciones disponibles globalmente
+      window.showTab = showTab;
+      
+      // Función para añadir invitado
+      window.addInvitado = () => {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3><i class="fas fa-user-plus"></i> ${i18n.translate('wedding:admin.addGuestTitle')}</h3>
+              <button onclick="closeModal()" class="modal-close">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="addInvitadoForm">
+                <div class="form-group">
+                  <label for="nombre">${i18n.translate('wedding:admin.fullName')} *</label>
+                  <input type="text" id="nombre" name="nombre" required>
+                </div>
+                <div class="form-group">
+                  <label for="email">${i18n.translate('wedding:admin.email')} *</label>
+                  <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" onclick="closeModal()" class="btn-secondary">${i18n.translate('wedding:admin.cancel')}</button>
+                  <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i> ${i18n.translate('wedding:admin.saveGuest')}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Manejar el envío del formulario
+        document.getElementById('addInvitadoForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          saveInvitado();
+        });
+      };
+      
+      // Función para cerrar el modal
+      window.closeModal = () => {
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+          modal.remove();
+        }
+      };
+      
+      // Función para guardar el invitado
+      async function saveInvitado() {
+        const form = document.getElementById('addInvitadoForm');
+        const formData = new FormData(form);
+        
+        const nuevoInvitado = {
+          nombre: formData.get('nombre'),
+          email: formData.get('email'),
+          asistencia: 'pendiente', // Por defecto pendiente, el invitado lo cambiará
+          acompañantes: 0, // Por defecto 0, el invitado lo cambiará
+          notas: '' // Por defecto vacío, el invitado lo cambiará
+        };
+        
+        // Validaciones básicas
+        if (!nuevoInvitado.nombre || !nuevoInvitado.email) {
+          alert(i18n.translate('wedding:admin.requiredFieldsError'));
+          return;
+        }
+        
+        // Validar formato de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(nuevoInvitado.email)) {
+          alert(i18n.translate('wedding:admin.invalidEmailError'));
+          return;
+        }
+        
+        try {
+          // Obtener el token de autenticación (usar token de prueba si no existe)
+          let token = localStorage.getItem('adminToken');
+          if (!token) {
+            // Para pruebas, usar token de prueba
+            token = 'test-token';
+            localStorage.setItem('adminToken', token);
+          }
+          
+          // Hacer la llamada al backend
+          const response = await fetch('/api/admin/invitados', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': token
+            },
+            body: JSON.stringify(nuevoInvitado)
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            if (response.status === 409) {
+              alert(i18n.translate('wedding:admin.duplicateEmailError'));
+            } else {
+              alert(`${i18n.translate('wedding:admin.addGuestError')}: ${errorData.error || i18n.translate('wedding:admin.unknownError')}`);
+            }
+            return;
+          }
+          
+          const result = await response.json();
+          
+          // Mostrar mensaje de éxito
+          alert(`${i18n.translate('wedding:admin.guestAddedSuccess')} "${nuevoInvitado.nombre}"`);
+          
+          // Cerrar modal y recargar la lista
+          closeModal();
+          showTab('invitados'); // Recargar la pestaña de invitados
+          
+        } catch (error) {
+          console.error('Error al añadir invitado:', error);
+          alert(i18n.translate('wedding:admin.connectionError'));
+        }
+      }
+      
+      // Función para editar invitado
+      window.editInvitado = async (email) => {
+        try {
+          // Obtener datos del invitado
+          const response = await fetch(`/api/admin/invitados/${email}`, {
+            headers: {
+              'Authorization': localStorage.getItem('adminToken')
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('Error al obtener datos del invitado');
+          }
+          
+          const invitado = await response.json();
+          showEditGuestForm(invitado);
+        } catch (error) {
+          console.error('Error:', error);
+          alert(i18n.translate('wedding:admin.errorUpdatingGuest'));
+        }
+      };
+
+      // Función para eliminar invitado
+      window.deleteInvitado = async (email) => {
+        if (confirm(i18n.translate('wedding:admin.deleteGuestConfirm'))) {
+          try {
+            const response = await fetch(`/api/admin/invitados/${email}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': localStorage.getItem('adminToken')
+              }
+            });
+            
+            if (!response.ok) {
+              throw new Error('Error al eliminar invitado');
+            }
+            
+            const result = await response.json();
+            alert(i18n.translate('wedding:admin.guestDeletedSuccess'));
+            showTab('invitados'); // Recargar la lista
+          } catch (error) {
+            console.error('Error:', error);
+            alert(i18n.translate('wedding:admin.errorDeletingGuest'));
+          }
+        }
+      };
+      // Función para añadir plato
+      window.addPlato = () => showAddDishForm();
+
+      // Función para editar plato
+      window.editPlato = async (id) => {
+        try {
+          const response = await fetch(`/api/admin/menu/plato/${id}`, {
+            headers: {
+              'Authorization': localStorage.getItem('adminToken')
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('Error al obtener datos del plato');
+          }
+          
+          const plato = await response.json();
+          showEditDishForm(plato);
+        } catch (error) {
+          console.error('Error:', error);
+          alert(i18n.translate('wedding:admin.errorUpdatingDish'));
+        }
+      };
+
+      // Función para eliminar plato
+      window.deletePlato = async (id) => {
+        // Crear diálogo de confirmación personalizado
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+          background: rgba(0,0,0,0.5); z-index: 1000; display: flex; 
+          align-items: center; justify-content: center;
+        `;
+        
+        const dialog = document.createElement('div');
+        dialog.style.cssText = `
+          background: white; padding: 30px; border-radius: 12px; 
+          max-width: 400px; width: 90%; text-align: center;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        `;
+        
+        dialog.innerHTML = `
+          <h3 style="margin: 0 0 20px 0; color: #333;">
+            <i class="fas fa-exclamation-triangle" style="color: #ffc107; margin-right: 10px;"></i>
+            Confirmar eliminación
+          </h3>
+          <p style="margin: 0 0 25px 0; color: #666;">
+            ${i18n.translate('wedding:admin.deleteDishConfirm')}
+          </p>
+          <div style="display: flex; gap: 10px; justify-content: center;">
+            <button id="cancelDelete" style="
+              padding: 10px 20px; background: #6c757d; color: white; 
+              border: none; border-radius: 6px; cursor: pointer;
+            ">Cancelar</button>
+            <button id="confirmDelete" style="
+              padding: 10px 20px; background: #dc3545; color: white; 
+              border: none; border-radius: 6px; cursor: pointer;
+            ">Eliminar</button>
+          </div>
+        `;
+        
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        
+        // Event listeners
+        document.getElementById('cancelDelete').onclick = () => {
+          document.body.removeChild(overlay);
+        };
+        
+        document.getElementById('confirmDelete').onclick = async () => {
+          document.body.removeChild(overlay);
+          
+          try {
+            const response = await fetch(`/api/admin/menu/plato/${id}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': localStorage.getItem('adminToken')
+              }
+            });
+            
+            if (!response.ok) {
+              throw new Error('Error al eliminar plato');
+            }
+            
+            const result = await response.json();
+            alert(i18n.translate('wedding:admin.dishDeletedSuccess'));
+            showTab('menu'); // Recargar la lista
+          } catch (error) {
+            console.error('Error:', error);
+            alert(i18n.translate('wedding:admin.errorDeletingDish'));
+          }
+        };
+        
+        // Cerrar con Escape
+        const handleEscape = (e) => {
+          if (e.key === 'Escape') {
+            document.body.removeChild(overlay);
+            document.removeEventListener('keydown', handleEscape);
+          }
+        };
+        document.addEventListener('keydown', handleEscape);
+      };
+
+      // Funciones para gestión de agenda
+      window.addNewEvent = function() {
+        const nuevoEvento = {
+          id: null,
+          fecha: '',
+          dia: '',
+          hora: '',
+          titulo: '',
+          descripcion: '',
+          lugar: '',
+          direccion: ''
+        };
+        showEventForm(nuevoEvento);
+      };
+
+      window.editEvento = async function(id) {
+        try {
+          const response = await fetch(`/api/admin/agenda/${id}`, {
+            headers: { 'Authorization': localStorage.getItem('adminToken') }
+          });
+          
+          if (!response.ok) {
+            throw new Error(i18n.translate('wedding:admin.errorLoadingEvent'));
+          }
+          
+          const evento = await response.json();
+          showEventForm(evento);
+        } catch (error) {
+          console.error('Error:', error);
+          alert(i18n.translate('wedding:admin.errorLoadingEvent'));
+        }
+      };
+
+      window.deleteEvento = async function(id) {
+        if (confirm(i18n.translate('wedding:admin.confirmDeleteEvent'))) {
+          try {
+            const response = await fetch(`/api/admin/agenda/${id}`, {
+              method: 'DELETE',
+              headers: { 'Authorization': localStorage.getItem('adminToken') }
+            });
+            
+            if (!response.ok) {
+              throw new Error(i18n.translate('wedding:admin.errorDeletingEvent'));
+            }
+            
+            alert(i18n.translate('wedding:admin.eventDeleted'));
+            showTab('agenda'); // Recargar la lista
+          } catch (error) {
+            console.error('Error:', error);
+            alert(i18n.translate('wedding:admin.errorDeletingEvent'));
+          }
+        }
+      };
+
+      function showEventForm(evento) {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+          background: rgba(0,0,0,0.5); z-index: 1000; display: flex; 
+          align-items: center; justify-content: center;
+        `;
+        
+        const form = document.createElement('div');
+        form.style.cssText = `
+          background: white; padding: 30px; border-radius: 12px; 
+          max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        `;
+        
+        const isNew = !evento.id;
+        form.innerHTML = `
+          <h3 style="margin: 0 0 20px 0; color: #333;">
+            <i class="fas fa-${isNew ? 'plus' : 'edit'}"></i> 
+            ${isNew ? i18n.translate('wedding:admin.addEventTitle') : i18n.translate('wedding:admin.editEventTitle')}
+          </h3>
+          
+          <form id="eventForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+              <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.eventDate')}</label>
+                <input type="date" id="fecha" value="${evento.fecha}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.eventTime')}</label>
+                <input type="time" id="hora" value="${evento.hora}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.eventTitle')}</label>
+              <input type="text" id="titulo" value="${evento.titulo}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.eventDescription')}</label>
+              <textarea id="descripcion" rows="3" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">${evento.descripcion}</textarea>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.eventLocation')}</label>
+              <input type="text" id="lugar" value="${evento.lugar}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.eventAddress')}</label>
+              <input type="text" id="direccion" value="${evento.direccion}" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+              <button type="button" onclick="closeEventForm()" style="
+                padding: 10px 20px; background: #6c757d; color: white; 
+                border: none; border-radius: 6px; cursor: pointer;
+              ">${i18n.translate('wedding:admin.cancel')}</button>
+              <button type="submit" style="
+                padding: 10px 20px; background: #28a745; color: white; 
+                border: none; border-radius: 6px; cursor: pointer;
+              ">${isNew ? i18n.translate('wedding:admin.addEvent') : i18n.translate('wedding:admin.save')}</button>
+            </div>
+          </form>
+        `;
+        
+        overlay.appendChild(form);
+        document.body.appendChild(overlay);
+        
+        // Configurar el formulario
+        const eventForm = document.getElementById('eventForm');
+        eventForm.onsubmit = (e) => {
+          e.preventDefault();
+          saveEvent(evento.id);
+        };
+        
+        // Función para cerrar el formulario
+        window.closeEventForm = () => {
+          document.body.removeChild(overlay);
+        };
+      }
+
+      window.saveEvent = async function(id) {
+        const formData = {
+          fecha: document.getElementById('fecha').value,
+          hora: document.getElementById('hora').value,
+          titulo: document.getElementById('titulo').value,
+          descripcion: document.getElementById('descripcion').value,
+          lugar: document.getElementById('lugar').value,
+          direccion: document.getElementById('direccion').value
+        };
+        
+        // Generar el día en formato legible
+        const fecha = new Date(formData.fecha);
+        const opciones = { day: 'numeric', month: 'long' };
+        formData.dia = fecha.toLocaleDateString('es-ES', opciones);
+        
+        try {
+          const url = id ? `/api/admin/agenda/${id}` : '/api/admin/agenda';
+          const method = id ? 'PUT' : 'POST';
+          
+          const response = await fetch(url, {
+            method: method,
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': localStorage.getItem('adminToken')
+            },
+            body: JSON.stringify(formData)
+          });
+          
+          if (!response.ok) {
+            throw new Error(i18n.translate('wedding:admin.errorSavingEvent'));
+          }
+          
+          alert(id ? i18n.translate('wedding:admin.eventUpdated') : i18n.translate('wedding:admin.eventAdded'));
+          window.closeEventForm();
+          showTab('agenda'); // Recargar la lista
+        } catch (error) {
+          console.error('Error:', error);
+          alert(i18n.translate('wedding:admin.errorSavingEvent'));
+        }
+      };
+
+      // Función para mostrar formulario de edición de invitado
+      function showEditGuestForm(invitado) {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+          background: rgba(0,0,0,0.5); z-index: 1000; display: flex; 
+          align-items: center; justify-content: center;
+        `;
+        
+        const form = document.createElement('div');
+        form.style.cssText = `
+          background: white; padding: 30px; border-radius: 12px; 
+          max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        `;
+        
+        form.innerHTML = `
+          <h3 style="margin: 0 0 20px 0; color: #333;">
+            <i class="fas fa-edit"></i> ${i18n.translate('wedding:admin.editGuestTitle')}
+          </h3>
+          
+          <form id="editGuestForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+              <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.name')}</label>
+                <input type="text" id="editNombre" name="nombre" value="${invitado.nombre || ''}" required style="
+                  width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+                ">
+              </div>
+              <div>
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.email')}</label>
+                <input type="email" id="editEmail" name="email" value="${invitado.email || ''}" readonly style="
+                  width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; background: #f5f5f5;
+                ">
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">Acompañantes</label>
+              <input type="number" id="editAcompañantes" name="acompañantes" min="0" max="5" value="${invitado.acompañantes || 0}" style="
+                width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+              ">
+            </div>
+            
+
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+              <button type="button" onclick="closeEditGuestForm()" style="
+                padding: 10px 20px; background: #6c757d; color: white; 
+                border: none; border-radius: 6px; cursor: pointer;
+              ">${i18n.translate('wedding:admin.cancel')}</button>
+              <button type="submit" style="
+                padding: 10px 20px; background: #28a745; color: white; 
+                border: none; border-radius: 6px; cursor: pointer;
+              ">${i18n.translate('wedding:admin.updateGuest')}</button>
+            </div>
+          </form>
+        `;
+        
+        overlay.appendChild(form);
+        document.body.appendChild(overlay);
+        
+        // Configurar el formulario
+        const editForm = document.getElementById('editGuestForm');
+        editForm.onsubmit = (e) => {
+          e.preventDefault();
+          updateGuest(invitado.email);
+        };
+        
+        // Función para cerrar el formulario
+        window.closeEditGuestForm = () => {
+          document.body.removeChild(overlay);
+        };
+      }
+
+      // Función para actualizar invitado
+      async function updateGuest(email) {
+        const formData = {
+          nombre: document.getElementById('editNombre').value
+        };
+        
+        try {
+          const response = await fetch(`/api/admin/invitados/${email}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': localStorage.getItem('adminToken')
+            },
+            body: JSON.stringify(formData)
+          });
+          
+          if (!response.ok) {
+            throw new Error('Error al actualizar invitado');
+          }
+          
+          const result = await response.json();
+          alert(i18n.translate('wedding:admin.guestUpdatedSuccess'));
+          window.closeEditGuestForm();
+          showTab('invitados'); // Recargar la lista
+        } catch (error) {
+          console.error('Error:', error);
+          alert(i18n.translate('wedding:admin.errorUpdatingGuest'));
+        }
+      }
+
+      // Función para mostrar formulario de añadir plato
+      function showAddDishForm() {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+          background: rgba(0,0,0,0.5); z-index: 1000; display: flex; 
+          align-items: center; justify-content: center;
+        `;
+        
+        const form = document.createElement('div');
+        form.style.cssText = `
+          background: white; padding: 30px; border-radius: 12px; 
+          max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        `;
+        
+        form.innerHTML = `
+          <h3 style="margin: 0 0 20px 0; color: #333;">
+            <i class="fas fa-plus"></i> ${i18n.translate('wedding:admin.addDishTitle')}
+          </h3>
+          
+          <form id="addDishForm">
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.dishName')}</label>
+              <input type="text" id="dishNombre" name="nombre" required style="
+                width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+              ">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.dishDescription')}</label>
+              <textarea id="dishDescripcion" name="descripcion" rows="3" required style="
+                width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+              "></textarea>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.dishCategory')}</label>
+              <select id="dishCategoria" name="categoria" required style="
+                width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+              ">
+                <option value="">Seleccionar categoría</option>
+                <option value="entrantes">${i18n.translate('wedding:admin.entrantes')}</option>
+                <option value="principales">${i18n.translate('wedding:admin.principales')}</option>
+                <option value="postres">${i18n.translate('wedding:admin.postres')}</option>
+                <option value="bebidas">${i18n.translate('wedding:admin.bebidas')}</option>
+              </select>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.dishAllergens')}</label>
+              <input type="text" id="dishAlergenos" name="alergenos" placeholder="Ej: Gluten, Lactosa, Frutos secos..." style="
+                width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+              ">
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+              <button type="button" onclick="closeAddDishForm()" style="
+                padding: 10px 20px; background: #6c757d; color: white; 
+                border: none; border-radius: 6px; cursor: pointer;
+              ">${i18n.translate('wedding:admin.cancel')}</button>
+              <button type="submit" style="
+                padding: 10px 20px; background: #28a745; color: white; 
+                border: none; border-radius: 6px; cursor: pointer;
+              ">${i18n.translate('wedding:admin.addDish')}</button>
+            </div>
+          </form>
+        `;
+        
+        overlay.appendChild(form);
+        document.body.appendChild(overlay);
+        
+        // Configurar el formulario
+        const addForm = document.getElementById('addDishForm');
+        addForm.onsubmit = (e) => {
+          e.preventDefault();
+          addDish();
+        };
+        
+        // Función para cerrar el formulario
+        window.closeAddDishForm = () => {
+          document.body.removeChild(overlay);
+        };
+      }
+
+      // Función para mostrar formulario de editar plato
+      function showEditDishForm(plato) {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+          background: rgba(0,0,0,0.5); z-index: 1000; display: flex; 
+          align-items: center; justify-content: center;
+        `;
+        
+        const form = document.createElement('div');
+        form.style.cssText = `
+          background: white; padding: 30px; border-radius: 12px; 
+          max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        `;
+        
+        form.innerHTML = `
+          <h3 style="margin: 0 0 20px 0; color: #333;">
+            <i class="fas fa-edit"></i> ${i18n.translate('wedding:admin.editDishTitle')}
+          </h3>
+          
+          <form id="editDishForm">
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.dishName')}</label>
+              <input type="text" id="editDishNombre" name="nombre" value="${plato.nombre || ''}" required style="
+                width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+              ">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.dishDescription')}</label>
+              <textarea id="editDishDescripcion" name="descripcion" rows="3" required style="
+                width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+              ">${plato.descripcion || ''}</textarea>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.dishCategory')}</label>
+              <select id="editDishCategoria" name="categoria" required style="
+                width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+              ">
+                <option value="entrantes" ${plato.categoria === 'entrantes' ? 'selected' : ''}>${i18n.translate('wedding:admin.entrantes')}</option>
+                <option value="principales" ${plato.categoria === 'principales' ? 'selected' : ''}>${i18n.translate('wedding:admin.principales')}</option>
+                <option value="postres" ${plato.categoria === 'postres' ? 'selected' : ''}>${i18n.translate('wedding:admin.postres')}</option>
+                <option value="bebidas" ${plato.categoria === 'bebidas' ? 'selected' : ''}>${i18n.translate('wedding:admin.bebidas')}</option>
+              </select>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: 600;">${i18n.translate('wedding:admin.dishAllergens')}</label>
+              <input type="text" id="editDishAlergenos" name="alergenos" value="${plato.alergenos ? plato.alergenos.join(', ') : ''}" placeholder="Ej: Gluten, Lactosa, Frutos secos..." style="
+                width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;
+              ">
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+              <button type="button" onclick="closeEditDishForm()" style="
+                padding: 10px 20px; background: #6c757d; color: white; 
+                border: none; border-radius: 6px; cursor: pointer;
+              ">${i18n.translate('wedding:admin.cancel')}</button>
+              <button type="submit" style="
+                padding: 10px 20px; background: #28a745; color: white; 
+                border: none; border-radius: 6px; cursor: pointer;
+              ">${i18n.translate('wedding:admin.updateDish')}</button>
+            </div>
+          </form>
+        `;
+        
+        overlay.appendChild(form);
+        document.body.appendChild(overlay);
+        
+        // Configurar el formulario
+        const editForm = document.getElementById('editDishForm');
+        editForm.onsubmit = (e) => {
+          e.preventDefault();
+          updateDish(plato.id);
+        };
+        
+        // Función para cerrar el formulario
+        window.closeEditDishForm = () => {
+          document.body.removeChild(overlay);
+        };
+      }
+
+      // Función para añadir plato
+      async function addDish() {
+        const formData = {
+          nombre: document.getElementById('dishNombre').value,
+          descripcion: document.getElementById('dishDescripcion').value,
+          categoria: document.getElementById('dishCategoria').value,
+          alergenos: document.getElementById('dishAlergenos').value ? document.getElementById('dishAlergenos').value.split(',').map(a => a.trim()) : []
+        };
+        
+        console.log('Enviando datos:', formData);
+        console.log('Token:', localStorage.getItem('adminToken'));
+        
+        try {
+          const response = await fetch('/api/admin/menu/plato', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': localStorage.getItem('adminToken')
+            },
+            body: JSON.stringify(formData)
+          });
+          
+          console.log('Respuesta status:', response.status);
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error del servidor:', errorData);
+            throw new Error('Error al añadir plato: ' + (errorData.error || response.status));
+          }
+          
+          const result = await response.json();
+          console.log('Respuesta exitosa:', result);
+          alert(i18n.translate('wedding:admin.dishAddedSuccess'));
+          window.closeAddDishForm();
+          showTab('menu'); // Recargar la lista
+        } catch (error) {
+          console.error('Error completo:', error);
+          alert('Error al añadir plato: ' + error.message);
+        }
+      }
+
+      // Función para actualizar plato
+      async function updateDish(id) {
+        const formData = {
+          nombre: document.getElementById('editDishNombre').value,
+          descripcion: document.getElementById('editDishDescripcion').value,
+          categoria: document.getElementById('editDishCategoria').value,
+          alergenos: document.getElementById('editDishAlergenos').value ? document.getElementById('editDishAlergenos').value.split(',').map(a => a.trim()) : []
+        };
+        
+        try {
+          const response = await fetch(`/api/admin/menu/plato/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': localStorage.getItem('adminToken')
+            },
+            body: JSON.stringify(formData)
+          });
+          
+          if (!response.ok) {
+            throw new Error('Error al actualizar plato');
+          }
+          
+          const result = await response.json();
+          alert(i18n.translate('wedding:admin.dishUpdatedSuccess'));
+          window.closeEditDishForm();
+          showTab('menu'); // Recargar la lista
+        } catch (error) {
+          console.error('Error:', error);
+          alert(i18n.translate('wedding:admin.errorUpdatingDish'));
+        }
+      }
+
+      // Función para eliminar comentario
+      window.deleteComment = async function(commentId) {
+        if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+          try {
+            const response = await fetch(`/api/comentarios/${commentId}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': localStorage.getItem('adminToken')
+              }
+            });
+            
+            if (!response.ok) {
+              throw new Error('Error al eliminar comentario');
+            }
+            
+            alert('Comentario eliminado correctamente');
+            showTab('comentarios'); // Recargar la lista
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Error al eliminar comentario');
+          }
+        }
+      };
+
+      // Inicializar token de admin para pruebas
+      if (!localStorage.getItem('adminToken')) {
+        localStorage.setItem('adminToken', 'test-token');
+      }
+      
+      // Función para debug - mostrar token actual
+      function debugToken() {
+        console.log('Token actual:', localStorage.getItem('adminToken'));
+        alert('Token actual: ' + localStorage.getItem('adminToken'));
+      }
+
+      // Cargar la pestaña de invitados por defecto
+      console.log('🚀 Cargando pestaña de invitados por defecto...');
+      showTab('invitados');
+      
+      // Escuchar cambios de idioma
+      window.addEventListener('languageChanged', (event) => {
+        console.log('Idioma cambiado a:', event.detail.language);
+        updateModalContent();
+      });
+
+      // Función para mostrar el sistema de gestión de eventos
+      async function showEventosAdmin() {
+        try {
+          // Cargar el estado de bloqueo de agenda
+          const bloqueoRes = await fetch('/api/config/agenda/bloqueo');
+          const configBloqueo = await bloqueoRes.json();
+          const agendaBloqueada = configBloqueo.agenda && configBloqueo.agenda.bloqueada;
+          
+          adminContent.innerHTML = `
+            <div class="eventos-container">
+              <!-- Sección de control de bloqueo -->
+              <div class="agenda-controls">
+                <div class="bloqueo-section">
+                  <h4><i class="fas fa-lock"></i> Control de Bloqueo de Agenda</h4>
+                  <div class="bloqueo-status">
+                    <span class="status-label">Estado actual:</span>
+                    <span class="status-value ${agendaBloqueada ? 'bloqueada' : 'desbloqueada'}">
+                      ${agendaBloqueada ? 'BLOQUEADA' : 'DESBLOQUEADA'}
+                    </span>
+                  </div>
+                  ${agendaBloqueada ? `
+                    <div class="bloqueo-info">
+                      <p><strong>Motivo:</strong> ${configBloqueo.agenda.motivoBloqueo || 'No especificado'}</p>
+                      <p><strong>Bloqueada desde:</strong> ${new Date(configBloqueo.agenda.fechaBloqueo).toLocaleString('es-ES')}</p>
+                    </div>
+                  ` : ''}
+                  <div class="bloqueo-actions">
+                    ${agendaBloqueada ? `
+                      <button onclick="desbloquearAgenda()" class="btn-desbloquear">
+                        <i class="fas fa-unlock"></i> Desbloquear Agenda
+                      </button>
+                    ` : `
+                                        <button onclick="bloquearAgendaDirecto()" class="btn-bloquear">
+                    <i class="fas fa-lock"></i> Bloquear Agenda
+                  </button>
+                    `}
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Contenedor de eventos -->
+              <div id="eventosContainer">
+                <div class="eventos-loading">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <p>Cargando gestión de eventos...</p>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          // Cargar los scripts necesarios
+          await loadScript('js/eventos-icons.js');
+          await loadScript('js/eventos-admin.js');
+          loadStylesheet('assets/css/eventos-admin.css');
+          
+          // Inicializar el sistema de eventos
+          if (typeof initEventosAdmin === 'function') {
+            initEventosAdmin();
+          } else {
+            console.error('❌ Función initEventosAdmin no encontrada');
+          }
+        } catch (error) {
+          console.error('Error al cargar el estado de bloqueo:', error);
+          // Mostrar contenido sin bloqueo si hay error
+          adminContent.innerHTML = `
+            <div class="eventos-container">
+              <div id="eventosContainer">
+                <div class="eventos-loading">
+                  <i class="fas fa-spinner fa-spin"></i>
+                  <p>Cargando gestión de eventos...</p>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          // Cargar los scripts necesarios
+          await loadScript('js/eventos-icons.js');
+          await loadScript('js/eventos-admin.js');
+          loadStylesheet('assets/css/eventos-admin.css');
+          
+          // Inicializar el sistema de eventos
+          if (typeof initEventosAdmin === 'function') {
+            initEventosAdmin();
+          } else {
+            console.error('❌ Función initEventosAdmin no encontrada');
+          }
+        }
+      }
+
+      // Función para cargar scripts dinámicamente
+      function loadScript(src) {
+        return new Promise((resolve, reject) => {
+          // Verificar si el script ya está cargado
+          if (document.querySelector(`script[src="${src}"]`)) {
+            resolve();
+            return;
+          }
+          
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = reject;
+          document.head.appendChild(script);
+        });
+      }
+
+      // Función para cargar hojas de estilo dinámicamente
+      function loadStylesheet(href) {
+        // Verificar si la hoja de estilo ya está cargada
+        if (document.querySelector(`link[href="${href}"]`)) {
+          return;
+        }
+        
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        document.head.appendChild(link);
+      }
+
+      // ===== FUNCIONES PARA GESTIÓN DE BLOQUEO DE AGENDA =====
+
+      // Función para bloquear agenda directamente
+      window.bloquearAgendaDirecto = async () => {
+        try {
+          const response = await fetch('/api/config/agenda/bloqueo', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': localStorage.getItem('adminToken')
+            },
+            body: JSON.stringify({
+              bloqueada: true,
+              motivoBloqueo: 'Agenda bloqueada por el administrador'
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            console.log('✅ Agenda bloqueada correctamente');
+            showTab('agenda'); // Recargar la agenda para mostrar el nuevo estado
+          } else {
+            console.error('❌ Error al bloquear agenda:', data.error);
+            alert(`Error al bloquear la agenda: ${data.error}`);
+          }
+        } catch (error) {
+          console.error('❌ Error de conexión al bloquear agenda:', error);
+          alert('Error de conexión al bloquear la agenda.');
+        }
+      };
+
+      // Función para desbloquear agenda directamente
+      window.desbloquearAgenda = async () => {
+        try {
+          const response = await fetch('/api/config/agenda/bloqueo', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': localStorage.getItem('adminToken')
+            },
+            body: JSON.stringify({
+              bloqueada: false,
+              motivoBloqueo: null
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            console.log('✅ Agenda desbloqueada correctamente');
+            showTab('agenda'); // Recargar la agenda para mostrar el nuevo estado
+          } else {
+            console.error('❌ Error al desbloquear agenda:', data.error);
+            alert(`Error al desbloquear la agenda: ${data.error}`);
+          }
+        } catch (error) {
+          console.error('❌ Error de conexión al desbloquear agenda:', error);
+          alert('Error de conexión al desbloquear la agenda.');
+        }
+      };
+
+      // Función para renderizar la pestaña de regalos en efectivo
+      function renderEfectivo(data) {
+        const { cards, gifts, stats } = data;
+        
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-money-bill-wave"></i> <span data-i18n="wedding:admin.cashGifts">Regalos en Efectivo</span></h3>
+              <div style="display: flex; gap: 10px;">
+                <button onclick="showAddCardModal()" class="admin-action">
+                  <i class="fas fa-plus"></i> <span data-i18n="wedding:admin.addCard">Agregar Tarjeta</span>
+                </button>
+                <button onclick="resetCashGifts()" class="admin-action danger">
+                  <i class="fas fa-trash-alt"></i> Puesta a Cero
+                </button>
+              </div>
+            </div>
+            
+            <!-- Estadísticas -->
+            <div class="stats-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
+              <div class="stat-card" style="background: linear-gradient(135deg, #8B5A96, #D4A5A5); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                <h4 style="margin: 0 0 10px 0; font-size: 2em; color: white;">${stats.totalCards}</h4>
+                <p style="margin: 0; color: white;">Tarjetas Creadas</p>
+              </div>
+              <div class="stat-card" style="background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                <h4 style="margin: 0 0 10px 0; font-size: 2em; color: white;">${stats.totalGifts}</h4>
+                <p style="margin: 0; color: white;">Regalos Recibidos</p>
+              </div>
+              <div class="stat-card" style="background: linear-gradient(135deg, #17a2b8, #6f42c1); color: white; padding: 20px; border-radius: 10px; text-align: center;">
+                <h4 style="margin: 0 0 10px 0; font-size: 2em; color: white;">€${(stats.totalAmount / 100).toFixed(2)}</h4>
+                <p style="margin: 0; color: white;">Total Recibido</p>
+              </div>
+            </div>
+            
+            <!-- Tarjetas de pago -->
+            <div class="admin-subsection">
+              <h4><i class="fas fa-credit-card"></i> Tarjetas de Pago Disponibles</h4>
+              <div class="cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                ${cards.map(card => `
+                  <div class="card-item" style="border: 1px solid #e9ecef; border-radius: 10px; padding: 20px; background: ${card.imageUrl ? `url('${card.imageUrl}')` : 'white'}; background-size: cover; background-position: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); ${card.imageUrl ? 'color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);' : ''}">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                      <h5 style="margin: 0; color: ${card.imageUrl ? 'white' : 'var(--primary-color)'}; font-size: 1.8em; font-weight: 700; ${card.imageUrl ? 'text-shadow: 2px 2px 4px rgba(0,0,0,0.8);' : ''}">€${card.amount}</h5>
+                      <div class="card-actions">
+                        <button onclick="editCard('${card.id}')" class="admin-action small" style="margin-right: 5px;">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        ${!card.isDefault ? `<button onclick="deleteCard('${card.id}')" class="admin-action small danger">
+                          <i class="fas fa-trash"></i>
+                        </button>` : '<span style="color: #6c757d; font-size: 0.8em;">Por defecto</span>'}
+                      </div>
+                    </div>
+                    <div class="card-content">
+                      <p style="margin: 0 0 10px 0; font-weight: 600; ${card.imageUrl ? 'color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);' : ''}">${card.label}</p>
+                      ${card.description ? `<p style="margin: 0; color: ${card.imageUrl ? 'rgba(255,255,255,0.9)' : '#6c757d'}; font-size: 0.9em; ${card.imageUrl ? 'text-shadow: 1px 1px 2px rgba(0,0,0,0.8);' : ''}">${card.description}</p>` : ''}
+                      <div class="card-status" style="margin-top: 10px;">
+                        <span class="status-badge ${card.isActive ? 'status-active' : 'status-inactive'}" style="padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600;">
+                          ${card.isActive ? 'Activa' : 'Inactiva'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                `).join('')}
+                ${cards.length === 0 ? `
+                  <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #6c757d;">
+                    <i class="fas fa-credit-card" style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <h4>No hay tarjetas de pago creadas</h4>
+                    <p>Haz clic en "Agregar Tarjeta" para crear la primera tarjeta de pago en efectivo.</p>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+            
+            <!-- Regalos recibidos -->
+            <div class="admin-subsection" style="margin-top: 40px;">
+              <h4><i class="fas fa-gift"></i> Regalos Recibidos</h4>
+              <div class="gifts-list" style="margin-top: 20px;">
+                ${gifts.map(gift => `
+                  <div class="gift-item" style="border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; margin-bottom: 15px; background: white;">
+                    <div class="gift-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                      <div class="gift-info">
+                        <strong>${gift.donorName}</strong>
+                        <span style="color: #6c757d; margin-left: 10px;">€${(gift.amount / 100).toFixed(2)}</span>
+                      </div>
+                      <div class="gift-date" style="color: #6c757d; font-size: 0.9em;">
+                        ${new Date(gift.createdAt).toLocaleDateString()}
+                      </div>
+                    </div>
+                    ${gift.donorMessage ? `<div class="gift-message" style="color: #6c757d; font-style: italic; margin-top: 10px;">"${gift.donorMessage}"</div>` : ''}
+                    <div class="gift-status" style="margin-top: 10px;">
+                      <span class="status-badge status-${gift.status}" style="padding: 4px 8px; border-radius: 4px; font-size: 0.8em; font-weight: 600; text-transform: capitalize;">
+                        ${gift.status}
+                      </span>
+                    </div>
+                  </div>
+                `).join('')}
+                ${gifts.length === 0 ? `
+                  <div class="empty-state" style="text-align: center; padding: 40px; color: #6c757d;">
+                    <i class="fas fa-gift" style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;"></i>
+                    <h4>No hay regalos recibidos aún</h4>
+                    <p>Los regalos en efectivo aparecerán aquí cuando los invitados realicen pagos.</p>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // Agregar estilos CSS
+        const style = document.createElement('style');
+        style.textContent = `
+          .status-active { background: #d4edda; color: #155724; }
+          .status-inactive { background: #f8d7da; color: #721c24; }
+          .status-pending { background: #fff3cd; color: #856404; }
+          .status-completed { background: #d4edda; color: #155724; }
+        `;
+        document.head.appendChild(style);
+        
+        i18n.updatePageContent();
+      }
+
+      // Función para cargar imágenes de puestas de sol
+      async function loadSunsetImages() {
+        try {
+          console.log('🖼️ Cargando imágenes de puestas de sol...');
+          console.log('🔗 URL de la petición:', '/assets/images/sunset-beach-images.json');
+          
+          const response = await fetch('/assets/images/sunset-beach-images.json');
+          console.log('📡 Respuesta del servidor:', response.status, response.statusText);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          console.log('🖼️ Datos recibidos:', data);
+          
+          const images = data.images || data;
+          console.log('🖼️ Imágenes procesadas:', images);
+          
+          const imageGrid = document.getElementById('imageGrid');
+          if (!imageGrid) {
+            console.error('❌ No se encontró el elemento imageGrid');
+            return;
+          }
+          
+          imageGrid.innerHTML = '';
+          console.log('🖼️ Creando elementos de imagen...');
+          
+          images.forEach((image, index) => {
+            console.log(`🖼️ Procesando imagen ${index + 1}:`, image);
+            
+            const imageOption = document.createElement('div');
+            imageOption.className = 'image-option';
+            imageOption.dataset.imageId = image.id;
+            imageOption.dataset.imageUrl = image.url;
+            
+            imageOption.innerHTML = `
+              <img src="${image.url}" alt="${image.name}" loading="lazy" title="${image.name}">
+            `;
+            
+            imageOption.addEventListener('click', () => {
+              // Remover selección anterior
+              document.querySelectorAll('.image-option').forEach(option => {
+                option.classList.remove('selected');
+              });
+              
+              // Seleccionar imagen actual
+              imageOption.classList.add('selected');
+              console.log('🖼️ Imagen seleccionada:', image.name);
+            });
+            
+            imageGrid.appendChild(imageOption);
+            console.log(`✅ Imagen ${index + 1} agregada al grid`);
+          });
+          
+          console.log('🎉 Todas las imágenes cargadas correctamente');
+        } catch (error) {
+          console.error('Error cargando imágenes:', error);
+        }
+      }
+
+      // Función para mostrar modal de agregar tarjeta
+      window.showAddCardModal = () => {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+          <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+              <h3><i class="fas fa-plus"></i> Agregar Tarjeta de Pago</h3>
+              <button onclick="closeModal()" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+              <form id="addCardForm">
+                <div class="form-group">
+                  <label for="cardAmount">Cantidad (€) *</label>
+                  <input type="number" id="cardAmount" step="0.01" min="0.01" required>
+                </div>
+                <div class="form-group">
+                  <label for="cardLabel">Etiqueta *</label>
+                  <input type="text" id="cardLabel" placeholder="Ej: Regalo pequeño" required>
+                </div>
+                <div class="form-group">
+                  <label for="cardDescription">Descripción (opcional)</label>
+                  <textarea id="cardDescription" placeholder="Descripción de la tarjeta..."></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Imagen de fondo *</label>
+                  <div id="imageSelector" class="image-selector">
+                    <div class="image-grid" id="imageGrid">
+                      <!-- Las imágenes se cargarán dinámicamente -->
+                    </div>
+                  </div>
+                </div>
+                <div class="form-actions">
+                  <button type="button" onclick="closeModal()" class="btn-secondary">Cancelar</button>
+                  <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i> Crear Tarjeta
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Cargar imágenes de puestas de sol después de que el modal esté en el DOM
+        setTimeout(() => {
+          loadSunsetImages();
+        }, 100);
+        
+        // Manejar envío del formulario
+        document.getElementById('addCardForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          
+          const amount = parseFloat(document.getElementById('cardAmount').value);
+          const label = document.getElementById('cardLabel').value.trim();
+          const description = document.getElementById('cardDescription').value.trim();
+          const selectedImage = document.querySelector('.image-option.selected');
+          
+          if (!selectedImage) {
+            alert('Por favor, selecciona una imagen de fondo para la tarjeta');
+            return;
+          }
+          
+          const imageId = selectedImage.dataset.imageId;
+          const imageUrl = selectedImage.dataset.imageUrl;
+          
+          console.log('🎨 Datos de la imagen seleccionada:', { imageId, imageUrl });
+          
+          try {
+            const response = await fetch('/api/admin/efectivo/card', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': localStorage.getItem('adminToken')
+              },
+              body: JSON.stringify({ amount, label, description, imageId, imageUrl })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+              closeModal();
+              showTab('efectivo'); // Recargar la pestaña
+            } else {
+              alert(`Error: ${data.error}`);
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Error de conexión');
+          }
+        });
+      };
+
+      // Función para editar tarjeta
+      window.editCard = async (cardId) => {
+        try {
+          // Obtener datos de la tarjeta actual
+          const response = await fetch('/api/admin/efectivo', {
+            headers: {
+              'Authorization': localStorage.getItem('adminToken')
+            }
+          });
+          
+          const data = await response.json();
+          const card = data.cards.find(c => c.id === cardId);
+          
+          if (!card) {
+            alert('Tarjeta no encontrada');
+            return;
+          }
+          
+          // Crear modal de edición
+          const modal = document.createElement('div');
+          modal.className = 'modal-overlay';
+          modal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px;">
+              <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Editar Tarjeta de Pago</h3>
+                <button onclick="closeModal()" class="modal-close">&times;</button>
+              </div>
+              <div class="modal-body">
+                <form id="editCardForm">
+                  <div class="form-group">
+                    <label for="editCardAmount">Cantidad (€) *</label>
+                    <input type="number" id="editCardAmount" step="0.01" min="0.01" value="${card.amount}" ${card.isDefault ? 'readonly' : 'required'}>
+                    ${card.isDefault ? '<small style="color: #6c757d;">Las tarjetas por defecto no se pueden editar</small>' : ''}
+                  </div>
+                  <div class="form-group">
+                    <label for="editCardLabel">Etiqueta *</label>
+                    <input type="text" id="editCardLabel" value="${card.label}" ${card.isDefault ? 'readonly' : 'required'}>
+                  </div>
+                  <div class="form-group">
+                    <label for="editCardDescription">Descripción (opcional)</label>
+                    <textarea id="editCardDescription" placeholder="Descripción de la tarjeta..." ${card.isDefault ? 'readonly' : ''}>${card.description || ''}</textarea>
+                  </div>
+                  <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                      <input type="checkbox" id="editCardActive" ${card.isActive ? 'checked' : ''}>
+                      <span>Tarjeta activa</span>
+                    </label>
+                  </div>
+                  <div class="form-actions">
+                    <button type="button" onclick="closeModal()" class="btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn-primary">
+                      <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(modal);
+          
+          // Manejar envío del formulario
+          document.getElementById('editCardForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const isActive = document.getElementById('editCardActive').checked;
+            
+            // Para tarjetas por defecto, solo permitir cambiar el estado activo
+            let amount, label, description;
+            if (card.isDefault) {
+              amount = card.amount;
+              label = card.label;
+              description = card.description;
+            } else {
+              amount = parseFloat(document.getElementById('editCardAmount').value);
+              label = document.getElementById('editCardLabel').value.trim();
+              description = document.getElementById('editCardDescription').value.trim();
+            }
+            
+            try {
+              const response = await fetch(`/api/admin/efectivo/card/${cardId}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': localStorage.getItem('adminToken')
+                },
+                body: JSON.stringify({ amount, label, description, isActive })
+              });
+              
+              const data = await response.json();
+              
+              if (response.ok) {
+                closeModal();
+                showTab('efectivo'); // Recargar la pestaña
+              } else {
+                alert(`Error: ${data.error}`);
+              }
+            } catch (error) {
+              console.error('Error:', error);
+              alert('Error de conexión');
+            }
+          });
+          
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Error al cargar los datos de la tarjeta');
+        }
+      };
+
+      // Función para eliminar tarjeta
+      window.deleteCard = async (cardId) => {
+        if (confirm('¿Estás seguro de que quieres eliminar esta tarjeta?')) {
+          try {
+            const response = await fetch(`/api/admin/efectivo/card/${cardId}`, {
+              method: 'DELETE',
+              headers: {
+                'Authorization': localStorage.getItem('adminToken')
+              }
+            });
+            
+            if (response.ok) {
+              showTab('efectivo'); // Recargar la pestaña
+            } else {
+              const data = await response.json();
+              alert(`Error: ${data.error}`);
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            alert('Error de conexión');
+          }
+        }
+      };
+
+      // Función para resetear regalos en efectivo
+      window.resetCashGifts = async () => {
+        if (confirm('¿Estás seguro de que quieres resetear todos los regalos en efectivo?\n\nEsto eliminará:\n- Todos los regalos recibidos\n- El contador de regalos\n- El total de dinero recibido\n\nEsta acción NO se puede deshacer.')) {
+          try {
+            const token = localStorage.getItem('adminToken');
+            console.log('🔍 Debug - Token de admin:', token ? 'Presente' : 'Ausente');
+            
+            const response = await fetch('/api/admin/efectivo/reset', {
+              method: 'DELETE',
+              headers: {
+                'Authorization': token,
+                'Content-Type': 'application/json'
+              }
+            });
+            
+            console.log('🔍 Debug - Respuesta del servidor:', response.status, response.statusText);
+            
+            if (!response.ok) {
+              const errorData = await response.json();
+              console.error('Error del servidor:', errorData);
+              alert(`Error: ${errorData.error}`);
+              return;
+            }
+            
+            const data = await response.json();
+            console.log('🔍 Debug - Datos recibidos:', data);
+            
+            alert('Regalos en efectivo reseteados correctamente');
+            showTab('efectivo'); // Recargar la pestaña para mostrar los cambios
+          } catch (error) {
+            console.error('Error completo:', error);
+            alert(`Error de conexión: ${error.message}`);
+          }
+        }
+      };
+
+      // Función para cerrar modal
+      window.closeModal = () => {
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+          modal.remove();
+        }
+      };
+    });
+  </script>
+</body>
+</html>

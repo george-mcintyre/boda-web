@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="wedding:title">Boda de Iluminada & George</title>
+  <meta name="description" content="Celebra con nosotros nuestro día especial" data-i18n="wedding:hero.description">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <style>
+    /* Estilos para el header con selector de idiomas */
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+    }
+    
+    .header-left {
+      flex: 1;
+    }
+    
+    /* Estilos para el selector de idiomas */
+    .language-selector {
+      position: relative;
+      margin-left: 20px;
+      z-index: 1000;
+    }
+
+    /* Estilos para el icono de acceso al login */
+    .login-access-icon {
+      margin-left: 15px;
+      z-index: 1000;
+    }
+
+    .login-access-icon a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      font-size: 18px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .login-access-icon a:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .login-access-icon a:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Estilos específicos para centrar eventos */
+    .info-grid {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 2rem !important;
+      margin: 2rem 0 !important;
+    }
+
+    /* Contenedor de eventos */
+    .events-container {
+      width: 100% !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 2rem !important;
+    }
+
+    /* Fila de eventos */
+    .events-row {
+      display: flex !important;
+      justify-content: center !important;
+      flex-wrap: wrap !important;
+      gap: 2rem !important;
+      max-width: 1200px !important;
+      width: 100% !important;
+    }
+
+    /* Sección de ubicación */
+    .location-section {
+      display: flex !important;
+      justify-content: center !important;
+      width: 100% !important;
+    }
+
+    .location-card {
+      max-width: 400px !important;
+    }
+    
+    .language-selector-wrapper {
+      position: relative;
+    }
+    
+    .language-selector-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .language-selector-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      min-width: 120px;
+    }
+    
+    .language-selector-toggle:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .language-selector-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+      background: white;
+      border: 1px solid #e1e5e9;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      backdrop-filter: blur(20px);
+      min-width: 160px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1001;
+      overflow: hidden;
+    }
+    
+    .language-selector-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    .language-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #333;
+      font-size: 14px;
+      font-weight: 500;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    
+    .language-option:last-child {
+      border-bottom: none;
+    }
+    
+    .language-option:hover {
+      background: #f8f9fa;
+      color: #007bff;
+    }
+    
+    .language-option.active {
+      background: #e3f2fd;
+      color: #1976d2;
+      font-weight: 600;
+    }
+    
+    /* Asegurar que el header tenga el espacio correcto */
+    header {
+      position: relative;
+      padding: 20px;
+    }
+
+    /* Espaciado para el contenido principal */
+    main {
+      margin-top: 40px;
+    }
+
+
+
+    /* Asegurar que la sección de invitados esté centrada */
+    .cta-section {
+      text-align: center;
+    }
+
+    .cta-content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .cta-content > h3 {
+      font-size: 2.5rem;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 30px;
+    }
+
+    /* Estilos para la carga de eventos */
+    .loading-events {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: var(--text-light);
+      font-style: italic;
+      grid-column: 1 / -1;
+    }
+
+    .loading-events i {
+      font-size: 2em;
+      margin-bottom: 15px;
+      color: var(--primary-color);
+    }
+
+    .error-events {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      color: #dc3545;
+      font-style: italic;
+      grid-column: 1 / -1;
+    }
+
+    .error-events i {
+      font-size: 2em;
+      margin-bottom: 15px;
+    }
+
+
+
+    /* Estilos para los headers de sección (CTA y Admin) */
+    .section-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-header .info-icon {
+      width: 80px;
+      height: 80px;
+      background: var(--gradient-primary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      color: var(--white);
+      font-size: 2rem;
+    }
+
+    .section-header h3 {
+      color: var(--primary-color);
+      margin-bottom: 0;
+      font-size: 2.5rem;
+      font-weight: 600;
+    }
+
+    /* Estilos para el layout de eventos y ubicación */
+    .events-container {
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+    }
+
+    .events-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .location-section {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .location-card {
+      max-width: 400px;
+    }
+    
+    /* Botón rosa degradado para ver en mapa */
+    a.btn-ver-mapa {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--gradient-primary);
+      color: #ffffff;
+      padding: 0.8rem 1.4rem;
+      border-radius: 50px;
+      text-decoration: none;
+      box-shadow: 0 4px 15px var(--shadow);
+      margin-top: 0.8rem;
+      transition: all 0.3s ease;
+    }
+    
+    a.btn-ver-mapa:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px var(--shadow-hover);
+    }
+    
+    a.btn-ver-mapa i {
+      font-size: 1rem;
+    }
+
+    /* Overlay y contenedor de mapa */
+    .map-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+    }
+
+    .map-container {
+      position: relative;
+      width: min(1000px, 92%);
+      height: min(700px, 85%);
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    }
+
+    #events-map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .map-close-btn {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 100000;
+      background: var(--gradient-primary);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      border: 2px solid #ffffff;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <div class="header-left">
+        <h1 data-i18n="wedding:title">Iluminada & George</h1>
+        <p data-i18n="wedding:subtitle">Nos casamos</p>
+        <div class="wedding-date">
+          <i class="fas fa-calendar-alt"></i>
+          <span data-i18n="wedding:date">6 de Junio, 2026</span>
+        </div>
+      </div>
+      <div class="language-selector">
+        <div class="language-selector-wrapper">
+          <div class="language-selector-dropdown">
+            <button class="language-selector-toggle" id="language-toggle" aria-label="Select language">
+              <span class="current-language">
+                <span class="flag">🇪🇸</span>
+                <span class="name">Español</span>
+              </span>
+              <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="language-selector-menu" id="language-menu">
+              <button class="language-option active" data-lang="es">
+                <span class="flag">🇪🇸</span>
+                <span class="name">Español</span>
+              </button>
+              <button class="language-option" data-lang="en">
+                <span class="flag">🇬🇧</span>
+                <span class="name">English</span>
+              </button>
+              <button class="language-option" data-lang="fr">
+                <span class="flag">🇫🇷</span>
+                <span class="name">Français</span>
+              </button>
+              
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="login-access-icon">
+        <a href="login-i18n.html" title="Acceso para invitados" aria-label="Acceso para invitados">
+          <i class="fas fa-user"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-section fade-in-up">
+      <div class="hero-content">
+        <h2 data-i18n="wedding:hero.title">¡Te invitamos a celebrar nuestro amor!</h2>
+        <p class="hero-description" data-i18n="wedding:hero.description">
+          Después de 5 años de amor y aventuras juntos, hemos decidido dar el paso más importante de nuestras vidas. 
+          Queremos que formes parte de este momento tan especial para Iluminada y George.
+        </p>
+        <div class="countdown-container">
+          <div class="countdown-item">
+            <span class="countdown-number" id="days">00</span>
+            <span class="countdown-label" data-i18n="common:days">Días</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-number" id="hours">00</span>
+            <span class="countdown-label" data-i18n="common:hours">Horas</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-number" id="minutes">00</span>
+            <span class="countdown-label" data-i18n="common:minutes">Minutos</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-number" id="seconds">00</span>
+            <span class="countdown-label" data-i18n="common:seconds">Segundos</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-section fade-in-up">
+      <div class="info-grid" id="events-grid">
+        <!-- Los eventos se cargarán dinámicamente aquí -->
+        <div class="loading-events">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span data-i18n="common:loadingEvents">Cargando eventos...</span>
+        </div>
+      </div>
+    </section>
+
+
+
+    <section class="cta-section fade-in-up">
+      <div class="cta-content">
+        <div class="section-header">
+          <div class="info-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3 data-i18n="wedding:guestZone.title">Zona de Invitados</h3>
+        </div>
+        <p data-i18n="wedding:guestZone.description">Aquí puedes gestionar todos los detalles de tu participación en nuestra boda.</p>
+        <div class="cta-buttons">
+          <button class="primary" onclick="window.location.href='http://localhost:3000/login-i18n.html'">
+            <i class="fas fa-sign-in-alt"></i>
+            <span data-i18n="common:login">Iniciar sesión</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+
+
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2026 <span data-i18n="wedding:title">Boda de Iluminada & George</span></p>
+      <p data-i18n="common:thankYou">Gracias por ser parte de nuestro día especial</p>
+    </div>
+  </footer>
+
+  <!-- Modal de mapa de eventos -->
+  <div class="map-overlay" id="mapOverlay" role="dialog" aria-modal="true" aria-label="Mapa de eventos">
+    <div class="map-container">
+      <button class="map-close-btn" id="mapCloseBtn" aria-label="Cerrar mapa">✕</button>
+      <div id="events-map"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+    // Datos de traducción completos
+    const translations = {
+      es: {
+        'wedding:title': 'Boda de Iluminada & George',
+        'wedding:subtitle': 'Nos casamos',
+        'wedding:date': '6 de Junio, 2026',
+        'wedding:hero.title': '¡Te invitamos a celebrar nuestro amor!',
+        'wedding:hero.description': 'Después de 5 años de amor y aventuras juntos, hemos decidido dar el paso más importante de nuestras vidas. Queremos que formes parte de este momento tan especial para Iluminada y George.',
+        'wedding:ceremony.title': 'Ceremonia',
+        'wedding:ceremony.venue': 'Iglesia de San Miguel',
+        'wedding:ceremony.address': 'Plaza Mayor, 1',
+        'wedding:ceremony.city': 'Madrid, España',
+        'wedding:ceremony.time': '12:00 h',
+        'wedding:celebration.title': 'Celebración',
+        'wedding:celebration.venue': 'Palacio de los Duques',
+        'wedding:celebration.address': 'Calle Gran Vía, 28',
+        'wedding:celebration.city': 'Madrid, España',
+        'wedding:celebration.time': '14:00 h',
+        'wedding:location.title': 'Ubicación',
+        'wedding:location.description': 'Ambos eventos se celebrarán en el centro de Madrid, con fácil acceso en transporte público.',
+        'wedding:location.viewMap': 'Ver en mapa',
+
+        'wedding:guestZone.title': 'Zona de Invitados',
+        'wedding:guestZone.description': 'Aquí puedes gestionar todos los detalles de tu participación en nuestra boda.',
+        'common:days': 'Días',
+        'common:hours': 'Horas',
+        'common:minutes': 'Minutos',
+        'common:seconds': 'Segundos',
+
+        'common:login': 'Iniciar sesión',
+
+        'common:thankYou': 'Gracias por ser parte de nuestro día especial',
+        'common:countdownMessage': '¡Hoy es el gran día!',
+        'common:loadingEvents': 'Cargando eventos...',
+
+        'common:advancedFeatures': 'Ejemplos de Funcionalidades Avanzadas',
+        'common:numberFormatting': 'Formateo de Números',
+        'common:price': 'Precio',
+        'common:percentage': 'Porcentaje',
+        'common:dateFormatting': 'Formateo de Fechas',
+        'common:currentDate': 'Fecha actual',
+        'common:currentTime': 'Hora actual',
+        'common:currencyFormatting': 'Formateo de Moneda',
+        'common:gift': 'Regalo',
+        // Traducciones para eventos de la agenda
+        'events:cocktail.title': 'Cocktail de Bienvenida',
+        'events:cocktail.description': 'Celebración informal para dar la bienvenida a todos los invitados',
+        'events:cocktail.venue': 'Hotel Palace Madrid',
+        'events:cocktail.address': 'Plaza de las Cortes, 7, Madrid',
+        'events:ceremony.title': 'Ceremonia de Boda',
+        'events:ceremony.description': 'Ceremonia religiosa de Iluminada y George',
+        'events:ceremony.venue': 'Iglesia de San Miguel',
+        'events:ceremony.address': 'Plaza Mayor, 1, Madrid',
+        'events:reception.title': 'Recepción de Invitados',
+        'events:reception.description': 'Celebración principal con cena y baile',
+        'events:reception.venue': 'Palacio de los Duques',
+        'events:reception.address': 'Calle Gran Vía, 28, Madrid',
+        'events:brunch.title': 'Brunch de Despedida',
+        'events:brunch.description': 'Desayuno informal para despedir a los invitados',
+        'events:brunch.venue': 'Restaurante "El Jardín"',
+        'events:brunch.address': 'Calle de Alcalá, 15, Madrid',
+        'events:anniversary.title': 'Aniversario de Boda',
+        'events:anniversary.description': 'Celebración del primer año de casados',
+        'events:anniversary.venue': 'Restaurante "El Puerto"',
+        'events:anniversary.address': 'Puerto Banús, 15'
+      },
+      en: {
+        'wedding:title': 'Iluminada & George Wedding',
+        'wedding:subtitle': 'We are getting married',
+        'wedding:date': 'June 6th, 2026',
+        'wedding:hero.title': 'We invite you to celebrate our love!',
+        'wedding:hero.description': 'After 5 years of love and adventures together, we have decided to take the most important step of our lives. We want you to be part of this very special moment for Iluminada and George.',
+        'wedding:ceremony.title': 'Ceremony',
+        'wedding:ceremony.venue': 'San Miguel Church',
+        'wedding:ceremony.address': 'Plaza Mayor, 1',
+        'wedding:ceremony.city': 'Madrid, Spain',
+        'wedding:ceremony.time': '12:00 PM',
+        'wedding:celebration.title': 'Celebration',
+        'wedding:celebration.venue': 'Palace of the Dukes',
+        'wedding:celebration.address': 'Gran Vía Street, 28',
+        'wedding:celebration.city': 'Madrid, Spain',
+        'wedding:celebration.time': '2:00 PM',
+        'wedding:location.title': 'Location',
+        'wedding:location.description': 'Both events will be held in downtown Madrid, with easy access by public transportation.',
+        'wedding:location.viewMap': 'View on map',
+
+        'wedding:guestZone.title': 'Guest Zone',
+        'wedding:guestZone.description': 'Here you can manage all the details of your participation in our wedding.',
+        'common:days': 'Days',
+        'common:hours': 'Hours',
+        'common:minutes': 'Minutes',
+        'common:seconds': 'Seconds',
+
+        'common:login': 'Login',
+
+        'common:thankYou': 'Thank you for being part of our special day',
+        'common:countdownMessage': 'Today is the big day!',
+        'common:loadingEvents': 'Loading events...',
+
+        'common:advancedFeatures': 'Advanced Features Examples',
+        'common:numberFormatting': 'Number Formatting',
+        'common:price': 'Price',
+        'common:percentage': 'Percentage',
+        'common:dateFormatting': 'Date Formatting',
+        'common:currentDate': 'Current Date',
+        'common:currentTime': 'Current Time',
+        'common:currencyFormatting': 'Currency Formatting',
+        'common:gift': 'Gift',
+        // Traducciones para eventos de la agenda
+        'events:cocktail.title': 'Welcome Cocktail',
+        'events:cocktail.description': 'Informal celebration to welcome all guests',
+        'events:cocktail.venue': 'Hotel Palace Madrid',
+        'events:cocktail.address': 'Plaza de las Cortes, 7, Madrid',
+        'events:ceremony.title': 'Wedding Ceremony',
+        'events:ceremony.description': 'Religious ceremony of Iluminada and George',
+        'events:ceremony.venue': 'San Miguel Church',
+        'events:ceremony.address': 'Plaza Mayor, 1, Madrid',
+        'events:reception.title': 'Guest Reception',
+        'events:reception.description': 'Main celebration with dinner and dancing',
+        'events:reception.venue': 'Palace of the Dukes',
+        'events:reception.address': 'Gran Vía Street, 28, Madrid',
+        'events:brunch.title': 'Farewell Brunch',
+        'events:brunch.description': 'Informal breakfast to say goodbye to guests',
+        'events:brunch.venue': 'Restaurant "El Jardín"',
+        'events:brunch.address': 'Calle de Alcalá, 15, Madrid',
+        'events:anniversary.title': 'Wedding Anniversary',
+        'events:anniversary.description': 'Celebration of the first year of marriage',
+        'events:anniversary.venue': 'Restaurant "El Puerto"',
+        'events:anniversary.address': 'Puerto Banús, 15'
+      },
+      fr: {
+        'wedding:title': 'Mariage d\'Iluminada & George',
+        'wedding:subtitle': 'Nous nous marions',
+        'wedding:date': '6 Juin 2026',
+        'wedding:hero.title': 'Nous vous invitons à célébrer notre amour !',
+        'wedding:hero.description': 'Après 5 ans d\'amour et d\'aventures ensemble, nous avons décidé de faire le pas le plus important de nos vies. Nous voulons que vous fassiez partie de ce moment si spécial pour Iluminada et George.',
+        'wedding:ceremony.title': 'Cérémonie',
+        'wedding:ceremony.venue': 'Église San Miguel',
+        'wedding:ceremony.address': 'Plaza Mayor, 1',
+        'wedding:ceremony.city': 'Madrid, Espagne',
+        'wedding:ceremony.time': '12h00',
+        'wedding:celebration.title': 'Célébration',
+        'wedding:celebration.venue': 'Palais des Ducs',
+        'wedding:celebration.address': 'Rue Gran Vía, 28',
+        'wedding:celebration.city': 'Madrid, Espagne',
+        'wedding:celebration.time': '14h00',
+        'wedding:location.title': 'Emplacement',
+        'wedding:location.description': 'Les deux événements se tiendront au centre de Madrid, avec un accès facile par les transports publics.',
+        'wedding:location.viewMap': 'Voir sur la carte',
+
+        'wedding:guestZone.title': 'Zone des Invités',
+        'wedding:guestZone.description': 'Ici vous pouvez gérer tous les détails de votre participation à notre mariage.',
+        'common:days': 'Jours',
+        'common:hours': 'Heures',
+        'common:minutes': 'Minutes',
+        'common:seconds': 'Secondes',
+
+        'common:login': 'Se connecter',
+
+        'common:thankYou': 'Merci de faire partie de notre jour spécial',
+        'common:countdownMessage': 'Aujourd\'hui est le grand jour !',
+        'common:loadingEvents': 'Chargement des événements...',
+
+        'common:advancedFeatures': 'Exemples de Fonctionnalités Avancées',
+        'common:numberFormatting': 'Formatage de Nombres',
+        'common:price': 'Prix',
+        'common:percentage': 'Pourcentage',
+        'common:dateFormatting': 'Formatage de Dates',
+        'common:currentDate': 'Date Actuelle',
+        'common:currentTime': 'Heure Actuelle',
+        'common:currencyFormatting': 'Formatage de Devise',
+        'common:gift': 'Cadeau',
+        // Traducciones para eventos de la agenda
+        'events:cocktail.title': 'Cocktail de Bienvenue',
+        'events:cocktail.description': 'Célébration informelle pour souhaiter la bienvenue à tous les invités',
+        'events:cocktail.venue': 'Hôtel Palace Madrid',
+        'events:cocktail.address': 'Plaza de las Cortes, 7, Madrid',
+        'events:ceremony.title': 'Cérémonie de Mariage',
+        'events:ceremony.description': 'Cérémonie religieuse d\'Iluminada et George',
+        'events:ceremony.venue': 'Église San Miguel',
+        'events:ceremony.address': 'Plaza Mayor, 1, Madrid',
+        'events:reception.title': 'Réception des Invités',
+        'events:reception.description': 'Célébration principale avec dîner et danse',
+        'events:reception.venue': 'Palais des Ducs',
+        'events:reception.address': 'Rue Gran Vía, 28, Madrid',
+        'events:brunch.title': 'Brunch d\'Adieu',
+        'events:brunch.description': 'Petit-déjeuner informel pour dire au revoir aux invités',
+        'events:brunch.venue': 'Restaurant "El Jardín"',
+        'events:brunch.address': 'Calle de Alcalá, 15, Madrid',
+        'events:anniversary.title': 'Anniversaire de Mariage',
+        'events:anniversary.description': 'Célébration de la première année de mariage',
+        'events:anniversary.venue': 'Restaurant "El Puerto"',
+        'events:anniversary.address': 'Puerto Banús, 15'
+      },
+
+    };
+
+    // Configuración de idiomas
+    const languages = {
+      es: { name: 'Español', flag: '🇪🇸', rtl: false },
+      en: { name: 'English', flag: '🇬🇧', rtl: false },
+      fr: { name: 'Français', flag: '🇫🇷', rtl: false },
+
+    };
+
+    let currentLanguage = 'es';
+
+    function translate(key, lang = currentLanguage) {
+      const translation = translations[lang]?.[key];
+      return translation || key;
+    }
+
+    function updatePageContent() {
+      document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        const translation = translate(key);
+        if (translation !== key) {
+          element.textContent = translation;
+        }
+      });
+    }
+
+    function updateLanguageSelector() {
+      const toggle = document.getElementById('language-toggle');
+      const currentLang = languages[currentLanguage];
+      
+      if (toggle) {
+        toggle.innerHTML = `
+          <span class="current-language">
+            <span class="flag">${currentLang.flag}</span>
+            <span class="name">${currentLang.name}</span>
+          </span>
+          <i class="fas fa-chevron-down"></i>
+        `;
+      }
+      
+      // Actualizar opciones activas
+      document.querySelectorAll('.language-option').forEach(option => {
+        const lang = option.getAttribute('data-lang');
+        if (lang === currentLanguage) {
+          option.classList.add('active');
+        } else {
+          option.classList.remove('active');
+        }
+      });
+    }
+
+    function updateDocumentDirection() {
+      const isRTL = languages[currentLanguage].rtl;
+      document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+      document.documentElement.lang = currentLanguage;
+    }
+
+    async function changeLanguage(lang) {
+      if (!languages[lang]) {
+        console.warn(`Language ${lang} is not supported`);
+        return false;
+      }
+
+      try {
+        currentLanguage = lang;
+        
+        // Guardar preferencia
+        localStorage.setItem('i18nextLng', lang);
+        
+        // Actualizar dirección del documento
+        updateDocumentDirection();
+        
+        // Actualizar contenido
+        updatePageContent();
+        
+        // Actualizar selector
+        updateLanguageSelector();
+        
+        // Actualizar formateo
+        updateFormatting();
+        
+        // Recargar eventos con el nuevo idioma
+        await loadEvents();
+        
+        console.log(`Language changed to: ${lang}`);
+        return true;
+      } catch (error) {
+        console.error(`Error changing language: ${error.message}`);
+        return false;
+      }
+    }
+
+    function updateFormatting() {
+      try {
+        // Formatear números
+        const priceElement = document.getElementById('formatted-price');
+        const percentageElement = document.getElementById('formatted-percentage');
+        
+        if (priceElement) {
+          priceElement.textContent = new Intl.NumberFormat(currentLanguage, { 
+            style: 'decimal', 
+            minimumFractionDigits: 2 
+          }).format(1000);
+        }
+        
+        if (percentageElement) {
+          percentageElement.textContent = new Intl.NumberFormat(currentLanguage, { 
+            style: 'percent', 
+            minimumFractionDigits: 1 
+          }).format(0.855);
+        }
+        
+        // Formatear fechas
+        const dateElement = document.getElementById('formatted-date');
+        const timeElement = document.getElementById('formatted-time');
+        const now = new Date();
+        
+        if (dateElement) {
+          dateElement.textContent = new Intl.DateTimeFormat(currentLanguage, { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          }).format(now);
+        }
+        
+        if (timeElement) {
+          timeElement.textContent = new Intl.DateTimeFormat(currentLanguage, { 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          }).format(now);
+        }
+        
+        // Formatear moneda
+        const currencyElement = document.getElementById('formatted-currency');
+        if (currencyElement) {
+          const currency = currentLanguage === 'en' ? 'USD' : 'EUR';
+          currencyElement.textContent = new Intl.NumberFormat(currentLanguage, {
+            style: 'currency',
+            currency: currency
+          }).format(150);
+        }
+      } catch (error) {
+        console.error('Error updating formatting:', error);
+      }
+    }
+
+    // Configurar event listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded, initializing i18n system...');
+      
+      // Configurar selector de idiomas
+      const toggle = document.getElementById('language-toggle');
+      const menu = document.getElementById('language-menu');
+      
+      if (toggle && menu) {
+        toggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          menu.classList.toggle('show');
+          toggle.setAttribute('aria-expanded', menu.classList.contains('show'));
+        });
+        
+        // Cerrar al hacer clic fuera
+        document.addEventListener('click', (e) => {
+          if (!toggle.contains(e.target)) {
+            menu.classList.remove('show');
+            toggle.setAttribute('aria-expanded', 'false');
+          }
+        });
+        
+        // Opciones de idioma
+        document.querySelectorAll('.language-option').forEach(option => {
+          option.addEventListener('click', (e) => {
+            e.preventDefault();
+            const lang = option.getAttribute('data-lang');
+            changeLanguage(lang);
+            menu.classList.remove('show');
+            toggle.setAttribute('aria-expanded', 'false');
+          });
+        });
+      }
+      
+      // Cargar idioma preferido
+      const savedLang = localStorage.getItem('i18nextLng');
+      if (savedLang && languages[savedLang]) {
+        currentLanguage = savedLang;
+      }
+      
+      // Inicializar
+      updateDocumentDirection();
+      updatePageContent();
+      updateLanguageSelector();
+      updateFormatting();
+      
+      console.log(`i18n system initialized, language: ${currentLanguage}`);
+    });
+
+    // Función para abrir mapa con todos los eventos
+    let mapInstance = null;
+    async function openMap() {
+      try {
+        const overlay = document.getElementById('mapOverlay');
+        const closeBtn = document.getElementById('mapCloseBtn');
+        if (!overlay) return;
+
+        // Mostrar overlay
+        overlay.style.display = 'flex';
+
+        // Cerrar al hacer clic en close o fuera
+        const handleClose = () => { overlay.style.display = 'none'; };
+        closeBtn && (closeBtn.onclick = handleClose);
+        overlay.addEventListener('click', (e) => {
+          if (e.target === overlay) handleClose();
+        }, { once: true });
+
+        // Obtener eventos del backend
+        const response = await fetch('/api/eventos');
+        const data = await response.json();
+        const events = Array.isArray(data?.eventos) ? data.eventos : [];
+
+        // Preparar contenedor de mapa
+        const mapEl = document.getElementById('events-map');
+        if (!mapEl) return;
+
+        // Crear o resetear mapa
+        if (mapInstance) {
+          mapInstance.remove();
+          mapInstance = null;
+        }
+
+        mapInstance = L.map('events-map');
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(mapInstance);
+
+        const markers = [];
+
+        events.forEach(ev => {
+          // Determinar coordenadas o geocodificar dirección
+          if (ev && ev.coordenadas && typeof ev.coordenadas.lat === 'number' && typeof ev.coordenadas.lng === 'number') {
+            const marker = L.marker([ev.coordenadas.lat, ev.coordenadas.lng]).addTo(mapInstance);
+            const title = ev.titulo || '';
+            const place = ev.lugar || '';
+            const address = ev.direccion || '';
+            const hours = `${ev.horaInicio || ''}${ev.horaFin ? ' - ' + ev.horaFin : ''}`;
+            const gmUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place} ${address}`.trim())}`;
+            marker.bindPopup(`<strong>${title}</strong><br>${place}<br>${address}<br>${hours}<br><a href="${gmUrl}" target="_blank" rel="noopener">${translate('wedding:location.viewMap')}</a>`);
+            markers.push(marker);
+          }
+        });
+
+        // Si no hay coordenadas, intentar geocodificar rápidamente usando Nominatim (mejorable)
+        const noCoords = events.filter(ev => !ev.coordenadas && (ev.lugar || ev.direccion));
+        for (const ev of noCoords) {
+          const query = encodeURIComponent(`${ev.lugar || ''} ${ev.direccion || ''}`.trim());
+          if (!query) continue;
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`);
+            const results = await res.json();
+            if (Array.isArray(results) && results.length > 0) {
+              const { lat, lon } = results[0];
+              const marker = L.marker([parseFloat(lat), parseFloat(lon)]).addTo(mapInstance);
+              const title = ev.titulo || '';
+              const place = ev.lugar || '';
+              const address = ev.direccion || '';
+              const hours = `${ev.horaInicio || ''}${ev.horaFin ? ' - ' + ev.horaFin : ''}`;
+              const gmUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${place} ${address}`.trim())}`;
+              marker.bindPopup(`<strong>${title}</strong><br>${place}<br>${address}<br>${hours}<br><a href="${gmUrl}" target="_blank" rel="noopener">${translate('wedding:location.viewMap')}</a>`);
+              markers.push(marker);
+            }
+          } catch (e) {
+            console.warn('No se pudo geocodificar:', ev);
+          }
+        }
+
+        // Encajar vista
+        const group = L.featureGroup(markers);
+        if (markers.length > 0) {
+          mapInstance.fitBounds(group.getBounds().pad(0.2));
+        } else {
+          mapInstance.setView([40.4168, -3.7038], 12); // Madrid por defecto
+        }
+      } catch (error) {
+        console.error('Error al abrir el mapa:', error);
+        alert('No se pudo cargar el mapa. Intenta de nuevo más tarde.');
+      }
+    }
+
+    // Contador regresivo
+    function updateCountdown() {
+      const weddingDate = new Date('2026-06-06T12:00:00').getTime();
+      const now = new Date().getTime();
+      const distance = weddingDate - now;
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById('days').textContent = days.toString().padStart(2, '0');
+      document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+      document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+      document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+
+      if (distance < 0) {
+        const currentLang = localStorage.getItem('i18nextLng') || 'es';
+        const message = translate('common:countdownMessage', currentLang);
+        document.querySelector('.countdown-container').innerHTML = `<h3>${message}</h3>`;
+      }
+    }
+
+    // Actualizar contador cada segundo
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // Animaciones al hacer scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    // Observar elementos con animación
+    document.querySelectorAll('.fade-in-up').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+      observer.observe(el);
+    });
+
+    // Función para obtener el icono apropiado según el tipo de evento
+    function getEventIcon(eventTitle) {
+      const title = eventTitle.toLowerCase();
+      if (title.includes('ceremonia') || title.includes('ceremony') || title.includes('cérémonie')) {
+        return 'fas fa-church';
+      } else if (title.includes('cocktail') || title.includes('bienvenida') || title.includes('welcome') || title.includes('bienvenue')) {
+        return 'fas fa-glass-cheers';
+      } else if (title.includes('recepción') || title.includes('reception') || title.includes('celebration') || title.includes('réception')) {
+        return 'fas fa-glass-cheers';
+      } else if (title.includes('brunch') || title.includes('desayuno') || title.includes('breakfast') || title.includes('déjeuner')) {
+        return 'fas fa-coffee';
+      } else if (title.includes('aniversario') || title.includes('anniversary') || title.includes('anniversaire')) {
+        return 'fas fa-heart';
+      } else {
+        return 'fas fa-calendar-alt';
+      }
+    }
+
+    // Función para mapear eventos del backend a claves de traducción
+    function getEventTranslationKey(event) {
+      const title = event.titulo.toLowerCase();
+      if (title.includes('cocktail') || title.includes('bienvenida')) {
+        return 'cocktail';
+      } else if (title.includes('ceremonia')) {
+        return 'ceremony';
+      } else if (title.includes('recepción')) {
+        return 'reception';
+      } else if (title.includes('brunch') || title.includes('despedida')) {
+        return 'brunch';
+      } else if (title.includes('aniversario')) {
+        return 'anniversary';
+      }
+      return null;
+    }
+
+    // Función para traducir un evento
+    function translateEvent(event) {
+      const translationKey = getEventTranslationKey(event);
+      if (!translationKey) {
+        return event; // Retornar evento original si no se encuentra traducción
+      }
+
+      return {
+        ...event,
+        titulo: translate(`events:${translationKey}.title`),
+        descripcion: translate(`events:${translationKey}.description`),
+        lugar: translate(`events:${translationKey}.venue`),
+        direccion: translate(`events:${translationKey}.address`)
+      };
+    }
+
+    // Función para cargar eventos dinámicamente
+    async function loadEvents() {
+      const eventsGrid = document.getElementById('events-grid');
+      if (!eventsGrid) return;
+
+      try {
+        const response = await fetch('/api/eventos');
+        const data = await response.json();
+
+        if (response.ok && data && data.eventos && data.eventos.length > 0) {
+          // Usar los eventos actualizados del panel de administración
+          const events = data.eventos;
+          
+          // Generar HTML para los eventos en una fila
+          const eventsHTML = events.map(event => {
+            const hasCoords = event.coordenadas && typeof event.coordenadas.lat === 'number' && typeof event.coordenadas.lng === 'number';
+            const mapsQuery = hasCoords 
+              ? `${event.coordenadas.lat},${event.coordenadas.lng}` 
+              : encodeURIComponent(`${event.lugar || ''} ${event.direccion || ''}`.trim());
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
+            return `
+            <div class="info-card">
+              <div class="info-icon">
+                <i class="${event.icono || getEventIcon(event.titulo)}"></i>
+              </div>
+              <h3>${event.titulo}</h3>
+              <p><strong>${event.lugar}</strong></p>
+              <p>${event.direccion}</p>
+              <p class="time"><i class="fas fa-clock"></i> ${event.horaInicio}${event.horaFin ? ` - ${event.horaFin}` : ''}</p>
+              ${event.descripcion ? `<p class="event-description">${event.descripcion}</p>` : ''}
+              <a class="btn-ver-mapa" href="${mapsUrl}" target="_blank" rel="noopener">
+                <i class="fas fa-map"></i> ${translate('wedding:location.viewMap')}
+              </a>
+            </div>
+            `;
+          }).join('');
+
+          // Generar la tarjeta de ubicación centrada
+          const locationCard = `
+            <div class="info-card location-card">
+              <div class="info-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <h3>${translate('wedding:location.title')}</h3>
+              <p>${translate('wedding:location.description')}</p>
+              <button onclick="openMap()">
+                <i class="fas fa-map"></i> ${translate('wedding:location.viewMap')}
+              </button>
+            </div>
+          `;
+
+          // Estructura con eventos en fila y ubicación centrada abajo
+          eventsGrid.innerHTML = `
+            <div class="events-container">
+              <div class="events-row">
+                ${eventsHTML}
+              </div>
+              <div class="location-section">
+                ${locationCard}
+              </div>
+            </div>
+          `;
+        } else {
+          // Mostrar eventos por defecto si no hay eventos
+          showDefaultEvents();
+        }
+      } catch (error) {
+        console.error('Error loading events:', error);
+        // Mostrar eventos por defecto si hay error de conexión
+        showDefaultEvents();
+      }
+    }
+
+    // Función para mostrar eventos por defecto
+    function showDefaultEvents() {
+      const eventsGrid = document.getElementById('events-grid');
+      if (!eventsGrid) return;
+
+      eventsGrid.innerHTML = `
+        <div class="events-container">
+          <div class="events-row">
+            <div class="info-card">
+              <div class="info-icon">
+                <i class="fas fa-church"></i>
+              </div>
+              <h3>${translate('wedding:ceremony.title')}</h3>
+              <p><strong>${translate('wedding:ceremony.venue')}</strong></p>
+              <p>${translate('wedding:ceremony.address')}</p>
+              <p>${translate('wedding:ceremony.city')}</p>
+              <a class="btn-ver-mapa" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(translate('wedding:ceremony.venue') + ' ' + translate('wedding:ceremony.address'))}" target="_blank" rel="noopener">
+                <i class="fas fa-map"></i> ${translate('wedding:location.viewMap')}
+              </a>
+              <p class="time"><i class="fas fa-clock"></i> ${translate('wedding:ceremony.time')}</p>
+            </div>
+            
+            <div class="info-card">
+              <div class="info-icon">
+                <i class="fas fa-glass-cheers"></i>
+              </div>
+              <h3>${translate('wedding:celebration.title')}</h3>
+              <p><strong>${translate('wedding:celebration.venue')}</strong></p>
+              <p>${translate('wedding:celebration.address')}</p>
+              <p>${translate('wedding:celebration.city')}</p>
+              <a class="btn-ver-mapa" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(translate('wedding:celebration.venue') + ' ' + translate('wedding:celebration.address'))}" target="_blank" rel="noopener">
+                <i class="fas fa-map"></i> ${translate('wedding:location.viewMap')}
+              </a>
+              <p class="time"><i class="fas fa-clock"></i> ${translate('wedding:celebration.time')}</p>
+            </div>
+          </div>
+          <div class="location-section">
+            <div class="info-card location-card">
+              <div class="info-icon">
+                <i class="fas fa-map-marker-alt"></i>
+              </div>
+              <h3>${translate('wedding:location.title')}</h3>
+              <p>${translate('wedding:location.description')}</p>
+              <button onclick="openMap()">
+                <i class="fas fa-map"></i> ${translate('wedding:location.viewMap')}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Cargar eventos cuando se carga la página
+    document.addEventListener('DOMContentLoaded', () => {
+      loadEvents();
+    });
+  </script>
+</body>
+</html>

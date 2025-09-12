@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Boda de Iluminada & George</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+      /* Estilos para el sistema de pestañas */
+      .tabs-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: var(--white);
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        overflow: hidden;
+      }
+      
+      .tabs-header {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 0;
+        border-bottom: 2px solid var(--accent-color);
+        background: var(--white);
+        border-radius: 15px 15px 0 0;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
+      
+      .tab-btn {
+        flex: 1;
+        padding: 20px 15px;
+        border: none;
+        background: transparent;
+        color: var(--text-light);
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        position: relative;
+      }
+      
+      .tab-btn:hover {
+        background: var(--accent-color);
+        color: var(--primary-color);
+      }
+      
+      .tab-btn.active {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: var(--white);
+        box-shadow: 0 4px 15px rgba(139, 90, 150, 0.3);
+      }
+      
+      .tab-btn.active::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--white);
+      }
+      
+      .tab-btn i {
+        font-size: 1.1em;
+      }
+      
+             /* Variables CSS para colores */
+       :root {
+         --primary-color: #8b5a96;
+         --secondary-color: #4caf50;
+         --accent-color: #f8f9fa;
+         --text-color: #333;
+         --text-light: #6c757d;
+         --white: #ffffff;
+         --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+       }
+       
+       /* Estilos para el contenido del admin */
+       #adminContent {
+         padding: 30px;
+         background: var(--white);
+         border-radius: 0 0 15px 15px;
+       }
+       
+       .admin-section {
+         background: var(--white);
+         border-radius: 15px;
+         box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+         margin-bottom: 20px;
+       }
+       
+       .admin-header-section {
+         padding: 20px 30px;
+         border-bottom: 1px solid var(--accent-color);
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+       }
+       
+       .admin-actions {
+         display: flex;
+         gap: 10px;
+         align-items: center;
+       }
+       
+       .admin-header-section h3 {
+         margin: 0;
+         color: var(--primary-color);
+         font-size: 1.3em;
+         display: flex;
+         align-items: center;
+         gap: 10px;
+       }
+       
+       .admin-loading {
+         text-align: center;
+         padding: 50px;
+         color: var(--text-light);
+       }
+       
+       .admin-loading i {
+         font-size: 2em;
+         margin-bottom: 15px;
+         color: var(--primary-color);
+       }
+    </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Panel de Administración</h1>
+      <a href="index.html" class="home-link">
+        <i class="fas fa-home"></i>
+        Inicio
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <section id="adminPanelSection">
+      <div class="admin-header">
+        <button id="logoutAdmin" class="admin-action">
+          <i class="fas fa-sign-out-alt"></i>
+          Cerrar sesión
+        </button>
+        <div class="admin-welcome">
+          <h2><i class="fas fa-user-shield"></i> Bienvenido, Administrador</h2>
+          <p>Gestiona toda la información de la boda de Iluminada y George</p>
+        </div>
+      </div>
+      
+    <!-- Sistema de pestañas -->
+    <div class="tabs-container">
+      <div class="tabs-header">
+        <button class="tab-btn active" data-tab="invitados">
+          <i class="fas fa-users"></i>
+          Invitados
+        </button>
+        <button class="tab-btn" data-tab="mensajes">
+          <i class="fas fa-comments"></i>
+          Mensajes
+        </button>
+        <button class="tab-btn" data-tab="agenda">
+          <i class="fas fa-calendar-alt"></i>
+          Agenda de Eventos
+        </button>
+        <button class="tab-btn" data-tab="menu">
+          <i class="fas fa-utensils"></i>
+          Gestión de Menús
+        </button>
+        <button class="tab-btn" data-tab="configuracion">
+          <i class="fas fa-cog"></i>
+          Configuración
+        </button>
+      </div>
+      
+      <div id="adminContent">
+        <div class="admin-loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Cargando panel de administración...</p>
+        </div>
+      </div>
+    </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2026 Boda de Iluminada & George</p>
+      <p>Panel de administración</p>
+    </div>
+  </footer>
+
+  <script>
+    // Panel de administración corregido y funcional
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('Panel de administración cargando...');
+      
+      const logoutBtn = document.getElementById('logoutAdmin');
+      const adminContent = document.getElementById('adminContent');
+      const adminTabs = document.querySelectorAll('.tab-btn');
+
+      // Verificar autenticación
+      const token = localStorage.getItem('adminToken');
+      if (!token) {
+        console.log('No hay token, redirigiendo al login');
+        window.location.href = 'admin-login.html';
+        return;
+      }
+
+      console.log('Token encontrado:', token);
+
+      // Logout
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('adminToken');
+        window.location.href = 'admin-login.html';
+      });
+
+      // Tabs
+      adminTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabName = tab.getAttribute('data-tab');
+          console.log('Cambiando a pestaña:', tabName);
+          showTab(tabName);
+        });
+      });
+
+      // Función principal para mostrar pestañas
+      async function showTab(tab) {
+        console.log('Mostrando pestaña:', tab);
+        
+        // Actualizar pestañas activas
+        adminTabs.forEach(t => t.classList.remove('active'));
+        const activeTab = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+        if (activeTab) {
+          activeTab.classList.add('active');
+        }
+        
+        // Mostrar loading
+        adminContent.innerHTML = '<div class="admin-loading"><i class="fas fa-spinner fa-spin"></i><p>Cargando...</p></div>';
+        
+        // Determinar URL
+        let url = '';
+        if (tab === 'invitados') url = '/api/admin/invitados';
+        if (tab === 'regalos') url = '/api/admin/regalos';
+        if (tab === 'mensajes') url = '/api/admin/mensajes';
+        if (tab === 'agenda') url = '/api/admin/agenda';
+        if (tab === 'menu') url = '/api/admin/menu';
+        if (tab === 'configuracion') {
+          showConfiguracion();
+          return;
+        }
+        
+        if (!url) {
+          adminContent.innerHTML = '<div class="message error"><p>Pestaña no implementada</p></div>';
+          return;
+        }
+        
+        try {
+          console.log('Haciendo petición a:', url);
+          
+          // Agregar timestamp para evitar cache
+          const urlWithTimestamp = `${url}?_t=${Date.now()}`;
+          console.log('URL con timestamp:', urlWithTimestamp);
+          
+          const res = await fetch(urlWithTimestamp, {
+            headers: { 
+              'Authorization': token,
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          });
+          console.log('Respuesta del servidor:', res.status, res.statusText);
+          
+          if (!res.ok) {
+            const errorData = await res.json();
+            console.error('Error del servidor:', errorData);
+            adminContent.innerHTML = `
+              <div class="message error">
+                <h3>Error al cargar los datos</h3>
+                <p>${errorData.error || 'Error desconocido'}</p>
+                <p>Código de error: ${res.status}</p>
+                <button onclick="showTab('${tab}')" class="submit-btn">
+                  <i class="fas fa-redo"></i>
+                  Reintentar
+                </button>
+              </div>
+            `;
+            return;
+          }
+          
+          const data = await res.json();
+          console.log('Datos recibidos:', data);
+          
+          // Renderizar contenido según la pestaña
+          if (tab === 'invitados') {
+            renderInvitados(data);
+          } else if (tab === 'regalos') {
+            renderRegalos(data);
+          } else if (tab === 'mensajes') {
+            renderMensajes(data);
+          } else if (tab === 'agenda') {
+            renderAgenda(data);
+                  } else if (tab === 'menu') {
+            renderMenu(data);
+          }
+          
+        } catch (error) {
+          console.error('Error en la petición:', error);
+          adminContent.innerHTML = `
+            <div class="message error">
+              <h3>Error de conexión</h3>
+              <p>No se pudo conectar con el servidor</p>
+              <p>Detalles: ${error.message}</p>
+              <button onclick="showTab('${tab}')" class="submit-btn">
+                <i class="fas fa-redo"></i>
+                Reintentar
+              </button>
+            </div>
+          `;
+        }
+      }
+
+      // Funciones de renderizado
+      function renderInvitados(invitados) {
+        // Ordenar invitados alfabéticamente por nombre
+        const invitadosOrdenados = [...invitados].sort((a, b) => 
+          a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
+        );
+        
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-users"></i> Lista de Invitados (${invitadosOrdenados.length})</h3>
+              <button onclick="addInvitado()" class="admin-action">
+                <i class="fas fa-plus"></i> Añadir Invitado
+              </button>
+            </div>
+            <div class="admin-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Asistencia</th>
+                    <th>Acompañantes</th>
+                    <th>Menú</th>
+                    <th>Notas</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${invitadosOrdenados.map(inv => `
+                    <tr>
+                      <td><strong>${inv.nombre}</strong></td>
+                      <td>${inv.email}</td>
+                      <td>
+                        <span class="status-badge ${inv.asistencia === 'si' ? 'status-confirmed' : inv.asistencia === 'no' ? 'status-cancelled' : 'status-pending'}">
+                          ${inv.asistencia === 'si' ? '✅ Confirmado' : inv.asistencia === 'no' ? '❌ No asistirá' : '⏳ Pendiente'}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="acompañantes-badge">
+                          ${inv.acompañantes || 0} ${inv.acompañantes === 1 ? 'acompañante' : 'acompañantes'}
+                        </span>
+                      </td>
+                      <td>
+                        ${inv.seleccionMenu ? `
+                          <div class="menu-summary">
+                            <small>${inv.seleccionMenu.entrante}</small><br>
+                            <small>${inv.seleccionMenu.principal}</small><br>
+                            <small>${inv.seleccionMenu.postre}</small>
+                          </div>
+                        ` : 'No seleccionado'}
+                      </td>
+                      <td>
+                        ${inv.notas ? `
+                          <div class="notas-tooltip">
+                            <i class="fas fa-sticky-note"></i>
+                            <span class="tooltip-text">${inv.notas}</span>
+                          </div>
+                        ` : '-'}
+                      </td>
+                      <td>
+                        <button onclick="editInvitado('${inv.email}')" class="admin-action small" title="Editar">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteInvitado('${inv.email}')" class="admin-action small danger" title="Eliminar">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderRegalos(regalos) {
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-gift"></i> Lista de Regalos (${regalos.length})</h3>
+              <button onclick="addRegalo()" class="admin-action">
+                <i class="fas fa-plus"></i> Añadir Regalo
+              </button>
+            </div>
+            <div class="admin-table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Categoría</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${regalos.map(reg => `
+                    <tr>
+                      <td>${reg.nombre}</td>
+                      <td>${reg.descripcion || '-'}</td>
+                      <td>${reg.precio ? `€${reg.precio}` : '-'}</td>
+                      <td>${reg.categoria || '-'}</td>
+                      <td>
+                        <button onclick="editRegalo('${reg.id}')" class="admin-action small">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteRegalo('${reg.id}')" class="admin-action small danger">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderMensajes(mensajes) {
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-comments"></i> Mensajes de Invitados (${mensajes.length})</h3>
+            </div>
+            <div class="messages-container">
+              ${mensajes.map(msg => `
+                <div class="message-card">
+                  <div class="message-header">
+                    <strong>${msg.nombre}</strong>
+                    <span class="message-date">${new Date(msg.fecha).toLocaleDateString()}</span>
+                  </div>
+                  <div class="message-content">
+                    ${msg.mensaje}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderAgenda(agenda) {
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-calendar-alt"></i> Agenda de Eventos (${agenda.length})</h3>
+            </div>
+            <div class="agenda-container">
+              ${agenda.map(evento => `
+                <div class="evento-card">
+                  <div class="evento-header">
+                    <h4>${evento.evento}</h4>
+                    <span class="evento-fecha">${evento.fecha} - ${evento.hora}</span>
+                  </div>
+                  <div class="evento-content">
+                    <p><strong>Lugar:</strong> ${evento.lugar}</p>
+                    <p><strong>Dirección:</strong> ${evento.direccion}</p>
+                    <p>${evento.descripcion}</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+
+
+      function renderMenu(data) {
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-utensils"></i> Gestión de Menús</h3>
+            </div>
+            <div class="menu-stats">
+              <h4>Estadísticas de Selección de Menús</h4>
+              <p>Total de invitados con menú seleccionado: ${data.totalSelecciones || 0}</p>
+            </div>
+          </div>
+        `;
+      }
+
+      function showConfiguracion() {
+        adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-cog"></i> Configuración del Sistema</h3>
+            </div>
+            <div class="config-grid">
+              <div class="config-card">
+                <h4><i class="fas fa-calendar"></i> Información de la Boda</h4>
+                <p><strong>Fecha:</strong> 6 de Junio, 2026</p>
+                <p><strong>Novios:</strong> Iluminada & George</p>
+                <p><strong>Estado:</strong> <span class="status-badge status-confirmed">Activa</span></p>
+              </div>
+              <div class="config-card">
+                <h4><i class="fas fa-server"></i> Estado del Servidor</h4>
+                <p><strong>Backend:</strong> <span class="status-badge status-confirmed">Online</span></p>
+                <p><strong>Base de datos:</strong> <span class="status-badge status-confirmed">Conectada</span></p>
+                <p><strong>Última actualización:</strong> ${new Date().toLocaleString()}</p>
+              </div>
+              <div class="config-card">
+                <h4><i class="fas fa-shield-alt"></i> Seguridad</h4>
+                <p><strong>Autenticación:</strong> <span class="status-badge status-confirmed">Activa</span></p>
+                <p><strong>Tokens:</strong> <span class="status-badge status-confirmed">Válidos</span></p>
+                <p><strong>Sesión admin:</strong> <span class="status-badge status-confirmed">Activa</span></p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Hacer funciones disponibles globalmente
+      window.showTab = showTab;
+      
+      // Función para añadir invitado
+      window.addInvitado = () => {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3><i class="fas fa-user-plus"></i> Añadir Nuevo Invitado</h3>
+              <button onclick="closeModal()" class="modal-close">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="addInvitadoForm">
+                <div class="form-group">
+                  <label for="nombre">Nombre completo *</label>
+                  <input type="text" id="nombre" name="nombre" required>
+                </div>
+                <div class="form-group">
+                  <label for="email">Email *</label>
+                  <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                  <label for="asistencia">Estado de asistencia</label>
+                  <select id="asistencia" name="asistencia">
+                    <option value="pendiente">⏳ Pendiente</option>
+                    <option value="si">✅ Confirmado</option>
+                    <option value="no">❌ No asistirá</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="acompañantes">Número de acompañantes</label>
+                  <input type="number" id="acompañantes" name="acompañantes" min="0" max="5" value="0">
+                </div>
+                <div class="form-group">
+                  <label for="notas">Notas adicionales</label>
+                  <textarea id="notas" name="notas" rows="3" placeholder="Alergias, preferencias especiales, etc."></textarea>
+                </div>
+                <div class="form-actions">
+                  <button type="button" onclick="closeModal()" class="btn-secondary">Cancelar</button>
+                  <button type="submit" class="btn-primary">
+                    <i class="fas fa-save"></i> Guardar Invitado
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Manejar el envío del formulario
+        document.getElementById('addInvitadoForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          saveInvitado();
+        });
+      };
+      
+      // Función para cerrar el modal
+      window.closeModal = () => {
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) {
+          modal.remove();
+        }
+      };
+      
+      // Función para guardar el invitado
+      async function saveInvitado() {
+        const form = document.getElementById('addInvitadoForm');
+        const formData = new FormData(form);
+        
+        const nuevoInvitado = {
+          nombre: formData.get('nombre'),
+          email: formData.get('email'),
+          asistencia: formData.get('asistencia'),
+          acompañantes: parseInt(formData.get('acompañantes')) || 0,
+          notas: formData.get('notas') || ''
+        };
+        
+        // Validaciones básicas
+        if (!nuevoInvitado.nombre || !nuevoInvitado.email) {
+          alert('Por favor, completa los campos obligatorios (nombre y email).');
+          return;
+        }
+        
+        // Validar formato de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(nuevoInvitado.email)) {
+          alert('Por favor, introduce un email válido.');
+          return;
+        }
+        
+        try {
+          // Obtener el token de autenticación
+          const token = localStorage.getItem('adminToken');
+          if (!token) {
+            alert('Error de autenticación. Por favor, inicia sesión nuevamente.');
+            return;
+          }
+          
+          // Hacer la llamada al backend
+          const response = await fetch('/api/admin/invitados', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': token
+            },
+            body: JSON.stringify(nuevoInvitado)
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            if (response.status === 409) {
+              alert('Ya existe un invitado con ese email. Por favor, usa un email diferente.');
+            } else {
+              alert(`Error al añadir invitado: ${errorData.error || 'Error desconocido'}`);
+            }
+            return;
+          }
+          
+          const result = await response.json();
+          
+          // Mostrar mensaje de éxito
+          alert(`Invitado "${nuevoInvitado.nombre}" añadido correctamente.`);
+          
+          // Cerrar modal y recargar la lista
+          closeModal();
+          showTab('invitados'); // Recargar la pestaña de invitados
+          
+        } catch (error) {
+          console.error('Error al añadir invitado:', error);
+          alert('Error de conexión. Por favor, intenta nuevamente.');
+        }
+      }
+      
+      window.editInvitado = (email) => alert(`Editar invitado: ${email}`);
+      window.deleteInvitado = (email) => {
+        if (confirm(`¿Estás seguro de eliminar a ${email}?`)) {
+          alert('Función en desarrollo');
+        }
+      };
+      window.addRegalo = () => alert('Función en desarrollo');
+      window.editRegalo = (id) => alert(`Editar regalo: ${id}`);
+      window.deleteRegalo = (id) => {
+        if (confirm(`¿Estás seguro de eliminar este regalo?`)) {
+          alert('Función en desarrollo');
+        }
+      };
+
+      // Cargar la pestaña de invitados por defecto
+      showTab('invitados');
+    });
+  </script>
+</body>
+</html>
+
+

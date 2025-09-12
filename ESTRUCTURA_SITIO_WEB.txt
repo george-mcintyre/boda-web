@@ -1,0 +1,723 @@
+================================================================================
+                    ESTRUCTURA DE SITIO WEB: VISUAL Y DE ARCHIVOS
+                           Guía Completa para Proyecto Boda-Web
+================================================================================
+
+ÍNDICE
+------
+1. Estructura Visual de un Sitio Web
+2. Estructura de Archivos y Carpetas
+3. Jerarquía de Información
+4. Navegación y UX
+5. Responsive Design
+6. Estructura de tu Proyecto Boda-Web
+7. Mejores Prácticas
+8. Herramientas de Organización
+
+================================================================================
+1. ESTRUCTURA VISUAL DE UN SITIO WEB
+================================================================================
+
+CONCEPTOS FUNDAMENTALES:
+
+HEADER (Encabezado):
+- Logo de la empresa/proyecto
+- Navegación principal (menú)
+- Información de contacto
+- Botones de acción (login, registro)
+- Barra de búsqueda (opcional)
+
+NAVEGACIÓN PRINCIPAL:
+- Enlaces a secciones principales
+- Dropdown menus para subcategorías
+- Breadcrumbs (migas de pan)
+- Navegación secundaria
+
+HERO SECTION (Sección Principal):
+- Título principal impactante
+- Subtítulo descriptivo
+- Imagen o video de fondo
+- Call-to-action (botón principal)
+- Información clave
+
+CONTENIDO PRINCIPAL:
+- Secciones organizadas por importancia
+- Información estructurada
+- Imágenes y multimedia
+- Formularios y interacciones
+- Testimonios y reseñas
+
+SIDEBAR (Barra Lateral):
+- Información adicional
+- Enlaces relacionados
+- Publicidad (opcional)
+- Widgets útiles
+
+FOOTER (Pie de Página):
+- Enlaces de navegación
+- Información de contacto
+- Redes sociales
+- Copyright y legal
+- Mapa del sitio
+
+ELEMENTOS VISUALES:
+
+JERARQUÍA TIPOGRÁFICA:
+- H1: Título principal (más grande, más prominente)
+- H2: Títulos de sección
+- H3: Subtítulos
+- H4-H6: Títulos menores
+- P: Párrafo normal
+- Small: Texto pequeño, notas
+
+ESPACIADO Y LAYOUT:
+- Márgenes consistentes
+- Padding uniforme
+- Grid system para organización
+- Whitespace para respiración visual
+- Alineación clara
+
+COLORES Y CONTRASTE:
+- Paleta de colores limitada
+- Contraste adecuado para legibilidad
+- Colores de acento para elementos importantes
+- Estados de hover y focus
+- Colores semánticos (éxito, error, advertencia)
+
+================================================================================
+2. ESTRUCTURA DE ARCHIVOS Y CARPETAS
+================================================================================
+
+ESTRUCTURA BÁSICA DE UN SITIO WEB:
+
+proyecto-web/
+├── index.html                 # Página principal
+├── about.html                 # Página sobre nosotros
+├── contact.html               # Página de contacto
+├── css/                       # Archivos de estilos
+│   ├── main.css              # Estilos principales
+│   ├── components.css        # Componentes reutilizables
+│   ├── utilities.css         # Clases utilitarias
+│   └── responsive.css        # Estilos responsive
+├── js/                        # Archivos JavaScript
+│   ├── main.js               # JavaScript principal
+│   ├── components.js         # Componentes JS
+│   └── utils.js              # Utilidades
+├── images/                    # Imágenes del sitio
+│   ├── logos/                # Logos y marcas
+│   ├── photos/               # Fotografías
+│   ├── icons/                # Iconos
+│   └── backgrounds/          # Imágenes de fondo
+├── fonts/                     # Fuentes personalizadas
+├── assets/                    # Otros recursos
+│   ├── documents/            # PDFs, documentos
+│   └── media/                # Videos, audio
+└── README.md                  # Documentación
+
+ESTRUCTURA AVANZADA (SPA/APLICACIONES):
+
+proyecto-web/
+├── public/                    # Archivos públicos
+│   ├── index.html            # Template principal
+│   ├── favicon.ico           # Icono del sitio
+│   └── manifest.json         # PWA manifest
+├── src/                       # Código fuente
+│   ├── components/           # Componentes reutilizables
+│   ├── pages/                # Páginas de la aplicación
+│   ├── styles/               # Estilos organizados
+│   ├── utils/                # Utilidades
+│   ├── services/             # Servicios y APIs
+│   └── assets/               # Recursos del código
+├── dist/                      # Archivos compilados
+├── node_modules/              # Dependencias
+├── package.json               # Configuración del proyecto
+└── README.md                  # Documentación
+
+ESTRUCTURA BACKEND:
+
+backend/
+├── server.js                  # Servidor principal
+├── routes/                    # Rutas de la API
+│   ├── auth.js               # Autenticación
+│   ├── users.js              # Usuarios
+│   └── api.js                # API general
+├── models/                    # Modelos de datos
+├── controllers/               # Controladores
+├── middleware/                # Middleware personalizado
+├── config/                    # Configuraciones
+├── data/                      # Datos y archivos JSON
+├── public/                    # Archivos estáticos
+├── uploads/                   # Archivos subidos
+├── tests/                     # Pruebas
+├── package.json               # Dependencias
+└── README.md                  # Documentación
+
+================================================================================
+3. JERARQUÍA DE INFORMACIÓN
+================================================================================
+
+PRINCIPIOS DE JERARQUÍA:
+
+1. INFORMACIÓN MÁS IMPORTANTE PRIMERO:
+   - Título principal
+   - Propuesta de valor
+   - Call-to-action principal
+   - Información de contacto
+
+2. ORGANIZACIÓN LÓGICA:
+   - De lo general a lo específico
+   - De lo conocido a lo desconocido
+   - Flujo natural de lectura
+   - Agrupación por temas
+
+3. PESO VISUAL:
+   - Elementos más grandes = más importantes
+   - Colores más intensos = mayor atención
+   - Posición superior = mayor prioridad
+   - Contraste alto = mayor énfasis
+
+EJEMPLO DE JERARQUÍA PARA BODA-WEB:
+
+NIVEL 1 (MÁS IMPORTANTE):
+- Nombre de los novios
+- Fecha de la boda
+- Ubicación principal
+- Botón de confirmación
+
+NIVEL 2 (IMPORTANTE):
+- Agenda de eventos
+- Información de regalos
+- Menú de opciones
+- Contacto
+
+NIVEL 3 (SECUNDARIO):
+- Detalles adicionales
+- Información de transporte
+- Alojamiento
+- Regalos en efectivo
+
+NIVEL 4 (COMPLEMENTARIO):
+- Galería de fotos
+- Testimonios
+- Información adicional
+- Enlaces externos
+
+================================================================================
+4. NAVEGACIÓN Y UX
+================================================================================
+
+TIPOS DE NAVEGACIÓN:
+
+NAVEGACIÓN PRINCIPAL:
+- Horizontal en el header
+- Máximo 7 elementos
+- Nombres claros y descriptivos
+- Orden lógico de importancia
+
+NAVEGACIÓN SECUNDARIA:
+- Submenús desplegables
+- Navegación por categorías
+- Filtros y búsqueda
+- Breadcrumbs
+
+NAVEGACIÓN CONTEXTUAL:
+- Enlaces relacionados
+- "También te puede interesar"
+- Navegación por tags
+- Historial reciente
+
+NAVEGACIÓN DE PIE:
+- Enlaces de soporte
+- Información legal
+- Redes sociales
+- Mapa del sitio
+
+PRINCIPIOS DE UX:
+
+1. CONSISTENCIA:
+   - Misma navegación en todas las páginas
+   - Colores y estilos uniformes
+   - Comportamiento predecible
+   - Patrones familiares
+
+2. CLARIDAD:
+   - Etiquetas descriptivas
+   - Iconos intuitivos
+   - Estados claros (activo, hover)
+   - Feedback inmediato
+
+3. EFICIENCIA:
+   - Acceso rápido a información
+   - Menos clics para objetivos
+   - Búsqueda efectiva
+   - Navegación por teclado
+
+4. ACCESIBILIDAD:
+   - Contraste adecuado
+   - Tamaños de click apropiados
+   - Navegación por teclado
+   - Screen reader friendly
+
+================================================================================
+5. RESPONSIVE DESIGN
+================================================================================
+
+BREAKPOINTS ESTÁNDAR:
+
+MOBILE FIRST:
+- 320px - 480px: Móviles pequeños
+- 481px - 768px: Móviles grandes
+- 769px - 1024px: Tablets
+- 1025px - 1200px: Laptops
+- 1201px+: Desktops grandes
+
+ADAPTACIONES POR DISPOSITIVO:
+
+MÓVIL:
+- Navegación en hamburger menu
+- Contenido en una columna
+- Botones más grandes
+- Texto legible sin zoom
+- Imágenes optimizadas
+
+TABLET:
+- Navegación horizontal
+- Contenido en 2 columnas
+- Tamaños intermedios
+- Touch-friendly
+- Orientación landscape/portrait
+
+DESKTOP:
+- Navegación completa visible
+- Múltiples columnas
+- Hover effects
+- Teclado y mouse
+- Más espacio para contenido
+
+ELEMENTOS RESPONSIVE:
+
+IMÁGENES:
+- srcset para diferentes resoluciones
+- object-fit para mantener proporciones
+- Lazy loading para rendimiento
+- Formatos optimizados (WebP, AVIF)
+
+TIPOGRAFÍA:
+- Tamaños escalables (rem, em)
+- Line-height apropiado
+- Contraste en todos los tamaños
+- Legibilidad en móviles
+
+LAYOUT:
+- CSS Grid y Flexbox
+- Containers fluidos
+- Breakpoints lógicos
+- Overflow manejado
+
+================================================================================
+6. ESTRUCTURA DE TU PROYECTO BODA-WEB
+================================================================================
+
+ESTRUCTURA ACTUAL:
+
+boda-web/
+├── admin-panel.html           # Panel de administración
+├── backend/                   # Servidor y API
+│   ├── server.js             # Servidor principal
+│   ├── data/                 # Archivos de datos JSON
+│   │   ├── admin.json        # Datos de administradores
+│   │   ├── agenda.json       # Eventos de la boda
+│   │   ├── invitados.json    # Lista de invitados
+│   │   ├── regalos.json      # Lista de regalos
+│   │   ├── regalos-efectivo.json # Regalos en efectivo
+│   │   └── cash-gift-cards.json # Tarjetas de pago
+│   ├── package.json          # Dependencias del backend
+│   └── node_modules/         # Módulos instalados
+├── frontend/                  # Interfaz de usuario
+│   ├── public/               # Archivos públicos
+│   │   ├── index.html        # Página principal
+│   │   ├── admin-i18n.html   # Panel admin con i18n
+│   │   ├── invitados-i18n.html # Página de invitados
+│   │   ├── regalos-efectivo.html # Regalos en efectivo
+│   │   ├── agenda-eventos.html # Agenda de eventos
+│   │   ├── menu-seleccion.html # Selección de menú
+│   │   └── [otros archivos HTML]
+│   └── src/                  # Código fuente
+│       ├── admin.js          # Lógica del admin
+│       ├── invitados.js      # Lógica de invitados
+│       ├── login.js          # Sistema de login
+│       └── main.js           # JavaScript principal
+├── test-*.html               # Archivos de prueba
+├── start-server.bat          # Script de inicio Windows
+├── start-server.ps1          # Script de inicio PowerShell
+└── README.md                 # Documentación
+
+ESTRUCTURA RECOMENDADA MEJORADA:
+
+boda-web/
+├── frontend/
+│   ├── public/
+│   │   ├── index.html        # Página principal
+│   │   ├── pages/            # Páginas organizadas
+│   │   │   ├── admin/
+│   │   │   │   └── admin-i18n.html
+│   │   │   ├── guests/
+│   │   │   │   └── invitados-i18n.html
+│   │   │   ├── gifts/
+│   │   │   │   └── regalos-efectivo.html
+│   │   │   └── events/
+│   │   │       └── agenda-eventos.html
+│   │   ├── css/              # Estilos organizados
+│   │   │   ├── main.css
+│   │   │   ├── components/
+│   │   │   ├── pages/
+│   │   │   └── utilities/
+│   │   ├── js/               # JavaScript organizado
+│   │   │   ├── main.js
+│   │   │   ├── components/
+│   │   │   ├── pages/
+│   │   │   └── utils/
+│   │   ├── images/           # Imágenes organizadas
+│   │   │   ├── photos/
+│   │   │   ├── icons/
+│   │   │   └── backgrounds/
+│   │   └── assets/           # Otros recursos
+│   └── src/                  # Código fuente
+├── backend/
+│   ├── server.js
+│   ├── routes/               # Rutas organizadas
+│   ├── controllers/          # Controladores
+│   ├── models/               # Modelos de datos
+│   ├── middleware/           # Middleware
+│   ├── data/                 # Datos JSON
+│   ├── public/               # Archivos estáticos
+│   └── tests/                # Pruebas
+├── docs/                     # Documentación
+├── scripts/                  # Scripts de utilidad
+└── README.md
+
+================================================================================
+7. MEJORES PRÁCTICAS
+================================================================================
+
+ORGANIZACIÓN DE ARCHIVOS:
+
+1. NOMENCLATURA:
+   - Nombres descriptivos y claros
+   - Evitar espacios y caracteres especiales
+   - Usar guiones para separar palabras
+   - Mantener consistencia en mayúsculas/minúsculas
+
+2. ESTRUCTURA LÓGICA:
+   - Agrupar archivos relacionados
+   - Separar por funcionalidad
+   - Mantener jerarquía clara
+   - Documentar la estructura
+
+3. VERSIONADO:
+   - Usar control de versiones (Git)
+   - Commits descriptivos
+   - Ramas para features
+   - Tags para releases
+
+4. DOCUMENTACIÓN:
+   - README actualizado
+   - Comentarios en código
+   - Guías de instalación
+   - Documentación de API
+
+OPTIMIZACIÓN:
+
+1. RENDIMIENTO:
+   - Minificar CSS y JS
+   - Optimizar imágenes
+   - Usar CDN para recursos
+   - Implementar caching
+
+2. SEO:
+   - Meta tags apropiados
+   - URLs amigables
+   - Sitemap XML
+   - Schema markup
+
+3. ACCESIBILIDAD:
+   - Alt text en imágenes
+   - Contraste adecuado
+   - Navegación por teclado
+   - ARIA labels
+
+4. SEGURIDAD:
+   - Validación de entrada
+   - Sanitización de datos
+   - HTTPS obligatorio
+   - Headers de seguridad
+
+================================================================================
+8. HERRAMIENTAS DE ORGANIZACIÓN
+================================================================================
+
+HERRAMIENTAS DE DESARROLLO:
+
+EDITORES DE CÓDIGO:
+- Visual Studio Code (recomendado)
+- Sublime Text
+- Atom
+- WebStorm
+
+EXTENSIONES ÚTILES:
+- Live Server (servidor local)
+- Prettier (formateo de código)
+- ESLint (linting de JavaScript)
+- Auto Rename Tag
+- Bracket Pair Colorizer
+
+HERRAMIENTAS DE DISEÑO:
+- Figma (diseño y prototipado)
+- Adobe XD
+- Sketch (Mac)
+- Canva (diseño rápido)
+
+HERRAMIENTAS DE OPTIMIZACIÓN:
+- Lighthouse (auditoría de rendimiento)
+- GTmetrix (análisis de velocidad)
+- PageSpeed Insights
+- WebPageTest
+
+HERRAMIENTAS DE VERSIONADO:
+- Git (control de versiones)
+- GitHub (repositorio remoto)
+- GitLab
+- Bitbucket
+
+HERRAMIENTAS DE DEPLOYMENT:
+- Netlify (estático)
+- Vercel (estático y serverless)
+- Heroku (aplicaciones)
+- AWS (escalable)
+
+FLUJO DE TRABAJO RECOMENDADO:
+
+1. PLANIFICACIÓN:
+   - Definir estructura visual
+   - Crear wireframes
+   - Establecer jerarquía de información
+   - Planificar responsive design
+
+2. DESARROLLO:
+   - Crear estructura de archivos
+   - Implementar HTML semántico
+   - Desarrollar CSS organizado
+   - Programar JavaScript modular
+
+3. TESTING:
+   - Probar en múltiples navegadores
+   - Verificar responsive design
+   - Validar accesibilidad
+   - Optimizar rendimiento
+
+4. DEPLOYMENT:
+   - Configurar servidor
+   - Implementar HTTPS
+   - Configurar CDN
+   - Monitorear rendimiento
+
+================================================================================
+EJEMPLOS PRÁCTICOS
+================================================================================
+
+ESTRUCTURA HTML SEMÁNTICA:
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boda de Iluminada y George</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="nav__brand">
+                <h1>Iluminada & George</h1>
+            </div>
+            <ul class="nav__menu">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#agenda">Agenda</a></li>
+                <li><a href="#regalos">Regalos</a></li>
+                <li><a href="#contacto">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main">
+        <section class="hero">
+            <h2>¡Nos Casamos!</h2>
+            <p>Únete a nosotros en esta celebración especial</p>
+            <button class="btn btn-primary">Confirmar Asistencia</button>
+        </section>
+
+        <section class="agenda">
+            <h3>Agenda de Eventos</h3>
+            <div class="events-grid">
+                <!-- Eventos aquí -->
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer__content">
+            <p>&copy; 2024 Iluminada & George</p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
+
+ESTRUCTURA CSS ORGANIZADA:
+
+/* main.css */
+:root {
+  --primary-color: #8B5A96;
+  --secondary-color: #D4A5A5;
+  --spacing-md: 24px;
+  --border-radius: 12px;
+}
+
+/* Reset y base */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+/* Header */
+.header {
+  background: var(--primary-color);
+  padding: var(--spacing-md);
+}
+
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav__brand h1 {
+  color: white;
+  font-size: 1.5rem;
+}
+
+.nav__menu {
+  display: flex;
+  list-style: none;
+  gap: var(--spacing-md);
+}
+
+.nav__menu a {
+  color: white;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.nav__menu a:hover {
+  opacity: 0.8;
+}
+
+/* Hero section */
+.hero {
+  text-align: center;
+  padding: 4rem var(--spacing-md);
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+}
+
+.hero h2 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+/* Botones */
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.btn-primary {
+  background: white;
+  color: var(--primary-color);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+  
+  .hero h2 {
+    font-size: 2rem;
+  }
+}
+
+================================================================================
+CONCLUSIONES
+================================================================================
+
+PUNTOS CLAVE:
+
+1. ESTRUCTURA VISUAL:
+   - Header, navegación, contenido, footer
+   - Jerarquía clara de información
+   - Diseño responsive
+   - Consistencia visual
+
+2. ESTRUCTURA DE ARCHIVOS:
+   - Organización lógica por funcionalidad
+   - Separación de responsabilidades
+   - Nomenclatura consistente
+   - Documentación clara
+
+3. MEJORES PRÁCTICAS:
+   - Código semántico y accesible
+   - Optimización de rendimiento
+   - Versionado y documentación
+   - Testing continuo
+
+4. HERRAMIENTAS:
+   - Editores de código apropiados
+   - Herramientas de diseño
+   - Sistemas de versionado
+   - Plataformas de deployment
+
+IMPLEMENTACIÓN EN BODA-WEB:
+
+1. Reorganizar archivos por funcionalidad
+2. Implementar estructura CSS modular
+3. Mejorar navegación y UX
+4. Optimizar para dispositivos móviles
+5. Documentar toda la estructura
+
+================================================================================
+FIN DEL DOCUMENTO
+================================================================================
+
+

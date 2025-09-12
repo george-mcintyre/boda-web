@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Auto-Update</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .tab { padding: 10px; margin: 5px; background: #f0f0f0; cursor: pointer; display: inline-block; }
+        .tab.active { background: #007bff; color: white; }
+        .content { margin-top: 20px; padding: 20px; border: 1px solid #ccc; }
+        .log { background: #f8f9fa; padding: 10px; margin: 10px 0; border-left: 4px solid #007bff; }
+    </style>
+</head>
+<body>
+    <h1>Test Auto-Update - Panel de Administración</h1>
+    
+    <div>
+        <div class="tab active" data-tab="invitados">Invitados</div>
+        <div class="tab" data-tab="regalos">Regalos</div>
+        <div class="tab" data-tab="mensajes">Mensajes</div>
+    </div>
+    
+    <div class="content" id="content">
+        <p>Haz clic en una pestaña para probar la auto-actualización</p>
+    </div>
+    
+    <div class="log" id="log">
+        <strong>Log de eventos:</strong><br>
+        <div id="logContent"></div>
+    </div>
+    
+    <script>
+        // Token de admin para pruebas
+        localStorage.setItem('adminToken', 'test-token');
+        
+        const tabs = document.querySelectorAll('.tab');
+        const content = document.getElementById('content');
+        const logContent = document.getElementById('logContent');
+        
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            logContent.innerHTML += `[${timestamp}] ${message}<br>`;
+            console.log(message);
+        }
+        
+        // Event listeners para las pestañas
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                addLog(`🖱️ Click en pestaña: ${tabName}`);
+                
+                // Actualizar pestañas activas
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Llamar a showTab
+                showTab(tabName);
+            });
+        });
+        
+        async function showTab(tab) {
+            addLog(`🚀 showTab() ejecutándose con tab: ${tab}`);
+            
+            // Mostrar loading
+            content.innerHTML = '<p>Cargando...</p>';
+            
+            // Determinar URL
+            let url = '';
+            if (tab === 'invitados') url = '/api/admin/invitados';
+            if (tab === 'regalos') url = '/api/admin/regalos';
+            if (tab === 'mensajes') url = '/api/admin/mensajes';
+            
+            addLog(`🔗 URL a consultar: ${url}`);
+            
+            if (!url) {
+                content.innerHTML = '<p>Pestaña no implementada</p>';
+                return;
+            }
+            
+            try {
+                // Agregar timestamp para evitar cache
+                const urlWithTimestamp = `${url}?_t=${Date.now()}`;
+                addLog(`🔗 URL con timestamp: ${urlWithTimestamp}`);
+                
+                const res = await fetch(urlWithTimestamp, {
+                    headers: { 
+                        'Authorization': localStorage.getItem('adminToken'),
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                addLog(`📡 Respuesta del servidor: ${res.status} ${res.statusText}`);
+                
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    addLog(`❌ Error del servidor: ${JSON.stringify(errorData)}`);
+                    content.innerHTML = `<p>Error: ${errorData.error || 'Error desconocido'}</p>`;
+                    return;
+                }
+                
+                const data = await res.json();
+                addLog(`✅ Datos recibidos: ${Array.isArray(data) ? data.length + ' elementos' : 'Objeto'}`);
+                
+                // Renderizar contenido
+                if (tab === 'invitados') {
+                    renderInvitados(data);
+                } else if (tab === 'regalos') {
+                    content.innerHTML = `<h3>Regalos (${Array.isArray(data) ? data.length : 0})</h3><p>Contenido de regalos...</p>`;
+                } else if (tab === 'mensajes') {
+                    content.innerHTML = `<h3>Mensajes (${Array.isArray(data) ? data.length : 0})</h3><p>Contenido de mensajes...</p>`;
+                }
+                
+            } catch (error) {
+                addLog(`❌ Error en la petición: ${error.message}`);
+                content.innerHTML = `<p>Error de conexión: ${error.message}</p>`;
+            }
+        }
+        
+        function renderInvitados(invitados) {
+            // Ordenar invitados alfabéticamente
+            const invitadosOrdenados = [...invitados].sort((a, b) => 
+                a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
+            );
+            
+            addLog(`📋 Renderizando ${invitadosOrdenados.length} invitados ordenados alfabéticamente`);
+            
+            content.innerHTML = `
+                <h3>Lista de Invitados (${invitadosOrdenados.length})</h3>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8f9fa;">
+                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Nombre</th>
+                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Email</th>
+                            <th style="padding: 10px; text-align: left; border-bottom: 2px solid #dee2e6;">Asistencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${invitadosOrdenados.map(inv => `
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 10px;">${inv.nombre}</td>
+                                <td style="padding: 10px;">${inv.email}</td>
+                                <td style="padding: 10px;">${inv.asistencia || 'Pendiente'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        // Cargar invitados por defecto
+        addLog('🚀 Cargando pestaña de invitados por defecto...');
+        showTab('invitados');
+    </script>
+</body>
+</html>
+

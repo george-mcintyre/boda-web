@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Prueba</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .status {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .links {
+            margin-top: 30px;
+        }
+        .links a {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .links a:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Página de Prueba - Servidor Funcionando</h1>
+        
+        <div class="status">
+            <strong>Estado:</strong> El servidor está funcionando correctamente
+        </div>
+        
+        <p>Si puedes ver esta página, significa que:</p>
+        <ul>
+            <li>✅ El servidor Express está corriendo</li>
+            <li>✅ Los archivos estáticos se están sirviendo correctamente</li>
+            <li>✅ El puerto 3000 está funcionando</li>
+        </ul>
+        
+        <div class="links">
+            <h3>Enlaces de prueba:</h3>
+            <a href="/index.html">Página principal básica</a>
+            <a href="/index-i18n-fixed.html">Página principal con i18n</a>
+            <a href="/invitados-i18n.html">Zona de invitados</a>
+            <a href="/admin-fixed.html">Panel de administración</a>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+            <h4>Información técnica:</h4>
+            <p><strong>URL actual:</strong> <span id="current-url"></span></p>
+            <p><strong>Timestamp:</strong> <span id="timestamp"></span></p>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Debug</title>
+</head>
+<body>
+    <h1>🧪 Test Debug - Servidor Funcionando</h1>
+    
+    <div id="test-content">
+        <p>Si ves esta página, el servidor está funcionando.</p>
+        <button onclick="testConsole()">Probar Console.log</button>
+        <button onclick="testFetch()">Probar Fetch</button>
+    </div>
+    
+    <div id="results"></div>
+    
+    <script>
+        console.log('🚀 Test Debug - Script cargado correctamente');
+        
+        function testConsole() {
+            console.log('✅ Console.log funciona correctamente');
+            alert('Console.log funciona - revisa la consola (F12)');
+        }
+        
+        async function testFetch() {
+            try {
+                console.log('🔍 Probando fetch a /api/admin/invitados...');
+                const response = await fetch('/api/admin/invitados', {
+                    headers: { 'Authorization': 'test-token' }
+                });
+                console.log('📡 Respuesta del servidor:', response.status, response.statusText);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('📊 Datos recibidos:', data);
+                    document.getElementById('results').innerHTML = `
+                        <h3>✅ Fetch exitoso</h3>
+                        <p>Status: ${response.status}</p>
+                        <p>Datos: ${JSON.stringify(data, null, 2)}</p>
+                    `;
+                } else {
+                    console.log('❌ Error en la respuesta:', response.status);
+                    document.getElementById('results').innerHTML = `
+                        <h3>❌ Error en fetch</h3>
+                        <p>Status: ${response.status}</p>
+                        <p>StatusText: ${response.statusText}</p>
+                    `;
+                }
+            } catch (error) {
+                console.error('💥 Error en fetch:', error);
+                document.getElementById('results').innerHTML = `
+                    <h3>💥 Error en fetch</h3>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        }
+        
+        // Test automático al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎯 DOM cargado - Test Debug iniciado');
+        });
+    </script>
+</body>
+</html>

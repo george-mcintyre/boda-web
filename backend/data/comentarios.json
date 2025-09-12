@@ -1,0 +1,53 @@
+[
+  {
+    "id": "comment_1756113028641",
+    "nombre": "José A. Jiménez Corzo",
+    "email": "joseajimenezcorzo@gmail.com",
+    "comentario": "De nuevo aquí",
+    "fecha": "2025-08-25T09:10:28.641Z",
+    "reacciones": {
+      "👍": [
+        "joseajimenezcorzo@gmail.com"
+      ],
+      "❤️": [
+        "joseajimenezcorzo@gmail.com"
+      ]
+    }
+  },
+  {
+    "id": "comment_1755867871456",
+    "nombre": "ILU",
+    "email": "ilu@ejemplo.com",
+    "comentario": "la prueba salio bien",
+    "fecha": "2025-08-22T13:04:31.456Z",
+    "reacciones": {
+      "❤️": [
+        "ilu@ejemplo.com"
+      ],
+      "👏": [
+        "joseajimenezcorzo@gmail.com"
+      ],
+      "👍": [
+        "joseajimenezcorzo@gmail.com"
+      ]
+    }
+  },
+  {
+    "id": "comment_1755868072401",
+    "nombre": "ILU",
+    "email": "ilu@ejemplo.com",
+    "comentario": "Parece que esto funciona",
+    "fecha": "2025-08-22T13:07:52.401Z",
+    "reacciones": {
+      "👍": [
+        "ilu@ejemplo.com"
+      ],
+      "❤️": [
+        "joseajimenezcorzo@gmail.com"
+      ],
+      "😊": [
+        "joseajimenezcorzo@gmail.com"
+      ]
+    }
+  }
+]

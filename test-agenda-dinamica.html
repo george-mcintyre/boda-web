@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prueba - Agenda Dinámica y Bloqueo</title>
+  <link rel="stylesheet" href="frontend/public/assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .test-section {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .test-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin: 1rem 0;
+    }
+    
+    .test-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .test-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 90, 150, 0.3);
+    }
+    
+    .test-result {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .status-indicator {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+    }
+    
+    .status-success {
+      background: #28a745;
+    }
+    
+    .status-error {
+      background: #dc3545;
+    }
+    
+    .status-warning {
+      background: #ffc107;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Prueba - Agenda Dinámica y Bloqueo</h1>
+      <p>Verificación de funcionalidades implementadas</p>
+      <div style="margin-top: 20px;">
+        <a href="frontend/public/index-i18n-fixed.html" target="_blank" class="test-btn" style="text-decoration: none; margin-right: 10px;">
+          <i class="fas fa-home"></i> Página de Inicio
+        </a>
+        <a href="frontend/public/invitados-i18n.html" target="_blank" class="test-btn" style="text-decoration: none; margin-right: 10px;">
+          <i class="fas fa-users"></i> Página de Invitados
+        </a>
+        <a href="frontend/public/admin-i18n.html" target="_blank" class="test-btn" style="text-decoration: none;">
+          <i class="fas fa-cog"></i> Panel de Administración
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+    
+    <div class="test-section">
+      <h2><i class="fas fa-calendar-alt"></i> Prueba de Carga Dinámica de Eventos</h2>
+      <p>Verifica que los eventos se cargan correctamente desde la API.</p>
+      
+      <div class="test-buttons">
+        <button class="test-btn" onclick="probarCargaEventos()">
+          <i class="fas fa-download"></i> Cargar Eventos
+        </button>
+        <button class="test-btn" onclick="probarEventosInicio()">
+          <i class="fas fa-home"></i> Simular Página de Inicio
+        </button>
+      </div>
+      
+      <div id="resultadoEventos" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h2><i class="fas fa-lock"></i> Prueba de Sistema de Bloqueo</h2>
+      <p>Verifica que el sistema de bloqueo de agenda funciona correctamente.</p>
+      
+      <div class="test-buttons">
+        <button class="test-btn" onclick="verificarEstadoBloqueo()">
+          <i class="fas fa-info-circle"></i> Verificar Estado
+        </button>
+        <button class="test-btn" onclick="probarBloqueoAgenda()">
+          <i class="fas fa-lock"></i> Bloquear Agenda
+        </button>
+        <button class="test-btn" onclick="probarDesbloqueoAgenda()">
+          <i class="fas fa-unlock"></i> Desbloquear Agenda
+        </button>
+      </div>
+      
+      <div id="resultadoBloqueo" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h2><i class="fas fa-users"></i> Prueba de Confirmación de Eventos</h2>
+      <p>Verifica que las confirmaciones funcionan correctamente con bloqueo.</p>
+      
+      <div class="test-buttons">
+        <button class="test-btn" onclick="probarConfirmacionEvento()">
+          <i class="fas fa-check"></i> Probar Confirmación
+        </button>
+        <button class="test-btn" onclick="probarConfirmacionBloqueada()">
+          <i class="fas fa-ban"></i> Probar con Bloqueo
+        </button>
+      </div>
+      
+      <div id="resultadoConfirmacion" class="test-result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h2><i class="fas fa-chart-bar"></i> Resumen de Pruebas</h2>
+      <div id="resumenPruebas" class="test-result">
+        Ejecuta las pruebas para ver el resumen de resultados.
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    let resultadosPruebas = [];
+
+    function mostrarResultado(elementId, contenido, tipo = 'info') {
+      const elemento = document.getElementById(elementId);
+      elemento.style.display = 'block';
+      elemento.innerHTML = contenido;
+      
+      // Agregar indicador visual
+      const statusClass = tipo === 'success' ? 'status-success' : 
+                         tipo === 'error' ? 'status-error' : 'status-warning';
+      elemento.innerHTML = `<span class="status-indicator ${statusClass}"></span>${contenido}`;
+    }
+
+    function agregarResultadoPrueba(nombre, resultado, tipo) {
+      resultadosPruebas.push({ nombre, resultado, tipo, fecha: new Date().toLocaleString() });
+      actualizarResumen();
+    }
+
+    function actualizarResumen() {
+      const resumen = document.getElementById('resumenPruebas');
+      let contenido = '=== RESUMEN DE PRUEBAS ===\n\n';
+      
+      resultadosPruebas.forEach(prueba => {
+        const icono = prueba.tipo === 'success' ? '✅' : 
+                     prueba.tipo === 'error' ? '❌' : '⚠️';
+        contenido += `${icono} ${prueba.nombre}\n`;
+        contenido += `   Fecha: ${prueba.fecha}\n`;
+        contenido += `   Resultado: ${prueba.resultado}\n\n`;
+      });
+      
+      resumen.innerHTML = contenido;
+    }
+
+    async function probarCargaEventos() {
+      try {
+        const response = await fetch('/api/agenda');
+        const eventos = await response.json();
+        
+        let resultado = `✅ Eventos cargados exitosamente\n`;
+        resultado += `📊 Total de eventos: ${eventos.length}\n\n`;
+        
+        eventos.forEach(evento => {
+          resultado += `📅 ${evento.titulo}\n`;
+          resultado += `   📍 ${evento.lugar}\n`;
+          resultado += `   🕐 ${evento.dia} - ${evento.hora}\n`;
+          resultado += `   📝 ${evento.descripcion || 'Sin descripción'}\n\n`;
+        });
+        
+        mostrarResultado('resultadoEventos', resultado, 'success');
+        agregarResultadoPrueba('Carga de Eventos', 'Exitoso', 'success');
+        
+      } catch (error) {
+        const resultado = `❌ Error al cargar eventos: ${error.message}`;
+        mostrarResultado('resultadoEventos', resultado, 'error');
+        agregarResultadoPrueba('Carga de Eventos', `Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function probarEventosInicio() {
+      try {
+        const response = await fetch('/api/agenda');
+        const eventos = await response.json();
+        
+        // Simular la lógica de la página de inicio
+        const eventosOrdenados = eventos.sort((a, b) => {
+          const fechaA = new Date(`${a.fecha} ${a.hora}`);
+          const fechaB = new Date(`${b.fecha} ${b.hora}`);
+          return fechaA - fechaB;
+        });
+        
+        const eventosPrincipales = eventosOrdenados.slice(0, 3);
+        
+        let resultado = `✅ Simulación de página de inicio exitosa\n`;
+        resultado += `📊 Eventos principales mostrados: ${eventosPrincipales.length}\n\n`;
+        
+        eventosPrincipales.forEach((evento, index) => {
+          resultado += `${index + 1}. ${evento.titulo}\n`;
+          resultado += `   📍 ${evento.lugar}\n`;
+          resultado += `   🕐 ${evento.dia} - ${evento.hora}\n\n`;
+        });
+        
+        mostrarResultado('resultadoEventos', resultado, 'success');
+        agregarResultadoPrueba('Simulación Página Inicio', 'Exitoso', 'success');
+        
+      } catch (error) {
+        const resultado = `❌ Error en simulación: ${error.message}`;
+        mostrarResultado('resultadoEventos', resultado, 'error');
+        agregarResultadoPrueba('Simulación Página Inicio', `Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function verificarEstadoBloqueo() {
+      try {
+        const response = await fetch('/api/config/agenda/bloqueo');
+        const config = await response.json();
+        
+        let resultado = `✅ Estado de bloqueo verificado\n`;
+        resultado += `🔒 Agenda bloqueada: ${config.agenda?.bloqueada ? 'SÍ' : 'NO'}\n`;
+        
+        if (config.agenda?.bloqueada) {
+          resultado += `📝 Motivo: ${config.agenda.motivoBloqueo || 'No especificado'}\n`;
+          resultado += `📅 Fecha de bloqueo: ${new Date(config.agenda.fechaBloqueo).toLocaleString('es-ES')}\n`;
+        }
+        
+        resultado += `🔄 Última actualización: ${new Date(config.sistema.ultimaActualizacion).toLocaleString('es-ES')}\n`;
+        
+        mostrarResultado('resultadoBloqueo', resultado, 'success');
+        agregarResultadoPrueba('Verificación Estado Bloqueo', 'Exitoso', 'success');
+        
+      } catch (error) {
+        const resultado = `❌ Error al verificar estado: ${error.message}`;
+        mostrarResultado('resultadoBloqueo', resultado, 'error');
+        agregarResultadoPrueba('Verificación Estado Bloqueo', `Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function probarBloqueoAgenda() {
+      try {
+        const motivo = prompt('Ingresa el motivo del bloqueo:');
+        if (!motivo) return;
+        
+        const response = await fetch('/api/config/agenda/bloqueo', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'admin-token'
+          },
+          body: JSON.stringify({
+            bloqueada: true,
+            motivoBloqueo: motivo
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          const resultado = `✅ Agenda bloqueada exitosamente\n`;
+          resultado += `📝 Motivo: ${motivo}\n`;
+          resultado += `📅 Fecha: ${new Date().toLocaleString('es-ES')}\n`;
+          resultado += `💬 Respuesta: ${data.mensaje}\n`;
+          
+          mostrarResultado('resultadoBloqueo', resultado, 'success');
+          agregarResultadoPrueba('Bloqueo de Agenda', 'Exitoso', 'success');
+        } else {
+          const resultado = `❌ Error al bloquear agenda: ${data.error}`;
+          mostrarResultado('resultadoBloqueo', resultado, 'error');
+          agregarResultadoPrueba('Bloqueo de Agenda', `Error: ${data.error}`, 'error');
+        }
+        
+      } catch (error) {
+        const resultado = `❌ Error de conexión: ${error.message}`;
+        mostrarResultado('resultadoBloqueo', resultado, 'error');
+        agregarResultadoPrueba('Bloqueo de Agenda', `Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function probarDesbloqueoAgenda() {
+      try {
+        const response = await fetch('/api/config/agenda/bloqueo', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'admin-token'
+          },
+          body: JSON.stringify({
+            bloqueada: false,
+            motivoBloqueo: null
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          const resultado = `✅ Agenda desbloqueada exitosamente\n`;
+          resultado += `📅 Fecha: ${new Date().toLocaleString('es-ES')}\n`;
+          resultado += `💬 Respuesta: ${data.mensaje}\n`;
+          
+          mostrarResultado('resultadoBloqueo', resultado, 'success');
+          agregarResultadoPrueba('Desbloqueo de Agenda', 'Exitoso', 'success');
+        } else {
+          const resultado = `❌ Error al desbloquear agenda: ${data.error}`;
+          mostrarResultado('resultadoBloqueo', resultado, 'error');
+          agregarResultadoPrueba('Desbloqueo de Agenda', `Error: ${data.error}`, 'error');
+        }
+        
+      } catch (error) {
+        const resultado = `❌ Error de conexión: ${error.message}`;
+        mostrarResultado('resultadoBloqueo', resultado, 'error');
+        agregarResultadoPrueba('Desbloqueo de Agenda', `Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function probarConfirmacionEvento() {
+      try {
+        // Primero verificar si hay eventos disponibles
+        const agendaResponse = await fetch('/api/agenda');
+        const eventos = await agendaResponse.json();
+        
+        if (eventos.length === 0) {
+          const resultado = `⚠️ No hay eventos disponibles para probar confirmación`;
+          mostrarResultado('resultadoConfirmacion', resultado, 'warning');
+          agregarResultadoPrueba('Confirmación de Evento', 'Sin eventos disponibles', 'warning');
+          return;
+        }
+        
+        const primerEvento = eventos[0];
+        
+        // Simular confirmación (sin token real)
+        const resultado = `✅ Simulación de confirmación exitosa\n`;
+        resultado += `📅 Evento: ${primerEvento.titulo}\n`;
+        resultado += `🆔 ID: ${primerEvento.id}\n`;
+        resultado += `📝 Nota: Esta es una simulación sin token de invitado\n`;
+        resultado += `🔒 Estado de bloqueo: Verificar con función específica\n`;
+        
+        mostrarResultado('resultadoConfirmacion', resultado, 'success');
+        agregarResultadoPrueba('Confirmación de Evento', 'Simulación exitosa', 'success');
+        
+      } catch (error) {
+        const resultado = `❌ Error en confirmación: ${error.message}`;
+        mostrarResultado('resultadoConfirmacion', resultado, 'error');
+        agregarResultadoPrueba('Confirmación de Evento', `Error: ${error.message}`, 'error');
+      }
+    }
+
+    async function probarConfirmacionBloqueada() {
+      try {
+        // Verificar estado de bloqueo
+        const bloqueoResponse = await fetch('/api/config/agenda/bloqueo');
+        const config = await bloqueoResponse.json();
+        
+        let resultado = `🔍 Verificación de confirmación con bloqueo\n`;
+        resultado += `🔒 Agenda bloqueada: ${config.agenda?.bloqueada ? 'SÍ' : 'NO'}\n`;
+        
+        if (config.agenda?.bloqueada) {
+          resultado += `✅ Confirmación bloqueada correctamente\n`;
+          resultado += `📝 Motivo del bloqueo: ${config.agenda.motivoBloqueo}\n`;
+          resultado += `📅 Bloqueada desde: ${new Date(config.agenda.fechaBloqueo).toLocaleString('es-ES')}\n`;
+          resultado += `🚫 Los invitados no pueden modificar confirmaciones\n`;
+        } else {
+          resultado += `⚠️ Agenda no está bloqueada\n`;
+          resultado += `✅ Los invitados pueden modificar confirmaciones\n`;
+        }
+        
+        mostrarResultado('resultadoConfirmacion', resultado, config.agenda?.bloqueada ? 'success' : 'warning');
+        agregarResultadoPrueba('Confirmación con Bloqueo', config.agenda?.bloqueada ? 'Bloqueo activo' : 'Sin bloqueo', config.agenda?.bloqueada ? 'success' : 'warning');
+        
+      } catch (error) {
+        const resultado = `❌ Error al verificar bloqueo: ${error.message}`;
+        mostrarResultado('resultadoConfirmacion', resultado, 'error');
+        agregarResultadoPrueba('Confirmación con Bloqueo', `Error: ${error.message}`, 'error');
+      }
+    }
+
+    // Ejecutar verificación inicial al cargar la página
+    window.addEventListener('load', () => {
+      verificarEstadoBloqueo();
+    });
+  </script>
+</body>
+</html>

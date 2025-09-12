@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sistema de Comentarios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Sistema de Comentarios</h1>
+    
+    <div class="test-section">
+        <h2>1. Configuración Inicial</h2>
+        <button class="test-button" onclick="setupTestData()">Configurar Datos de Prueba</button>
+        <div id="setupResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Login de Invitado</h2>
+        <button class="test-button" onclick="testGuestLogin()">Simular Login de Invitado</button>
+        <div id="loginResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Test Publicar Comentario</h2>
+        <button class="test-button" onclick="testPublishComment()">Publicar Comentario de Prueba</button>
+        <div id="publishResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Test Obtener Comentarios</h2>
+        <button class="test-button" onclick="testGetComments()">Obtener Todos los Comentarios</button>
+        <div id="getResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Test Panel de Administración</h2>
+        <button class="test-button" onclick="testAdminComments()">Ver Comentarios como Admin</button>
+        <div id="adminResult"></div>
+    </div>
+
+    <script>
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="result ${type}">${message}</div>`;
+        }
+
+        function setupTestData() {
+            // Simular datos de invitado en localStorage
+            localStorage.setItem('token', 'test-guest-token');
+            localStorage.setItem('nombre', 'Juan Pérez');
+            localStorage.setItem('email', 'juan@example.com');
+            
+            showResult('setupResult', 
+                '✅ Datos de prueba configurados:<br>' +
+                '• Token: test-guest-token<br>' +
+                '• Nombre: Juan Pérez<br>' +
+                '• Email: juan@example.com', 'success');
+        }
+
+        async function testGuestLogin() {
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'juan@example.com' })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('loginResult', 
+                        '✅ Login exitoso:<br>' +
+                        `• Token: ${data.token}<br>` +
+                        `• Nombre: ${data.nombre}<br>` +
+                        `• Email: ${data.email}`, 'success');
+                } else {
+                    const error = await response.json();
+                    showResult('loginResult', 
+                        `❌ Error en login: ${error.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('loginResult', 
+                    `❌ Error de conexión: ${error.message}`, 'error');
+            }
+        }
+
+        async function testPublishComment() {
+            try {
+                const response = await fetch('/api/comentarios', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': localStorage.getItem('token')
+                    },
+                    body: JSON.stringify({ 
+                        comentario: '¡Qué emoción! No puedo esperar para la boda de Iluminada y George. Será un día maravilloso.' 
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('publishResult', 
+                        `✅ Comentario publicado exitosamente:<br>${data.mensaje}`, 'success');
+                } else {
+                    const error = await response.json();
+                    showResult('publishResult', 
+                        `❌ Error al publicar: ${error.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('publishResult', 
+                    `❌ Error de conexión: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetComments() {
+            try {
+                const response = await fetch('/api/comentarios');
+                
+                if (response.ok) {
+                    const comments = await response.json();
+                    let html = `✅ Comentarios obtenidos (${comments.length} comentarios):<br>`;
+                    
+                    comments.forEach((comment, index) => {
+                        html += `<br><strong>Comentario ${index + 1}:</strong><br>`;
+                        html += `• Autor: ${comment.nombre}<br>`;
+                        html += `• Email: ${comment.email}<br>`;
+                        html += `• Fecha: ${new Date(comment.fecha).toLocaleString()}<br>`;
+                        html += `• Comentario: ${comment.comentario}<br>`;
+                    });
+                    
+                    showResult('getResult', html, 'success');
+                } else {
+                    const error = await response.json();
+                    showResult('getResult', 
+                        `❌ Error al obtener comentarios: ${error.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('getResult', 
+                    `❌ Error de conexión: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAdminComments() {
+            try {
+                const response = await fetch('/api/admin/comentarios', {
+                    headers: {
+                        'Authorization': 'test-token'
+                    }
+                });
+                
+                if (response.ok) {
+                    const comments = await response.json();
+                    let html = `✅ Comentarios obtenidos como admin (${comments.length} comentarios):<br>`;
+                    
+                    comments.forEach((comment, index) => {
+                        html += `<br><strong>Comentario ${index + 1}:</strong><br>`;
+                        html += `• ID: ${comment.id}<br>`;
+                        html += `• Autor: ${comment.nombre}<br>`;
+                        html += `• Email: ${comment.email}<br>`;
+                        html += `• Fecha: ${new Date(comment.fecha).toLocaleString()}<br>`;
+                        html += `• Comentario: ${comment.comentario}<br>`;
+                    });
+                    
+                    showResult('adminResult', html, 'success');
+                } else {
+                    const error = await response.json();
+                    showResult('adminResult', 
+                        `❌ Error al obtener comentarios como admin: ${error.error}`, 'error');
+                }
+            } catch (error) {
+                showResult('adminResult', 
+                    `❌ Error de conexión: ${error.message}`, 'error');
+            }
+        }
+
+        // Configurar datos iniciales
+        setupTestData();
+    </script>
+</body>
+</html>

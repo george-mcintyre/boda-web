@@ -1,0 +1,69 @@
+{
+  "images": [
+    {
+      "id": "imagen-1",
+      "name": "Imagen 1",
+      "url": "/assets/images/gift-cards/IMAGEN 1.jpg"
+    },
+    {
+      "id": "imagen-2", 
+      "name": "Imagen 2",
+      "url": "/assets/images/gift-cards/IMAGEN 2.jpg"
+    },
+    {
+      "id": "imagen-3",
+      "name": "Imagen 3", 
+      "url": "/assets/images/gift-cards/IMAGEN 3.jpg"
+    },
+    {
+      "id": "imagen-4",
+      "name": "Imagen 4",
+      "url": "/assets/images/gift-cards/IMAGEN 4.jpg"
+    },
+    {
+      "id": "imagen-5",
+      "name": "Imagen 5",
+      "url": "/assets/images/gift-cards/IMAGEN 5.jpg"
+    },
+    {
+      "id": "imagen-6",
+      "name": "Imagen 6",
+      "url": "/assets/images/gift-cards/IMAGEN 6.jpg"
+    },
+    {
+      "id": "imagen-7",
+      "name": "Imagen 7",
+      "url": "/assets/images/gift-cards/IMAGEN 7.jpg"
+    },
+    {
+      "id": "imagen-8",
+      "name": "Imagen 8",
+      "url": "/assets/images/gift-cards/IMAGEN 8.jpg"
+    },
+    {
+      "id": "imagen-9",
+      "name": "Imagen 9",
+      "url": "/assets/images/gift-cards/IMAGEN 9.jpg"
+    },
+    {
+      "id": "imagen-10",
+      "name": "Imagen 10",
+      "url": "/assets/images/gift-cards/IMAGEN 10.jpg"
+    },
+    {
+      "id": "imagen-11",
+      "name": "Imagen 11",
+      "url": "/assets/images/gift-cards/IMAGEN 11.jpg"
+    },
+    {
+      "id": "imagen-12",
+      "name": "Imagen 12",
+      "url": "/assets/images/gift-cards/IMAGEN 12.jpg"
+    },
+    {
+      "id": "imagen-13",
+      "name": "Imagen 13",
+      "url": "/assets/images/gift-cards/IMAGEN 13.jpg"
+    }
+  ]
+}

@@ -1,0 +1,368 @@
+{
+  "wedding": {
+    "title": "Mariage d'Iluminada & George",
+    "subtitle": "Nous nous marions",
+    "date": "6 Juin 2026",
+    "hero": {
+      "title": "Nous vous invitons à célébrer notre amour !",
+      "description": "Après 5 ans d'amour et d'aventures ensemble, nous avons décidé de faire le pas le plus important de nos vies. Nous voulons que vous fassiez partie de ce moment si spécial pour Iluminada et George.",
+      "countdown": "Jours restants jusqu'à notre grand jour",
+      "rsvpButton": "Confirmer ma présence",
+      "viewDetailsButton": "Voir les détails"
+    },
+    "ceremony": {
+      "title": "Cérémonie Religieuse",
+      "time": "16:00",
+      "location": "Église de Santa María",
+      "address": "Calle Mayor, 123, Madrid",
+      "description": "La cérémonie religieuse aura lieu dans cette belle église historique du centre de Madrid.",
+      "dressCode": "Tenue formelle",
+      "duration": "1 heure",
+      "seating": "Places assises disponibles",
+      "parking": "Parking gratuit à proximité",
+      "accessibility": "Accès handicapé disponible"
+    },
+    "celebration": {
+      "title": "Réception & Festin",
+      "time": "18:00",
+      "location": "Palais Royal de Madrid",
+      "address": "Calle de Bailén, s/n, Madrid",
+      "description": "Après la cérémonie, nous célébrerons avec un dîner élégant dans les jardins du Palais Royal.",
+      "dressCode": "Tenue de soirée",
+      "duration": "6 heures",
+      "menu": "Menu gastronomique avec options végétariennes",
+      "music": "Orchestre en direct et DJ",
+      "dancing": "Piste de danse disponible",
+      "photography": "Photographe professionnel inclus"
+    },
+    "location": {
+      "title": "Comment s'y rendre",
+      "ceremony": {
+        "title": "Église de Santa María",
+        "address": "Calle Mayor, 123, Madrid",
+        "transport": "Métro: Ligne 1, Station Sol",
+        "parking": "Parking public disponible"
+      },
+      "celebration": {
+        "title": "Palais Royal de Madrid",
+        "address": "Calle de Bailén, s/n, Madrid",
+        "transport": "Métro: Ligne 2, Station Ópera",
+        "parking": "Parking privé disponible"
+      },
+      "map": "Voir sur la carte",
+      "directions": "Obtenir l'itinéraire"
+    },
+    "dressCode": {
+      "title": "Code vestimentaire",
+      "ceremony": "Tenue formelle - Costume et cravate pour hommes, robe ou ensemble élégant pour femmes",
+      "celebration": "Tenue de soirée - Smoking ou costume sombre pour hommes, robe de soirée pour femmes",
+      "colors": "Couleurs suggérées: Bleu marine, Gris, Blanc, Or",
+      "avoid": "À éviter: Jeans, T-shirts, Chaussures de sport"
+    },
+    "guestZone": {
+      "title": "Zone Invités",
+      "welcome": "Bienvenue dans votre espace personnel",
+      "login": "Connectez-vous avec votre code d'invitation",
+      "code": "Code d'invitation",
+      "enterCode": "Entrez votre code",
+      "submit": "Accéder",
+      "error": "Code invalide. Veuillez réessayer.",
+      "success": "Connexion réussie !"
+    },
+    "menu": {
+      "title": "Menu du Festin",
+      "subtitle": "Un festin gastronomique préparé par nos chefs",
+      "starters": {
+        "title": "Entrées",
+        "items": [
+          "Carpaccio de bœuf avec parmesan et roquette",
+          "Soupe de champignons sauvages",
+          "Salade de fruits de mer frais"
+        ]
+      },
+      "mainCourses": {
+        "title": "Plats principaux",
+        "items": [
+          "Filet de bœuf avec sauce au vin rouge",
+          "Saumon grillé avec légumes de saison",
+          "Risotto aux champignons (végétarien)"
+        ]
+      },
+      "desserts": {
+        "title": "Desserts",
+        "items": [
+          "Tiramisu classique",
+          "Crème brûlée à la vanille",
+          "Assortiment de chocolats fins"
+        ]
+      },
+      "drinks": {
+        "title": "Boissons",
+        "items": [
+          "Champagne et vins sélectionnés",
+          "Cocktails signature",
+          "Boissons non alcoolisées"
+        ]
+      },
+      "dietary": "Options végétariennes et sans gluten disponibles sur demande"
+    },
+    "agenda": {
+      "title": "Programme de la Journée",
+      "subtitle": "Détails de notre journée spéciale",
+      "events": [
+        {
+          "time": "15:30",
+          "title": "Accueil des invités",
+          "description": "Arrivée et enregistrement à l'église"
+        },
+        {
+          "time": "16:00",
+          "title": "Cérémonie religieuse",
+          "description": "Cérémonie de mariage traditionnelle"
+        },
+        {
+          "time": "17:00",
+          "title": "Cocktail de réception",
+          "description": "Boissons et canapés dans les jardins"
+        },
+        {
+          "time": "18:00",
+          "title": "Réception et dîner",
+          "description": "Festin et célébrations"
+        },
+        {
+          "time": "20:00",
+          "title": "Première danse",
+          "description": "Danse traditionnelle des mariés"
+        },
+        {
+          "time": "21:00",
+          "title": "Fête et danse",
+          "description": "Musique en direct et DJ"
+        },
+        {
+          "time": "00:00",
+          "title": "Fin des célébrations",
+          "description": "Merci à tous nos invités"
+        }
+      ]
+    },
+    "gifts": {
+      "title": "Liste de Mariage",
+      "subtitle": "Votre présence est notre plus beau cadeau",
+      "message": "Si vous souhaitez nous faire un cadeau, voici quelques suggestions qui nous feraient plaisir :",
+      "categories": {
+        "home": "Pour la maison",
+        "kitchen": "Cuisine",
+        "bedroom": "Chambre",
+        "bathroom": "Salle de bain",
+        "garden": "Jardin",
+        "travel": "Voyage",
+        "experience": "Expériences"
+      },
+      "items": [
+        {
+          "name": "Machine à café expresso",
+          "category": "kitchen",
+          "price": "€300",
+          "description": "Pour commencer nos matins avec style",
+          "reserved": false
+        },
+        {
+          "name": "Set de draps en coton égyptien",
+          "category": "bedroom",
+          "price": "€150",
+          "description": "Pour des nuits confortables",
+          "reserved": false
+        },
+        {
+          "name": "Vase en cristal",
+          "category": "home",
+          "price": "€80",
+          "description": "Pour décorer notre salon",
+          "reserved": false
+        },
+        {
+          "name": "Week-end romantique",
+          "category": "experience",
+          "price": "€200",
+          "description": "Pour une escapade amoureuse",
+          "reserved": false
+        }
+      ],
+      "reserveButton": "Réserver ce cadeau",
+      "unreserveButton": "Annuler la réservation",
+      "reservedMessage": "Ce cadeau a été réservé",
+      "thankYou": "Merci pour votre générosité !"
+    },
+    "messages": {
+      "title": "Messages des Invités",
+      "subtitle": "Partagez vos vœux et souvenirs avec nous",
+      "sendMessage": "Envoyer un message",
+      "form": {
+        "name": "Votre nom",
+        "email": "Votre email",
+        "message": "Votre message",
+        "placeholder": "Écrivez vos vœux, souvenirs ou conseils pour notre mariage...",
+        "submit": "Envoyer le message",
+        "success": "Message envoyé avec succès !",
+        "error": "Erreur lors de l'envoi du message"
+      },
+      "recent": "Messages récents",
+      "noMessages": "Aucun message pour le moment. Soyez le premier !"
+    },
+    "summary": {
+      "title": "Résumé de votre Participation",
+      "subtitle": "Vue d'ensemble de vos choix et confirmations",
+      "rsvp": {
+        "title": "Confirmation de présence",
+        "status": "Statut",
+        "guests": "Nombre d'invités",
+        "dietary": "Restrictions alimentaires",
+        "notes": "Notes spéciales"
+      },
+      "menu": {
+        "title": "Choix de menu",
+        "starter": "Entrée sélectionnée",
+        "mainCourse": "Plat principal sélectionné",
+        "dessert": "Dessert sélectionné"
+      },
+      "agenda": {
+        "title": "Événements confirmés",
+        "ceremony": "Cérémonie religieuse",
+        "celebration": "Réception et festin"
+      },
+      "gifts": {
+        "title": "Cadeaux réservés",
+        "count": "Nombre de cadeaux réservés",
+        "total": "Valeur totale"
+      },
+      "messages": {
+        "title": "Messages envoyés",
+        "count": "Nombre de messages",
+        "lastMessage": "Dernier message"
+      }
+    },
+    "admin": {
+      "title": "Panneau d'Administration",
+      "welcome": "Bienvenue au panneau d'administration",
+      "welcomeMessage": "Gérez toutes les informations du mariage d'Iluminada et George",
+      "guests": "Invités",
+      "rsvp": "Confirmations RSVP",
+      "gifts": "Liste de Cadeaux",
+      "messages": "Messages",
+      "agenda": "Programme d'Événements",
+      "menu": "Gestion des Menus",
+      "settings": "Configuration",
+      "logout": "Se déconnecter",
+      "home": "Accueil",
+      "loading": "Chargement du panneau d'administration...",
+      "loadingGeneric": "Chargement...",
+      "guestsList": "Liste des Invités",
+      "addGuest": "Ajouter un Invité",
+      "giftsList": "Liste de Cadeaux",
+      "addGift": "Ajouter un Cadeau",
+      "guestMessages": "Messages des Invités",
+      "eventSchedule": "Programme d'Événements",
+      "menuManagement": "Gestion des Menus",
+      "systemConfig": "Configuration du Système",
+      "name": "Nom",
+      "email": "Email",
+      "attendance": "Présence",
+      "menu": "Menu",
+      "actions": "Actions",
+      "description": "Description",
+      "price": "Prix",
+      "category": "Catégorie",
+      "confirmed": "✅ Confirmé",
+      "notAttending": "❌ Ne participera pas",
+      "pending": "⏳ En attente",
+      "notSelected": "Non sélectionné",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "date": "Date",
+      "location": "Lieu",
+      "address": "Adresse",
+      "menuStats": "Statistiques de Sélection de Menus",
+      "totalMenuSelections": "Total d'invités avec menu sélectionné",
+      "weddingInfo": "Informations du Mariage",
+      "weddingDate": "Date",
+      "couple": "Couple",
+      "status": "Statut",
+      "active": "Actif",
+      "serverStatus": "État du Serveur",
+      "backend": "Backend",
+      "database": "Base de données",
+      "connected": "Connectée",
+      "lastUpdate": "Dernière mise à jour",
+      "security": "Sécurité",
+      "authentication": "Authentification",
+      "tokens": "Jetons",
+      "valid": "Valides",
+      "adminSession": "Session admin",
+      "online": "En ligne",
+      "connectionError": "Erreur de connexion",
+      "serverConnectionError": "Impossible de se connecter au serveur",
+      "details": "Détails",
+      "retry": "Réessayer",
+      "loadDataError": "Erreur lors du chargement des données",
+      "unknownError": "Erreur inconnue",
+      "errorCode": "Code d'erreur",
+      "tabNotImplemented": "Onglet non implémenté",
+      "confirmDeleteGuest": "Êtes-vous sûr de vouloir supprimer",
+      "confirmDeleteGift": "Êtes-vous sûr de vouloir supprimer ce cadeau ?",
+      "functionInDevelopment": "Fonction en développement",
+      "addGuestTitle": "Ajouter un Nouvel Invité",
+      "fullName": "Nom complet",
+      "phone": "Téléphone",
+      "attendanceStatus": "Statut de présence",
+      "companions": "Nombre d'accompagnateurs",
+      "notes": "Notes supplémentaires",
+      "notesPlaceholder": "Allergies, préférences spéciales, etc.",
+      "cancel": "Annuler",
+      "saveGuest": "Enregistrer l'Invité",
+      "requiredFieldsError": "Veuillez remplir tous les champs obligatoires",
+      "invalidEmailError": "Veuillez entrer une adresse email valide",
+      "authError": "Erreur d'authentification",
+      "duplicateEmailError": "Un invité avec cet email existe déjà",
+      "addGuestError": "Erreur lors de l'ajout de l'invité",
+      "guestAddedSuccess": "Invitado ajouté avec succès",
+      "connectionError": "Erreur de connexion"
+    },
+    "login": {
+      "title": "Connexion Administrateur",
+      "subtitle": "Accédez au panneau d'administration",
+      "username": "Nom d'utilisateur",
+      "password": "Mot de passe",
+      "login": "Se connecter",
+      "error": "Identifiants invalides"
+    },
+    "navigation": {
+      "home": "Accueil",
+      "ceremony": "Cérémonie",
+      "celebration": "Célébration",
+      "location": "Lieu",
+      "dressCode": "Code vestimentaire",
+      "menu": "Menu",
+      "agenda": "Programme",
+      "gifts": "Cadeaux",
+      "messages": "Messages",
+      "rsvp": "RSVP",
+      "admin": "Admin"
+    },
+    "status": {
+      "confirmed": "Confirmé",
+      "pending": "En attente",
+      "declined": "Décliné",
+      "maybe": "Peut-être",
+      "notResponded": "N'a pas répondu"
+    }
+  }
+}
+
+
+
+
+
+
+

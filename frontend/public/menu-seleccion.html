@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selección de Menú - Boda de Iluminada & George</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .menu-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .menu-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .menu-header h1 {
+      margin: 0;
+      font-size: 2.5em;
+      font-weight: 300;
+    }
+    
+    .menu-header p {
+      margin: 10px 0 0 0;
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+    
+    .menu-form {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-color);
+      font-size: 1.1em;
+    }
+    
+    .form-group label i {
+      margin-right: 8px;
+      color: var(--primary-color);
+    }
+    
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 1em;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    }
+    
+    .submit-btn {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+    }
+    
+    .submit-btn i {
+      margin-right: 8px;
+    }
+    
+    .message {
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 20px;
+      text-align: center;
+      font-weight: 500;
+      display: none;
+    }
+    
+    .message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .current-selection {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .current-selection h3 {
+      margin: 0 0 15px 0;
+      color: var(--primary-color);
+      font-size: 1.2em;
+    }
+    
+    .selection-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .selection-item:last-child {
+      border-bottom: none;
+    }
+    
+    .selection-label {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    
+    .selection-value {
+      color: var(--primary-color);
+      font-style: italic;
+    }
+    
+    .navigation-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    
+    .nav-btn {
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .nav-btn.primary {
+      background: var(--primary-color);
+      color: white;
+    }
+    
+    .nav-btn.secondary {
+      background: #6c757d;
+      color: white;
+    }
+    
+    .nav-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    @media (max-width: 768px) {
+      .menu-container {
+        padding: 10px;
+      }
+      
+      .menu-header h1 {
+        font-size: 2em;
+      }
+      
+      .menu-form {
+        padding: 20px;
+      }
+      
+      .navigation-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Selección de Menú</h1>
+      <a href="invitados.html" class="home-link">
+        <i class="fas fa-arrow-left"></i>
+        Volver a invitados
+      </a>
+    </div>
+  </header>
+  
+  <main class="menu-container">
+    <div class="menu-header">
+      <h1><i class="fas fa-utensils"></i> Selección de Menú</h1>
+      <p>Elige tus platos preferidos para nuestra boda</p>
+    </div>
+
+    <!-- Mostrar selección actual si existe -->
+    <div id="currentSelection" class="current-selection" style="display: none;">
+      <h3><i class="fas fa-check-circle"></i> Tu selección actual</h3>
+      <div id="currentSelectionContent"></div>
+    </div>
+
+    <div class="menu-form">
+      <form id="menuForm">
+        <div class="form-group">
+          <label for="entrante">
+            <i class="fas fa-appetizers"></i>
+            Entrante
+          </label>
+          <select id="entrante" name="entrante" required>
+            <option value="">Selecciona un entrante</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="principal">
+            <i class="fas fa-drumstick-bite"></i>
+            Plato principal
+          </label>
+          <select id="principal" name="principal" required>
+            <option value="">Selecciona un plato principal</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="postre">
+            <i class="fas fa-ice-cream"></i>
+            Postre
+          </label>
+          <select id="postre" name="postre" required>
+            <option value="">Selecciona un postre</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="opcion">
+            <i class="fas fa-leaf"></i>
+            Opción especial (si aplica)
+          </label>
+          <select id="opcion" name="opcion">
+            <option value="">Ninguna</option>
+            <option value="Vegano">Vegano</option>
+            <option value="Sin gluten">Sin gluten</option>
+            <option value="Sin lactosa">Sin lactosa</option>
+            <option value="Sin frutos secos">Sin frutos secos</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="alergias">
+            <i class="fas fa-exclamation-triangle"></i>
+            Alergias o patologías alimentarias
+          </label>
+          <input type="text" id="alergias" name="alergias" placeholder="Ej: Sin frutos secos, celiaquía, intolerancia a la lactosa...">
+        </div>
+        
+        <button type="submit" class="submit-btn">
+          <i class="fas fa-save"></i>
+          Guardar selección
+        </button>
+      </form>
+      
+      <div id="menuMessage" class="message"></div>
+    </div>
+
+    <div class="navigation-buttons">
+      <a href="invitados.html" class="nav-btn secondary">
+        <i class="fas fa-arrow-left"></i>
+        Volver a invitados
+      </a>
+      <a href="index.html" class="nav-btn primary">
+        <i class="fas fa-home"></i>
+        Ir al inicio
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <button onclick="logoutInvitado()" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        Cerrar sesión
+      </button>
+    </div>
+  </footer>
+
+  <script src="js/menu-seleccion.js"></script>
+</body>
+</html>
+

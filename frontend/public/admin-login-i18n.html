@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso Administrador - Boda de Iluminada & George</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap">
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: white;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #8B5A96 0%, #D4A5A5 100%);
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            pointer-events: none;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        .header-left {
+            flex: 1;
+        }
+
+        .header-left h1 {
+            color: white;
+            -webkit-text-fill-color: white;
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+
+        /* Estilos para el selector de idiomas */
+        .language-selector {
+            position: relative;
+            margin-left: 20px;
+            z-index: 1000;
+        }
+        
+        .language-selector-wrapper {
+            position: relative;
+        }
+        
+        .language-selector-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .language-selector-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            min-width: 120px;
+        }
+        
+        .language-selector-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .language-selector-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border: 1px solid #e1e5e9;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(20px);
+            min-width: 160px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1001;
+            overflow: hidden;
+        }
+        
+        .language-selector-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .language-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #333;
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .language-option:last-child {
+            border-bottom: none;
+        }
+        
+        .language-option:hover {
+            background: #f8f9fa;
+            color: #007bff;
+        }
+        
+        .language-option.active {
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: 600;
+        }
+
+        .home-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .home-link:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .home-link i {
+            font-size: 1.1rem;
+        }
+
+        /* Selector de idiomas - ESTILOS CRÍTICOS */
+        .language-selector {
+            position: relative;
+            z-index: 1000;
+        }
+
+        .language-selector-toggle {
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            padding: 10px 15px !important;
+            background: rgba(255, 255, 255, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            border-radius: 8px !important;
+            color: white !important;
+            font-size: 14px !important;
+            font-weight: 500 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            min-width: 120px !important;
+            text-decoration: none !important;
+        }
+
+        .language-selector-toggle:hover {
+            background: rgba(255, 255, 255, 0.3) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .language-selector-menu {
+            position: absolute !important;
+            top: 100% !important;
+            right: 0 !important;
+            margin-top: 8px !important;
+            background: white !important;
+            border: 1px solid #ddd !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+            min-width: 150px !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            transform: translateY(-10px) !important;
+            transition: all 0.3s ease !important;
+            z-index: 1001 !important;
+        }
+
+        .language-selector-menu.show {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
+        }
+
+        .language-option {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            padding: 12px 15px !important;
+            border: none !important;
+            background: none !important;
+            width: 100% !important;
+            text-align: left !important;
+            cursor: pointer !important;
+            transition: background 0.2s ease !important;
+            color: #333 !important;
+            font-size: 14px !important;
+        }
+
+        .language-option:hover {
+            background: #f5f5f5 !important;
+        }
+
+        .language-option.active {
+            background: #e3f2fd !important;
+            color: #1976d2 !important;
+            font-weight: 600 !important;
+        }
+
+        /* Contenedor principal */
+        .admin-login-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 100px);
+            padding: 20px;
+            margin-top: 40px;
+        }
+
+        .admin-login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .admin-login-icon {
+            font-size: 48px;
+            color: #8B5A96;
+            margin-bottom: 20px;
+        }
+
+        .admin-login-container h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .admin-login-description {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #8B5A96;
+            box-shadow: 0 0 0 2px rgba(139, 90, 150, 0.2);
+        }
+
+        .password-input-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .admin-login-btn {
+            width: 100%;
+            padding: 15px;
+            background: #8B5A96;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .admin-login-btn:hover {
+            background: #7a4a85;
+        }
+
+        .admin-login-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+        }
+
+        .admin-login-footer i {
+            color: #8B5A96;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="header-left">
+                <h1 data-i18n="admin:title">Acceso para Administrador</h1>
+                <a href="index-i18n-fixed.html" class="home-link">
+                    <i class="fas fa-home"></i>
+                    <span data-i18n="common:home">Inicio</span>
+                </a>
+            </div>
+            <div class="language-selector">
+                <div class="language-selector-wrapper">
+                    <div class="language-selector-dropdown">
+                        <button class="language-selector-toggle" id="language-toggle" aria-label="Select language">
+                            <span class="current-language">
+                                <span class="flag">🇪🇸</span>
+                                <span class="name">Español</span>
+                            </span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="language-selector-menu" id="language-menu">
+                            <button class="language-option active" data-lang="es">
+                                <span class="flag">🇪🇸</span>
+                                <span class="name">Español</span>
+                            </button>
+                            <button class="language-option" data-lang="en">
+                                <span class="flag">🇬🇧</span>
+                                <span class="name">English</span>
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-login-section">
+        <div class="admin-login-container">
+            <div class="admin-login-icon">
+                <i class="fas fa-cog"></i>
+            </div>
+            <h2 data-i18n="admin:loginTitle">Acceso al Panel de Administrador</h2>
+            <p class="admin-login-description" data-i18n="admin:loginDescription">
+                Introduce tus credenciales para gestionar los detalles de la boda y las confirmaciones de asistencia.
+            </p>
+
+            <form id="adminLoginForm">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user-shield"></i> 
+                        <span data-i18n="admin:usernameLabel">Usuario</span>
+                    </label>
+                    <input type="text" id="username" name="username" 
+                           data-i18n-placeholder="admin:usernamePlaceholder" 
+                           placeholder="Tu nombre de usuario" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> 
+                        <span data-i18n="admin:passwordLabel">Contraseña</span>
+                    </label>
+                    <div class="password-input-container">
+                        <input type="password" id="password" name="password" 
+                               data-i18n-placeholder="admin:passwordPlaceholder" 
+                               placeholder="Tu contraseña secreta" required>
+                        <button type="button" class="password-toggle" id="togglePassword">
+                            <i class="fas fa-eye-slash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="admin-login-btn">
+                    <i class="fas fa-sign-in-alt"></i> 
+                    <span data-i18n="admin:loginButton">Iniciar Sesión</span>
+                </button>
+            </form>
+
+            <div class="admin-login-footer">
+                <p>
+                    <i class="fas fa-heart"></i> 
+                    <span data-i18n="wedding:title">Boda de Iluminada & George</span>
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Traducciones
+        const translations = {
+            es: {
+                'admin:title': 'Acceso para Administrador',
+                'admin:loginTitle': 'Acceso al Panel de Administrador',
+                'admin:loginDescription': 'Introduce tus credenciales para gestionar los detalles de la boda y las confirmaciones de asistencia.',
+                'admin:usernameLabel': 'Usuario',
+                'admin:usernamePlaceholder': 'Tu nombre de usuario',
+                'admin:passwordLabel': 'Contraseña',
+                'admin:passwordPlaceholder': 'Tu contraseña secreta',
+                'admin:loginButton': 'Iniciar Sesión',
+                'wedding:title': 'Boda de Iluminada & George',
+                'common:home': 'Inicio'
+            },
+            en: {
+                'admin:title': 'Administrator Access',
+                'admin:loginTitle': 'Administrator Panel Access',
+                'admin:loginDescription': 'Enter your credentials to manage wedding details and attendance confirmations.',
+                'admin:usernameLabel': 'Username',
+                'admin:usernamePlaceholder': 'Your username',
+                'admin:passwordLabel': 'Password',
+                'admin:passwordPlaceholder': 'Your secret password',
+                'admin:loginButton': 'Login',
+                                'wedding:title': 'Iluminada & George Wedding',
+                'common:home': 'Home'
+            }
+        };
+
+        // Configuración de idiomas
+        const languages = {
+            es: { name: 'Español', flag: '🇪🇸' },
+            en: { name: 'English', flag: '🇬🇧' }
+        };
+
+        let currentLanguage = 'es';
+
+        // Función para traducir
+        function translate(key) {
+            return translations[currentLanguage]?.[key] || key;
+        }
+
+        // Función para actualizar el contenido
+        function updateContent() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                element.textContent = translate(key);
+            });
+
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                element.placeholder = translate(key);
+            });
+        }
+
+        // Función para actualizar el selector
+        function updateSelector() {
+            const toggle = document.getElementById('language-toggle');
+            const currentLang = languages[currentLanguage];
+            
+            if (toggle) {
+                toggle.innerHTML = `
+                    <span class="flag">${currentLang.flag}</span>
+                    <span class="name">${currentLang.name}</span>
+                    <i class="fas fa-chevron-down"></i>
+                `;
+            }
+
+            // Actualizar opciones activas
+            document.querySelectorAll('.language-option').forEach(option => {
+                const lang = option.getAttribute('data-lang');
+                if (lang === currentLanguage) {
+                    option.classList.add('active');
+                } else {
+                    option.classList.remove('active');
+                }
+            });
+        }
+
+        // Función para cambiar idioma
+        function changeLanguage(lang) {
+            if (languages[lang]) {
+                currentLanguage = lang;
+                localStorage.setItem('i18nextLng', lang);
+                updateContent();
+                updateSelector();
+                console.log('Idioma cambiado a:', lang);
+            }
+        }
+
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Inicializando sistema i18n...');
+            
+            // Cargar idioma guardado
+            const savedLang = localStorage.getItem('i18nextLng');
+            if (savedLang && languages[savedLang]) {
+                currentLanguage = savedLang;
+            }
+            
+            // Configurar selector de idiomas
+            const toggle = document.getElementById('language-toggle');
+            const menu = document.getElementById('language-menu');
+            
+            if (toggle && menu) {
+                toggle.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    menu.classList.toggle('show');
+                });
+                
+                // Cerrar al hacer clic fuera
+                document.addEventListener('click', (e) => {
+                    if (!toggle.contains(e.target)) {
+                        menu.classList.remove('show');
+                    }
+                });
+                
+                // Opciones de idioma
+                document.querySelectorAll('.language-option').forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const lang = option.getAttribute('data-lang');
+                        changeLanguage(lang);
+                        menu.classList.remove('show');
+                    });
+                });
+            }
+            
+            // Inicializar contenido
+            updateContent();
+            updateSelector();
+            
+            console.log('Sistema i18n inicializado. Idioma actual:', currentLanguage);
+        });
+
+        // Configurar toggle de contraseña
+        document.addEventListener('DOMContentLoaded', () => {
+            const togglePassword = document.getElementById('togglePassword');
+            const password = document.getElementById('password');
+
+            if (togglePassword && password) {
+                togglePassword.addEventListener('click', function (e) {
+                    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                    password.setAttribute('type', type);
+                    this.querySelector('i').classList.toggle('fa-eye');
+                    this.querySelector('i').classList.toggle('fa-eye-slash');
+                });
+            }
+        });
+    </script>
+    <script src="js/admin-login.js"></script>
+</body>
+</html>
+
+
+
+
+

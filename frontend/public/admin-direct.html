@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Boda de Iluminada & George</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Estilos específicos para el panel de administración */
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--gradient-secondary);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+        
+        .admin-welcome h2 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 1.8rem;
+        }
+        
+        .admin-welcome p {
+            margin: 5px 0 0 0;
+            color: var(--text-light);
+        }
+        
+        .admin-action {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .admin-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow-hover);
+        }
+        
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .adminTab {
+            background: white;
+            border: 2px solid var(--accent-color);
+            padding: 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+        
+        .adminTab:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px var(--shadow);
+        }
+        
+        .adminTab.active {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        
+        .adminTab i {
+            font-size: 1.5rem;
+        }
+        
+        .admin-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px var(--shadow);
+            min-height: 500px;
+        }
+        
+        .admin-loading {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-light);
+        }
+        
+        .admin-loading i {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .admin-section {
+            margin-bottom: 30px;
+        }
+        
+        .admin-header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--accent-color);
+        }
+        
+        .admin-header-section h3 {
+            margin: 0;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow-hover);
+        }
+        
+        .btn-secondary {
+            background: var(--accent-color);
+            color: var(--text-dark);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-1px);
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px var(--shadow);
+        }
+        
+        .data-table th {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid var(--accent-color);
+        }
+        
+        .data-table tr:hover {
+            background: var(--light-bg);
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--gradient-secondary);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 15px var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px var(--shadow-hover);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+            margin: 10px 0;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .button-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+            
+            .admin-content {
+                padding: 20px;
+            }
+            
+            .data-table {
+                font-size: 0.9rem;
+            }
+            
+            .data-table th,
+            .data-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Panel de Administración</h1>
+      <a href="index.html" class="home-link">
+        <i class="fas fa-home"></i>
+        Inicio
+      </a>
+    </div>
+  </header>
+
+  <main class="admin-container">
+    <!-- Panel de Administración -->
+    <section id="adminPanelSection">
+      <div class="admin-header">
+        <div class="admin-welcome">
+          <h2><i class="fas fa-user-shield"></i> Bienvenido, Administrador</h2>
+          <p>Gestiona toda la información de la boda de Iluminada y George</p>
+        </div>
+        <button id="logoutAdmin" class="admin-action">
+          <i class="fas fa-sign-out-alt"></i>
+          Cerrar sesión
+        </button>
+      </div>
+      
+      <div class="button-grid">
+        <button class="adminTab active" data-tab="invitados">
+          <i class="fas fa-users"></i>
+          Invitados
+        </button>
+
+        <button class="adminTab" data-tab="mensajes">
+          <i class="fas fa-comments"></i>
+          Mensajes
+        </button>
+        <button class="adminTab" data-tab="agenda">
+          <i class="fas fa-calendar-alt"></i>
+          Agenda de Eventos
+        </button>
+        <button class="adminTab" data-tab="menu">
+          <i class="fas fa-utensils"></i>
+          Gestión de Menús
+        </button>
+        <button class="adminTab" data-tab="configuracion">
+          <i class="fas fa-cog"></i>
+          Configuración
+        </button>
+      </div>
+
+      <div id="adminContent" class="admin-content">
+        <!-- El contenido se cargará dinámicamente aquí -->
+        <div class="admin-loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Cargando panel de administración...</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2026 Boda de Iluminada & George</p>
+      <p>Panel de administración</p>
+    </div>
+  </footer>
+
+  <script>
+    // Panel de administración mejorado y optimizado
+    class AdminPanel {
+      constructor() {
+        this.token = localStorage.getItem('adminToken');
+        this.adminContent = document.getElementById('adminContent');
+        this.adminTabs = document.querySelectorAll('.adminTab');
+        this.logoutBtn = document.getElementById('logoutAdmin');
+        
+        this.init();
+      }
+      
+      init() {
+        console.log('Panel de administración inicializando...');
+        
+        // Verificar autenticación
+        if (!this.token) {
+          console.log('No hay token, redirigiendo al login');
+          window.location.href = 'admin-login.html';
+          return;
+        }
+        
+        console.log('Token encontrado:', this.token);
+        
+        // Configurar event listeners
+        this.setupEventListeners();
+        
+        // Cargar pestaña inicial
+        this.showTab('invitados');
+      }
+      
+      setupEventListeners() {
+        // Logout
+        this.logoutBtn.addEventListener('click', () => {
+          localStorage.removeItem('adminToken');
+          window.location.href = 'admin-login.html';
+        });
+        
+        // Tabs
+        this.adminTabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            this.showTab(tab.dataset.tab);
+          });
+        });
+        
+        // Hacer funciones disponibles globalmente
+        window.showTab = (tab) => this.showTab(tab);
+        window.addInvitado = () => this.addInvitado();
+        window.editInvitado = (id, nombre, email) => this.editInvitado(id, nombre, email);
+        window.deleteInvitado = (id, nombre) => this.deleteInvitado(id, nombre);
+        window.addRegalo = () => this.addRegalo();
+        window.editRegalo = (id, nombre, descripcion, precio, categoria, url) => 
+          this.editRegalo(id, nombre, descripcion, precio, categoria, url);
+        window.deleteRegalo = (id, nombre) => this.deleteRegalo(id, nombre);
+        window.editEvento = (id, evento, fecha, dia, hora, descripcion, lugar, direccion) => 
+          this.editEvento(id, evento, fecha, dia, hora, descripcion, lugar, direccion);
+      }
+      
+      async showTab(tab) {
+        console.log('Mostrando pestaña:', tab);
+        
+        // Actualizar tabs activos
+        this.adminTabs.forEach(t => t.classList.remove('active'));
+        document.querySelector(`.adminTab[data-tab="${tab}"]`).classList.add('active');
+        
+        // Mostrar loading
+        this.showLoading();
+        
+        try {
+          let url = '';
+          let endpoint = '';
+          
+          switch(tab) {
+            case 'invitados':
+              endpoint = '/api/admin/invitados';
+              break;
+            case 'regalos':
+              endpoint = '/api/admin/regalos';
+              break;
+            case 'mensajes':
+              endpoint = '/api/admin/mensajes';
+              break;
+            case 'agenda':
+              endpoint = '/api/admin/agenda';
+              break;
+            case 'menu':
+              endpoint = '/api/admin/menu';
+              break;
+            case 'configuracion':
+              this.showConfiguracion();
+              return;
+            default:
+              throw new Error('Pestaña no válida');
+          }
+          
+          // Agregar timestamp para evitar cache
+          const endpointWithTimestamp = `${endpoint}?_t=${Date.now()}`;
+          console.log('URL con timestamp:', endpointWithTimestamp);
+          
+          const response = await fetch(endpointWithTimestamp, {
+            headers: { 
+              'Authorization': this.token,
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+          }
+          
+          const data = await response.json();
+          
+          // Renderizar contenido según la pestaña
+          switch(tab) {
+            case 'invitados':
+              this.renderInvitados(data);
+              break;
+            case 'regalos':
+              this.renderRegalos(data);
+              break;
+            case 'mensajes':
+              this.renderMensajes(data);
+              break;
+            case 'agenda':
+              this.renderAgenda(data);
+              break;
+            case 'menu':
+              this.renderMenu(data);
+              break;
+          }
+          
+        } catch (error) {
+          console.error('Error en la petición:', error);
+          this.showError(`Error de conexión: ${error.message}`);
+        }
+      }
+      
+      showLoading() {
+        this.adminContent.innerHTML = `
+          <div class="admin-loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Cargando...</p>
+          </div>
+        `;
+      }
+      
+      showError(message) {
+        this.adminContent.innerHTML = `
+          <div class="message error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div>
+              <h3>Error de conexión</h3>
+              <p>${message}</p>
+              <button onclick="adminPanel.showTab('${document.querySelector('.adminTab.active').dataset.tab}')" class="btn-primary">
+                <i class="fas fa-redo"></i>
+                Reintentar
+              </button>
+            </div>
+          </div>
+        `;
+      }
+      
+      showSuccess(message) {
+        const successDiv = document.createElement('div');
+        successDiv.className = 'message success';
+        successDiv.innerHTML = `
+          <i class="fas fa-check-circle"></i>
+          <span>${message}</span>
+        `;
+        
+        this.adminContent.insertBefore(successDiv, this.adminContent.firstChild);
+        
+        setTimeout(() => {
+          successDiv.remove();
+        }, 5000);
+      }
+      
+      // Renderizado de contenido
+      renderInvitados(data) {
+        // Ordenar invitados alfabéticamente por nombre
+        const invitadosOrdenados = [...data].sort((a, b) => 
+          a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
+        );
+        
+        this.adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-users"></i> Gestión de Invitados</h3>
+              <div class="action-buttons">
+                <button onclick="adminPanel.addInvitado()" class="btn-primary">
+                  <i class="fas fa-plus"></i>
+                  Añadir Invitado
+                </button>
+              </div>
+            </div>
+            
+                         <div class="stats-grid">
+               <div class="stat-card">
+                 <i class="fas fa-users"></i>
+                 <span class="stat-number">${invitadosOrdenados.length}</span>
+                 <h4>Total Invitados</h4>
+               </div>
+               <div class="stat-card">
+                 <i class="fas fa-utensils"></i>
+                 <span class="stat-number">${invitadosOrdenados.filter(inv => inv.seleccionMenu).length}</span>
+                 <h4>Con Menú</h4>
+               </div>
+               <div class="stat-card">
+                 <i class="fas fa-calendar-alt"></i>
+                 <span class="stat-number">${invitadosOrdenados.filter(inv => inv.confirmacionesAgenda && Object.keys(inv.confirmacionesAgenda).length > 0).length}</span>
+                 <h4>Con Agenda</h4>
+               </div>
+               <div class="stat-card">
+                 <i class="fas fa-comments"></i>
+                 <span class="stat-number">${invitadosOrdenados.filter(inv => inv.mensajes && inv.mensajes.length > 0).length}</span>
+                 <h4>Con Mensajes</h4>
+               </div>
+             </div>
+            
+                         <table class="data-table">
+               <thead>
+                 <tr>
+                   <th>Nombre</th>
+                   <th>Email</th>
+                   <th>Menú Seleccionado</th>
+                   <th>Agenda Confirmada</th>
+                   <th>Fecha Registro</th>
+                   <th>Acciones</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 ${invitadosOrdenados.map(inv => `
+                   <tr>
+                     <td><strong>${inv.nombre}</strong></td>
+                     <td>${inv.email}</td>
+                     <td>
+                       <span class="status-badge ${inv.seleccionMenu ? 'status-confirmed' : 'status-pending'}">
+                         ${inv.seleccionMenu ? '✅ Seleccionado' : '❌ No seleccionado'}
+                       </span>
+                     </td>
+                     <td>
+                       <span class="status-badge ${inv.confirmacionesAgenda && Object.keys(inv.confirmacionesAgenda).length > 0 ? 'status-confirmed' : 'status-pending'}">
+                         ${inv.confirmacionesAgenda && Object.keys(inv.confirmacionesAgenda).length > 0 ? '✅ Confirmada' : '❌ Pendiente'}
+                       </span>
+                     </td>
+                     <td>${inv.fechaRegistro ? new Date(inv.fechaRegistro).toLocaleDateString() : 'No especificada'}</td>
+                     <td>
+                       <button onclick="adminPanel.editInvitado('${inv.id}', '${inv.nombre}', '${inv.email}')" class="btn-secondary">
+                         <i class="fas fa-edit"></i>
+                       </button>
+                       <button onclick="adminPanel.deleteInvitado('${inv.id}', '${inv.nombre}')" class="btn-danger">
+                         <i class="fas fa-trash"></i>
+                       </button>
+                     </td>
+                   </tr>
+                 `).join('')}
+               </tbody>
+             </table>
+          </div>
+        `;
+      }
+      
+
+      
+      renderRegalos(data) {
+        const reservados = data.filter(r => r.reservadoPor).length;
+        const disponibles = data.length - reservados;
+        
+        this.adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-gift"></i> Lista de Regalos</h3>
+              <div class="action-buttons">
+                <button onclick="adminPanel.addRegalo()" class="btn-primary">
+                  <i class="fas fa-plus"></i>
+                  Añadir Regalo
+                </button>
+              </div>
+            </div>
+            
+            <div class="stats-grid">
+              <div class="stat-card">
+                <i class="fas fa-gift"></i>
+                <span class="stat-number">${data.length}</span>
+                <h4>Total Regalos</h4>
+              </div>
+              <div class="stat-card">
+                <i class="fas fa-check-circle"></i>
+                <span class="stat-number">${reservados}</span>
+                <h4>Reservados</h4>
+              </div>
+              <div class="stat-card">
+                <i class="fas fa-clock"></i>
+                <span class="stat-number">${disponibles}</span>
+                <h4>Disponibles</h4>
+              </div>
+            </div>
+            
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Regalo</th>
+                  <th>Descripción</th>
+                  <th>Precio</th>
+                  <th>Categoría</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${data.map(r => `
+                  <tr>
+                    <td>
+                      <strong>${r.nombre}</strong>
+                      ${r.url ? `<br><a href="${r.url}" target="_blank" style="color: var(--primary-color); font-size: 0.9em;">Ver enlace</a>` : ''}
+                    </td>
+                    <td>${r.descripcion || 'Sin descripción'}</td>
+                    <td>${r.precio || 'No especificado'}</td>
+                    <td>${r.categoria || 'General'}</td>
+                    <td>
+                      <span class="status-badge ${r.reservadoPor ? 'status-confirmed' : 'status-pending'}">
+                        ${r.reservadoPor ? `✅ Reservado por ${r.reservadoPor}` : '⏳ Disponible'}
+                      </span>
+                    </td>
+                    <td>
+                      <button onclick="adminPanel.editRegalo('${r.id}', '${r.nombre}', '${r.descripcion || ''}', '${r.precio || ''}', '${r.categoria || ''}', '${r.url || ''}')" class="btn-secondary">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                      <button onclick="adminPanel.deleteRegalo('${r.id}', '${r.nombre}')" class="btn-danger">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+      
+      renderMensajes(data) {
+        this.adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-comments"></i> Mensajes de Invitados</h3>
+            </div>
+            
+            <div class="stats-grid">
+              <div class="stat-card">
+                <i class="fas fa-comments"></i>
+                <span class="stat-number">${data.length}</span>
+                <h4>Total Mensajes</h4>
+              </div>
+            </div>
+            
+            ${data.length > 0 ? `
+              <div style="max-height: 600px; overflow-y: auto;">
+                ${data.map(msg => `
+                  <div class="message info" style="margin-bottom: 15px;">
+                    <i class="fas fa-user"></i>
+                    <div style="flex: 1;">
+                      <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <strong style="color: var(--primary-color);">${msg.nombre}</strong>
+                        <small style="color: var(--text-light);">${new Date(msg.fecha).toLocaleString()}</small>
+                      </div>
+                      <p style="margin: 0; color: var(--text-dark);">${msg.mensaje}</p>
+                      <small style="color: var(--text-light);">${msg.email}</small>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            ` : `
+              <div class="message info">
+                <i class="fas fa-info-circle"></i>
+                <span>No hay mensajes aún.</span>
+              </div>
+            `}
+          </div>
+        `;
+      }
+      
+      renderAgenda(data) {
+        this.adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-calendar-alt"></i> Agenda de Eventos</h3>
+            </div>
+            
+            <div class="stats-grid">
+              <div class="stat-card">
+                <i class="fas fa-calendar"></i>
+                <span class="stat-number">${data.length}</span>
+                <h4>Total Eventos</h4>
+              </div>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+              ${data.map((ev, index) => `
+                <div style="display: flex; align-items: center; padding: 20px; background: ${index % 2 === 0 ? 'var(--light-bg)' : 'white'}; border-radius: 15px; border-left: 4px solid var(--primary-color); box-shadow: 0 2px 10px var(--shadow);">
+                  <div style="min-width: 100px; font-weight: bold; color: var(--primary-color); font-size: 1.1rem;">
+                    <i class="fas fa-clock"></i> ${ev.hora}
+                  </div>
+                  <div style="flex: 1; margin: 0 20px;">
+                    <strong style="font-size: 1.2rem; color: var(--text-dark);">${ev.evento}</strong><br>
+                    <small style="color: var(--text-light);">
+                      <i class="fas fa-map-marker-alt"></i> ${ev.lugar}
+                    </small>
+                    ${ev.descripcion ? `<br><small style="color: var(--text-light);">${ev.descripcion}</small>` : ''}
+                  </div>
+                  <div>
+                    <button onclick="adminPanel.editEvento('${ev.id}', '${ev.evento}', '${ev.fecha}', '${ev.dia}', '${ev.hora}', '${ev.descripcion || ''}', '${ev.lugar}', '${ev.direccion || ''}')" class="btn-secondary">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+      
+      renderMenu(data) {
+        this.adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-utensils"></i> Gestión de Menús</h3>
+            </div>
+            
+            <div class="stats-grid">
+              <div class="stat-card">
+                <i class="fas fa-users"></i>
+                <span class="stat-number">${data.estadisticas.totalSelecciones}</span>
+                <h4>Menús Seleccionados</h4>
+              </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px;">
+              <div style="background: var(--light-bg); padding: 20px; border-radius: 15px;">
+                <h4><i class="fas fa-appetizers"></i> Entrantes</h4>
+                ${Object.entries(data.estadisticas.entrantes).map(([entrante, count]) => `
+                  <div style="display: flex; justify-content: space-between; margin: 5px 0;">
+                    <span>${entrante}</span>
+                    <strong>${count}</strong>
+                  </div>
+                `).join('')}
+              </div>
+              
+              <div style="background: var(--light-bg); padding: 20px; border-radius: 15px;">
+                <h4><i class="fas fa-drumstick-bite"></i> Principales</h4>
+                ${Object.entries(data.estadisticas.principales).map(([principal, count]) => `
+                  <div style="display: flex; justify-content: space-between; margin: 5px 0;">
+                    <span>${principal}</span>
+                    <strong>${count}</strong>
+                  </div>
+                `).join('')}
+              </div>
+              
+              <div style="background: var(--light-bg); padding: 20px; border-radius: 15px;">
+                <h4><i class="fas fa-ice-cream"></i> Postres</h4>
+                ${Object.entries(data.estadisticas.postres).map(([postre, count]) => `
+                  <div style="display: flex; justify-content: space-between; margin: 5px 0;">
+                    <span>${postre}</span>
+                    <strong>${count}</strong>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            
+            ${data.estadisticas.alergias.length > 0 ? `
+              <div style="margin-top: 20px; background: #fff3cd; padding: 20px; border-radius: 15px; border-left: 4px solid #ffc107;">
+                <h4><i class="fas fa-exclamation-triangle"></i> Alergias Reportadas</h4>
+                ${data.estadisticas.alergias.map(alergia => `
+                  <div style="margin: 10px 0; padding: 10px; background: white; border-radius: 10px;">
+                    <strong>${alergia.invitado}:</strong> ${alergia.alergias}
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+      
+      showConfiguracion() {
+        this.adminContent.innerHTML = `
+          <div class="admin-section">
+            <div class="admin-header-section">
+              <h3><i class="fas fa-cog"></i> Configuración del Sistema</h3>
+            </div>
+            
+            <div class="stats-grid">
+              <div class="stat-card">
+                <h4><i class="fas fa-calendar"></i> Información de la Boda</h4>
+                <p><strong>Fecha:</strong> 6 de Junio, 2026</p>
+                <p><strong>Novios:</strong> Iluminada & George</p>
+                <p><strong>Estado:</strong> <span class="status-badge status-confirmed">Activa</span></p>
+              </div>
+              
+              <div class="stat-card">
+                <h4><i class="fas fa-server"></i> Estado del Servidor</h4>
+                <p><strong>Backend:</strong> <span class="status-badge status-confirmed">Online</span></p>
+                <p><strong>Base de datos:</strong> <span class="status-badge status-confirmed">Conectada</span></p>
+                <p><strong>Última actualización:</strong> ${new Date().toLocaleString()}</p>
+              </div>
+              
+              <div class="stat-card">
+                <h4><i class="fas fa-shield-alt"></i> Seguridad</h4>
+                <p><strong>Autenticación:</strong> <span class="status-badge status-confirmed">Activa</span></p>
+                <p><strong>Tokens:</strong> <span class="status-badge status-confirmed">Válidos</span></p>
+                <p><strong>Sesión admin:</strong> <span class="status-badge status-confirmed">Activa</span></p>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Funciones CRUD
+      async addInvitado() {
+        const nombre = prompt('Nombre del invitado:');
+        if (!nombre) return;
+        
+        const email = prompt('Email del invitado:');
+        if (!email) return;
+        
+        try {
+          const response = await fetch('/api/admin/invitados', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.token
+            },
+            body: JSON.stringify({ 
+              nombre, 
+              email,
+              fechaRegistro: new Date().toISOString()
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            this.showSuccess('Invitado añadido correctamente');
+            this.showTab('invitados');
+          } else {
+            alert('Error: ' + data.error);
+          }
+        } catch (error) {
+          alert('Error al añadir invitado: ' + error.message);
+        }
+      }
+      
+             async editInvitado(id, nombre, email) {
+         const newNombre = prompt('Nombre del invitado:', nombre);
+         if (!newNombre) return;
+         
+         const newEmail = prompt('Email del invitado:', email);
+         if (!newEmail) return;
+         
+         try {
+           const response = await fetch(`/api/admin/invitados/${id}`, {
+             method: 'PUT',
+             headers: {
+               'Content-Type': 'application/json',
+               'Authorization': this.token
+             },
+             body: JSON.stringify({ 
+               nombre: newNombre, 
+               email: newEmail
+             })
+           });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            this.showSuccess('Invitado actualizado correctamente');
+            this.showTab('invitados');
+          } else {
+            alert('Error: ' + data.error);
+          }
+        } catch (error) {
+          alert('Error al actualizar invitado: ' + error.message);
+        }
+      }
+      
+      async deleteInvitado(id, nombre) {
+        if (!confirm(`¿Estás seguro de que quieres eliminar al invitado "${nombre}"?`)) return;
+        
+        try {
+          const response = await fetch(`/api/admin/invitados/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': this.token }
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            this.showSuccess('Invitado eliminado correctamente');
+            this.showTab('invitados');
+          } else {
+            alert('Error: ' + data.error);
+          }
+        } catch (error) {
+          alert('Error al eliminar invitado: ' + error.message);
+        }
+      }
+      
+      async addRegalo() {
+        const nombre = prompt('Nombre del regalo:');
+        if (!nombre) return;
+        
+        const descripcion = prompt('Descripción del regalo:');
+        const precio = prompt('Precio del regalo:');
+        const categoria = prompt('Categoría del regalo:');
+        const url = prompt('URL del regalo (opcional):');
+        
+        try {
+          const response = await fetch('/api/admin/regalos', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.token
+            },
+            body: JSON.stringify({ 
+              nombre, 
+              descripcion, 
+              precio, 
+              categoria, 
+              url 
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            this.showSuccess('Regalo añadido correctamente');
+            this.showTab('regalos');
+          } else {
+            alert('Error: ' + data.error);
+          }
+        } catch (error) {
+          alert('Error al añadir regalo: ' + error.message);
+        }
+      }
+      
+      async editRegalo(id, nombre, descripcion, precio, categoria, url) {
+        const newNombre = prompt('Nombre del regalo:', nombre);
+        if (!newNombre) return;
+        
+        const newDescripcion = prompt('Descripción del regalo:', descripcion);
+        const newPrecio = prompt('Precio del regalo:', precio);
+        const newCategoria = prompt('Categoría del regalo:', categoria);
+        const newUrl = prompt('URL del regalo:', url);
+        
+        try {
+          const response = await fetch(`/api/admin/regalos/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.token
+            },
+            body: JSON.stringify({ 
+              nombre: newNombre, 
+              descripcion: newDescripcion, 
+              precio: newPrecio, 
+              categoria: newCategoria, 
+              url: newUrl 
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            this.showSuccess('Regalo actualizado correctamente');
+            this.showTab('regalos');
+          } else {
+            alert('Error: ' + data.error);
+          }
+        } catch (error) {
+          alert('Error al actualizar regalo: ' + error.message);
+        }
+      }
+      
+      async deleteRegalo(id, nombre) {
+        if (!confirm(`¿Estás seguro de que quieres eliminar el regalo "${nombre}"?`)) return;
+        
+        try {
+          const response = await fetch(`/api/admin/regalos/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': this.token }
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            this.showSuccess('Regalo eliminado correctamente');
+            this.showTab('regalos');
+          } else {
+            alert('Error: ' + data.error);
+          }
+        } catch (error) {
+          alert('Error al eliminar regalo: ' + error.message);
+        }
+      }
+      
+      async editEvento(id, evento, fecha, dia, hora, descripcion, lugar, direccion) {
+        const newEvento = prompt('Nombre del evento:', evento);
+        if (!newEvento) return;
+        
+        const newFecha = prompt('Fecha del evento:', fecha);
+        const newDia = prompt('Día del evento:', dia);
+        const newHora = prompt('Hora del evento:', hora);
+        const newDescripcion = prompt('Descripción del evento:', descripcion);
+        const newLugar = prompt('Lugar del evento:', lugar);
+        const newDireccion = prompt('Dirección del evento:', direccion);
+        
+        try {
+          const response = await fetch(`/api/admin/agenda/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.token
+            },
+            body: JSON.stringify({ 
+              evento: newEvento, 
+              fecha: newFecha, 
+              dia: newDia, 
+              hora: newHora, 
+              descripcion: newDescripcion, 
+              lugar: newLugar, 
+              direccion: newDireccion 
+            })
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            this.showSuccess('Evento actualizado correctamente');
+            this.showTab('agenda');
+          } else {
+            alert('Error: ' + data.error);
+          }
+        } catch (error) {
+          alert('Error al actualizar evento: ' + error.message);
+        }
+      }
+    }
+    
+    // Inicializar el panel cuando el DOM esté listo
+    let adminPanel;
+    document.addEventListener('DOMContentLoaded', () => {
+      adminPanel = new AdminPanel();
+    });
+  </script>
+</body>
+</html>
+
+
+

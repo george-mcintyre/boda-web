@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin - Añadir Invitados</title>
+    <link rel="stylesheet" href="frontend/public/assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
+        <h1>Test Panel de Administración</h1>
+        
+        <div style="margin: 2rem 0;">
+            <button onclick="addInvitado()" class="admin-action">
+                <i class="fas fa-plus"></i> Añadir Invitado
+            </button>
+        </div>
+        
+        <div id="guestsList">
+            <h3>Lista de Invitados</h3>
+            <div id="guestsTableBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // Datos de ejemplo
+        let invitadosData = JSON.parse(localStorage.getItem('invitadosData')) || [
+            { id: 1, nombre: 'Ana García', email: 'ana.garcia@email.com', estado: 'confirmado', acompañantes: 1, menu: 'Sin alergias' },
+            { id: 2, nombre: 'Juan Pérez', email: 'juan.perez@email.com', estado: 'confirmado', acompañantes: 0, menu: 'Vegetariano' },
+        ];
+
+        // Función para mostrar invitados
+        function mostrarInvitados() {
+            const container = document.getElementById('guestsTableBody');
+            container.innerHTML = '';
+            
+            invitadosData.forEach(invitado => {
+                const div = document.createElement('div');
+                div.style.border = '1px solid #ddd';
+                div.style.padding = '1rem';
+                div.style.margin = '0.5rem 0';
+                div.style.borderRadius = '8px';
+                div.innerHTML = `
+                    <strong>${invitado.nombre}</strong> - ${invitado.email}<br>
+                    Estado: ${invitado.estado} | Acompañantes: ${invitado.acompañantes} | Menú: ${invitado.menu}
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Función para añadir invitado
+        window.addInvitado = () => {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h3><i class="fas fa-user-plus"></i> Añadir Nuevo Invitado</h3>
+                  <button onclick="closeModal()" class="modal-close">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <form id="addInvitadoForm">
+                    <div class="form-group">
+                      <label for="nombre">Nombre completo *</label>
+                      <input type="text" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="email">Email *</label>
+                      <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                      <label for="estado">Estado de asistencia</label>
+                      <select id="estado" name="estado">
+                        <option value="pendiente">⏳ Pendiente</option>
+                        <option value="confirmado">✅ Confirmado</option>
+                        <option value="rechazado">❌ No asistirá</option>
+                      </select>
+                    </div>
+                    <div class="form-group">
+                      <label for="acompañantes">Número de acompañantes</label>
+                      <input type="number" id="acompañantes" name="acompañantes" min="0" max="5" value="0">
+                    </div>
+                    <div class="form-group">
+                      <label for="menu">Menú especial</label>
+                      <select id="menu" name="menu">
+                        <option value="Sin alergias">Sin alergias</option>
+                        <option value="Vegetariano">Vegetariano</option>
+                        <option value="Vegano">Vegano</option>
+                        <option value="Sin gluten">Sin gluten</option>
+                        <option value="Sin lactosa">Sin lactosa</option>
+                      </select>
+                    </div>
+                    <div class="form-actions">
+                      <button type="button" onclick="closeModal()" class="btn-secondary">Cancelar</button>
+                      <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Guardar Invitado
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Manejar el envío del formulario
+            document.getElementById('addInvitadoForm').addEventListener('submit', (e) => {
+              e.preventDefault();
+              saveInvitado();
+            });
+        };
+        
+        // Función para cerrar el modal
+        window.closeModal = () => {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) {
+              modal.remove();
+            }
+        };
+        
+        // Función para guardar el invitado
+        function saveInvitado() {
+            const form = document.getElementById('addInvitadoForm');
+            const formData = new FormData(form);
+            
+            const nuevoInvitado = {
+              id: Date.now(),
+              nombre: formData.get('nombre'),
+              email: formData.get('email'),
+              estado: formData.get('estado'),
+              acompañantes: parseInt(formData.get('acompañantes')) || 0,
+              menu: formData.get('menu')
+            };
+            
+            // Validaciones
+            if (!nuevoInvitado.nombre || !nuevoInvitado.email) {
+              alert('Por favor, completa los campos obligatorios.');
+              return;
+            }
+            
+            const emailExists = invitadosData.some(inv => inv.email === nuevoInvitado.email);
+            if (emailExists) {
+              alert('Ya existe un invitado con ese email.');
+              return;
+            }
+            
+            // Añadir invitado
+            invitadosData.push(nuevoInvitado);
+            localStorage.setItem('invitadosData', JSON.stringify(invitadosData));
+            
+            alert(`Invitado "${nuevoInvitado.nombre}" añadido correctamente.`);
+            closeModal();
+            mostrarInvitados();
+        }
+
+        // Cargar invitados al inicio
+        mostrarInvitados();
+    </script>
+</body>
+</html>
+
+
+

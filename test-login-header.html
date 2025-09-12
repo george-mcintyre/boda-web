@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prueba - Header de Login</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    
+    .test-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .iframe-container {
+      width: 100%;
+      height: 500px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    
+    .iframe-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    
+    .test-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 0.5rem;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    
+    .test-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1><i class="fas fa-sign-in-alt"></i> Prueba - Header de Login</h1>
+    <p>Verifica que el botón "Inicio" está correctamente posicionado a la izquierda del título en la página de login.</p>
+    
+    <a href="frontend/public/login-i18n.html" target="_blank" class="test-btn">
+      <i class="fas fa-external-link-alt"></i> Abrir Página de Login en Nueva Pestaña
+    </a>
+    
+    <div class="iframe-container">
+      <iframe src="frontend/public/login-i18n.html" id="loginPanel"></iframe>
+    </div>
+    
+    <p><strong>✅ Verificar:</strong></p>
+    <ul>
+      <li>El botón "Inicio" debe estar a la izquierda del título "Acceso para invitados"</li>
+      <li>Ambos elementos deben estar alineados horizontalmente en el mismo nivel</li>
+      <li>El botón no debe aparecer arriba del header</li>
+    </ul>
+    
+    <p><strong>🔧 Cambios realizados:</strong></p>
+    <ul>
+      <li>Cambiado <code>align-items: flex-start</code> a <code>align-items: center</code> en <code>.header-content</code></li>
+      <li>Agregado <code>display: flex</code> y <code>align-items: center</code> a <code>.header-left</code></li>
+      <li>Agregado <code>gap: 2rem</code> para espaciado entre botón y título</li>
+      <li>Configurado <code>order: -1</code> para que el botón aparezca primero</li>
+    </ul>
+  </div>
+</body>
+</html>

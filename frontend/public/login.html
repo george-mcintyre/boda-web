@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso invitados - Boda</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Acceso para invitados</h1>
+      <a href="index.html" class="home-link">
+        <i class="fas fa-home"></i>
+        Inicio
+      </a>
+    </div>
+  </header>
+  <main>
+    <form id="loginForm" autocomplete="off">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" autocomplete="off" placeholder="Introduce tu email" required>
+      <button type="submit">Acceder</button>
+    </form>
+    <div id="loginMessage" style="margin-top:1em;"></div>
+  </main>
+  <script src="js/login.js"></script>
+</body>
+</html> 

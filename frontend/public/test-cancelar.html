@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Cancelar Regalo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .regalo { border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .reservado { background-color: #fff3cd; border-color: #ffeaa7; }
+        .no-reservado { background-color: #f8f9fa; }
+        button { padding: 10px 15px; margin: 5px; border: none; border-radius: 3px; cursor: pointer; }
+        .btn-reservar { background-color: #28a745; color: white; }
+        .btn-cancelar { background-color: #dc3545; color: white; }
+        .btn-disabled { background-color: #6c757d; cursor: not-allowed; }
+        .result { margin-top: 20px; padding: 10px; border-radius: 3px; }
+        .success { background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Cancelar Regalo</h1>
+    
+    <div>
+        <h2>📋 Regalos actuales:</h2>
+        <div id="regalos"></div>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <h2>🔧 Test Manual:</h2>
+        <p><strong>Token de prueba:</strong> dd37b7b0-1ea6-44bb-80c6-cf1563025e10 (usuario: mcl@example.com)</p>
+        <p>Este usuario tiene varios regalos reservados que puedes cancelar.</p>
+    </div>
+    
+    <div id="result" style="margin-top: 20px;"></div>
+    
+    <script>
+        const TOKEN_TEST = 'dd37b7b0-1ea6-44bb-80c6-cf1563025e10';
+        
+        async function cargarRegalos() {
+            try {
+                const response = await fetch('/api/regalos');
+                const regalos = await response.json();
+                
+                const regalosDiv = document.getElementById('regalos');
+                regalosDiv.innerHTML = regalos.map(regalo => {
+                    const esReservado = regalo.reservadoPor;
+                    const esMio = regalo.reservadoPor === 'mcl@example.com';
+                    
+                    return `
+                        <div class="regalo ${esReservado ? 'reservado' : 'no-reservado'}">
+                            <strong>ID: ${regalo.id}</strong> - ${regalo.nombre}<br>
+                            <small>Reservado por: ${regalo.reservadoPor || 'Nadie'}</small><br>
+                            ${esReservado && esMio ? 
+                                `<button class="btn-cancelar" onclick="cancelarRegalo(${regalo.id}, '${regalo.nombre}')">❌ Cancelar Reserva</button>` :
+                                esReservado ? 
+                                    `<button class="btn-disabled" disabled>🔒 Reservado por otro</button>` :
+                                    `<button class="btn-reservar" onclick="reservarRegalo(${regalo.id}, '${regalo.nombre}')">✅ Reservar</button>`
+                            }
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error cargando regalos:', error);
+                document.getElementById('result').innerHTML = `<div class="error">Error cargando regalos: ${error.message}</div>`;
+            }
+        }
+        
+        async function cancelarRegalo(id, nombre) {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                console.log('🔄 Cancelando regalo:', { id, nombre });
+                
+                const response = await fetch('/api/regalos/cancelar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': TOKEN_TEST
+                    },
+                    body: JSON.stringify({ id })
+                });
+                
+                console.log('📡 Respuesta del servidor:', response.status);
+                const data = await response.json();
+                console.log('📄 Datos de respuesta:', data);
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ ¡Éxito! Se canceló la reserva de "${nombre}"</div>`;
+                    // Recargar regalos después de 1 segundo
+                    setTimeout(cargarRegalos, 1000);
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Error: ${data.error || 'Error desconocido'}</div>`;
+                }
+                
+            } catch (error) {
+                console.error('💥 Error en la petición:', error);
+                resultDiv.innerHTML = `<div class="error">💥 Error de conexión: ${error.message}</div>`;
+            }
+        }
+        
+        async function reservarRegalo(id, nombre) {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                console.log('🔄 Reservando regalo:', { id, nombre });
+                
+                const response = await fetch('/api/regalos/reservar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': TOKEN_TEST
+                    },
+                    body: JSON.stringify({ id })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `<div class="success">✅ ¡Éxito! Se reservó "${nombre}"</div>`;
+                    setTimeout(cargarRegalos, 1000);
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ Error: ${data.error || 'Error desconocido'}</div>`;
+                }
+                
+            } catch (error) {
+                console.error('💥 Error en la petición:', error);
+                resultDiv.innerHTML = `<div class="error">💥 Error de conexión: ${error.message}</div>`;
+            }
+        }
+        
+        // Cargar regalos al iniciar
+        cargarRegalos();
+    </script>
+</body>
+</html> 

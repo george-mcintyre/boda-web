@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prueba de Conexión - Servidor</title>
+  <link rel="stylesheet" href="frontend/public/assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .test-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .test-result {
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 8px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    
+    .test-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    
+    .test-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    
+    .test-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .test-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 90, 150, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1><i class="fas fa-network-wired"></i> Prueba de Conexión del Servidor</h1>
+    <p>Esta página verifica la conectividad con el servidor y las APIs principales.</p>
+    
+    <div>
+      <button class="test-btn" onclick="testServerConnection()">
+        <i class="fas fa-server"></i> Probar Conexión del Servidor
+      </button>
+      <button class="test-btn" onclick="testAgendaAPI()">
+        <i class="fas fa-calendar"></i> Probar API de Agenda
+      </button>
+      <button class="test-btn" onclick="testConfigAPI()">
+        <i class="fas fa-cog"></i> Probar API de Configuración
+      </button>
+      <button class="test-btn" onclick="testAllAPIs()">
+        <i class="fas fa-check-double"></i> Probar Todas las APIs
+      </button>
+    </div>
+    
+    <div id="results"></div>
+  </div>
+
+  <script>
+    function showResult(message, isSuccess = true) {
+      const results = document.getElementById('results');
+      const resultDiv = document.createElement('div');
+      resultDiv.className = `test-result ${isSuccess ? 'test-success' : 'test-error'}`;
+      resultDiv.innerHTML = message;
+      results.appendChild(resultDiv);
+    }
+
+    async function testServerConnection() {
+      try {
+        const response = await fetch('/');
+        if (response.ok) {
+          showResult(`✅ Servidor conectado correctamente\nStatus: ${response.status}\nURL: ${response.url}`);
+        } else {
+          showResult(`⚠️ Servidor responde pero con error\nStatus: ${response.status}\nURL: ${response.url}`, false);
+        }
+      } catch (error) {
+        showResult(`❌ Error de conexión con el servidor\nError: ${error.message}`, false);
+      }
+    }
+
+    async function testAgendaAPI() {
+      try {
+        const response = await fetch('/api/agenda');
+        const data = await response.json();
+        
+        if (response.ok) {
+          showResult(`✅ API de Agenda funcionando\nStatus: ${response.status}\nEventos encontrados: ${data.length}\n\nDatos de ejemplo:\n${JSON.stringify(data[0], null, 2)}`);
+        } else {
+          showResult(`❌ Error en API de Agenda\nStatus: ${response.status}\nError: ${data.error || 'Error desconocido'}`, false);
+        }
+      } catch (error) {
+        showResult(`❌ Error de conexión con API de Agenda\nError: ${error.message}`, false);
+      }
+    }
+
+    async function testConfigAPI() {
+      try {
+        const response = await fetch('/api/config/agenda/bloqueo');
+        const data = await response.json();
+        
+        if (response.ok) {
+          showResult(`✅ API de Configuración funcionando\nStatus: ${response.status}\nEstado de bloqueo: ${data.agenda?.bloqueada ? 'BLOQUEADA' : 'DESBLOQUEADA'}\n\nDatos completos:\n${JSON.stringify(data, null, 2)}`);
+        } else {
+          showResult(`❌ Error en API de Configuración\nStatus: ${response.status}\nError: ${data.error || 'Error desconocido'}`, false);
+        }
+      } catch (error) {
+        showResult(`❌ Error de conexión con API de Configuración\nError: ${error.message}`, false);
+      }
+    }
+
+    async function testAllAPIs() {
+      showResult('🔄 Iniciando pruebas completas...\n');
+      
+      await testServerConnection();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      await testAgendaAPI();
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      await testConfigAPI();
+      
+      showResult('✅ Todas las pruebas completadas');
+    }
+
+    // Ejecutar prueba automática al cargar la página
+    window.addEventListener('load', () => {
+      setTimeout(testAllAPIs, 1000);
+    });
+  </script>
+</body>
+</html>
+
+
+

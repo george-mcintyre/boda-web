@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Login API</title>
+</head>
+<body>
+  <h1>Test de API Login</h1>
+  
+  <div>
+    <label for="testEmail">Email de prueba:</label>
+    <input type="email" id="testEmail" value="luis@ejemplo.com">
+    <button onclick="testLogin()">Probar Login</button>
+  </div>
+  
+  <div id="result" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
+
+  <script>
+    async function testLogin() {
+      const email = document.getElementById('testEmail').value;
+      const resultDiv = document.getElementById('result');
+      
+      resultDiv.innerHTML = 'Probando...';
+      
+      try {
+        console.log('Enviando email:', email);
+        
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email: email })
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        if (response.ok) {
+          resultDiv.innerHTML = `
+            <h3>✅ Login Exitoso</h3>
+            <p><strong>Token:</strong> ${data.token}</p>
+            <p><strong>Nombre:</strong> ${data.nombre}</p>
+            <p><strong>Email:</strong> ${data.email}</p>
+            <p><strong>Mensaje:</strong> ${data.mensaje}</p>
+          `;
+        } else {
+          resultDiv.innerHTML = `
+            <h3>❌ Error en Login</h3>
+            <p><strong>Status:</strong> ${response.status}</p>
+            <p><strong>Error:</strong> ${data.error}</p>
+          `;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        resultDiv.innerHTML = `
+          <h3>❌ Error de Conexión</h3>
+          <p><strong>Error:</strong> ${error.message}</p>
+        `;
+      }
+    }
+  </script>
+</body>
+</html>
+

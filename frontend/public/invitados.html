@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zona de invitados - Boda de Iluminada & George</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .menu-button-container {
+      text-align: center;
+      margin: 30px 0;
+    }
+    
+    .menu-access-btn {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 10px;
+      font-size: 1.2em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .menu-access-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+    }
+    
+    .menu-access-btn i {
+      margin-right: 10px;
+    }
+    
+    .menu-status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f8f9fa;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .menu-status h4 {
+      margin: 0 0 10px 0;
+      color: var(--primary-color);
+      font-size: 1.1em;
+    }
+    
+    .menu-status-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      padding: 5px 0;
+    }
+    
+    .menu-status-label {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    
+    .menu-status-value {
+      color: var(--primary-color);
+      font-style: italic;
+    }
+    
+    .no-selection {
+      color: #6c757d;
+      font-style: italic;
+    }
+    
+    .agenda-button-container {
+      text-align: center;
+      margin: 30px 0;
+    }
+    
+    .agenda-access-btn {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 10px;
+      font-size: 1.2em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .agenda-access-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+    }
+    
+    .agenda-access-btn i {
+      margin-right: 10px;
+    }
+    
+    .agenda-status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f8f9fa;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .agenda-status h4 {
+      margin: 0 0 10px 0;
+      color: var(--primary-color);
+      font-size: 1.1em;
+    }
+    
+    .agenda-status-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      padding: 5px 0;
+    }
+    
+    .agenda-status-label {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    
+    .agenda-status-value {
+      color: var(--primary-color);
+      font-style: italic;
+    }
+    
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8em;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-confirmado {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-no-confirmado {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .regalos-button-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+    
+    .regalos-access-btn {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .regalos-access-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    
+    .regalos-status {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f8f9fa;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .regalos-status h4 {
+      margin: 0 0 10px 0;
+      color: var(--primary-color);
+      font-size: 1.1em;
+    }
+    
+    .regalos-status-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      padding: 5px 0;
+    }
+    
+    .regalos-status-label {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    
+    .regalos-status-value {
+      color: var(--primary-color);
+      font-style: italic;
+    }
+    
+    .mensajes-button-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+    
+    .mensajes-access-btn {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .mensajes-access-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+    
+    /* Estilos para las pestañas */
+    .tabs-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .tabs-header {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      border-bottom: 2px solid var(--accent-color);
+      background: var(--white);
+      border-radius: 15px 15px 0 0;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .tab-btn {
+      flex: 1;
+      padding: 20px 30px;
+      border: none;
+      background: transparent;
+      color: var(--text-light);
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      position: relative;
+    }
+    
+    .tab-btn:hover {
+      background: var(--accent-color);
+      color: var(--primary-color);
+    }
+    
+    .tab-btn.active {
+      background: var(--gradient-primary);
+      color: var(--white);
+      box-shadow: 0 4px 15px rgba(139, 90, 150, 0.3);
+    }
+    
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--white);
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Estilos para el formulario del menú */
+    .menu-form {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: var(--text-color);
+      font-size: 1.1em;
+    }
+    
+    .form-group label i {
+      margin-right: 8px;
+      color: var(--primary-color);
+    }
+    
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 1em;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(139, 90, 150, 0.1);
+    }
+    
+    .submit-btn {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 8px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 90, 150, 0.3);
+    }
+    
+    .submit-btn i {
+      margin-right: 8px;
+    }
+    
+    .current-selection {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .current-selection h3 {
+      margin: 0 0 15px 0;
+      color: var(--primary-color);
+      font-size: 1.2em;
+    }
+    
+    .selection-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .selection-item:last-child {
+      border-bottom: none;
+    }
+    
+    .selection-label {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    
+    .selection-value {
+      color: var(--primary-color);
+      font-style: italic;
+    }
+    
+    /* Estilos para la agenda */
+    .agenda-content {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    
+    .agenda-dia {
+      margin-bottom: 30px;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    
+    .dia-titulo {
+      background: #f8f9fa;
+      padding: 15px 20px;
+      margin: 0;
+      color: var(--primary-color);
+      font-size: 1.3em;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .dia-titulo i {
+      margin-right: 10px;
+    }
+    
+    .eventos-del-dia {
+      padding: 0;
+    }
+    
+    .evento-item {
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid #f1f3f4;
+      transition: background-color 0.3s ease;
+    }
+    
+    .evento-item:last-child {
+      border-bottom: none;
+    }
+    
+    .evento-item:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .evento-info {
+      flex: 1;
+    }
+    
+    .evento-titulo {
+      font-size: 1.2em;
+      font-weight: 600;
+      color: var(--text-color);
+      margin: 0 0 5px 0;
+    }
+    
+    .evento-descripcion {
+      color: #6c757d;
+      margin: 0 0 8px 0;
+      font-size: 0.95em;
+    }
+    
+    .evento-hora {
+      color: var(--primary-color);
+      font-weight: 500;
+      margin: 0;
+    }
+    
+    .evento-hora i {
+      margin-right: 5px;
+    }
+    
+    .evento-acciones {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .btn-confirmar {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-confirmar {
+      background: #28a745;
+      color: white;
+    }
+    
+    .btn-confirmar:hover {
+      background: #218838;
+      transform: translateY(-1px);
+    }
+    
+    .btn-cancelar {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #dc3545;
+      color: white;
+    }
+    
+    .btn-cancelar:hover {
+      background: #c82333;
+      transform: translateY(-1px);
+    }
+    
+    .current-confirmations {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border-left: 4px solid var(--primary-color);
+    }
+    
+    .current-confirmations h3 {
+      margin: 0 0 15px 0;
+      color: var(--primary-color);
+      font-size: 1.2em;
+    }
+    
+    .confirmation-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    
+    .confirmation-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .confirmation-item:last-child {
+      border-bottom: none;
+    }
+    
+    .confirmation-label {
+      font-weight: 600;
+      color: var(--text-color);
+    }
+    
+    .confirmation-value {
+      color: var(--primary-color);
+      font-style: italic;
+    }
+    
+    /* Estilos para la lista de regalos */
+    .regalos-container {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 10px;
+    }
+    
+    .regalos-header {
+      text-align: center;
+      margin-bottom: 15px;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .regalos-header h1 {
+      margin: 0;
+      font-size: 1.8em;
+      font-weight: 300;
+    }
+    
+    .regalos-header p {
+      margin: 5px 0 0 0;
+      font-size: 1em;
+      opacity: 0.9;
+    }
+    
+    .regalos-content {
+      background: white;
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 10px;
+    }
+    
+    .regalos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      margin-top: 10px;
+    }
+    
+    .regalo-card {
+      border: 1px solid #e9ecef;
+      border-radius: 12px;
+      padding: 15px;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    
+    .regalo-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .regalo-card.reservado-por-mi {
+      border-color: var(--primary-color);
+      background: linear-gradient(135deg, #f8f9ff, #e8f4fd);
+    }
+    
+    .regalo-info h4 {
+      margin: 0 0 8px 0;
+      color: var(--text-color);
+      font-size: 1.1em;
+      font-weight: 600;
+    }
+    
+    .regalo-info p {
+      color: #6c757d;
+      margin: 0 0 10px 0;
+      line-height: 1.4;
+      font-size: 0.9em;
+    }
+    
+    .regalo-enlace {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      margin-bottom: 10px;
+      transition: color 0.3s ease;
+      font-size: 0.9em;
+    }
+    
+    .regalo-enlace:hover {
+      color: var(--secondary-color);
+    }
+    
+    .regalo-accion {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 10px;
+    }
+    
+    .status-available {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .btn-disabled {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8em;
+      font-weight: 600;
+      cursor: not-allowed;
+      background: #6c757d;
+      color: white;
+      opacity: 0.6;
+    }
+    
+    .agenda-bloqueada-warning {
+      background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+      border-left: 4px solid #d63031;
+    }
+    
+    .warning-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    
+    .warning-content i {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+    
+    .warning-content h3 {
+      margin: 0 0 10px 0;
+      font-size: 1.3em;
+    }
+    
+    .warning-content p {
+      margin: 5px 0;
+      font-size: 0.95em;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <h1>Bienvenido a la zona de invitados</h1>
+      <a href="index.html" class="home-link">
+        <i class="fas fa-home"></i>
+        Inicio
+      </a>
+    </div>
+  </header>
+  <main>
+    <!-- Sistema de pestañas -->
+    <div class="tabs-container">
+      <div class="tabs-header">
+        <button class="tab-btn active" data-tab="resumen">
+          <i class="fas fa-chart-bar"></i>
+          Resumen
+        </button>
+        <button class="tab-btn" data-tab="menu">
+          <i class="fas fa-utensils"></i>
+          Menú
+        </button>
+        <button class="tab-btn" data-tab="agenda">
+          <i class="fas fa-calendar-alt"></i>
+          Agenda
+        </button>
+        <button class="tab-btn" data-tab="regalos">
+          <i class="fas fa-gift"></i>
+          Regalos
+        </button>
+        <button class="tab-btn" data-tab="mensajes">
+          <i class="fas fa-comments"></i>
+          Mensajes
+        </button>
+      </div>
+      
+      <!-- Contenido de la pestaña Resumen -->
+      <div id="resumen-tab" class="tab-content active">
+        <section id="infoMenu">
+          <h2><i class="fas fa-utensils"></i> Selección de Menú</h2>
+          <p class="section-description">
+            Tu selección actual de menú para nuestra boda.
+          </p>
+          <div id="menuStatus" class="menu-status">
+            <div id="menuStatusContent"></div>
+          </div>
+        </section>
+
+        <section id="infoAgenda">
+          <h2><i class="fas fa-calendar-alt"></i> Agenda de Eventos</h2>
+          <p class="section-description">
+            Tus confirmaciones de asistencia a los eventos de nuestra boda.
+          </p>
+          <div id="agendaStatus" class="agenda-status">
+            <div id="agendaStatusContent"></div>
+          </div>
+        </section>
+
+        <section id="infoRegalos">
+          <h2><i class="fas fa-gift"></i> Lista de Regalos</h2>
+          <p class="section-description">
+            Tus regalos reservados de nuestra lista de deseos.
+          </p>
+          <div id="regalosStatus" class="regalos-status">
+            <div id="regalosStatusContent"></div>
+          </div>
+        </section>
+
+        <section id="infoMensajes">
+          <h2><i class="fas fa-comments"></i> Mensajes</h2>
+          <p class="section-description">
+            Déjanos un mensaje especial para este día tan importante.
+          </p>
+          <div id="mensajesContent" class="mensajes-container"></div>
+        </section>
+      </div>
+      
+      <!-- Contenido de la pestaña Menú -->
+      <div id="menu-tab" class="tab-content">
+        <section id="infoMenu">
+          <h2><i class="fas fa-utensils"></i> Selección de Menú</h2>
+          <p class="section-description">
+            Elige tus platos preferidos para nuestra boda.
+          </p>
+          <div id="menuContent"></div>
+        </section>
+      </div>
+      
+      <!-- Contenido de la pestaña Agenda -->
+      <div id="agenda-tab" class="tab-content">
+        <section id="infoAgenda">
+          <h2><i class="fas fa-calendar-alt"></i> Agenda de Eventos</h2>
+          <p class="section-description">
+            Confirma tu asistencia a cada uno de los eventos de nuestra boda.
+          </p>
+          <div id="agendaContent"></div>
+        </section>
+      </div>
+      
+      <!-- Contenido de la pestaña Regalos -->
+      <div id="regalos-tab" class="tab-content">
+        <section id="infoRegalos">
+          <h2><i class="fas fa-gift"></i> Lista de Regalos</h2>
+          <p class="section-description">
+            Si deseas hacernos un regalo, aquí tienes nuestra lista de deseos. Puedes reservar cualquier regalo que te guste.
+          </p>
+          <div id="regalosContent"></div>
+          <div id="regalosMessage" class="message"></div>
+        </section>
+      </div>
+      
+      <!-- Contenido de la pestaña Mensajes -->
+      <div id="mensajes-tab" class="tab-content">
+        <section id="enviarMensaje">
+          <h2><i class="fas fa-heart"></i> Deja tu mensaje especial</h2>
+          <p class="section-description">
+            Comparte con nosotros tus mejores deseos para este día tan importante.
+          </p>
+          
+          <form id="mensajeForm">
+            <div class="form-group">
+              <label for="mensaje">
+                <i class="fas fa-heart"></i>
+                Tu mensaje para Iluminada y George
+              </label>
+              <textarea id="mensaje" name="mensaje" rows="6" placeholder="Escribe tu mensaje especial..." required></textarea>
+            </div>
+            <button type="submit" class="submit-btn">
+              <i class="fas fa-paper-plane"></i>
+              Enviar mensaje
+            </button>
+          </form>
+          <div id="mensajeStatus" class="message"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <button onclick="logoutInvitado()" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        Cerrar sesión
+      </button>
+      <button onclick="window.location.href='index.html'" class="back-btn">
+        <i class="fas fa-home"></i>
+        Volver al inicio
+      </button>
+    </div>
+  </footer>
+
+  <script src="js/invitados.js"></script>
+</body>
+</html> 

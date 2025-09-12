@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prueba - Eventos Actualizados</title>
+  <link rel="stylesheet" href="frontend/public/assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    .test-container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .test-section {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+    }
+    
+    .test-result {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-family: monospace;
+      white-space: pre-wrap;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    
+    .test-btn {
+      background: var(--gradient-primary);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 0.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .test-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(139, 90, 150, 0.3);
+    }
+    
+    .success { color: #28a745; }
+    .error { color: #dc3545; }
+    .warning { color: #ffc107; }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1><i class="fas fa-calendar-check"></i> Prueba - Eventos Actualizados</h1>
+    <p>Esta página verifica que las nuevas rutas de eventos funcionan correctamente.</p>
+    
+    <div class="test-section">
+      <h3><i class="fas fa-list"></i> Comparación de Rutas</h3>
+      <button class="test-btn" onclick="compararRutas()">
+        <i class="fas fa-exchange-alt"></i> Comparar Rutas Antiguas vs Nuevas
+      </button>
+      <div id="comparacionResult" class="test-result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+      <h3><i class="fas fa-calendar"></i> Prueba de Eventos Actualizados</h3>
+      <button class="test-btn" onclick="probarEventosActualizados()">
+        <i class="fas fa-download"></i> Cargar Eventos Actualizados
+      </button>
+      <div id="eventosResult" class="test-result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+      <h3><i class="fas fa-users"></i> Prueba de Confirmaciones</h3>
+      <button class="test-btn" onclick="probarConfirmaciones()">
+        <i class="fas fa-check-circle"></i> Probar Confirmaciones
+      </button>
+      <div id="confirmacionesResult" class="test-result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+      <h3><i class="fas fa-link"></i> Enlaces a Páginas</h3>
+      <a href="frontend/public/index-i18n-fixed.html" target="_blank" class="test-btn" style="text-decoration: none;">
+        <i class="fas fa-home"></i> Página de Inicio
+      </a>
+      <a href="frontend/public/invitados-i18n.html" target="_blank" class="test-btn" style="text-decoration: none;">
+        <i class="fas fa-users"></i> Página de Invitados
+      </a>
+      <a href="frontend/public/admin-i18n.html" target="_blank" class="test-btn" style="text-decoration: none;">
+        <i class="fas fa-cog"></i> Panel de Administración
+      </a>
+    </div>
+  </div>
+
+  <script>
+    function showResult(elementId, content, type = 'info') {
+      const element = document.getElementById(elementId);
+      element.style.display = 'block';
+      element.innerHTML = content;
+    }
+
+    async function compararRutas() {
+      const result = document.getElementById('comparacionResult');
+      let content = '🔄 Comparando rutas antiguas vs nuevas...\n\n';
+      
+      try {
+        // Probar ruta antigua
+        const agendaRes = await fetch('/api/agenda');
+        const agendaData = await agendaRes.json();
+        
+        content += `📋 RUTA ANTIGUA (/api/agenda):\n`;
+        content += `   Status: ${agendaRes.status}\n`;
+        content += `   Eventos encontrados: ${agendaData.length}\n`;
+        content += `   Primer evento: ${agendaData[0]?.titulo || 'N/A'}\n\n`;
+        
+        // Probar ruta nueva
+        const eventosRes = await fetch('/api/eventos');
+        const eventosData = await eventosRes.json();
+        
+        content += `🆕 RUTA NUEVA (/api/eventos):\n`;
+        content += `   Status: ${eventosRes.status}\n`;
+        content += `   Eventos encontrados: ${eventosData.eventos?.length || 0}\n`;
+        content += `   Primer evento: ${eventosData.eventos?.[0]?.titulo || 'N/A'}\n\n`;
+        
+        // Comparación
+        content += `📊 COMPARACIÓN:\n`;
+        if (agendaData.length !== (eventosData.eventos?.length || 0)) {
+          content += `   ✅ Las rutas devuelven diferentes datos (correcto)\n`;
+          content += `   📝 Ruta antigua: ${agendaData.length} eventos\n`;
+          content += `   📝 Ruta nueva: ${eventosData.eventos?.length || 0} eventos\n`;
+        } else {
+          content += `   ⚠️ Las rutas devuelven la misma cantidad de eventos\n`;
+        }
+        
+        showResult('comparacionResult', content);
+        
+      } catch (error) {
+        showResult('comparacionResult', `❌ Error en comparación: ${error.message}`);
+      }
+    }
+
+    async function probarEventosActualizados() {
+      const result = document.getElementById('eventosResult');
+      let content = '🔄 Cargando eventos actualizados...\n\n';
+      
+      try {
+        const response = await fetch('/api/eventos');
+        const data = await response.json();
+        
+        if (response.ok) {
+          content += `✅ Eventos cargados exitosamente\n`;
+          content += `📊 Total de eventos: ${data.eventos?.length || 0}\n\n`;
+          
+          if (data.eventos && data.eventos.length > 0) {
+            content += `📅 EVENTOS DISPONIBLES:\n`;
+            data.eventos.forEach((evento, index) => {
+              content += `\n${index + 1}. ${evento.titulo}\n`;
+              content += `   📍 ${evento.lugar}\n`;
+              content += `   🕐 ${evento.fecha} - ${evento.horaInicio}${evento.horaFin ? ` - ${evento.horaFin}` : ''}\n`;
+              content += `   📝 ${evento.descripcion}\n`;
+              content += `   🆔 ID: ${evento.id}\n`;
+            });
+          } else {
+            content += `⚠️ No hay eventos disponibles\n`;
+          }
+        } else {
+          content += `❌ Error al cargar eventos: ${data.error || 'Error desconocido'}\n`;
+        }
+        
+        showResult('eventosResult', content);
+        
+      } catch (error) {
+        showResult('eventosResult', `❌ Error de conexión: ${error.message}`);
+      }
+    }
+
+    async function probarConfirmaciones() {
+      const result = document.getElementById('confirmacionesResult');
+      let content = '🔄 Probando confirmaciones...\n\n';
+      
+      try {
+        // Simular un token de invitado (para pruebas)
+        const testToken = 'test-token';
+        
+        const response = await fetch('/api/eventos/confirmaciones', {
+          headers: { 'Authorization': testToken }
+        });
+        const data = await response.json();
+        
+        content += `📋 PRUEBA DE CONFIRMACIONES:\n`;
+        content += `   Status: ${response.status}\n`;
+        
+        if (response.ok) {
+          content += `   ✅ Ruta de confirmaciones funciona\n`;
+          content += `   📊 Confirmaciones: ${Object.keys(data.confirmaciones || {}).length}\n`;
+          content += `   📝 Datos: ${JSON.stringify(data, null, 2)}\n`;
+        } else {
+          content += `   ⚠️ Respuesta: ${data.error || 'Error desconocido'}\n`;
+          content += `   📝 Esto es normal si no hay token válido\n`;
+        }
+        
+        showResult('confirmacionesResult', content);
+        
+      } catch (error) {
+        showResult('confirmacionesResult', `❌ Error de conexión: ${error.message}`);
+      }
+    }
+
+    // Ejecutar pruebas automáticas al cargar la página
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        compararRutas();
+        setTimeout(() => {
+          probarEventosActualizados();
+        }, 1000);
+      }, 500);
+    });
+  </script>
+</body>
+</html>
+
+
