@@ -1,0 +1,17 @@
+{
+  "name": "boda-web",
+  "version": "1.0.0",
+  "description": "Wedding website with MongoDB Atlas integration",
+  "main": "backend/start-mongodb-server.js",
+  "scripts": {
+    "build": "echo 'No build step required'",
+    "start": "cd backend && node start-mongodb-server.js",
+    "dev": "cd backend && node start-mongodb-server.js"
+  },
+  "keywords": ["wedding", "website", "mongodb", "vercel"],
+  "author": "George McIntyre",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,13 @@
+# Environment Configuration for Vercel
+NODE_ENV=production
+VERCEL=1
+
+# MongoDB Configuration
+MONGODB_URI=mongodb+srv://admin:EWEWQZwECrY2JgI0@bodadb.zyb782r.mongodb.net/?retryWrites=true&w=majority&appName=BodaDB
+
+# Stripe Configuration
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+
+# Application Configuration
+PORT=3000
