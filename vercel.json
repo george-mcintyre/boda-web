@@ -3,7 +3,10 @@
   "builds": [
     {
       "src": "backend/start-mongodb-server.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "maxDuration": 30
+      }
     },
     {
       "src": "frontend/public/**",
@@ -31,11 +34,6 @@
   "env": {
     "NODE_ENV": "production",
     "VERCEL": "1"
-  },
-  "functions": {
-    "backend/start-mongodb-server.js": {
-      "maxDuration": 30
-    }
   }
 }
 
