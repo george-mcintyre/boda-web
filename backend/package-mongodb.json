@@ -1,23 +1,25 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "start-mongodb-server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node start-mongodb-server.js",
+    "migrate": "node migrate-to-mongodb.js",
+    "dev": "nodemon start-mongodb-server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@vercel/blob": "^0.19.0",
-    "cloudinary": "^2.0.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "mongoose": "^8.18.1",
-    "multer": "^1.4.5-lts.1",
+    "mongoose": "^8.0.0",
     "stripe": "^14.25.0",
     "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
   }
 }

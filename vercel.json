@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "backend/server-mongodb.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "frontend/public/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/server-mongodb.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/public/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "backend/server-mongodb.js": {
+      "maxDuration": 30
+    }
+  }
+}
+
