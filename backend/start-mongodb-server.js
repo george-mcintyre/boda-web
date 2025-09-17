@@ -39,7 +39,20 @@ app.get('/api/environment', (req, res) => {
     environment: req.isVercel ? 'Vercel' : req.isProduction ? 'Production' : 'Local',
     database: 'MongoDB Atlas',
     isVercel: req.isVercel,
-    isProduction: req.isProduction
+    isProduction: req.isProduction,
+    timestamp: new Date().toISOString(),
+    message: 'Servidor Node.js funcionando correctamente'
+  });
+});
+
+// Test endpoint to verify Vercel is using our Node.js server
+app.get('/api/test-vercel', (req, res) => {
+  res.json({
+    status: 'OK',
+    server: 'Node.js Express',
+    timestamp: new Date().toISOString(),
+    environment: req.isVercel ? 'Vercel' : 'Local',
+    message: 'Si ves esto, Vercel está usando nuestro servidor Node.js'
   });
 });
 
