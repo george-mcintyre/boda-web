@@ -28,7 +28,7 @@ app.use((req, res, next) => {
 // Serve static files from frontend
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 
-// Root route
+// Root route - Updated to serve correct homepage
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/public/index-i18n-fixed.html'));
 });
