@@ -516,6 +516,18 @@
         </div>
       </div>
 
+      <!-- Sección de pago -->
+      <div class="payment-section">
+        <div class="payment-summary" id="paymentSummary" style="display: none;">
+          <h3>Resumen del Regalo</h3>
+          <p class="amount" id="selectedAmount">€0</p>
+        </div>
+        <button class="stripe-button" id="payButton" disabled>
+          <i class="fas fa-credit-card"></i>
+          Proceder al Pago
+        </button>
+      </div>
+
       <!-- Información del donante -->
       <div class="donor-info">
         <h3>
@@ -534,18 +546,6 @@
           <label for="donorMessage">Mensaje para los novios (opcional)</label>
           <textarea id="donorMessage" placeholder="Escribe un mensaje especial para Iluminada y George..."></textarea>
         </div>
-      </div>
-
-      <!-- Sección de pago -->
-      <div class="payment-section">
-        <div class="payment-summary" id="paymentSummary" style="display: none;">
-          <h3>Resumen del Regalo</h3>
-          <p class="amount" id="selectedAmount">€0</p>
-        </div>
-        <button class="stripe-button" id="payButton" disabled>
-          <i class="fas fa-credit-card"></i>
-          Proceder al Pago
-        </button>
       </div>
     </div>
   </main>

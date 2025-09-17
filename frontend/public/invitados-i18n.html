@@ -1819,7 +1819,17 @@
               <!-- Las tarjetas se cargarán dinámicamente desde el servidor -->
             </div>
             
-            
+            <div class="payment-section">
+              <div class="payment-summary" id="paymentSummary" style="display: none;">
+                <h3 data-i18n="guests:paymentSummary">Resumen del Regalo</h3>
+                <p class="amount" id="selectedAmount">€0</p>
+              </div>
+              <button class="stripe-button" id="payButton" disabled>
+                <i class="fas fa-credit-card"></i>
+                <span data-i18n="guests:proceedPayment">Proceder al Pago</span>
+              </button>
+            </div>
+
             <div class="donor-info">
               <h3><i class="fas fa-user"></i> <span data-i18n="guests:donorInfo">Tu Información</span></h3>
               <div class="form-group">
@@ -1834,17 +1844,6 @@
                 <label for="donorMessage" data-i18n="guests:donorMessage">Mensaje para los novios (opcional)</label>
                 <textarea id="donorMessage" data-i18n-placeholder="guests:messagePlaceholder" placeholder="Escribe un mensaje especial para Iluminada y George..."></textarea>
               </div>
-            </div>
-            
-            <div class="payment-section">
-              <div class="payment-summary" id="paymentSummary" style="display: none;">
-                <h3 data-i18n="guests:paymentSummary">Resumen del Regalo</h3>
-                <p class="amount" id="selectedAmount">€0</p>
-              </div>
-              <button class="stripe-button" id="payButton" disabled>
-                <i class="fas fa-credit-card"></i>
-                <span data-i18n="guests:proceedPayment">Proceder al Pago</span>
-              </button>
             </div>
           </div>
           <div id="cashGiftsMessage" class="message"></div>

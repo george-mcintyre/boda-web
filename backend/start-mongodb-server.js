@@ -2,6 +2,7 @@
 const express = require('express');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_51S3mEM1VZvSGk6xqXEVy537524nXBqzArijKFhiKHcfjWWpx774QfInVvUglbnP10rwzG1wpAIkLkKYHBtawI5V100vONks99y');
 
 // Import database configuration and models
@@ -16,7 +17,6 @@ connectDB();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
 
 // Environment detection middleware
 app.use((req, res, next) => {
@@ -26,11 +26,11 @@ app.use((req, res, next) => {
 });
 
 // Serve static files from frontend
-app.use(express.static('../frontend/public'));
+app.use(express.static(path.join(__dirname, '../frontend/public')));
 
 // Root route
 app.get('/', (req, res) => {
-  res.sendFile('index.html', { root: '../frontend/public' });
+  res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
 });
 
 // Environment info endpoint
@@ -653,10 +653,22 @@ app.get('/api/admin/invitados', verificarAdmin, async (req, res) => {
 // ===== CASH GIFT CARDS ROUTES =====
 app.get('/api/admin/efectivo', verificarAdmin, async (req, res) => {
   try {
-    const cards = await models.CashGiftCard.find({});
-    res.json(cards);
+    const [cards, cashGifts] = await Promise.all([
+      models.CashGiftCard.find({}),
+      models.CashGift.find({})
+    ]);
+    const totalAmount = cashGifts.reduce((sum, g) => sum + (g.amount || 0), 0);
+    res.json({
+      cards,
+      gifts: cashGifts,
+      stats: {
+        totalCards: cards.length,
+        totalGifts: cashGifts.length,
+        totalAmount
+      }
+    });
   } catch (error) {
-    console.error('Error fetching cash gift cards:', error);
+    console.error('Error fetching cash gifts/cards:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
@@ -727,6 +739,18 @@ app.delete('/api/admin/efectivo/card/:cardId', verificarAdmin, async (req, res) 
   }
 });
 
+// Reset all cash gifts (puesta a cero)
+app.delete('/api/admin/efectivo/reset', verificarAdmin, async (req, res) => {
+  try {
+    // Eliminar todos los registros de regalos en efectivo recibidos
+    const result = await models.CashGift.deleteMany({});
+    res.json({ mensaje: 'Regalos en efectivo reseteados', eliminados: result.deletedCount || 0 });
+  } catch (error) {
+    console.error('Error resetting cash gifts:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 // ===== GIFTS ROUTES =====
 app.get('/api/admin/regalos', verificarAdmin, async (req, res) => {
   try {
@@ -778,6 +802,55 @@ app.get('/api/admin/regalos-efectivo', verificarAdmin, async (req, res) => {
     res.json(cashGifts);
   } catch (error) {
     console.error('Error fetching cash gifts:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// Endpoint temporal para insertar un regalo en efectivo de prueba
+app.post('/api/admin/regalos-efectivo/test-add', verificarAdmin, async (req, res) => {
+  try {
+    const { amountCents = 12345, donorName = 'Tester', donorEmail = 'tester@example.com', donorMessage = 'Regalo de prueba' } = req.body || {};
+
+    const testGift = new models.CashGift({
+      id: 'gift_' + Date.now(),
+      donorName,
+      donorEmail,
+      donorMessage,
+      amount: parseInt(amountCents, 10),
+      currency: 'eur',
+      status: 'completed',
+      sessionId: 'session_test_' + Date.now(),
+      paymentIntentId: 'pi_test_' + Date.now(),
+      completedAt: new Date()
+    });
+
+    await testGift.save();
+    res.json({ mensaje: 'Regalo de prueba creado', gift: testGift });
+  } catch (error) {
+    console.error('Error creating test cash gift:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// Endpoint rápido (sin body) para crear un regalo de prueba
+app.get('/api/admin/regalos-efectivo/test-add-quick', verificarAdmin, async (req, res) => {
+  try {
+    const testGift = new models.CashGift({
+      id: 'gift_' + Date.now(),
+      donorName: 'Tester Quick',
+      donorEmail: 'tester.quick@example.com',
+      donorMessage: 'Regalo de prueba rápido',
+      amount: 54321, // céntimos → €543.21
+      currency: 'eur',
+      status: 'completed',
+      sessionId: 'session_test_quick_' + Date.now(),
+      paymentIntentId: 'pi_test_quick_' + Date.now(),
+      completedAt: new Date()
+    });
+    await testGift.save();
+    res.json({ mensaje: 'Regalo de prueba rápido creado', gift: testGift });
+  } catch (error) {
+    console.error('Error creating quick test cash gift:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
@@ -868,4 +941,44 @@ app.listen(PORT, () => {
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`☁️ Vercel: ${process.env.VERCEL === '1' ? 'Yes' : 'No'}`);
   console.log(`🗄️ Database: MongoDB Atlas (BodaDB)`);
+});
+
+// ===== STRIPE CHECKOUT (CASH GIFTS) =====
+app.post('/api/create-payment-session', async (req, res) => {
+  try {
+    const { amount, currency, donorName, donorEmail, donorMessage, successUrl, cancelUrl } = req.body;
+
+    if (!amount || !currency || !donorName || !donorEmail || !successUrl || !cancelUrl) {
+      return res.status(400).json({ error: 'Faltan datos requeridos' });
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: currency,
+          product_data: {
+            name: `Regalo en efectivo - ${donorName}`,
+            description: donorMessage || 'Aportación para la boda'
+          },
+          unit_amount: amount
+        },
+        quantity: 1,
+      }],
+      mode: 'payment',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      customer_email: donorEmail,
+      metadata: {
+        donorName,
+        donorEmail,
+        donorMessage: donorMessage || ''
+      },
+    });
+
+    res.json({ id: session.id });
+  } catch (error) {
+    console.error('Error creating payment session:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
 });
