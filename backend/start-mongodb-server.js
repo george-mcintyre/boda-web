@@ -30,7 +30,7 @@ app.use(express.static(path.join(__dirname, '../frontend/public')));
 
 // Root route
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/public/index-i18n-fixed.html'));
 });
 
 // Environment info endpoint
