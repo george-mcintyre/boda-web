@@ -1636,7 +1636,18 @@
         console.log('🔍 Debug - Datos que se pasan a renderInvitados:', data);
         await renderInvitados(data);
             } else if (tab === 'regalos') {
-              renderRegalos(data);
+              console.log('🔍 Debug - Datos de regalos recibidos:', data);
+              if (Array.isArray(data)) {
+                renderRegalos(data);
+              } else {
+                console.error('❌ Error: Los datos de regalos no son un array:', data);
+                adminContent.innerHTML = `
+                  <div class="message error">
+                    <h3>Error en los datos</h3>
+                    <p>Los datos de regalos no tienen el formato esperado</p>
+                  </div>
+                `;
+              }
             } else if (tab === 'efectivo') {
               renderEfectivo(data);
             } else if (tab === 'mensajes') {
@@ -1927,6 +1938,108 @@
           </div>
         `;
         i18n.updatePageContent();
+      }
+
+      // Función para agregar regalo con desplegable de cantidades
+      function addRegalo() {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3><i class="fas fa-gift"></i> Añadir Regalo</h3>
+              <button onclick="closeModal()" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+              <form id="addRegaloForm">
+                <div class="form-group">
+                  <label for="regaloNombre">Nombre del Regalo *</label>
+                  <input type="text" id="regaloNombre" required placeholder="Ej: Juego de sábanas">
+                </div>
+                <div class="form-group">
+                  <label for="regaloDescripcion">Descripción</label>
+                  <textarea id="regaloDescripcion" placeholder="Descripción del regalo"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="regaloCantidad">Cantidad (€) *</label>
+                  <select id="regaloCantidad" required>
+                    <option value="">Selecciona una cantidad</option>
+                    <option value="50">€50 - Regalo pequeño</option>
+                    <option value="100">€100 - Regalo medio</option>
+                    <option value="200">€200 - Regalo generoso</option>
+                    <option value="500">€500 - Regalo especial</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="regaloCategoria">Categoría</label>
+                  <input type="text" id="regaloCategoria" placeholder="Ej: Hogar, Cocina, etc.">
+                </div>
+                <div class="form-group">
+                  <label for="regaloUrl">URL (opcional)</label>
+                  <input type="url" id="regaloUrl" placeholder="https://ejemplo.com">
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button onclick="closeModal()" class="btn btn-secondary">Cancelar</button>
+              <button onclick="saveRegalo()" class="btn btn-primary">Guardar Regalo</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        modal.style.display = 'block';
+      }
+
+      // Función para guardar el regalo
+      async function saveRegalo() {
+        const nombre = document.getElementById('regaloNombre').value;
+        const descripcion = document.getElementById('regaloDescripcion').value;
+        const cantidad = document.getElementById('regaloCantidad').value;
+        const categoria = document.getElementById('regaloCategoria').value;
+        const url = document.getElementById('regaloUrl').value;
+
+        if (!nombre || !cantidad) {
+          alert('Por favor, completa los campos obligatorios (Nombre y Cantidad)');
+          return;
+        }
+
+        try {
+          const token = localStorage.getItem('adminToken');
+          const response = await fetch('/api/admin/regalos', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': token
+            },
+            body: JSON.stringify({
+              nombre: nombre,
+              descripcion: descripcion,
+              precio: cantidad,
+              categoria: categoria || 'General',
+              url: url
+            })
+          });
+
+          if (response.ok) {
+            alert('Regalo añadido exitosamente');
+            closeModal();
+            showTab('regalos'); // Recargar la pestaña
+          } else {
+            const error = await response.json();
+            alert(`Error al añadir regalo: ${error.error}`);
+          }
+        } catch (error) {
+          console.error('Error al añadir regalo:', error);
+          alert('Error de conexión al añadir regalo');
+        }
+      }
+
+      // Función para cerrar modal
+      function closeModal() {
+        const modal = document.querySelector('.modal') || document.querySelector('.modal-overlay');
+        if (modal) {
+          modal.remove();
+        }
       }
 
       function renderMensajes(mensajes) {
@@ -3135,7 +3248,16 @@
 
       // Función para renderizar la pestaña de regalos en efectivo
       function renderEfectivo(data) {
-        const { cards, gifts, stats } = data;
+        // Si data es un array, lo convertimos al formato esperado
+        const cards = Array.isArray(data) ? data : data.cards || [];
+        const gifts = Array.isArray(data) ? [] : data.gifts || [];
+        const stats = Array.isArray(data) ? 
+          { 
+            totalCards: data.length, 
+            totalGifts: 0, 
+            totalAmount: data.reduce((sum, card) => sum + (card.amount || 0), 0) 
+          } : 
+          data.stats || { totalCards: 0, totalGifts: 0, totalAmount: 0 };
         
         adminContent.innerHTML = `
           <div class="admin-section">
@@ -3328,7 +3450,13 @@
               <form id="addCardForm">
                 <div class="form-group">
                   <label for="cardAmount">Cantidad (€) *</label>
-                  <input type="number" id="cardAmount" step="0.01" min="0.01" required>
+                  <select id="cardAmount" required>
+                    <option value="">Selecciona una cantidad</option>
+                    <option value="50">€50 - Regalo pequeño</option>
+                    <option value="100">€100 - Regalo medio</option>
+                    <option value="200">€200 - Regalo generoso</option>
+                    <option value="500">€500 - Regalo especial</option>
+                  </select>
                 </div>
                 <div class="form-group">
                   <label for="cardLabel">Etiqueta *</label>
@@ -3383,20 +3511,26 @@
           console.log('🎨 Datos de la imagen seleccionada:', { imageId, imageUrl });
           
           try {
-            const response = await fetch('/api/admin/efectivo/card', {
+            const response = await fetch('/api/admin/efectivo', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': localStorage.getItem('adminToken')
               },
-              body: JSON.stringify({ amount, label, description, imageId, imageUrl })
+              body: JSON.stringify({ 
+                cantidad: amount, 
+                etiqueta: label, 
+                descripcion: description, 
+                imagen: imageUrl 
+              })
             });
             
             const data = await response.json();
             
             if (response.ok) {
+              alert('¡Tarjeta creada exitosamente!');
               closeModal();
-              showTab('efectivo'); // Recargar la pestaña
+              showTab('regalos'); // Recargar la pestaña
             } else {
               alert(`Error: ${data.error}`);
             }

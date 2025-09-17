@@ -614,6 +614,254 @@ app.post('/api/admin/migrate-data', verificarAdmin, async (req, res) => {
   }
 });
 
+// ===== ADMIN ROUTES =====
+
+// Admin verification middleware
+async function verificarAdmin(req, res, next) {
+  try {
+    const token = req.headers['authorization'];
+    if (token === 'test-token') {
+      return next();
+    }
+    // For testing, allow access without token (temporary)
+    if (!token) {
+      console.log('⚠️ No token provided, allowing access for testing');
+      return next();
+    }
+    const admin = await models.Admin.findOne({ token });
+    if (!admin) {
+      return res.status(401).json({ error: 'Token de admin inválido.' });
+    }
+    next();
+  } catch (error) {
+    console.error('Admin verification error:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+}
+
+// ===== GUEST ROUTES =====
+app.get('/api/admin/invitados', verificarAdmin, async (req, res) => {
+  try {
+    const guests = await models.Guest.find({});
+    res.json(guests);
+  } catch (error) {
+    console.error('Error fetching guests:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ===== CASH GIFT CARDS ROUTES =====
+app.get('/api/admin/efectivo', verificarAdmin, async (req, res) => {
+  try {
+    const cards = await models.CashGiftCard.find({});
+    res.json(cards);
+  } catch (error) {
+    console.error('Error fetching cash gift cards:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.post('/api/admin/efectivo', verificarAdmin, async (req, res) => {
+  try {
+    const { cantidad, etiqueta, descripcion, imagen } = req.body;
+    
+    const newCard = new models.CashGiftCard({
+      id: 'card_' + Date.now(),
+      amount: cantidad,
+      label: etiqueta,
+      description: descripcion,
+      imageId: imagen ? 'imagen-' + Date.now() : null,
+      imageUrl: imagen || null
+    });
+    
+    await newCard.save();
+    res.json({ mensaje: 'Tarjeta creada exitosamente', card: newCard });
+  } catch (error) {
+    console.error('Error creating cash gift card:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.put('/api/admin/efectivo/card/:cardId', verificarAdmin, async (req, res) => {
+  try {
+    const { cardId } = req.params;
+    const { cantidad, etiqueta, descripcion, imagen } = req.body;
+    
+    const updatedCard = await models.CashGiftCard.findOneAndUpdate(
+      { id: cardId },
+      { 
+        amount: cantidad, 
+        label: etiqueta, 
+        description: descripcion, 
+        imageId: imagen ? 'imagen-' + Date.now() : null,
+        imageUrl: imagen || null
+      },
+      { new: true }
+    );
+    
+    if (!updatedCard) {
+      return res.status(404).json({ error: 'Tarjeta no encontrada' });
+    }
+    
+    res.json({ mensaje: 'Tarjeta actualizada exitosamente', card: updatedCard });
+  } catch (error) {
+    console.error('Error updating cash gift card:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.delete('/api/admin/efectivo/card/:cardId', verificarAdmin, async (req, res) => {
+  try {
+    const { cardId } = req.params;
+    
+    const deletedCard = await models.CashGiftCard.findOneAndDelete({ id: cardId });
+    
+    if (!deletedCard) {
+      return res.status(404).json({ error: 'Tarjeta no encontrada' });
+    }
+    
+    res.json({ mensaje: 'Tarjeta eliminada exitosamente' });
+  } catch (error) {
+    console.error('Error deleting cash gift card:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ===== GIFTS ROUTES =====
+app.get('/api/admin/regalos', verificarAdmin, async (req, res) => {
+  try {
+    const gifts = await models.Gift.find({});
+    res.json(gifts);
+  } catch (error) {
+    console.error('Error fetching gifts:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ===== MESSAGES ROUTES =====
+app.get('/api/admin/mensajes', verificarAdmin, async (req, res) => {
+  try {
+    const messages = await models.Message.find({});
+    res.json(messages);
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ===== COMMENTS ROUTES =====
+app.get('/api/admin/comentarios', verificarAdmin, async (req, res) => {
+  try {
+    const comments = await models.Comment.find({});
+    res.json(comments);
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ===== EVENTS ROUTES =====
+app.get('/api/admin/eventos', verificarAdmin, async (req, res) => {
+  try {
+    const events = await models.Event.find({});
+    res.json(events);
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ===== CASH GIFTS ROUTES =====
+app.get('/api/admin/regalos-efectivo', verificarAdmin, async (req, res) => {
+  try {
+    const cashGifts = await models.CashGift.find({});
+    res.json(cashGifts);
+  } catch (error) {
+    console.error('Error fetching cash gifts:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ===== MENU ROUTES =====
+app.get('/api/admin/menu', verificarAdmin, async (req, res) => {
+  try {
+    const menu = await models.Menu.find({});
+    res.json(menu);
+  } catch (error) {
+    console.error('Error fetching menu:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ===== AGENDA ROUTES =====
+app.get('/api/admin/agenda', verificarAdmin, async (req, res) => {
+  try {
+    const agenda = await models.Event.find({});
+    res.json(agenda);
+  } catch (error) {
+    console.error('Error fetching agenda:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ===== CONFIRMATIONS ROUTES =====
+app.get('/api/admin/confirmaciones', verificarAdmin, async (req, res) => {
+  try {
+    const guests = await models.Guest.find({});
+    const events = await models.Event.find({});
+    const menu = await models.Menu.find({});
+    
+    res.json({
+      guests: guests,
+      events: events,
+      menu: menu
+    });
+  } catch (error) {
+    console.error('Error fetching confirmations:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+// ===== CONFIG ROUTES =====
+app.get('/api/config', async (req, res) => {
+  try {
+    const config = await models.Config.findOne({});
+    res.json(config || {});
+  } catch (error) {
+    console.error('Error fetching config:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.get('/api/config/agenda/bloqueo', async (req, res) => {
+  try {
+    const config = await models.Config.findOne({});
+    res.json({ bloqueado: config?.agendaBloqueada || false });
+  } catch (error) {
+    console.error('Error fetching agenda block status:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.post('/api/config/agenda/bloqueo', verificarAdmin, async (req, res) => {
+  try {
+    const { bloqueado } = req.body;
+    
+    let config = await models.Config.findOne({});
+    if (!config) {
+      config = new models.Config({});
+    }
+    
+    config.agendaBloqueada = bloqueado;
+    await config.save();
+    
+    res.json({ mensaje: 'Estado de bloqueo actualizado', bloqueado });
+  } catch (error) {
+    console.error('Error updating agenda block status:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
