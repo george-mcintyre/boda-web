@@ -12,8 +12,14 @@ const models = require('./models');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Connect to MongoDB Atlas
-connectDB();
+// Connect to MongoDB Atlas with error handling
+connectDB().catch(error => {
+  console.error('❌ Failed to connect to MongoDB:', error);
+  // Don't exit in Vercel environment, let the app continue
+  if (!process.env.VERCEL) {
+    process.exit(1);
+  }
+});
 
 app.use(cors());
 app.use(express.json());
@@ -28,9 +34,16 @@ app.use((req, res, next) => {
 // Serve static files from frontend
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 
-// Root route - Updated to serve correct homepage
+// Root route - Updated to serve correct homepage with error handling
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/public/index-i18n-fixed.html'));
+  try {
+    const filePath = path.join(__dirname, '../frontend/public/index-i18n-fixed.html');
+    console.log(`📄 Serving homepage: ${filePath}`);
+    res.sendFile(filePath);
+  } catch (error) {
+    console.error('❌ Error serving homepage:', error);
+    res.status(500).send('Error loading homepage');
+  }
 });
 
 // Environment info endpoint
