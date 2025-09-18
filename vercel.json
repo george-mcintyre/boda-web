@@ -28,7 +28,7 @@
     },
     {
       "src": "/",
-      "dest": "backend/start-mongodb-server.js"
+      "dest": "index-i18n-fixed.html"
     },
     {
       "src": "/(.*\\.html)",
