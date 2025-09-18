@@ -42,12 +42,6 @@
   "env": {
     "NODE_ENV": "production",
     "VERCEL": "1"
-  },
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/index-i18n-fixed.html"
-    }
-  ]
+  }
 }
 
