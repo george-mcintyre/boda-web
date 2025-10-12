@@ -1,95 +1,95 @@
 
 
-# Boda Web · Iluminada & George
+# Wedding Web · George & Iluminada
 
-Índice rápido:
-- Visión general y características
-- Estructura del proyecto (actualizada)
-- Configuración y arranque
-- Variables de entorno (plantilla .env)
-- Datos mínimos necesarios en la base de datos (bootstrap)
-- Migración de datos a MongoDB
-- API y autenticación
-- Frontend y cabeceras de autorización
-- Sistema de diseño (colores, tipografías, componentes)
-- Estrategia de estilos y estructura del sitio
-- Stripe (setup, variables y webhooks)
+Quick index:
+- Overview and features
+- Project structure
+- Setup and run
+- Environment variables (.env template)
+- Minimum required database data (bootstrap)
+- Data migration to MongoDB
+- API and authentication
+- Frontend and Authorization headers
+- Design system (colors, typography, components)
+- Styling strategy and site structure
+- Stripe (setup, variables, and webhooks)
 
-## ✨ Visión general
-- Invitados: login por email, perfil del invitado, selección de menú, mensajes, lista de regalos.
-- Administración: gestión de invitados y demás entidades (extensible), autenticación JWT.
-- Backend modular con Express + MongoDB (Mongoose) y JWT. Archivos JSON reemplazados por base de datos.
+## ✨ Overview
+- Guests: login by email, guest profile, menu selection, messages, gift list.
+- Admin: manage guests and other entities (extensible), JWT authentication.
+- Modular backend with Express + MongoDB (Mongoose) and JWT. JSON files replaced by a database.
 
-## 📁 Estructura del proyecto (actual)
+## 📁 Project structure (current)
 ```
 boda-web/
-├─ public/            # archivos estáticos del cliente (HTML, CSS, JS, assets, locales)
-├─ server/            # código Node (auth, api, vistas protegidas)
-│  ├─ auth/           # handlers de autenticación, utils de JWT/sesión
-│  ├─ api/            # rutas API (CRUD, etc.)
-│  ├─ views/          # páginas HTML protegidas (admin UI)
-│  ├─ config/         # env, conexiones, etc.
-│  ├─ models/         # modelos Mongoose
+├─ public/            # client static files (HTML, CSS, JS, assets, locales)
+├─ server/            # Node code (auth, api, protected views)
+│  ├─ auth/           # auth handlers, JWT/session utils
+│  ├─ api/            # API routes (CRUD, etc.)
+│  ├─ views/          # protected HTML pages (admin UI)
+│  ├─ config/         # env, connections, etc.
+│  ├─ models/         # Mongoose models
 │  ├─ middleware/     # middlewares (auth, error, etc.)
-│  ├─ utils/          # utilidades del servidor
-│  ├─ app.js          # app Express
-│  └─ server.js       # arranque del servidor
-├─ scripts/           # utilidades locales (p.ej., DB: inspect, clean)
-├─ infra/             # infraestructura local
-│  └─ docker-compose.yml  # MongoDB local
+│  ├─ utils/          # server utilities
+│  ├─ app.js          # Express app
+│  └─ server.js       # server bootstrap
+├─ scripts/           # local utilities (e.g., DB: inspect, clean)
+├─ infra/             # local infrastructure
+│  └─ docker-compose.yml  # local MongoDB
 ├─ start-server.sh | start-server.bat | start-server.ps1
 ├─ env-vercel.example
-└─ README.md (este archivo)
+└─ README.md (this file)
 ```
 
-## 🚀 Configuración y arranque
-1) Variables de entorno: cree un archivo `.env` en la raíz del repo (vea plantilla debajo).
-2) Instalar y arrancar:
-- Linux/macOS: `./start-server.sh` (auto‑inicia MongoDB en macOS si Docker/Homebrew están disponibles)
-- Windows: `start-server.bat` o `start-server.ps1`
-3) Servido en: `http://localhost:${PORT || 3000}`
+## 🚀 Setup and run
+1) Environment variables: create a `.env` file in the repo root (see template below).
+2) Install and start:
+- Linux/macOS: `./start-server.sh` (auto-starts MongoDB on macOS if Docker/Homebrew are available)
+- Windows: `start-server.bat` or `start-server.ps1`
+3) Served at: `http://localhost:${PORT || 3000}`
 
-## 🔧 Variables de entorno (plantilla .env)
-Copie y pegue lo siguiente en un nuevo archivo `.env` en la raíz del proyecto. Ajuste valores según su entorno.
+## 🔧 Environment variables (.env template)
+Copy and paste the following into a new `.env` file at the project root. Adjust values for your environment.
 
 ```
-# Entorno
+# Environment
 NODE_ENV=development
 PORT=3000
 CORS_ORIGIN=*
 
 # MongoDB
-# En desarrollo, el script puede iniciar un contenedor Docker local en macOS si no está definido.
+# In development, the script can start a local Docker container on macOS if not defined.
 MONGODB_URI=mongodb://127.0.0.1:27017
 MONGODB_DB=boda-web
 
-# JWT (autenticación)
-# Cambie este secreto en producción.
+# JWT (authentication)
+# Change this secret in production.
 JWT_SECRET=dev-secret-change-me
 
-# Stripe (solo necesario si habilita pagos/donaciones)
-# Clave secreta de Stripe (test o live). Requerida para operaciones del servidor con Stripe.
+# Stripe (only required if you enable payments/donations)
+# Stripe secret key (test or live). Required for server-side operations with Stripe.
 STRIPE_SECRET_KEY=sk_test_xxx
-# Opcional: clave publicable para el frontend, si integra Stripe Elements/Checkout en cliente.
+# Optional: publishable key for the frontend, if you integrate Stripe Elements/Checkout on the client.
 STRIPE_PUBLISHABLE_KEY=pk_test_xxx
-# Opcional: secreto de webhook si configura webhooks.
+# Optional: webhook secret if you configure webhooks.
 STRIPE_WEBHOOK_SECRET=whsec_xxx
 ```
 
-Notas:
-- En producción, `MONGODB_URI` y `JWT_SECRET` son obligatorios (el backend los exige). `STRIPE_SECRET_KEY` es obligatoria si usa funciones de pago.
-- En desarrollo, si no define `MONGODB_URI` y está en macOS, `start-server.sh` intentará levantar un MongoDB local vía Docker/Homebrew.
+Notes:
+- In production, `MONGODB_URI` and `JWT_SECRET` are mandatory (the backend requires them). `STRIPE_SECRET_KEY` is mandatory if you use payment-related features.
+- In development, if you don't set `MONGODB_URI` and you're on macOS, `start-server.sh` will try to spin up a local MongoDB via Docker/Homebrew.
 
-## 🧪 Datos mínimos necesarios en la base de datos (bootstrap)
-Para que el sitio arranque en un estado mínimo funcional, necesita al menos:
-- Un usuario Administrador (colección `admins`) con `email` y `password` (texto plano por compatibilidad actual).
-- Al menos un Invitado (colección `guests`) con `email` y, opcionalmente, `nombre`.
+## 🧪 Minimum required data in the database (bootstrap)
+To get the site running in a minimally functional state, you need at least:
+- One Admin user (collection `admins`) with `email` and `password` (plaintext for current compatibility).
+- At least one Guest (collection `guests`) with `email` and, optionally, `name`.
 
-Existen varias formas de crear estos datos iniciales:
+There are several ways to create this initial data:
 
-### Opción A) Usar el script de migración con JSONs simples
-1. Cree directorio `server/data` (si no existe).
-2. Cree los archivos con contenido mínimo:
+### Option A) Use the migration script with simple JSON files
+1. Create directory `server/data` (if it doesn't exist).
+2. Create files with minimal content:
    - `server/data/admin.json`
    ```json
    [
@@ -102,20 +102,20 @@ Existen varias formas de crear estos datos iniciales:
      { "nombre": "Juan Pérez", "email": "juan@example.com" }
    ]
    ```
-3. Ejecute la migración:
+3. Run the migration:
 ```
 node scripts/inspect-db.js
 ```
-Esto listará las colecciones existentes en su base de datos MongoDB.
+This will list the existing collections in your MongoDB database.
 
-### Opción B) Sembrar datos con un comando Node (sin archivos JSON)
-Con su `.env` configurado y MongoDB en marcha, ejecute:
+### Option B) Seed data with a Node one-liner (no JSON files)
+With your `.env` configured and MongoDB running, execute:
 ```
 node -e "require('dotenv').config(); const mongoose=require('mongoose'); const {Admin,Guest}=require('./server/models'); (async()=>{ await mongoose.connect(process.env.MONGODB_URI||'mongodb://127.0.0.1:27017',{dbName:process.env.MONGODB_DB||'boda-web'}); await Admin.updateOne({email:'admin@example.com'},{email:'admin@example.com',password:'admin123'},{upsert:true}); await Guest.updateOne({email:'juan@example.com'},{nombre:'Juan Pérez',email:'juan@example.com'},{upsert:true}); console.log('Seed OK'); await mongoose.connection.close(); process.exit(0); })().catch(e=>{console.error(e);process.exit(1);});"
 ```
 
-### Opción C) Usar la consola de MongoDB
-En `mongosh`:
+### Option C) Use the MongoDB shell
+In `mongosh`:
 ```
 use boda-web
 
@@ -132,70 +132,70 @@ db.guests.updateOne(
 )
 ```
 
-### Probar el flujo mínimo
-1) Login como invitado (sin contraseña):
+### Test the minimum flow
+1) Login as guest (no password):
 ```
 curl -s -X POST http://localhost:3000/api/login \
   -H 'Content-Type: application/json' \
   -d '{"email":"juan@example.com"}'
 ```
-2) Usar el token para acceder a `/api/invitado`:
+2) Use the token to access `/api/invitado`:
 ```
-TOKEN=... # pegue el token recibido
+TOKEN=... # paste the received token
 curl -s http://localhost:3000/api/invitado -H "Authorization: Bearer $TOKEN"
 ```
-3) Login como admin (con contraseña):
+3) Login as admin (with password):
 ```
 curl -s -X POST http://localhost:3000/api/login \
   -H 'Content-Type: application/json' \
   -d '{"email":"admin@example.com","password":"admin123"}'
 ```
 
-## 🔄 Utilidades de base de datos
-- Inspeccionar colecciones: `node scripts/inspect-db.js`
-- Limpiar colecciones o DROPar DB: `node scripts/clean-db.js [--drop] [--force]`
+## 🔄 Database utilities
+- Inspect collections: `node scripts/inspect-db.js`
+- Clean collections or DROP DB: `node scripts/clean-db.js [--drop] [--force]`
 
-## 🔐 API y autenticación
+## 🔐 API and authentication
 - Login: `POST /api/login`  { email, password? }
-  - Invitado: email sin password → devuelve `{ token, tipo:"invitado" }`.
+  - Guest: email without password → returns `{ token, tipo:"invitado" }`.
   - Admin: email + password → `{ token, tipo:"admin" }`.
-- Perfil de invitado: `GET /api/invitado` con `Authorization: Bearer <token>` (rol invitado).
-- Administración de invitados (rol admin):
+- Guest profile: `GET /api/invitado` with `Authorization: Bearer <token>` (guest role).
+- Guest administration (admin role):
   - `GET /api/invitados`
   - `POST /api/invitados`
   - `PUT /api/invitados/:id`
   - `DELETE /api/invitados/:id`
 
 ## 🌐 Frontend
-- Al consumir endpoints autenticados, envíe el header: `Authorization: Bearer <token>`.
-- Los archivos estáticos se sirven desde `public/`.
+- When calling authenticated endpoints, send the header: `Authorization: Bearer <token>`.
+- Static files are served from `public/`.
 
-## 🎨 Sistema de diseño (consolidado)
-- Paleta principal:
-  - Primario #8B5A96 (púrpura suave)
-  - Secundario #D4A5A5 (rosa pálido)
-  - Acento #F4E4D6 (beige cálido)
-  - Texto oscuro #2C1810, texto claro #6B4E3D, blanco #FFFFFF, fondo claro #FDFBF7
-- Gradientes disponibles: primary, secondary, accent (135deg)
-- Tipografías: Títulos = Playfair Display; Texto = Inter
-- Tallas guía: H1 3.5rem, H2 2.5rem, H3 1.8rem, H4 1.3rem
-- Componentes: Header con gradiente, botones redondeados, tarjetas con sombra suave, formularios con focus púrpura
-- Efectos: transiciones 0.3s, sombras rgba(139,90,150, .1/.2), cursor decorativo opcional
-- Responsive: breakpoints móvil ≤768, tablet ≤1024, desktop ≥1025
-- Variables CSS sugeridas en :root (ver public/assets/css)
+## 🎨 Design system (consolidated)
+- Main palette:
+  - Primary #8B5A96 (soft purple)
+  - Secondary #D4A5A5 (pale pink)
+  - Accent #F4E4D6 (warm beige)
+  - Dark text #2C1810, light text #6B4E3D, white #FFFFFF, light background #FDFBF7
+- Available gradients: primary, secondary, accent (135deg)
+- Typography: Headings = Playfair Display; Body = Inter
+- Size guide: H1 3.5rem, H2 2.5rem, H3 1.8rem, H4 1.3rem
+- Components: Gradient header, rounded buttons, cards with soft shadow, forms with purple focus
+- Effects: 0.3s transitions, rgba(139,90,150, .1/.2) shadows, optional decorative cursor
+- Responsive: breakpoints mobile ≤768, tablet ≤1024, desktop ≥1025
+- Suggested CSS variables in :root (see public/assets/css)
 
-## 🧩 Estrategia de estilos y estructura del sitio (consolidado)
-- Estilos centralizados vía variables CSS (colores, tipografías, espaciados) para cambios rápidos.
-- Layout mediante Flexbox/Grid con adaptaciones por breakpoint.
-- Secciones principales: Hero, Formularios, Listas, Modales.
-- Estados interactivos: hover/focus/active uniformes.
-- Guía rápida de cambios: usar variables para ajustes globales; modificar reglas específicas para cambios moderados; rediseños parciales para cambios complejos.
+## 🧩 Styling strategy and site structure (consolidated)
+- Centralized styles via CSS variables (colors, typography, spacing) for quick changes.
+- Layout using Flexbox/Grid with breakpoint adaptations.
+- Main sections: Hero, Forms, Lists, Modals.
+- Interactive states: uniform hover/focus/active.
+- Quick change guide: use variables for global tweaks; modify specific rules for moderate changes; partial redesigns for complex changes.
 
-## 💳 Stripe (setup, variables y webhooks)
-- La clave `STRIPE_SECRET_KEY` se carga desde `.env`. Es requerida solo si habilita funciones relacionadas con pagos/donaciones (por ejemplo, regalos en efectivo). Si no la define, el servidor arranca pero esas funciones deberán abstenerse o fallarán con mensaje claro.
-- Si integra Stripe en el frontend, use `STRIPE_PUBLISHABLE_KEY` en el cliente (no comparta la clave secreta).
-- Para webhooks, configure `STRIPE_WEBHOOK_SECRET` y apunte Stripe a su endpoint público (p. ej. vía ngrok o despliegue en la nube).
+## 💳 Stripe (setup, variables, and webhooks)
+- The `STRIPE_SECRET_KEY` is loaded from `.env`. It is required only if you enable payment/donation-related features (e.g., cash gifts). If you don't set it, the server starts but those features should be disabled or will fail with a clear message.
+- If you integrate Stripe on the frontend, use `STRIPE_PUBLISHABLE_KEY` on the client (do not share the secret key).
+- For webhooks, configure `STRIPE_WEBHOOK_SECRET` and point Stripe to your public endpoint (e.g., via ngrok or a cloud deployment).
 
-## 📄 Notas
-- Este README reemplaza los antiguos documentos sueltos: ESQUEMA_DISENO_PROYECTO.md, ESTRATEGIA_ESTILOS_CENTRALIZADOS.txt, ESTRUCTURA_SITIO_WEB.txt, GUIA_ESTILOS_BODA_WEB.txt, README-GESTION-EVENTOS.md, STRIPE_SETUP.md y STRIPE_WEBHOOKS_SETUP.md.
-- Si necesita recuperar algún detalle, consulte el historial de Git previo a esta consolidación.
+## 📄 Notes
+- This README replaces the older scattered documents: ESQUEMA_DISENO_PROYECTO.md, ESTRATEGIA_ESTILOS_CENTRALIZADOS.txt, ESTRUCTURA_SITIO_WEB.txt, GUIA_ESTILOS_BODA_WEB.txt, README-GESTION-EVENTOS.md, STRIPE_SETUP.md, and STRIPE_WEBHOOKS_SETUP.md.
+- If you need to recover any detail, check the Git history prior to this consolidation.
