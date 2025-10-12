@@ -1839,54 +1839,11 @@
         loadCashGifts();
       }
 
-      // Función para cargar regalos en efectivo
+      // Cash gifts have been removed from the site. Do not fetch anything; show N/A.
       async function loadCashGifts() {
-        try {
-          const response = await fetch('/api/regalos-efectivo');
-          const cashGifts = await response.json();
-          
-          // Agrupar regalos por email del donante
-          const giftsByEmail = {};
-          cashGifts.forEach(gift => {
-            if (!giftsByEmail[gift.donorEmail]) {
-              giftsByEmail[gift.donorEmail] = [];
-            }
-            giftsByEmail[gift.donorEmail].push(gift);
-          });
-          
-          // Actualizar cada celda de regalos en efectivo
-          document.querySelectorAll('.cash-gifts-cell').forEach(cell => {
-            const email = cell.getAttribute('data-email');
-            const gifts = giftsByEmail[email] || [];
-            
-            if (gifts.length === 0) {
-              cell.innerHTML = '<span class="no-gifts">Sin regalos</span>';
-            } else {
-              const totalAmount = gifts.reduce((sum, gift) => sum + (gift.amount / 100), 0);
-              const giftCount = gifts.length;
-              
-              cell.innerHTML = `
-                <div class="cash-gifts-summary">
-                  <div class="gift-amount">
-                    <i class="fas fa-euro-sign"></i> ${totalAmount.toFixed(2)}
-                  </div>
-                  <div class="gift-count">
-                    ${giftCount} regalo${giftCount > 1 ? 's' : ''}
-                  </div>
-                  <button onclick="showCashGiftDetails('${email}')" class="view-details-btn" title="Ver detalles">
-                    <i class="fas fa-eye"></i>
-                  </button>
-                </div>
-              `;
-            }
-          });
-          
-        } catch (error) {
-          console.error('Error loading cash gifts:', error);
-          document.querySelectorAll('.cash-gifts-cell').forEach(cell => {
-            cell.innerHTML = '<span class="error">Error al cargar</span>';
-          });
-        }
+        document.querySelectorAll('.cash-gifts-cell').forEach(cell => {
+          cell.innerHTML = '<span class="no-gifts">N/A</span>';
+        });
       }
 
       // Función para mostrar detalles de regalos en efectivo

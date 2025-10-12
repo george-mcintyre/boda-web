@@ -1031,6 +1031,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cargar y mostrar el status de regalos
   async function cargarStatusRegalos() {
+    // Gifts (non-cash) have been removed from the site; skip loading status
+    return;
+  //
     try {
       // Verificar estado de bloqueo primero
       const bloqueoRes = await fetch('/api/config/agenda/bloqueo');
@@ -1345,25 +1348,14 @@ async function cargarStatusEfectivo() {
       return;
     }
 
-    // Si no está bloqueada, cargar contenido normal
-    const response = await fetch('/api/regalos-efectivo', {
-      method: 'GET',
-      headers: { 'Authorization': token }
-    });
-    
-    if (!response.ok) {
-      throw new Error('Error al cargar regalos en efectivo');
+    // Cash gifts have been removed; show N/A and return.
+    const efectivoStatusContent = document.getElementById('efectivoStatusContent');
+    if (efectivoStatusContent) {
+      efectivoStatusContent.innerHTML = '<span class="no-gifts">N/A</span>';
     }
-    
-    const regalos = await response.json();
-    
-    // Obtener el email del usuario actual
-    const userEmail = localStorage.getItem('email');
-    
-    // Filtrar solo los regalos realizados por el usuario actual
-    const regalosDelUsuario = regalos.filter(regalo => regalo.donorEmail === userEmail);
-    
-    if (regalosDelUsuario.length > 0) {
+    return;
+
+    if (false) {
       // Calcular total y fechas
       const totalAmount = regalosDelUsuario.reduce((sum, regalo) => sum + (regalo.amount / 100), 0);
       const lastGift = regalosDelUsuario.sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))[0];

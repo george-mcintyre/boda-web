@@ -237,6 +237,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Cargar y mostrar el status de regalos
   async function cargarStatusRegalos() {
+    // Gifts (non-cash) have been removed from the site; skip loading status
+    return;
+  //
     try {
       const response = await fetch('/api/regalos');
       const regalos = await response.json();

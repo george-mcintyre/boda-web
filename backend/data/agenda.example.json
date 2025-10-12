@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "date": "2026-06-05",
+    "day": { "en": "June 5", "es": "5 de junio" },
+    "time": "21:00",
+    "title": { "en": "Welcome Cocktail", "es": "Cocktail de Bienvenida" },
+    "description": { "en": "Informal celebration to welcome all guests", "es": "Celebración informal para dar la bienvenida a todos los invitados" },
+    "venue": { "en": "Hotel Palace Madrid", "es": "Hotel Palace Madrid" },
+    "address": { "en": "Plaza de las Cortes, 7, Madrid", "es": "Plaza de las Cortes, 7, Madrid" }
+  },
+  {
+    "id": 2,
+    "date": "2026-06-06",
+    "day": { "en": "June 6", "es": "6 de Junio" },
+    "time": "14:00",
+    "title": { "en": "Wedding Ceremony", "es": "Ceremonia de Boda" },
+    "description": { "en": "Religious ceremony of Iluminada and George", "es": "Ceremonia religiosa de Iluminada y George" },
+    "venue": { "en": "San Miguel Church", "es": "Iglesia de San Miguel" },
+    "address": { "en": "Plaza Mayor, 1, Madrid", "es": "Plaza Mayor, 1, Madrid" }
+  },
+  {
+    "id": 3,
+    "date": "2026-06-06",
+    "day": { "en": "June 6", "es": "6 de Junio" },
+    "time": "17:00",
+    "title": { "en": "Guest Reception", "es": "Recepción de Invitados" },
+    "description": { "en": "Main celebration with dinner and dancing", "es": "Celebración principal con cena y baile" },
+    "venue": { "en": "Palace of the Dukes", "es": "Palacio de los Duques" },
+    "address": { "en": "Gran Vía Street, 28, Madrid", "es": "Calle Gran Vía, 28, Madrid" }
+  },
+  {
+    "id": 4,
+    "date": "2026-06-07",
+    "day": { "en": "June 7", "es": "7 de junio" },
+    "time": "14:00",
+    "title": { "en": "Farewell Brunch", "es": "Brunch de Despedida" },
+    "description": { "en": "Casual breakfast to bid farewell to guests", "es": "Desayuno informal para despedir a los invitados" },
+    "venue": { "en": "\"El Jardín\" Restaurant", "es": "Restaurante \"El Jardín\"" },
+    "address": { "en": "Calle de Alcalá, 15, Madrid", "es": "Calle de Alcalá, 15, Madrid" }
+  }
+]
