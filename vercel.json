@@ -2,41 +2,41 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/start-mongodb-server.js",
+      "src": "server/server.js",
       "use": "@vercel/node",
       "config": {
         "maxDuration": 30
       }
     },
     {
-      "src": "frontend/public/**",
+      "src": "public/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/start-mongodb-server.js"
+      "dest": "server/server.js"
     },
     {
       "src": "/assets/(.*)",
-      "dest": "frontend/public/assets/$1"
+      "dest": "public/assets/$1"
     },
     {
       "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|pdf))",
-      "dest": "frontend/public/$1"
+      "dest": "public/$1"
     },
     {
       "src": "/",
-      "dest": "backend/start-mongodb-server.js"
+      "dest": "server/server.js"
     },
     {
       "src": "/(.*\\.html)",
-      "dest": "frontend/public/$1"
+      "dest": "public/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "frontend/public/$1"
+      "dest": "public/$1"
     }
   ],
   "env": {

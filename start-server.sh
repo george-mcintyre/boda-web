@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR/backend"
+cd "$SCRIPT_DIR/server"
 
 # Load env from project root if present
 if [ -f "$SCRIPT_DIR/.env" ]; then
@@ -101,6 +101,6 @@ else
 fi
 
 echo "Starting server..."
-node src/server.js
+node server.js
 
 

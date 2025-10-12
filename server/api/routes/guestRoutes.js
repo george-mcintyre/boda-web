@@ -1,6 +1,6 @@
 const router = require('express').Router();
-const { auth } = require('../middleware/auth');
-const ctrl = require('../controllers/guestController');
+const { auth } = require('../../auth/middleware');
+const ctrl = require('../../controllers/guestController');
 
 // Guest: own profile (keeping Spanish path for compatibility)
 router.get('/invitado', auth('guest'), ctrl.getMe);
