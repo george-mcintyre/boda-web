@@ -23,30 +23,20 @@
 ## 📁 Estructura del proyecto (actual)
 ```
 boda-web/
-├─ backend/
-│  ├─ scripts/
-│  │  └─ migrate-to-mongodb.js
-│  └─ src/
-│     ├─ app.js
-│     ├─ server.js
-│     ├─ config/
-│     │  ├─ env.js
-│     │  ├─ db.js
-│     │  └─ stripe.js
-│     ├─ middleware/
-│     │  ├─ auth.js
-│     │  └─ error.js
-│     ├─ models/ (Admin, Guest, Event, Gift, Message, Comment, Menu, CashGift, CashGiftCard, Config)
-│     ├─ services/ (...)
-│     ├─ controllers/ (...)
-│     ├─ routes/
-│     │  ├─ index.js
-│     │  ├─ authRoutes.js
-│     │  └─ guestRoutes.js
-│     └─ utils/logger.js
-├─ frontend/
-│  ├─ public/
-│  └─ src/
+├─ public/            # archivos estáticos del cliente (HTML, CSS, JS, assets, locales)
+├─ server/            # código Node (auth, api, vistas protegidas)
+│  ├─ auth/           # handlers de autenticación, utils de JWT/sesión
+│  ├─ api/            # rutas API (CRUD, etc.)
+│  ├─ views/          # páginas HTML protegidas (admin UI)
+│  ├─ config/         # env, conexiones, etc.
+│  ├─ models/         # modelos Mongoose
+│  ├─ middleware/     # middlewares (auth, error, etc.)
+│  ├─ utils/          # utilidades del servidor
+│  ├─ app.js          # app Express
+│  └─ server.js       # arranque del servidor
+├─ scripts/           # utilidades locales (p.ej., DB: inspect, clean)
+├─ infra/             # infraestructura local
+│  └─ docker-compose.yml  # MongoDB local
 ├─ start-server.sh | start-server.bat | start-server.ps1
 ├─ env-vercel.example
 └─ README.md (este archivo)
@@ -98,15 +88,15 @@ Para que el sitio arranque en un estado mínimo funcional, necesita al menos:
 Existen varias formas de crear estos datos iniciales:
 
 ### Opción A) Usar el script de migración con JSONs simples
-1. Cree directorio `backend/data` (si no existe).
+1. Cree directorio `server/data` (si no existe).
 2. Cree los archivos con contenido mínimo:
-   - `backend/data/admin.json`
+   - `server/data/admin.json`
    ```json
    [
      { "email": "admin@example.com", "password": "admin123" }
    ]
    ```
-   - `backend/data/invitados.json`
+   - `server/data/invitados.json`
    ```json
    [
      { "nombre": "Juan Pérez", "email": "juan@example.com" }
@@ -114,14 +104,14 @@ Existen varias formas de crear estos datos iniciales:
    ```
 3. Ejecute la migración:
 ```
-node backend/scripts/migrate-to-mongodb.js
+node scripts/inspect-db.js
 ```
-Esto creará/limpiará colecciones y cargará esos datos.
+Esto listará las colecciones existentes en su base de datos MongoDB.
 
 ### Opción B) Sembrar datos con un comando Node (sin archivos JSON)
 Con su `.env` configurado y MongoDB en marcha, ejecute:
 ```
-node -e "require('dotenv').config(); const mongoose=require('mongoose'); const {Admin,Guest}=require('./backend/src/models'); (async()=>{ await mongoose.connect(process.env.MONGODB_URI||'mongodb://127.0.0.1:27017',{dbName:process.env.MONGODB_DB||'boda-web'}); await Admin.updateOne({email:'admin@example.com'},{email:'admin@example.com',password:'admin123'},{upsert:true}); await Guest.updateOne({email:'juan@example.com'},{nombre:'Juan Pérez',email:'juan@example.com'},{upsert:true}); console.log('Seed OK'); await mongoose.connection.close(); process.exit(0); })().catch(e=>{console.error(e);process.exit(1);});"
+node -e "require('dotenv').config(); const mongoose=require('mongoose'); const {Admin,Guest}=require('./server/models'); (async()=>{ await mongoose.connect(process.env.MONGODB_URI||'mongodb://127.0.0.1:27017',{dbName:process.env.MONGODB_DB||'boda-web'}); await Admin.updateOne({email:'admin@example.com'},{email:'admin@example.com',password:'admin123'},{upsert:true}); await Guest.updateOne({email:'juan@example.com'},{nombre:'Juan Pérez',email:'juan@example.com'},{upsert:true}); console.log('Seed OK'); await mongoose.connection.close(); process.exit(0); })().catch(e=>{console.error(e);process.exit(1);});"
 ```
 
 ### Opción C) Usar la consola de MongoDB
@@ -161,9 +151,9 @@ curl -s -X POST http://localhost:3000/api/login \
   -d '{"email":"admin@example.com","password":"admin123"}'
 ```
 
-## 🔄 Migración de datos (desde JSON a MongoDB)
-- Coloque los JSON existentes en `backend/data/*.json` (si existen).
-- Ejecute: `node backend/scripts/migrate-to-mongodb.js`
+## 🔄 Utilidades de base de datos
+- Inspeccionar colecciones: `node scripts/inspect-db.js`
+- Limpiar colecciones o DROPar DB: `node scripts/clean-db.js [--drop] [--force]`
 
 ## 🔐 API y autenticación
 - Login: `POST /api/login`  { email, password? }
@@ -178,7 +168,7 @@ curl -s -X POST http://localhost:3000/api/login \
 
 ## 🌐 Frontend
 - Al consumir endpoints autenticados, envíe el header: `Authorization: Bearer <token>`.
-- Los archivos estáticos se sirven desde `frontend/public`.
+- Los archivos estáticos se sirven desde `public/`.
 
 ## 🎨 Sistema de diseño (consolidado)
 - Paleta principal:
@@ -192,7 +182,7 @@ curl -s -X POST http://localhost:3000/api/login \
 - Componentes: Header con gradiente, botones redondeados, tarjetas con sombra suave, formularios con focus púrpura
 - Efectos: transiciones 0.3s, sombras rgba(139,90,150, .1/.2), cursor decorativo opcional
 - Responsive: breakpoints móvil ≤768, tablet ≤1024, desktop ≥1025
-- Variables CSS sugeridas en :root (ver frontend/public/assets/css)
+- Variables CSS sugeridas en :root (ver public/assets/css)
 
 ## 🧩 Estrategia de estilos y estructura del sitio (consolidado)
 - Estilos centralizados vía variables CSS (colores, tipografías, espaciados) para cambios rápidos.

@@ -41,7 +41,7 @@ Este sistema proporciona una solución completa y robusta para la internacionali
 ### 2. Estructura de archivos de traducción
 
 ```
-frontend/public/locales/
+public/locales/
 ├── es/
 │   ├── common.json
 │   └── wedding.json

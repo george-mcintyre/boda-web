@@ -177,7 +177,7 @@ alert(translate('message:success'));
 ## 📁 Estructura de Archivos
 
 ```
-frontend/public/
+public/
 ├── assets/css/
 │   └── i18n-selector.css          # Estilos del selector de idiomas
 ├── js/
