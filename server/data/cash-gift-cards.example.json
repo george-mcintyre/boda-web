@@ -5,7 +5,7 @@
     "label": "Por vuestra nueva vida",
     "description": "Que este pequeño detalle os ayude a empezar vuestro hogar",
     "imageId": "imagen-5",
-    "imageUrl": "/assets/images/gift-cards/IMAGEN 5.jpg",
+    "imageUrl": "/assets/images/gift-cards/image_5.jpg",
     "createdAt": "2025-09-11T23:16:34.832Z",
     "isActive": true
   },
@@ -15,7 +15,7 @@
     "label": "Con cariño y mejores deseos",
     "description": "Que este regalo sea el comienzo de muchas cosas maravillosas que construiréis juntos. ¡Felicidades y que viva el amor!",
     "imageId": "imagen-12",
-    "imageUrl": "/assets/images/gift-cards/IMAGEN 12.jpg",
+    "imageUrl": "/assets/images/gift-cards/image_12.jpg",
     "createdAt": "2025-09-11T23:19:08.381Z",
     "isActive": true
   },
@@ -25,7 +25,7 @@
     "label": "Por vuestra nueva aventura",
     "description": "Desde lo más profundo de nuestro corazón, os deseamos un matrimonio lleno de amor, felicidad y prosperidad",
     "imageId": "imagen-11",
-    "imageUrl": "/assets/images/gift-cards/IMAGEN 11.jpg",
+    "imageUrl": "/assets/images/gift-cards/image_11.jpg",
     "createdAt": "2025-09-11T23:21:41.493Z",
     "isActive": true
   }
