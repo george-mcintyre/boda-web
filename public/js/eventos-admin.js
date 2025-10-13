@@ -109,16 +109,16 @@ class EventosAdmin {
 
     if (this.eventos.length === 0) {
       container.innerHTML = `
-        <div class="eventos-empty">
+        <div class="events-empty">
           <i class="fas fa-calendar-plus"></i>
           <h3>No hay eventos configurados</h3>
           <p>Comienza creando el primer evento de la boda</p>
           ${!agendaBloqueada ? `
-            <button onclick="eventosAdmin.addEvent()" class="evento-btn evento-btn-primary">
+            <button onclick="eventosAdmin.addEvent()" class="event-btn event-btn-primary">
               <i class="fas fa-plus"></i> Crear Primer Evento
             </button>
           ` : `
-            <div class="agenda-bloqueada-notice">
+            <div class="locked-agenda-notice">
               <i class="fas fa-lock"></i>
               <p>La agenda está bloqueada. No se pueden crear nuevos eventos.</p>
             </div>
@@ -134,33 +134,33 @@ class EventosAdmin {
     );
 
     container.innerHTML = `
-      <div class="eventos-header">
-        <div class="eventos-title">
+      <div class="events-header">
+        <div class="events-title">
           <i class="fas fa-calendar-alt"></i>
           <span>Gestión de Eventos (${eventosOrdenados.length})</span>
           ${agendaBloqueada ? `
-            <span class="agenda-bloqueada-badge">
+            <span class="locked-agenda-badge">
               <i class="fas fa-lock"></i> AGENDA BLOQUEADA
             </span>
           ` : ''}
         </div>
-        <div class="eventos-actions">
-          <button onclick="eventosAdmin.actualizarEstadoBloqueo()" class="evento-btn evento-btn-secondary" title="Actualizar estado de bloqueo">
-            <i class="fas fa-sync"></i> Actualizar
+        <div class="events-actions">
+          <button onclick=\"eventosAdmin.actualizarEstadoBloqueo()\" class=\"event-btn event-btn-secondary\" title=\"Actualizar estado de bloqueo\">
+            <i class=\"fas fa-sync\"></i> Actualizar
           </button>
           ${!agendaBloqueada ? `
-            <button onclick="eventosAdmin.addEvent()" class="evento-btn evento-btn-primary">
-              <i class="fas fa-plus"></i> Nuevo Evento
+            <button onclick=\"eventosAdmin.addEvent()\" class=\"event-btn event-btn-primary\">
+              <i class=\"fas fa-plus\"></i> Nuevo Evento
             </button>
           ` : `
-            <div class="agenda-bloqueada-notice">
-              <i class="fas fa-lock"></i>
+            <div class=\"locked-agenda-notice\">
+              <i class=\"fas fa-lock\"></i>
               <span>No se pueden crear eventos mientras la agenda esté bloqueada</span>
             </div>
           `}
         </div>
       </div>
-      <div class="eventos-list">
+      <div class="events-list">
         ${eventosOrdenados.map(evento => this.renderEvento(evento)).join('')}
       </div>
     `;
@@ -179,30 +179,30 @@ class EventosAdmin {
     const agendaBloqueada = window.AGENDA_BLOQUEADA || false;
 
     return `
-      <div class="evento-card" data-event-id="${evento.id}">
-        <div class="evento-header">
-          <div class="evento-info">
-            <div class="evento-icon">
+      <div class="event-card" data-event-id="${evento.id}">
+        <div class="event-header">
+          <div class="event-info">
+            <div class="event-icon">
               <i class="${evento.icono || 'fas fa-calendar-alt'}"></i>
             </div>
             <div>
-              <div class="evento-title">${evento.titulo}</div>
-              <div class="evento-description">${evento.descripcion}</div>
+              <div class="event-title">${evento.titulo}</div>
+              <div class="event-description">${evento.descripcion}</div>
             </div>
           </div>
-          <div class="evento-actions">
+          <div class="event-actions">
             ${!agendaBloqueada ? `
-              <button onclick="eventosAdmin.editEvent(${evento.id})" class="evento-action primary">
+              <button onclick="eventosAdmin.editEvent(${evento.id})" class="event-action primary">
                 <i class="fas fa-edit"></i> Editar
               </button>
-              <button onclick="eventosAdmin.addSubevent(${evento.id})" class="evento-action secondary">
+              <button onclick="eventosAdmin.addSubevent(${evento.id})" class="event-action secondary">
                 <i class="fas fa-plus"></i> Subevento
               </button>
-              <button onclick="eventosAdmin.deleteEvent(${evento.id})" class="evento-action danger">
+              <button onclick="eventosAdmin.deleteEvent(${evento.id})" class="event-action danger">
                 <i class="fas fa-trash"></i> Eliminar
               </button>
             ` : `
-              <div class="agenda-bloqueada-notice">
+              <div class="locked-agenda-notice">
                 <i class="fas fa-lock"></i>
                 <span>Evento bloqueado</span>
               </div>
@@ -210,25 +210,25 @@ class EventosAdmin {
           </div>
         </div>
         
-                 <div class="evento-details">
-           <div class="evento-detail">
+                 <div class="event-details">
+           <div class="event-detail">
              <i class="fas fa-calendar"></i>
              <span>${this.formatDate(evento.fecha)}</span>
            </div>
-           <div class="evento-detail">
+           <div class="event-detail">
              <i class="fas fa-clock"></i>
              <span>${evento.horaInicio} - ${evento.horaFin}</span>
            </div>
-           <div class="evento-detail">
+           <div class="event-detail">
              <i class="fas fa-map-marker-alt"></i>
              <span>${evento.lugar}</span>
            </div>
-           <div class="evento-detail">
+           <div class="event-detail">
              <i class="fas fa-map"></i>
              <span>${evento.direccion}</span>
            </div>
            ${evento.coordenadas && evento.coordenadas.lat && evento.coordenadas.lng ? `
-           <div class="evento-detail">
+           <div class="event-detail">
              <i class="fas fa-location-dot"></i>
              <span>${evento.coordenadas.lat}, ${evento.coordenadas.lng}</span>
              <button onclick="eventosAdmin.viewMap(${evento.coordenadas.lat}, ${evento.coordenadas.lng})" class="map-link-btn" title="Ver en Google Maps">
@@ -239,14 +239,14 @@ class EventosAdmin {
          </div>
 
         ${subeventosHTML ? `
-          <div class="subeventos-section">
-            <div class="subeventos-header">
-              <div class="subeventos-title">
+          <div class="subevents-section">
+            <div class="subevents-header">
+              <div class="subevents-title">
                 <i class="fas fa-list"></i>
                 <span>Subeventos (${evento.subeventos.length})</span>
               </div>
             </div>
-            <div class="subeventos-list">
+            <div class="subevents-list">
               ${subeventosHTML}
             </div>
           </div>
@@ -261,27 +261,27 @@ class EventosAdmin {
     const agendaBloqueada = window.AGENDA_BLOQUEADA || false;
 
     return `
-      <div class="subevento-card" data-subevent-id="${subevento.id}">
-        <div class="subevento-header">
-          <div class="subevento-info">
-            <div class="subevento-icon">
+      <div class="subevent-card" data-subevent-id="${subevento.id}">
+        <div class="subevent-header">
+          <div class="subevent-info">
+            <div class="subevent-icon">
               <i class="${subevento.icono || 'fas fa-clock'}"></i>
             </div>
             <div>
-              <div class="subevento-title">${subevento.titulo}</div>
-              <div class="subevento-description">${subevento.descripcion}</div>
+              <div class="subevent-title">${subevento.titulo}</div>
+              <div class="subevent-description">${subevento.descripcion}</div>
             </div>
           </div>
-          <div class="subevento-actions">
+          <div class="subevent-actions">
             ${!agendaBloqueada ? `
-              <button onclick="eventosAdmin.editSubevent(${eventoId}, ${subevento.id})" class="subevento-action primary">
+              <button onclick="eventosAdmin.editSubevent(${eventoId}, ${subevento.id})" class="subevent-action primary">
                 <i class="fas fa-edit"></i>
               </button>
-              <button onclick="eventosAdmin.deleteSubevent(${eventoId}, ${subevento.id})" class="subevento-action danger">
+              <button onclick="eventosAdmin.deleteSubevent(${eventoId}, ${subevento.id})" class="subevent-action danger">
                 <i class="fas fa-trash"></i>
               </button>
             ` : `
-              <div class="agenda-bloqueada-notice">
+              <div class="locked-agenda-notice">
                 <i class="fas fa-lock"></i>
                 <span>Subevento bloqueado</span>
               </div>
@@ -289,21 +289,21 @@ class EventosAdmin {
           </div>
         </div>
         
-                 <div class="subevento-details">
-           <div class="subevento-detail">
+                 <div class="subevent-details">
+           <div class="subevent-detail">
              <i class="fas fa-clock"></i>
              <span>${subevento.horaInicio} - ${subevento.horaFin}</span>
            </div>
-           <div class="subevento-detail">
+           <div class="subevent-detail">
              <i class="fas fa-map-marker-alt"></i>
              <span>${subevento.lugar}</span>
            </div>
-           <div class="subevento-detail">
+           <div class="subevent-detail">
              <i class="fas fa-map"></i>
              <span>${subevento.direccion}</span>
            </div>
            ${subevento.coordenadas && subevento.coordenadas.lat && subevento.coordenadas.lng ? `
-           <div class="subevento-detail">
+           <div class="subevent-detail">
              <i class="fas fa-location-dot"></i>
              <span>${subevento.coordenadas.lat}, ${subevento.coordenadas.lng}</span>
              <button onclick="eventosAdmin.viewMap(${subevento.coordenadas.lat}, ${subevento.coordenadas.lng})" class="map-link-btn" title="Ver en Google Maps">
@@ -323,21 +323,21 @@ class EventosAdmin {
     this.selectedIcon = evento?.icono || 'fas fa-calendar-alt';
 
     const modal = document.createElement('div');
-    modal.className = 'evento-modal';
+    modal.className = 'event-modal';
     modal.innerHTML = `
-      <div class="evento-modal-content">
-        <div class="evento-modal-header">
+      <div class="event-modal-content">
+        <div class="event-modal-header">
           <h3>
             <i class="fas fa-${isEdit ? 'edit' : 'plus'}"></i>
             ${isEdit ? 'Editar Evento' : 'Nuevo Evento'}
           </h3>
-          <button onclick="eventosAdmin.closeModal()" class="evento-modal-close">
+          <button onclick="eventosAdmin.closeModal()" class="event-modal-close">
             <i class="fas fa-times"></i>
           </button>
         </div>
-        <div class="evento-modal-body">
-          <form class="evento-form" id="eventoForm">
-            <div class="evento-form-row">
+        <div class="event-modal-body">
+          <form class="event-form" id="eventoForm">
+            <div class="event-form-row">
               <div class="evento-form-group">
                 <label for="eventoIcono">
                   <i class="fas fa-image"></i>
@@ -847,7 +847,7 @@ class EventosAdmin {
 
   // Cerrar modal
   closeModal() {
-    const modal = document.querySelector('.evento-modal');
+    const modal = document.querySelector('.event-modal');
     if (modal) {
       modal.remove();
     }

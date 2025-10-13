@@ -727,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Función para mostrar la gestión de eventos
   async function showEventosAdmin() {
     adminContent.innerHTML = `
-      <div class="eventos-container">
+      <div class="events-container">
         <div id="eventosContainer">
           <div class="admin-loading">
             <i class="fas fa-spinner fa-spin"></i>
@@ -742,7 +742,7 @@ document.addEventListener('DOMContentLoaded', () => {
     await loadScript('js/eventos-admin.js');
     
     // Cargar los estilos
-    loadStylesheet('assets/css/eventos-admin.css');
+    loadStylesheet('assets/css/events-admin.css');
   }
 
   // Función para cargar scripts dinámicamente
