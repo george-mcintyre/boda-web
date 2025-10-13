@@ -1,6 +1,6 @@
-/* Estilos comunes para el selector de idiomas */
+/* Common styles for the language selector */
 
-/* Estilos para el header con selector de idiomas */
+/* Header styles with language selector */
 .header-content {
   display: flex;
   justify-content: space-between;
@@ -59,7 +59,7 @@
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
 }
 
-/* Estilos para el selector de idiomas */
+/* Styles for the language selector */
 .language-selector {
   position: relative;
   margin-left: 20px;
@@ -160,7 +160,7 @@ header {
   padding: 20px;
 }
 
-/* Estilos para RTL */
+/* Styles for RTL */
 [dir="rtl"] .language-selector {
   margin-left: 0;
   margin-right: 20px;

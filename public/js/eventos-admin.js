@@ -866,7 +866,7 @@ class EventosAdmin {
   // Mostrar mensaje
   showMessage(message, type = 'info') {
     const messageDiv = document.createElement('div');
-    messageDiv.className = `evento-message ${type}`;
+    messageDiv.className = `event-message ${type}`;
     messageDiv.innerHTML = `
       <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
       <span>${message}</span>

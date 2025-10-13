@@ -1,4 +1,4 @@
-/* Estilos para el sistema de gestión de eventos (converted to English class names) */
+/* Styles for the events management system (converted to English class names) */
 
 .events-container {
   padding: 20px;
@@ -301,7 +301,7 @@
   transform: scale(1.05);
 }
 
-/* Modal de eventos */
+/* Event modal */
 .event-modal {
   position: fixed;
   top: 0;
@@ -595,7 +595,7 @@
   line-height: 1.2;
 }
 
-/* Estados de carga y vacío */
+/* Loading and empty states */
 .events-loading {
   text-align: center;
   padding: 50px;

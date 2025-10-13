@@ -1,9 +1,9 @@
 /**
- * Estilos para el Sistema de Internacionalización Avanzado
- * Soporte completo para RTL y diseño moderno
+ * Styles for the Advanced Internationalization System
+ * Full support for RTL and modern design
  */
 
-/* ===== CONFIGURACIÓN RTL ===== */
+/* ===== RTL CONFIGURATION ===== */
 [dir="rtl"] {
   direction: rtl;
   text-align: right;
@@ -43,7 +43,7 @@
   margin-right: auto;
 }
 
-/* ===== SELECTOR DE IDIOMAS ===== */
+/* ===== LANGUAGE SELECTOR ===== */
 .language-selector {
   position: relative;
   margin-left: 20px;
@@ -111,7 +111,7 @@
   font-weight: 500;
 }
 
-/* ===== MENÚ DE IDIOMAS ===== */
+/* ===== LANGUAGE MENU ===== */
 .language-selector-menu {
   position: absolute;
   top: 100%;
@@ -156,7 +156,7 @@
   left: 20px;
 }
 
-/* ===== OPCIONES DE IDIOMA ===== */
+/* ===== LANGUAGE OPTIONS ===== */
 .language-option {
   display: flex;
   align-items: center;
@@ -210,7 +210,7 @@
   margin-left: 8px;
 }
 
-/* ===== ANIMACIONES ===== */
+/* ===== ANIMATIONS ===== */
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -289,7 +289,7 @@
   }
 }
 
-/* ===== TEMAS OSCUROS ===== */
+/* ===== DARK THEMES ===== */
 @media (prefers-color-scheme: dark) {
   .language-selector-toggle {
     background: rgba(0, 0, 0, 0.2);
@@ -337,7 +337,7 @@
   }
 }
 
-/* ===== ACCESIBILIDAD ===== */
+/* ===== ACCESSIBILITY ===== */
 .language-selector-toggle:focus-visible {
   outline: 2px solid #007bff;
   outline-offset: 2px;
@@ -366,7 +366,7 @@
   }
 }
 
-/* ===== ESTILOS PARA ELEMENTOS TRADUCIDOS ===== */
+/* ===== STYLES FOR TRANSLATED ELEMENTS ===== */
 [data-i18n] {
   transition: opacity 0.3s ease;
 }
@@ -379,7 +379,7 @@
   opacity: 1;
 }
 
-/* ===== INDICADOR DE IDIOMA ACTUAL ===== */
+/* ===== CURRENT LANGUAGE INDICATOR ===== */
 .language-indicator {
   display: inline-flex;
   align-items: center;

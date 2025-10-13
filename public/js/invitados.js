@@ -329,23 +329,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (misMensajes.length > 0) {
           mensajesDiv.innerHTML = `
             <h4><i class="fas fa-comments"></i> Mis mensajes enviados</h4>
-            <div class="mensajes-grid">
+            <div class="messages-grid">
               ${misMensajes.map(m => `
-                <div class="mensaje-card">
-                  <div class="mensaje-header">
-                    <span class="mensaje-autor">${m.nombre}</span>
-                    <span class="mensaje-fecha">${new Date(m.fecha).toLocaleDateString('es-ES')}</span>
+                <div class="message-block">
+                  <div class="message-header">
+                    <span class="message-author">${m.nombre}</span>
+                    <span class="message-date">${new Date(m.fecha).toLocaleDateString('es-ES')}</span>
                   </div>
-                  <div class="mensaje-contenido">${m.mensaje}</div>
+                  <div class="message-content">${m.mensaje}</div>
                 </div>
               `).join('')}
             </div>
           `;
         } else {
-          mensajesDiv.innerHTML = '<p class="no-mensajes">Aún no has enviado ningún mensaje. Haz clic en el botón de arriba para enviar tu primer mensaje.</p>';
+          mensajesDiv.innerHTML = '<p class="no-messages">Aún no has enviado ningún mensaje. Haz clic en el botón de arriba para enviar tu primer mensaje.</p>';
         }
       } else {
-        mensajesDiv.innerHTML = '<p class="no-mensajes">Aún no hay mensajes. ¡Sé el primero en dejar uno!</p>';
+        mensajesDiv.innerHTML = '<p class="no-messages">Aún no hay mensajes. ¡Sé el primero en dejar uno!</p>';
       }
     } catch (err) {
       document.getElementById('mensajesContent').innerHTML = '<p class="error">Error de conexión al cargar los mensajes.</p>';
@@ -603,7 +603,7 @@ document.addEventListener('DOMContentLoaded', async () => {
          // Mostrar aviso de bloqueo si la agenda está bloqueada
          if (agendaBloqueada) {
            agendaHTML += `
-             <div class="agenda-bloqueada-warning">
+             <div class="agenda-blocked-warning">
                <div class="warning-content">
                  <i class="fas fa-lock"></i>
                  <h3>Agenda Bloqueada</h3>
@@ -663,12 +663,12 @@ document.addEventListener('DOMContentLoaded', async () => {
          
          Object.keys(eventosPorDia).forEach(dia => {
            agendaHTML += `
-             <div class="agenda-dia">
-               <h3 class="dia-titulo">
+             <div class="agenda-day">
+               <h3 class="day-title">
                  <i class="fas fa-calendar-day"></i>
                  ${dia}
                </h3>
-               <div class="eventos-del-dia">
+               <div class="day-events">
            `;
            
            eventosPorDia[dia].forEach(evento => {
@@ -677,11 +677,11 @@ document.addEventListener('DOMContentLoaded', async () => {
              const statusClass = confirmado ? 'status-confirmado' : 'status-no-confirmado';
              
              agendaHTML += `
-               <div class="evento-item">
-                 <div class="evento-info">
-                   <h4 class="evento-titulo">${evento.titulo}</h4>
-                   <p class="evento-descripcion">${evento.descripcion}</p>
-                   <p class="evento-hora">
+               <div class="event-item">
+                 <div class="agenda-event-info">
+                   <h4 class="agenda-event-title">${evento.titulo}</h4>
+                   <p class="agenda-event-description">${evento.descripcion}</p>
+                   <p class="agenda-event-time">
                      <i class="fas fa-clock"></i>
                      ${new Date(evento.fecha).toLocaleTimeString('es-ES', { 
                        hour: '2-digit', 
@@ -767,19 +767,19 @@ document.addEventListener('DOMContentLoaded', async () => {
        if (regalosRes.ok) {
          const userEmail = localStorage.getItem('email');
          
-         let regalosHTML = '<div class="regalos-grid">';
+         let regalosHTML = '<div class="gift-grid">';
          
          regalos.forEach(regalo => {
            const esMio = regalo.reservadoPor === userEmail;
            const estaReservado = regalo.reservadoPor && regalo.reservadoPor !== userEmail;
            
            regalosHTML += `
-             <div class="regalo-card ${esMio ? 'reservado-por-mi' : ''}">
-               <div class="regalo-info">
+             <div class="gift-card ${esMio ? 'reservado-por-mi' : ''}">
+               <div class="gift-info">
                  <h4>${regalo.nombre}</h4>
                  <p>${regalo.descripcion}</p>
                  ${regalo.enlace ? `
-                   <a href="${regalo.enlace}" target="_blank" class="regalo-enlace">
+                   <a href="${regalo.enlace}" target="_blank" class="gift-link">
                      <i class="fas fa-external-link-alt"></i>
                      Ver en tienda
                    </a>

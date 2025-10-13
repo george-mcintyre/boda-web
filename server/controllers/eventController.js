@@ -13,10 +13,10 @@ async function listAgenda(req, res, next) {
   }
 }
 
-// ===== Simple file-backed Eventos API (used by admin UI) =====
+// ===== Simple file-backed Events API (used by admin UI) =====
 const DATA_DIR = path.join(__dirname, '..', 'data');
-const EVENTOS_FILE = path.join(DATA_DIR, 'eventos.json');
-const EVENTOS_EXAMPLE = path.join(DATA_DIR, 'eventos.example.json');
+const EVENTOS_FILE = path.join(DATA_DIR, 'events.json');
+const EVENTOS_EXAMPLE = path.join(DATA_DIR, 'events.example.json');
 
 function ensureDataFile() {
   if (!fs.existsSync(DATA_DIR)) {

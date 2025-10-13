@@ -135,14 +135,14 @@ document.addEventListener('DOMContentLoaded', async () => {
               const resumenTab = document.getElementById('resumen-tab');
               if (resumenTab) {
                 resumenTab.innerHTML = `
-                  <div class="agenda-bloqueada-container">
-                    <div class="agenda-bloqueada-content">
-                      <div class="agenda-bloqueada-icon">
+                  <div class="agenda-blocked-container">
+                    <div class="agenda-blocked-content">
+                      <div class="agenda-blocked-icon">
                         <i class="fas fa-lock"></i>
                       </div>
                       <h2>Bloqueado temporalmente</h2>
                       <p>El resumen está bloqueado mientras la Agenda de Eventos permanezca bloqueada.</p>
-                      <div class="agenda-bloqueada-info">
+                      <div class="agenda-blocked-info">
                         <p><i class=\"fas fa-info-circle\"></i> Vuelve más tarde cuando la agenda esté disponible.</p>
                       </div>
                     </div>
@@ -155,14 +155,14 @@ document.addEventListener('DOMContentLoaded', async () => {
               const efectivoTab = document.getElementById('efectivo-tab');
               if (efectivoTab) {
                 efectivoTab.innerHTML = `
-                  <div class="agenda-bloqueada-container">
-                    <div class="agenda-bloqueada-content">
-                      <div class="agenda-bloqueada-icon">
+                  <div class="agenda-blocked-container">
+                    <div class="agenda-blocked-content">
+                      <div class="agenda-blocked-icon">
                         <i class="fas fa-lock"></i>
                       </div>
                       <h2>Regalos en Efectivo Bloqueados</h2>
                       <p>Los regalos en efectivo están bloqueados temporalmente por los organizadores.</p>
-                      <div class="agenda-bloqueada-info">
+                      <div class="agenda-blocked-info">
                         <p><i class=\"fas fa-info-circle\"></i> Vuelve más tarde cuando los regalos estén disponibles.</p>
                       </div>
                     </div>
@@ -216,14 +216,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           const resumenTab = document.getElementById('resumen-tab');
           if (resumenTab) {
             resumenTab.innerHTML = `
-              <div class="agenda-bloqueada-container">
-                <div class="agenda-bloqueada-content">
-                  <div class="agenda-bloqueada-icon">
+              <div class="agenda-blocked-container">
+                <div class="agenda-blocked-content">
+                  <div class="agenda-blocked-icon">
                     <i class="fas fa-lock"></i>
                   </div>
                   <h2>Bloqueado temporalmente</h2>
                   <p>El resumen está bloqueado mientras la Agenda de Eventos permanezca bloqueada.</p>
-                  <div class="agenda-bloqueada-info">
+                  <div class="agenda-blocked-info">
                     <p><i class=\"fas fa-info-circle\"></i> Vuelve más tarde cuando la agenda esté disponible.</p>
                   </div>
                 </div>
@@ -265,14 +265,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Si la agenda está bloqueada, mostrar mensaje de bloqueo
       if (agendaBloqueada) {
         regalosContent.innerHTML = `
-          <div class="agenda-bloqueada-container">
-            <div class="agenda-bloqueada-content">
-              <div class="agenda-bloqueada-icon">
+          <div class="agenda-blocked-container">
+            <div class="agenda-blocked-content">
+              <div class="agenda-blocked-icon">
                 <i class="fas fa-lock"></i>
               </div>
               <h2>Bloqueado temporalmente</h2>
               <p>La lista de regalos está actualmente bloqueada y no está disponible para modificaciones.</p>
-              <div class="agenda-bloqueada-info">
+              <div class="agenda-blocked-info">
                 <p><i class="fas fa-info-circle"></i> Intenta acceder más tarde cuando la lista esté disponible.</p>
               </div>
             </div>
@@ -294,37 +294,37 @@ document.addEventListener('DOMContentLoaded', async () => {
         regalosContent.innerHTML = `
           <div class="regalos-container">
             <div class="regalos-content">
-              <div class="regalos-grid">
+              <div class="gift-grid">
                 ${regalos.map(regalo => {
                   let estado;
                   if (regalo.reservadoPor) {
                     if (regalo.reservadoPor === userEmail) {
                       // Regalo reservado por el usuario actual - mostrar botón de cancelar
-                      estado = `<button class="btn-cancelar-reserva" data-id="${regalo.id}">
+                      estado = `<button class="btn-cancel-reservation" data-id="${regalo.id}">
                         <i class="fas fa-times"></i>
                         Cancelar reserva
                       </button>`;
                     } else {
                       // Regalo reservado por otro usuario
-                      estado = `<span class="estado-reservado">
+                      estado = `<span class="reserved-state">
                         <i class="fas fa-gift"></i>
                         Reservado por ${regalo.reservadoPor}
                       </span>`;
                     }
                   } else {
                     // Regalo disponible
-                    estado = `<button class="btn-reservar" data-id="${regalo.id}">
+                    estado = `<button class="btn-reservation" data-id="${regalo.id}">
                       <i class="fas fa-heart"></i>
                       Reservar
                     </button>`;
                   }
                   
                   return `
-                    <div class="regalo-card ${regalo.reservadoPor === userEmail ? 'reservado-por-mi' : ''}">
-                      <div class="regalo-info">
+                    <div class="gift-card ${regalo.reservadoPor === userEmail ? 'reservado-por-mi' : ''}">
+                      <div class="gift-info">
                         <h4>${regalo.nombre}</h4>
                         <p>${regalo.descripcion}</p>
-                        ${regalo.enlace ? `<a href="${regalo.enlace}" target="_blank" class="regalo-enlace">
+                        ${regalo.enlace ? `<a href="${regalo.enlace}" target="_blank" class="gift-link">
                           <i class="fas fa-external-link-alt"></i>
                           Ver/Comprar
                         </a>` : ''}
@@ -341,10 +341,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
         
         // Añadir listeners a los botones de reservar
-        document.querySelectorAll('.btn-reservar').forEach(btn => {
+        document.querySelectorAll('.btn-reservation').forEach(btn => {
           btn.addEventListener('click', async (e) => {
             const id = parseInt(btn.getAttribute('data-id'));
-            const regaloCard = btn.closest('.regalo-card');
+            const regaloCard = btn.closest('.gift-card');
             const regaloNombre = regaloCard.querySelector('h4').textContent;
             
             // Mostrar confirmación inmediata visual
@@ -394,10 +394,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         // Añadir listeners a los botones de cancelar reserva
-        document.querySelectorAll('.btn-cancelar-reserva').forEach(btn => {
+        document.querySelectorAll('.btn-cancel-reservation').forEach(btn => {
           btn.addEventListener('click', async (e) => {
             const id = parseInt(btn.getAttribute('data-id'));
-            const regaloCard = btn.closest('.regalo-card');
+            const regaloCard = btn.closest('.gift-card');
             const regaloNombre = regaloCard.querySelector('h4').textContent;
             
             // Mostrar diálogo de confirmación
@@ -458,7 +458,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           });
         });
       } else {
-        regalosContent.innerHTML = '<p class="no-regalos">No hay regalos disponibles en este momento.</p>';
+        regalosContent.innerHTML = '<p class="no-gifts">No hay regalos disponibles en este momento.</p>';
       }
     } catch (err) {
       console.error('Error loading gifts:', err);
@@ -480,14 +480,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Si la agenda está bloqueada, mostrar mensaje de bloqueo
       if (agendaBloqueada) {
         efectivoContent.innerHTML = `
-          <div class="agenda-bloqueada-container">
-            <div class="agenda-bloqueada-content">
-              <div class="agenda-bloqueada-icon">
+          <div class="agenda-blocked-container">
+            <div class="agenda-blocked-content">
+              <div class="agenda-blocked-icon">
                 <i class="fas fa-lock"></i>
               </div>
               <h2>Regalos en Efectivo Bloqueados</h2>
               <p>Los regalos en efectivo están actualmente bloqueados y no están disponibles.</p>
-              <div class="agenda-bloqueada-info">
+              <div class="agenda-blocked-info">
                 <p><i class="fas fa-info-circle"></i> Intenta acceder más tarde cuando los regalos estén disponibles.</p>
               </div>
             </div>
@@ -519,14 +519,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Si la agenda está bloqueada, mostrar mensaje de bloqueo
       if (agendaBloqueada) {
         agendaContent.innerHTML = `
-          <div class="agenda-bloqueada-container">
-            <div class="agenda-bloqueada-content">
-              <div class="agenda-bloqueada-icon">
+          <div class="agenda-blocked-container">
+            <div class="agenda-blocked-content">
+              <div class="agenda-blocked-icon">
                 <i class="fas fa-lock"></i>
               </div>
               <h2>Bloqueado temporalmente</h2>
               <p>La agenda de eventos está actualmente bloqueada y no está disponible para modificaciones.</p>
-              <div class="agenda-bloqueada-info">
+              <div class="agenda-blocked-info">
                 <p><i class="fas fa-info-circle"></i> Intenta acceder más tarde cuando la agenda esté disponible.</p>
               </div>
             </div>
@@ -556,7 +556,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${eventosData.eventos.map(evento => {
                   const confirmado = confirmacionesData.confirmaciones && confirmacionesData.confirmaciones[evento.id];
                   const estadoTexto = confirmado ? 'Confirmado' : 'No confirmado';
-                  const estadoClase = confirmado ? 'estado-confirmado' : 'estado-cancelado';
+                  const estadoClase = confirmado ? 'state-confirmed' : 'state-cancelled';
                   const estadoIcono = confirmado ? 'fa-check-circle' : 'fa-times-circle';
                   
                   // Mostrar botones según el estado de bloqueo
@@ -597,13 +597,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <p>${evento.descripcion}</p>
                       </div>
                       <div class="evento-accion">
-                        <div class="evento-estado">
+                        <div class="event-state">
                           <span class="${estadoClase}">
                             <i class="fas ${estadoIcono}"></i>
                             ${estadoTexto}
                           </span>
                         </div>
-                        <div class="evento-botones">
+                        <div class="event-buttons">
                           ${botonHTML}
                         </div>
                       </div>
@@ -672,14 +672,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Si la agenda está bloqueada, mostrar mensaje de bloqueo
       if (agendaBloqueada) {
         menuContent.innerHTML = `
-          <div class="agenda-bloqueada-container">
-            <div class="agenda-bloqueada-content">
-              <div class="agenda-bloqueada-icon">
+          <div class="agenda-blocked-container">
+            <div class="agenda-blocked-content">
+              <div class="agenda-blocked-icon">
                 <i class="fas fa-lock"></i>
               </div>
               <h2>Bloqueado temporalmente</h2>
               <p>La selección de menú está actualmente bloqueada y no está disponible para modificaciones.</p>
-              <div class="agenda-bloqueada-info">
+              <div class="agenda-blocked-info">
                 <p><i class="fas fa-info-circle"></i> Intenta acceder más tarde cuando la selección esté disponible.</p>
               </div>
             </div>
@@ -861,14 +861,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Si la agenda está bloqueada, mostrar mensaje de bloqueo
       if (agendaBloqueada) {
         menuStatusContent.innerHTML = `
-          <div class="agenda-bloqueada-container">
-            <div class="agenda-bloqueada-content">
-              <div class="agenda-bloqueada-icon">
+          <div class="agenda-blocked-container">
+            <div class="agenda-blocked-content">
+              <div class="agenda-blocked-icon">
                 <i class="fas fa-lock"></i>
               </div>
               <h2>Bloqueado temporalmente</h2>
               <p>La información del menú está actualmente bloqueada y no está disponible.</p>
-              <div class="agenda-bloqueada-info">
+              <div class="agenda-blocked-info">
                 <p><i class="fas fa-info-circle"></i> Intenta acceder más tarde cuando la información esté disponible.</p>
               </div>
             </div>
@@ -938,14 +938,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Si la agenda está bloqueada, mostrar mensaje de bloqueo
       if (agendaBloqueada) {
         agendaStatusContent.innerHTML = `
-          <div class="agenda-bloqueada-container">
-            <div class="agenda-bloqueada-content">
-              <div class="agenda-bloqueada-icon">
+          <div class="agenda-blocked-container">
+            <div class="agenda-blocked-content">
+              <div class="agenda-blocked-icon">
                 <i class="fas fa-lock"></i>
               </div>
               <h2>Bloqueado temporalmente</h2>
               <p>La información de la agenda está actualmente bloqueada y no está disponible.</p>
-              <div class="agenda-bloqueada-info">
+              <div class="agenda-blocked-info">
                 <p><i class="fas fa-info-circle"></i> Intenta acceder más tarde cuando la información esté disponible.</p>
               </div>
             </div>
@@ -1046,14 +1046,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Si la agenda está bloqueada, mostrar mensaje de bloqueo
       if (agendaBloqueada) {
         regalosStatusContent.innerHTML = `
-          <div class="agenda-bloqueada-container">
-            <div class="agenda-bloqueada-content">
-              <div class="agenda-bloqueada-icon">
+          <div class="agenda-blocked-container">
+            <div class="agenda-blocked-content">
+              <div class="agenda-blocked-icon">
                 <i class="fas fa-lock"></i>
               </div>
               <h2>Bloqueado temporalmente</h2>
               <p>La información de regalos está actualmente bloqueada y no está disponible.</p>
-              <div class="agenda-bloqueada-info">
+              <div class="agenda-blocked-info">
                 <p><i class="fas fa-info-circle"></i> Intenta acceder más tarde cuando la información esté disponible.</p>
               </div>
             </div>
@@ -1110,14 +1110,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Si la agenda está bloqueada, mostrar mensaje de bloqueo
       if (agendaBloqueada) {
         mensajesStatusContent.innerHTML = `
-          <div class="agenda-bloqueada-container">
-            <div class="agenda-bloqueada-content">
-              <div class="agenda-bloqueada-icon">
+          <div class="agenda-blocked-container">
+            <div class="agenda-blocked-content">
+              <div class="agenda-blocked-icon">
                 <i class="fas fa-lock"></i>
               </div>
               <h2>Bloqueado temporalmente</h2>
               <p>La información de mensajes está actualmente bloqueada y no está disponible.</p>
-              <div class="agenda-bloqueada-info">
+              <div class="agenda-blocked-info">
                 <p><i class="fas fa-info-circle"></i> Intenta acceder más tarde cuando la información esté disponible.</p>
               </div>
             </div>
@@ -1332,14 +1332,14 @@ async function cargarStatusEfectivo() {
     // Si la agenda está bloqueada, mostrar mensaje de bloqueo
     if (agendaBloqueada) {
       efectivoStatusContent.innerHTML = `
-        <div class="agenda-bloqueada-container">
-          <div class="agenda-bloqueada-content">
-            <div class="agenda-bloqueada-icon">
+        <div class="agenda-blocked-container">
+          <div class="agenda-blocked-content">
+            <div class="agenda-blocked-icon">
               <i class="fas fa-lock"></i>
             </div>
             <h2>Bloqueado temporalmente</h2>
             <p>La información de regalos en efectivo está actualmente bloqueada y no está disponible.</p>
-            <div class="agenda-bloqueada-info">
+            <div class="agenda-blocked-info">
               <p><i class="fas fa-info-circle"></i> Intenta acceder más tarde cuando la información esté disponible.</p>
             </div>
           </div>
