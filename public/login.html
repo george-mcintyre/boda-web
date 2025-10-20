@@ -3,28 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Acceso invitados - Boda</title>
+  <title data-i18n="login:pageTitle">Guest access - Wedding</title>
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
   <header>
     <div class="header-content">
-      <h1>Acceso para invitados</h1>
+      <h1 data-i18n="login:header">Guest access</h1>
       <a href="index.html" class="home-link">
         <i class="fas fa-home"></i>
-        Inicio
+        <span data-i18n="login:home">Home</span>
       </a>
     </div>
   </header>
   <main>
     <form id="loginForm" autocomplete="off">
-      <label for="email">Email:</label>
-      <input type="email" id="email" name="email" autocomplete="off" placeholder="Introduce tu email" required>
-      <button type="submit">Acceder</button>
+      <label for="email" data-i18n="login:emailLabel">Email:</label>
+      <input type="email" id="email" name="email" autocomplete="off" data-i18n-placeholder="login:emailPlaceholder" placeholder="Enter your email" required>
+      <button type="submit" data-i18n="login:submit">Continue</button>
     </form>
     <div id="loginMessage" style="margin-top:1em;"></div>
   </main>
+  <script src="js/i18n-common.js"></script>
+  <script>
+    // Translations for the login page
+    window.currentTranslations = {
+      es: {
+        'login:pageTitle': 'Acceso invitados - Boda',
+        'login:header': 'Acceso para invitados',
+        'login:home': 'Inicio',
+        'login:emailLabel': 'Email:',
+        'login:emailPlaceholder': 'Introduce tu email',
+        'login:submit': 'Acceder',
+        'login:enterEmail': 'Por favor, introduce tu email.',
+        'login:successRedirect': 'Acceso exitoso. Redirigiendo...',
+        'login:emailNotFound': 'Email no encontrado en la lista de invitados',
+        'login:serverError': 'Error de conexión con el servidor'
+      },
+      en: {
+        'login:pageTitle': 'Guest access - Wedding',
+        'login:header': 'Guest access',
+        'login:home': 'Home',
+        'login:emailLabel': 'Email:',
+        'login:emailPlaceholder': 'Enter your email',
+        'login:submit': 'Continue',
+        'login:enterEmail': 'Please enter your email.',
+        'login:successRedirect': 'Login successful. Redirecting...',
+        'login:emailNotFound': 'Email not found in the guest list',
+        'login:serverError': 'Server connection error'
+      }
+    };
+
+    // Initialize i18n for this page; respects language stored from home page
+    window.i18n = initI18n(window.currentTranslations);
+  </script>
   <script src="js/login.js"></script>
 </body>
-</html> 
+</html>

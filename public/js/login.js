@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const messageDiv = document.getElementById('loginMessage');
   const emailInput = document.getElementById('email');
 
-  // Limpiar campo al cargar la página
+  // Clear field on page load
   emailInput.value = '';
 
   function showMessage(msg, type = 'error') {
@@ -25,17 +25,17 @@ document.addEventListener('DOMContentLoaded', () => {
     messageDiv.style.borderRadius = '';
   }
 
-  // Limpiar mensaje al escribir
+  // Clear message on typing
   emailInput.addEventListener('input', clearMessage);
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = form.email.value.trim();
     
-    // Validación visual de campo vacío
+    // Empty field visual validation
     if (!email) {
       emailInput.style.borderColor = '#a00';
-      showMessage('Por favor, introduce tu email.', 'error');
+      showMessage(window.translate('login:enterEmail'), 'error');
       return;
     } else {
       emailInput.style.borderColor = '';
@@ -49,19 +49,19 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       const data = await response.json();
       if (response.ok) {
-        // Guardar el token y datos en localStorage
+        // Save token and data in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('nombre', data.nombre);
         localStorage.setItem('email', data.email);
-        showMessage('Acceso exitoso. Redirigiendo...', 'success');
+        showMessage(window.translate('login:successRedirect'), 'success');
         setTimeout(() => {
           window.location.href = 'guests.html';
         }, 800);
       } else {
-        showMessage(data.error || 'Email no encontrado en la lista de invitados', 'error');
+        showMessage(data.error || window.translate('login:emailNotFound'), 'error');
       }
     } catch (err) {
-      showMessage('Error de conexión con el servidor', 'error');
+      showMessage(window.translate('login:serverError'), 'error');
     }
   });
-}); 
+});
