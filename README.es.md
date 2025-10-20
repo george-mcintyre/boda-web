@@ -1,5 +1,3 @@
-
-
 # Boda Web · George & Iluminada
 
 ## Inicio rápido (local)
