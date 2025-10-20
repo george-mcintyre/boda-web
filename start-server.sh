@@ -92,12 +92,17 @@ if [ "${OS_NAME}" = "Darwin" ]; then
   fi
 fi
 
-echo "Installing dependencies..."
-# Prefer using npm ci when lockfile is in sync; fallback to npm install
-if [ -f package-lock.json ]; then
-  npm ci || npm install --no-audit --no-fund
+# Install dependencies only if needed
+if [ -d node_modules ]; then
+  echo "[INFO] Dependencies already installed. Skipping npm install."
 else
-  npm install --no-audit --no-fund
+  echo "Installing dependencies..."
+  # Prefer using npm ci when lockfile is in sync; fallback to npm install
+  if [ -f package-lock.json ]; then
+    npm ci || npm install --no-audit --no-fund
+  else
+    npm install --no-audit --no-fund
+  fi
 fi
 
 echo "Starting server..."

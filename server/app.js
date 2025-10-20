@@ -61,6 +61,17 @@ app.get('/favicon.ico', (req, res) => {
 });
 
 app.use(express.static(path.join(__dirname, '../public')));
+
+// Serve protected/admin views (HTML) from server/views
+const viewsDir = path.join(__dirname, 'views');
+app.get(['/admin.html', '/admin'], (req, res) => {
+  res.sendFile(path.join(viewsDir, 'admin.html'));
+});
+app.get(['/admin-login.html', '/admin-login'], (req, res) => {
+  const loginPath = path.join(viewsDir, 'admin-login.html');
+  res.sendFile(loginPath);
+});
+
 app.use(routes);
 app.use(errorHandler);
 
