@@ -2,6 +2,14 @@
 
 # Wedding Web · George & Iluminada
 
+## Quick Start (local)
+- Requirements: Node 18+, Docker (optional, for local MongoDB), or a MongoDB URI (Atlas/local)
+- 1) Copy env template: cp env-vercel.example .env and edit as needed (at least MONGODB_URI, JWT_SECRET). Defaults work for local mongodb://127.0.0.1:27017
+- 2) Install deps: npm install
+- 3) Start: npm start (serves http://localhost:3000)
+- 4) Visit: http://localhost:3000/index.html → Login → invitados.html
+- Optional: use ./start-server.sh (macOS/Linux) or start-server.bat/ps1 (Windows)
+
 Quick index:
 - Overview and features
 - Project structure
@@ -18,7 +26,7 @@ Quick index:
 ## ✨ Overview
 - Guests: login by email, guest profile, menu selection, messages, gift list.
 - Admin: manage guests and other entities (extensible), JWT authentication.
-- Modular backend with Express + MongoDB (Mongoose) and JWT. JSON files replaced by a database.
+- Modular backend with Express + MongoDB (Mongoose) and JWT.
 
 ## 📁 Project structure (current)
 ```

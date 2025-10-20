@@ -1,6 +1,14 @@
 
 
-# Boda Web · Iluminada & George
+# Boda Web · George & Iluminada
+
+## Inicio rápido (local)
+- Requisitos: Node 18+, Docker (opcional, para MongoDB local), o un URI de MongoDB (Atlas/local)
+- 1) Copiar plantilla de env: cp env-vercel.example .env y edítelo según sea necesario (al menos MONGODB_URI, JWT_SECRET). Los valores por defecto funcionan en local con mongodb://127.0.0.1:27017
+- 2) Instalar dependencias: npm install
+- 3) Iniciar: npm start (sirve http://localhost:3000)
+- 4) Visitar: http://localhost:3000/index.html → Login → invitados.html
+- Opcional: use ./start-server.sh (macOS/Linux) o start-server.bat/ps1 (Windows)
 
 Índice rápido:
 - Visión general y características
@@ -18,7 +26,7 @@
 ## ✨ Visión general
 - Invitados: login por email, perfil del invitado, selección de menú, mensajes, lista de regalos.
 - Administración: gestión de invitados y demás entidades (extensible), autenticación JWT.
-- Backend modular con Express + MongoDB (Mongoose) y JWT. Archivos JSON reemplazados por base de datos.
+- Backend modular con Express + MongoDB (Mongoose) y JWT.
 
 ## 📁 Estructura del proyecto (actual)
 ```
@@ -39,7 +47,7 @@ boda-web/
 │  └─ docker-compose.yml  # MongoDB local
 ├─ start-server.sh | start-server.bat | start-server.ps1
 ├─ env-vercel.example
-└─ README.md (este archivo)
+└─ README.es.md (este archivo)
 ```
 
 ## 🚀 Configuración y arranque
