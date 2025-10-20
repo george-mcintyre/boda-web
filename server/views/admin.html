@@ -3,68 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Administración - Boda de Iluminada & George</title>
+    <title data-i18n="admin:pageTitle">Panel de Administración - Boda de Iluminada & George</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
   <header>
     <div class="header-content">
-      <h1>Panel de Administración</h1>
+      <h1 data-i18n="admin:title">Panel de Administración</h1>
       <a href="index.html" class="home-link">
         <i class="fas fa-home"></i>
-        Inicio
+        <span data-i18n="admin:home">Inicio</span>
       </a>
     </div>
   </header>
 
   <main>
-    <!-- Panel de Administración -->
+    <!-- Admin Panel -->
     <section id="adminPanelSection">
       <div class="admin-header">
         <button id="logoutAdmin" class="admin-action">
           <i class="fas fa-sign-out-alt"></i>
-          Cerrar sesión
+          <span data-i18n="admin:logout">Cerrar sesión</span>
         </button>
         <div class="admin-welcome">
-          <h2><i class="fas fa-user-shield"></i> Bienvenido, Administrador</h2>
-          <p>Gestiona toda la información de la boda de Iluminada y George</p>
+          <h2><i class="fas fa-user-shield"></i> <span data-i18n="admin:welcomeTitle">Bienvenido, Administrador</span></h2>
+          <p data-i18n="admin:welcomeDesc">Gestiona toda la información de la boda de Iluminada y George</p>
         </div>
       </div>
       
       <div class="button-grid">
         <button class="adminTab active" data-tab="invitados">
           <i class="fas fa-users"></i>
-          Invitados
+          <span data-i18n="admin:tab.guests">Invitados</span>
         </button>
 
         <button class="adminTab" data-tab="regalos">
           <i class="fas fa-gift"></i>
-          Lista de Regalos
+          <span data-i18n="admin:tab.gifts">Lista de Regalos</span>
         </button>
         <button class="adminTab" data-tab="mensajes">
           <i class="fas fa-comments"></i>
-          Mensajes
+          <span data-i18n="admin:tab.messages">Mensajes</span>
         </button>
         <button class="adminTab" data-tab="agenda">
           <i class="fas fa-calendar-alt"></i>
-          Agenda de Eventos
+          <span data-i18n="admin:tab.events">Agenda de Eventos</span>
         </button>
         <button class="adminTab" data-tab="menu">
           <i class="fas fa-utensils"></i>
-          Gestión de Menús
+          <span data-i18n="admin:tab.menus">Gestión de Menús</span>
         </button>
         <button class="adminTab" data-tab="configuracion">
           <i class="fas fa-cog"></i>
-          Configuración
+          <span data-i18n="admin:tab.settings">Configuración</span>
         </button>
       </div>
 
       <div id="adminContent">
-        <!-- El contenido se cargará dinámicamente aquí -->
+        <!-- Content will load dynamically here -->
         <div class="admin-loading">
           <i class="fas fa-spinner fa-spin"></i>
-          <p>Cargando panel de administración...</p>
+          <p data-i18n="admin:loading">Cargando panel de administración...</p>
         </div>
       </div>
     </section>
@@ -73,28 +73,71 @@
   <footer>
     <div class="footer-content">
       <p>&copy; 2026 Boda de Iluminada & George</p>
-      <p>Panel de administración</p>
+      <p data-i18n="admin:footer">Panel de administración</p>
     </div>
   </footer>
 
+  <!-- i18n common system -->
+  <script src="/js/i18n-common.js"></script>
   <script>
-    // Verificar autenticación al cargar la página
+    // Translations for the admin page
+    window.currentTranslations = {
+      es: {
+        'admin:pageTitle': 'Panel de Administración - Boda de Iluminada & George',
+        'admin:title': 'Panel de Administración',
+        'admin:home': 'Inicio',
+        'admin:logout': 'Cerrar sesión',
+        'admin:welcomeTitle': 'Bienvenido, Administrador',
+        'admin:welcomeDesc': 'Gestiona toda la información de la boda de Iluminada y George',
+        'admin:tab.guests': 'Invitados',
+        'admin:tab.gifts': 'Lista de Regalos',
+        'admin:tab.messages': 'Mensajes',
+        'admin:tab.events': 'Agenda de Eventos',
+        'admin:tab.menus': 'Gestión de Menús',
+        'admin:tab.settings': 'Configuración',
+        'admin:loading': 'Cargando panel de administración...',
+        'admin:footer': 'Panel de administración'
+      },
+      en: {
+        'admin:pageTitle': 'Admin Panel - Wedding of Iluminada & George',
+        'admin:title': 'Admin Panel',
+        'admin:home': 'Home',
+        'admin:logout': 'Log out',
+        'admin:welcomeTitle': 'Welcome, Administrator',
+        'admin:welcomeDesc': 'Manage all wedding information for Iluminada and George',
+        'admin:tab.guests': 'Guests',
+        'admin:tab.gifts': 'Gift List',
+        'admin:tab.messages': 'Messages',
+        'admin:tab.events': 'Event Schedule',
+        'admin:tab.menus': 'Menu Management',
+        'admin:tab.settings': 'Settings',
+        'admin:loading': 'Loading admin panel...',
+        'admin:footer': 'Admin panel'
+      }
+    };
+
+    // Initialize i18n and apply saved language
+    window.i18n = initI18n(window.currentTranslations);
+  </script>
+
+  <script>
+    // Verify authentication on page load
     document.addEventListener('DOMContentLoaded', () => {
       const adminToken = localStorage.getItem('adminToken');
       if (!adminToken) {
-        // Si no hay token, redirigir al login
+        // If no token, redirect to login
         window.location.href = 'admin-login.html';
         return;
       }
       
-      // Si hay token, cargar el script de admin simplificado
+      // If token exists, load simplified admin script
       const script = document.createElement('script');
       script.src = 'js/admin-simple.js';
       script.onload = () => {
-        console.log('Script de admin simplificado cargado correctamente');
+        console.log('Admin simplified script loaded correctly');
       };
       document.body.appendChild(script);
     });
   </script>
 </body>
-</html> 
+</html>

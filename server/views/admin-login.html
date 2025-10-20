@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Administrador - Boda de Iluminada & George</title>
+    <title data-i18n="adminLogin:pageTitle">Acceso Administrador - Boda de Iluminada & George</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <header>
         <div class="header-content">
-            <h1>Acceso Administrador</h1>
+            <h1 data-i18n="adminLogin:header">Acceso Administrador</h1>
             <a href="index.html" class="home-link">
                 <i class="fas fa-home"></i>
-                Inicio
+                <span data-i18n="adminLogin:home">Inicio</span>
             </a>
         </div>
     </header>
@@ -22,27 +22,27 @@
             <div class="admin-login-icon">
                 <i class="fas fa-cog"></i>
             </div>
-            <h2>Acceso al Panel de Administrador</h2>
-            <p class="admin-login-description">
+            <h2 data-i18n="adminLogin:subHeader">Acceso al Panel de Administrador</h2>
+            <p class="admin-login-description" data-i18n="adminLogin:description">
                 Introduce tus credenciales para gestionar los detalles de la boda y las confirmaciones de asistencia.
             </p>
 
             <form id="adminLoginForm" class="admin-login-form">
                 <div class="form-group">
-                    <label for="username"><i class="fas fa-user-shield"></i> Usuario</label>
-                    <input type="text" id="username" name="username" placeholder="Tu nombre de usuario" required>
+                    <label for="username"><i class="fas fa-user-shield"></i> <span data-i18n="adminLogin:username">Usuario</span></label>
+                    <input type="text" id="username" name="username" data-i18n-placeholder="adminLogin:usernamePlaceholder" placeholder="Tu nombre de usuario" required>
                 </div>
                 <div class="form-group">
-                    <label for="password"><i class="fas fa-lock"></i> Contraseña</label>
+                    <label for="password"><i class="fas fa-lock"></i> <span data-i18n="adminLogin:password">Contraseña</span></label>
                     <div class="password-input-container">
-                        <input type="password" id="password" name="password" placeholder="Tu contraseña secreta" required>
+                        <input type="password" id="password" name="password" data-i18n-placeholder="adminLogin:passwordPlaceholder" placeholder="Tu contraseña secreta" required>
                         <button type="button" class="password-toggle" id="togglePassword">
                             <i class="fas fa-eye-slash"></i>
                         </button>
                     </div>
                 </div>
                 <button type="submit" class="admin-login-btn">
-                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                    <i class="fas fa-sign-in-alt"></i> <span data-i18n="adminLogin:submit">Iniciar Sesión</span>
                 </button>
             </form>
 
@@ -54,6 +54,40 @@
         </div>
     </main>
     
+    <!-- i18n common system -->
+    <script src="/js/i18n-common.js"></script>
+    <script>
+      window.currentTranslations = {
+        es: {
+          'adminLogin:pageTitle': 'Acceso Administrador - Boda de Iluminada & George',
+          'adminLogin:header': 'Acceso Administrador',
+          'adminLogin:home': 'Inicio',
+          'adminLogin:subHeader': 'Acceso al Panel de Administrador',
+          'adminLogin:description': 'Introduce tus credenciales para gestionar los detalles de la boda y las confirmaciones de asistencia.',
+          'adminLogin:username': 'Usuario',
+          'adminLogin:usernamePlaceholder': 'Tu nombre de usuario',
+          'adminLogin:password': 'Contraseña',
+          'adminLogin:passwordPlaceholder': 'Tu contraseña secreta',
+          'adminLogin:submit': 'Iniciar Sesión'
+        },
+        en: {
+          'adminLogin:pageTitle': 'Admin Login - Wedding of Iluminada & George',
+          'adminLogin:header': 'Admin Login',
+          'adminLogin:home': 'Home',
+          'adminLogin:subHeader': 'Access the Admin Panel',
+          'adminLogin:description': 'Enter your credentials to manage wedding details and RSVPs.',
+          'adminLogin:username': 'Username',
+          'adminLogin:usernamePlaceholder': 'Your username',
+          'adminLogin:password': 'Password',
+          'adminLogin:passwordPlaceholder': 'Your secret password',
+          'adminLogin:submit': 'Sign in'
+        }
+      };
+
+      // Initialize i18n
+      window.i18n = initI18n(window.currentTranslations);
+    </script>
+
     <script>
         const togglePassword = document.getElementById('togglePassword');
         const password = document.getElementById('password');
