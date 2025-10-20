@@ -7,7 +7,7 @@
 - 1) Copiar plantilla de env: cp env-vercel.example .env y edítelo según sea necesario (al menos MONGODB_URI, JWT_SECRET). Los valores por defecto funcionan en local con mongodb://127.0.0.1:27017
 - 2) Instalar dependencias: npm install
 - 3) Iniciar: npm start (sirve http://localhost:3000)
-- 4) Visitar: http://localhost:3000/index.html → Login → invitados.html
+- 4) Visitar: http://localhost:3000/index.html → Login → guests.html
 - Opcional: use ./start-server.sh (macOS/Linux) o start-server.bat/ps1 (Windows)
 
 Índice rápido:

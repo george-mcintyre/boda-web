@@ -7,7 +7,7 @@
 - 1) Copy env template: cp env-vercel.example .env and edit as needed (at least MONGODB_URI, JWT_SECRET). Defaults work for local mongodb://127.0.0.1:27017
 - 2) Install deps: npm install
 - 3) Start: npm start (serves http://localhost:3000)
-- 4) Visit: http://localhost:3000/index.html → Login → invitados.html
+- 4) Visit: http://localhost:3000/index.html → Login → guests.html
 - Optional: use ./start-server.sh (macOS/Linux) or start-server.bat/ps1 (Windows)
 
 Quick index:

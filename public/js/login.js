@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('email', data.email);
         showMessage('Acceso exitoso. Redirigiendo...', 'success');
         setTimeout(() => {
-          window.location.href = 'invitados.html';
+          window.location.href = 'guests.html';
         }, 800);
       } else {
         showMessage(data.error || 'Email no encontrado en la lista de invitados', 'error');
