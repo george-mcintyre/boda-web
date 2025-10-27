@@ -33,6 +33,79 @@
     tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   }
 
+  // Reusable modal form
+  function openFormModal({ title = 'Form', submitText = 'Save', fields = [], initialValues = {}, onSubmit }){
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;`;
+    const modal = document.createElement('div');
+    modal.style.cssText = `background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.25);width:min(520px,90vw);max-height:90vh;overflow:auto;`;
+    modal.innerHTML = `
+      <div style="padding:22px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
+        <h3 style="margin:0;color:#333;">${title}</h3>
+        <button id="mfClose" class="admin-action" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:8px;">Close</button>
+      </div>
+      <form id="mfForm" style="padding:18px 24px;">
+        <div id="mfError" style="display:none;margin-bottom:10px;color:#dc3545;font-weight:600;"></div>
+        ${fields.map(f => {
+          const id = `f_${f.name}`;
+          const label = `<label for="${id}" style="display:block;margin:6px 0 6px 0;font-weight:600;color:#333;">${f.label}${f.required?' *':''}</label>`;
+          const val = initialValues[f.name] ?? f.default ?? '';
+          const baseStyle = 'width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;';
+          let inputHtml = '';
+          if (f.type === 'textarea') {
+            inputHtml = `<textarea id="${id}" name="${f.name}" rows="${f.rows||3}" style="${baseStyle}">${val!==undefined?String(val):''}</textarea>`;
+          } else if (f.type === 'select') {
+            const opts = (f.options||[]).map(opt => {
+              const v = typeof opt === 'string' ? opt : opt.value;
+              const t = typeof opt === 'string' ? opt : opt.label;
+              const sel = String(val) === String(v) ? 'selected' : '';
+              return `<option value="${v}" ${sel}>${t}</option>`;
+            }).join('');
+            inputHtml = `<select id="${id}" name="${f.name}" style="${baseStyle}">${opts}</select>`;
+          } else {
+            const type = f.type || 'text';
+            inputHtml = `<input id="${id}" name="${f.name}" type="${type}" value="${val!==undefined?String(val):''}" style="${baseStyle}">`;
+          }
+          const help = f.help ? `<small style="display:block;color:#6c757d;margin-top:4px;">${f.help}</small>` : '';
+          return `<div style="margin-bottom:14px;">${label}${inputHtml}${help}</div>`;
+        }).join('')}
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;">
+          <button type="button" id="mfCancel" class="admin-action" style="background:#6c757d;color:#fff;border:none;padding:10px 16px;border-radius:8px;">Cancel</button>
+          <button type="submit" class="admin-action" style="background:#28a745;color:#fff;border:none;padding:10px 16px;border-radius:8px;">${submitText}</button>
+        </div>
+      </form>`;
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    function close(){ document.body.removeChild(overlay); }
+    modal.querySelector('#mfClose').addEventListener('click', close);
+    modal.querySelector('#mfCancel').addEventListener('click', close);
+    modal.querySelector('#mfForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const data = {};
+      let valid = true;
+      fields.forEach(f => {
+        const el = modal.querySelector(`#f_${f.name}`);
+        let v = el ? el.value : '';
+        if (f.type === 'number') v = v === '' ? '' : Number(v);
+        if (f.required && (v === '' || v === null || v === undefined || (f.type==='number' && Number.isNaN(v)))) valid = false;
+        data[f.name] = v;
+      });
+      if (!valid){
+        const err = modal.querySelector('#mfError');
+        err.textContent = 'Please fill all required fields correctly.';
+        err.style.display = 'block';
+        return;
+      }
+      Promise.resolve(onSubmit && onSubmit(data, close)).catch(err => {
+        const ebox = modal.querySelector('#mfError');
+        ebox.textContent = err && err.message ? err.message : 'Failed to submit form';
+        ebox.style.display = 'block';
+      });
+    });
+    return { close };
+  }
+
   // Generic table renderer
   function renderTable(headers, rowsHtml, extraActionsHtml){
     return `
@@ -76,25 +149,53 @@
       tbody.addEventListener('click', async (e)=>{
         const btn = e.target.closest('button'); if(!btn) return;
         const id = btn.dataset.id; const action = btn.dataset.action;
+        const current = (data||[]).find(x => String(x._id) === String(id)) || {};
         if (action==='del'){
           if (!confirm('Delete this guest?')) return;
           const r = await api(`/api/admin/invitados/${id}`, { method:'DELETE' });
           if (r.ok) showGuests(); else notify('Error deleting', 'error');
         } else if (action==='edit'){
-          const name = prompt('Name:'); if (name===null) return;
-          const email = prompt('Email:'); if (email===null) return;
-          const status = prompt('Status (pending|confirmed|declined):','pending'); if (status===null) return;
-          const companions = parseInt(prompt('Companions:','0')||'0',10);
-          const specialMenu = prompt('Special menu:','')||'';
-          const r = await api(`/api/admin/invitados/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, email, status, companions, specialMenu })});
-          if (r.ok) showGuests(); else notify('Error updating','error');
+          openFormModal({
+            title: 'Edit guest',
+            submitText: 'Save',
+            fields: [
+              { name:'name', label:'Name', required:true },
+              { name:'email', label:'Email', type:'email', required:true },
+              { name:'status', label:'Status', type:'select', options:['pending','confirmed','declined'], required:true },
+              { name:'companions', label:'Companions', type:'number', help:'Number of additional guests' },
+              { name:'specialMenu', label:'Special menu', help:'Allergies or special request' },
+            ],
+            initialValues: {
+              name: current.name || current.nombre || '',
+              email: current.email || '',
+              status: current.status || current.estado || 'pending',
+              companions: current.companions ?? current.acompanantes ?? 0,
+              specialMenu: current.specialMenu || current.menuEspecial || ''
+            },
+            onSubmit: async (values, close) => {
+              const r = await api(`/api/admin/invitados/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+              if (!r.ok) throw new Error('Failed to update');
+              close();
+              showGuests();
+            }
+          });
         }
       });
       content.querySelector('#addGuest').addEventListener('click', async ()=>{
-        const name = prompt('Name:'); if (!name) return;
-        const email = prompt('Email:'); if (!email) return;
-        const r = await api('/api/admin/invitados', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name, email })});
-        if (r.ok) showGuests(); else notify('Error creating','error');
+        openFormModal({
+          title: 'Add guest',
+          submitText: 'Add',
+          fields: [
+            { name:'name', label:'Name', required:true },
+            { name:'email', label:'Email', type:'email', required:true }
+          ],
+          onSubmit: async (values, close) => {
+            const r = await api('/api/admin/invitados', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+            if (!r.ok) throw new Error('Failed to create');
+            close();
+            showGuests();
+          }
+        });
       });
     } catch(e){ notify(e.message,'error'); }
   }
@@ -122,27 +223,53 @@
     const tbody = content.querySelector('tbody');
     tbody.addEventListener('click', async (e)=>{
       const btn = e.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
+      const current = (data||[]).find(x => String(x.id) === String(id)) || {};
       if (action==='del'){
         if (!confirm('Delete this gift?')) return;
         const r = await api(`/api/admin/regalos/${id}`, { method:'DELETE' }); if (r.ok) showGifts(); else notify('Error','error');
       } else if (action==='edit'){
-        const nombre = prompt('Name:'); if (nombre===null) return;
-        const descripcion = prompt('Description:')||'';
-        const precio = prompt('Price:')||'';
-        const categoria = prompt('Category:')||'';
-        const url = prompt('URL:')||'';
-        const r = await api(`/api/admin/regalos/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ nombre, descripcion, precio, categoria, url })});
-        if (r.ok) showGifts(); else notify('Error','error');
+        openFormModal({
+          title: 'Edit gift', submitText: 'Save',
+          fields: [
+            { name:'nombre', label:'Name', required:true },
+            { name:'descripcion', label:'Description', type:'textarea' },
+            { name:'precio', label:'Price' },
+            { name:'categoria', label:'Category' },
+            { name:'url', label:'URL' },
+          ],
+          initialValues: {
+            nombre: current.nombre || current.name || '',
+            descripcion: current.descripcion || '',
+            precio: current.precio || '',
+            categoria: current.categoria || '',
+            url: current.url || ''
+          },
+          onSubmit: async (values, close) => {
+            const r = await api(`/api/admin/regalos/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+            if (!r.ok) throw new Error('Failed to update');
+            close();
+            showGifts();
+          }
+        });
       }
     });
     content.querySelector('#addGift').addEventListener('click', async ()=>{
-      const nombre = prompt('Name:'); if (!nombre) return;
-      const descripcion = prompt('Description:')||'';
-      const precio = prompt('Price:')||'';
-      const categoria = prompt('Category:')||'';
-      const url = prompt('URL:')||'';
-      const r = await api('/api/admin/regalos', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ nombre, descripcion, precio, categoria, url })});
-      if (r.ok) showGifts(); else notify('Error','error');
+      openFormModal({
+        title: 'Add gift', submitText: 'Add',
+        fields: [
+          { name:'nombre', label:'Name', required:true },
+          { name:'descripcion', label:'Description', type:'textarea' },
+          { name:'precio', label:'Price' },
+          { name:'categoria', label:'Category' },
+          { name:'url', label:'URL' },
+        ],
+        onSubmit: async (values, close) => {
+          const r = await api('/api/admin/regalos', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+          if (!r.ok) throw new Error('Failed to create');
+          close();
+          showGifts();
+        }
+      });
     });
   }
 
@@ -193,19 +320,53 @@
     const tbody = content.querySelector('tbody');
     tbody.addEventListener('click', async (e)=>{
       const btn = e.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
+      const current = (data||[]).find(x => String(x.id) === String(id)) || {};
       if (action==='del'){
         if (!confirm('Delete this event?')) return;
         const r = await api(`/api/admin/agenda/${id}`, { method:'DELETE' }); if (r.ok) showAgenda(); else notify('Error','error');
       } else if (action==='edit'){
-        const evento = prompt('Event:')||''; const fecha = prompt('Date:')||''; const hora = prompt('Time:')||''; const lugar = prompt('Place:')||''; const descripcion = prompt('Description:')||'';
-        const r = await api(`/api/admin/agenda/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ evento, fecha, hora, lugar, descripcion })});
-        if (r.ok) showAgenda(); else notify('Error','error');
+        openFormModal({
+          title: 'Edit event', submitText: 'Save',
+          fields: [
+            { name:'evento', label:'Event', required:true },
+            { name:'fecha', label:'Date', type:'date' },
+            { name:'hora', label:'Time', type:'time' },
+            { name:'lugar', label:'Place' },
+            { name:'descripcion', label:'Description', type:'textarea' },
+          ],
+          initialValues: {
+            evento: current.evento || current.titulo || current.nombre || '',
+            fecha: current.fecha || '',
+            hora: current.hora || '',
+            lugar: current.lugar || '',
+            descripcion: current.descripcion || ''
+          },
+          onSubmit: async (values, close) => {
+            const r = await api(`/api/admin/agenda/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+            if (!r.ok) throw new Error('Failed to update');
+            close();
+            showAgenda();
+          }
+        });
       }
     });
     content.querySelector('#addEvt').addEventListener('click', async ()=>{
-      const evento = prompt('Event:'); if (!evento) return; const fecha = prompt('Date:')||''; const hora = prompt('Time:')||''; const lugar = prompt('Place:')||''; const descripcion = prompt('Description:')||'';
-      const r = await api('/api/admin/agenda', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ evento, fecha, hora, lugar, descripcion })});
-      if (r.ok) showAgenda(); else notify('Error','error');
+      openFormModal({
+        title: 'Add event', submitText: 'Add',
+        fields: [
+          { name:'evento', label:'Event', required:true },
+          { name:'fecha', label:'Date', type:'date' },
+          { name:'hora', label:'Time', type:'time' },
+          { name:'lugar', label:'Place' },
+          { name:'descripcion', label:'Description', type:'textarea' },
+        ],
+        onSubmit: async (values, close) => {
+          const r = await api('/api/admin/agenda', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+          if (!r.ok) throw new Error('Failed to create');
+          close();
+          showAgenda();
+        }
+      });
     });
   }
 
@@ -230,19 +391,47 @@
     const tbody = content.querySelector('tbody');
     tbody.addEventListener('click', async (e)=>{
       const btn = e.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
+      const current = (data||[]).find(x => String(x.id) === String(id)) || {};
       if (action==='del'){
         if (!confirm('Delete this menu item?')) return;
         const r = await api(`/api/admin/menu/${id}`, { method:'DELETE' }); if (r.ok) showMenu(); else notify('Error','error');
       } else if (action==='edit'){
-        const nombre = prompt('Name:')||''; const descripcion = prompt('Description:')||''; const tipo = prompt('Type:')||'';
-        const r = await api(`/api/admin/menu/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ nombre, descripcion, tipo })});
-        if (r.ok) showMenu(); else notify('Error','error');
+        openFormModal({
+          title: 'Edit menu item', submitText: 'Save',
+          fields: [
+            { name:'nombre', label:'Name', required:true },
+            { name:'descripcion', label:'Description', type:'textarea' },
+            { name:'tipo', label:'Type' },
+          ],
+          initialValues: {
+            nombre: current.nombre || current.name || '',
+            descripcion: current.descripcion || '',
+            tipo: current.tipo || ''
+          },
+          onSubmit: async (values, close) => {
+            const r = await api(`/api/admin/menu/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+            if (!r.ok) throw new Error('Failed to update');
+            close();
+            showMenu();
+          }
+        });
       }
     });
     content.querySelector('#addMenu').addEventListener('click', async ()=>{
-      const nombre = prompt('Name:'); if (!nombre) return; const descripcion = prompt('Description:')||''; const tipo = prompt('Type:')||'';
-      const r = await api('/api/admin/menu', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ nombre, descripcion, tipo })});
-      if (r.ok) showMenu(); else notify('Error','error');
+      openFormModal({
+        title: 'Add menu item', submitText: 'Add',
+        fields: [
+          { name:'nombre', label:'Name', required:true },
+          { name:'descripcion', label:'Description', type:'textarea' },
+          { name:'tipo', label:'Type' },
+        ],
+        onSubmit: async (values, close) => {
+          const r = await api('/api/admin/menu', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+          if (!r.ok) throw new Error('Failed to create');
+          close();
+          showMenu();
+        }
+      });
     });
   }
 
@@ -272,9 +461,16 @@
     const btnLock = document.getElementById('btnLock');
     const btnUnlock = document.getElementById('btnUnlock');
     if (btnLock) btnLock.addEventListener('click', async ()=>{
-      const motivoBloqueo = prompt('Lock reason:')||'';
-      const r = await api('/api/config/agenda/bloqueo', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ motivoBloqueo })});
-      if (r.ok) showSettings(); else notify('Error','error');
+      openFormModal({
+        title: 'Lock agenda', submitText: 'Lock',
+        fields: [ { name:'motivoBloqueo', label:'Reason', type:'textarea' } ],
+        onSubmit: async (values, close) => {
+          const r = await api('/api/config/agenda/bloqueo', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+          if (!r.ok) throw new Error('Failed to lock');
+          close();
+          showSettings();
+        }
+      });
     });
     if (btnUnlock) btnUnlock.addEventListener('click', async ()=>{
       const r = await api('/api/config/agenda/bloqueo', { method:'DELETE' });
