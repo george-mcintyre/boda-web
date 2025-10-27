@@ -16,18 +16,13 @@ async function listEvents(req, res, next) {
 // ===== Simple file-backed Events API (used by admin UI) =====
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const EVENTOS_FILE = path.join(DATA_DIR, 'events.json');
-const EVENTOS_EXAMPLE = path.join(DATA_DIR, 'events.example.json');
 
 function ensureDataFile() {
   if (!fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
   if (!fs.existsSync(EVENTOS_FILE)) {
-    if (fs.existsSync(EVENTOS_EXAMPLE)) {
-      fs.copyFileSync(EVENTOS_EXAMPLE, EVENTOS_FILE);
-    } else {
-      fs.writeFileSync(EVENTOS_FILE, JSON.stringify({ eventos: [] }, null, 2));
-    }
+    fs.writeFileSync(EVENTOS_FILE, JSON.stringify({ events: [] }, null, 2));
   }
 }
 
@@ -36,12 +31,12 @@ function readEventos() {
   try {
     const raw = fs.readFileSync(EVENTOS_FILE, 'utf8');
     const json = JSON.parse(raw);
-    if (!json || typeof json !== 'object' || !Array.isArray(json.eventos)) {
-      return { eventos: [] };
+    if (!json || typeof json !== 'object' || !Array.isArray(json.events)) {
+      return { events: [] };
     }
-    return { eventos: json.eventos };
+    return { events: json.events };
   } catch (e) {
-    return { eventos: [] };
+    return { events: [] };
   }
 }
 
@@ -59,14 +54,14 @@ async function getEvents(req, res) {
 
 async function postEvents(req, res) {
   const body = req.body || {};
-  if (!body || !Array.isArray(body.eventos)) {
-    return res.status(400).json({ error: 'Invalid payload: expected { eventos: [...] }' });
+  if (!body || !Array.isArray(body.events)) {
+    return res.status(400).json({ error: 'Invalid payload: expected { events: [...] }' });
   }
   try {
-    writeEventos({ eventos: body.eventos });
-    res.json({ ok: true, count: body.eventos.length });
+    writeEventos({ events: body.events });
+    res.json({ ok: true, count: body.events.length });
   } catch (e) {
-    res.status(500).json({ error: 'Failed to save eventos' });
+    res.status(500).json({ error: 'Failed to save events' });
   }
 }
 

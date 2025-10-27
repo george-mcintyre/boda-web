@@ -166,13 +166,12 @@ curl -s -X POST http://localhost:3000/api/login \
 
 Seeding behavior:
 - On server start in non‑production, the app auto‑seeds if collections are empty.
-- The seeder supports both English and Spanish example files and legacy field names:
-  - Guests: `guests.example.json` or `invitados.example.json`.
-  - Events: `events.example.json`, `eventos.example.json`, or `agenda.example.json`.
-  - Messages: `mensajes.example.json` (or legacy `comentarios.example.json`).
-  - Menu: `menu.example.json`.
-  - Cash gift cards: `cash-gift-cards.example.json`.
-  - Config: `config.example.json`.
+  - Guests: `guests.json`.
+  - Events: `events.json`.
+  - Messages: `messages.json`.
+  - Menu: `menu.json`.
+  - Cash gift cards: `cash-gift-cards.json`.
+  - Config: `config.json`.
 
 Schema compatibility notes:
 - Guests: Spanish fields like `nombre`, `estado`/`asistencia`, `acompañantes`, `menuEspecial` and `notas` are mapped to the new schema fields (`name`, `status`, `companions`, `specialMenu`, `message`).

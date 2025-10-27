@@ -20,10 +20,10 @@ router.put('/api/admin/gifts/:id', auth('admin'), adminCtrl.updateGift);
 router.delete('/api/admin/gifts/:id', auth('admin'), adminCtrl.deleteGift);
 
 // Agenda/Event schedule
-router.get('/api/admin/events', auth('admin'), adminCtrl.listAgendaAdmin);
-router.post('/api/admin/events', auth('admin'), adminCtrl.createAgendaItem);
-router.put('/api/admin/events/:id', auth('admin'), adminCtrl.updateAgendaItem);
-router.delete('/api/admin/events/:id', auth('admin'), adminCtrl.deleteAgendaItem);
+router.get('/api/admin/events', auth('admin'), adminCtrl.listEventsAdmin);
+router.post('/api/admin/events', auth('admin'), adminCtrl.createEventsItem);
+router.put('/api/admin/events/:id', auth('admin'), adminCtrl.updateEventsItem);
+router.delete('/api/admin/events/:id', auth('admin'), adminCtrl.deleteEventsItem);
 
 // Menu Management
 router.get('/api/admin/menu', auth('admin'), adminCtrl.listMenus);

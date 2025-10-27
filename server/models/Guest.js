@@ -1,13 +1,13 @@
 const { Schema, model } = require('mongoose');
 
-// English field names with Spanish aliases for backward compatibility
+// Canonical English field names; avoid aliases to prevent ambiguity
 const guestSchema = new Schema({
   name: { type: String, alias: 'nombre' },
   email: { type: String, unique: true, required: true },
   status: { type: String, enum: ['pending', 'confirmed', 'declined'], default: 'pending', alias: 'estado' },
-  companions: { type: Number, default: 0, alias: 'acompanantes' },
-  specialMenu: { type: String, default: '', alias: 'menuEspecial' },
-  message: { type: String, default: '', alias: 'mensaje' },
+  companions: { type: Number, default: 0 },
+  specialMenu: { type: String, default: '' },
+  message: { type: String, default: '' },
 }, { timestamps: true });
 
 module.exports = model('Guest', guestSchema);

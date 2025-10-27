@@ -5,14 +5,10 @@ const { Message } = require('../models');
 // Data dir and helpers
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const files = {
-  regalos: path.join(DATA_DIR, 'regalos.json'),
-  regalosExample: path.join(DATA_DIR, 'regalos.example.json'),
+  gifts: path.join(DATA_DIR, 'gifts.json'),
   agenda: path.join(DATA_DIR, 'agenda.json'),
-  agendaExample: path.join(DATA_DIR, 'agenda.example.json'),
   menu: path.join(DATA_DIR, 'menu.json'),
-  menuExample: path.join(DATA_DIR, 'menu.example.json'),
   config: path.join(DATA_DIR, 'config.json'),
-  configExample: path.join(DATA_DIR, 'config.example.json'),
 };
 
 function ensureFile(file, example) {
@@ -70,67 +66,67 @@ function nextId(arr) {
 }
 
 async function listGifts(req, res) {
-  ensureFile(files.regalos, files.regalosExample);
-  const items = readJson(files.regalos, []);
+  ensureFile(files.gifts);
+  const items = readJson(files.gifts, []);
   res.json(withIds(items));
 }
 
 async function createGift(req, res) {
-  const items = readJson(files.regalos, []);
+  const items = readJson(files.gifts, []);
   const item = { ...req.body, id: nextId(items) };
   items.push(item);
-  writeJson(files.regalos, items);
+  writeJson(files.gifts, items);
   res.status(201).json(item);
 }
 
 async function updateGift(req, res) {
-  const items = readJson(files.regalos, []);
+  const items = readJson(files.gifts, []);
   const id = req.params.id;
   const idx = items.findIndex(it => String(it.id) === String(id));
   if (idx === -1) return res.status(404).json({ error: 'Gift not found' });
   items[idx] = { ...items[idx], ...req.body, id };
-  writeJson(files.regalos, items);
+  writeJson(files.gifts, items);
   res.json(items[idx]);
 }
 
 async function deleteGift(req, res) {
-  const items = readJson(files.regalos, []);
+  const items = readJson(files.gifts, []);
   const id = req.params.id;
   const filtered = items.filter(it => String(it.id) !== String(id));
-  writeJson(files.regalos, filtered);
+  writeJson(files.gifts, filtered);
   res.json({ ok: true });
 }
 
-// ========== Agenda (file-backed CRUD) ==========
-async function listAgendaAdmin(req, res) {
-  ensureFile(files.agenda, files.agendaExample);
-  const items = readJson(files.agenda, []);
+// ========== Events (file-backed CRUD) ==========
+async function listEventsAdmin(req, res) {
+  ensureFile(files.events);
+  const items = readJson(files.events, []);
   res.json(withIds(items));
 }
 
-async function createAgendaItem(req, res) {
-  const items = readJson(files.agenda, []);
+async function createEventsItem(req, res) {
+  const items = readJson(files.events, []);
   const item = { ...req.body, id: nextId(items) };
   items.push(item);
-  writeJson(files.agenda, items);
+  writeJson(files.events, items);
   res.status(201).json(item);
 }
 
-async function updateAgendaItem(req, res) {
-  const items = readJson(files.agenda, []);
+async function updateEventsItem(req, res) {
+  const items = readJson(files.events, []);
   const id = req.params.id;
   const idx = items.findIndex(it => String(it.id) === String(id));
   if (idx === -1) return res.status(404).json({ error: 'Agenda item not found' });
   items[idx] = { ...items[idx], ...req.body, id };
-  writeJson(files.agenda, items);
+  writeJson(files.events, items);
   res.json(items[idx]);
 }
 
-async function deleteAgendaItem(req, res) {
-  const items = readJson(files.agenda, []);
+async function deleteEventsItem(req, res) {
+  const items = readJson(files.events, []);
   const id = req.params.id;
   const filtered = items.filter(it => String(it.id) !== String(id));
-  writeJson(files.agenda, filtered);
+  writeJson(files.events, filtered);
   res.json({ ok: true });
 }
 
@@ -156,7 +152,7 @@ function normalizeMenu(data) {
 }
 
 async function listMenus(req, res) {
-  ensureFile(files.menu, files.menuExample);
+  ensureFile(files.menu);
   const raw = readJson(files.menu, []);
   const items = normalizeMenu(raw);
   res.json(withIds(items));
@@ -195,7 +191,7 @@ async function deleteMenu(req, res) {
 
 // ========== Settings: Agenda bloqueo ==========
 function readConfig() {
-  ensureFile(files.config, files.configExample);
+  ensureFile(files.config);
   const cfg = readJson(files.config, {});
   return (cfg && typeof cfg === 'object') ? cfg : {};
 }
@@ -208,9 +204,9 @@ async function getBlockedEvent(req, res) {
   let migrated = false;
   if (!cfg.event && cfg.agenda) {
     cfg.event = {
-      blocked: !!(cfg.agenda.blocked ?? cfg.agenda.bloqueada),
-      reason: cfg.agenda.reason ?? cfg.agenda.motivoBloqueo ?? '',
-      blockedAt: cfg.agenda.blockedAt ?? cfg.agenda.fechaBloqueo ?? null,
+      blocked: !!(cfg.events.blocked ),
+      reason: cfg.events.reason ?? '',
+      blockedAt: cfg.events.blockedAt ?? null,
     };
     delete cfg.agenda;
     migrated = true;
@@ -220,7 +216,7 @@ async function getBlockedEvent(req, res) {
   res.json(cfg);
 }
 
-async function setAgendaBloqueo(req, res) {
+async function setBlockedEvent(req, res) {
   const cfg = readConfig();
   const now = new Date().toISOString();
   cfg.event = cfg.event || {};
@@ -234,7 +230,7 @@ async function setAgendaBloqueo(req, res) {
   res.json(cfg);
 }
 
-async function clearAgendaBloqueo(req, res) {
+async function clearBlockedEvent(req, res) {
   const cfg = readConfig();
   cfg.event = cfg.event || {};
   cfg.event.blocked = false;
@@ -251,9 +247,9 @@ module.exports = {
   // gifts
   listGifts, createGift, updateGift, deleteGift,
   // agenda
-  listAgendaAdmin, createAgendaItem, updateAgendaItem, deleteAgendaItem,
+  listEventsAdmin, createEventsItem, updateEventsItem, deleteEventsItem,
   // menu
-  listMenus, createMenu: createMenu, updateMenu, deleteMenu,
+  listMenus, createMenu, updateMenu, deleteMenu,
   // settings
-  getBlockedEvent, setBlockedEvent: setAgendaBloqueo, clearBlockedEvent: clearAgendaBloqueo,
+  getBlockedEvent, setBlockedEvent, clearBlockedEvent,
 };

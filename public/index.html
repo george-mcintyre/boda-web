@@ -933,7 +933,7 @@
         // Obtener eventos del backend
         const response = await fetch('/api/events');
         const data = await response.json();
-        const events = Array.isArray(data?.eventos) ? data.eventos : [];
+        const events = Array.isArray(data?.events) ? data.events : [];
 
         // Preparar contenedor de mapa
         const mapEl = document.getElementById('events-map');
@@ -1113,9 +1113,9 @@
         const response = await fetch('/api/events');
         const data = await response.json();
 
-        if (response.ok && data && data.eventos && data.eventos.length > 0) {
+        if (response.ok && data && data.events && data.events.length > 0) {
           // Usar los eventos actualizados del panel de administración
-          const events = data.eventos;
+          const events = data.events;
           
           // Generar HTML para los eventos en una fila
           const eventsHTML = events.map(event => {

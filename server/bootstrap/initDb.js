@@ -125,27 +125,20 @@ async function seedExampleDataIfEmpty() {
 
   const [cAdmin, cGuest, cEvent, cMsg, cMenu, cCard, cCfg] = counts;
 
-  if (cAdmin === 0 && exists('admin.example.json')) {
-    await models.Admin.insertMany(read('admin.example.json'));
+  if (cAdmin === 0 && exists('admin.json')) {
+    await models.Admin.insertMany(read('admin.json'));
     actions.push('Admin');
   }
   if (cGuest === 0) {
     let guests = [];
-    if (exists('guests.example.json')) guests = read('guests.example.json');
-    else if (exists('invitados.example.json')) guests = read('invitados.example.json');
+    if (exists('guests.json')) guests = read('guests.json');
     const wrapGuest = (g) => ({
-      name: g.name ?? g.nombre,
+      name: g.name ,
       email: g.email,
-      status: (function(){
-        if (g.status) return g.status;
-        const s = (g.estado || g.asistencia || '').toString().toLowerCase();
-        if (s.includes('confirm')) return 'confirmed';
-        if (s.includes('declin') || s.includes('rechaz')) return 'declined';
-        return 'pending';
-      })(),
-      companions: g.companions ?? g.acompanantes ?? g['acompañantes'] ?? 0,
-      specialMenu: normalizeSpecialMenu(g.specialMenu ?? g.menuEspecial ?? g.seleccionMenu),
-      message: g.message ?? g.mensaje ?? g.notas ?? '',
+      status: g.status ?? 'pending',
+      companions: g.companions ?? 0,
+      specialMenu: normalizeSpecialMenu(g.specialMenu ),
+      message: g.message ?? '',
     });
     if (Array.isArray(guests) && guests.length) {
       await models.Guest.insertMany(guests.map(wrapGuest));
@@ -154,31 +147,21 @@ async function seedExampleDataIfEmpty() {
   }
   if (cEvent === 0) {
     const wrapEvent = (e) => ({
-      date: e.date ? new Date(e.date) : (e.fecha ? new Date(e.fecha) : undefined),
-      time: e.time ?? e.hora,
-      day: localize(e.day ?? e.dia),
-      title: localize(e.title ?? e.titulo),
-      description: localize(e.description ?? e.descripcion),
-      venue: localize(e.venue ?? e.lugar),
-      address: localize(e.address ?? e.direccion),
-      order: e.order ?? e.orden,
-      location: e.location ?? e.ubicacion,
+      date: e.date ? new Date(e.date) : undefined,
+      time: e.time ,
+      day: localize(e.day ),
+      title: localize(e.title ),
+      description: localize(e.description),
+      venue: localize(e.venue ),
+      address: localize(e.address ),
+      order: e.order ,
+      location: e.location,
     });
     const candidates = [];
-    if (exists('events.example.json')) {
-      const data = read('events.example.json');
+    if (exists('events.json')) {
+      const data = read('events.json');
       if (Array.isArray(data)) candidates.push(...data);
       else if (Array.isArray(data?.events)) candidates.push(...data.events);
-    }
-    if (exists('eventos.example.json')) {
-      const data = read('eventos.example.json');
-      if (Array.isArray(data)) candidates.push(...data);
-      else if (Array.isArray(data?.eventos)) candidates.push(...data.eventos);
-    }
-    if (exists('agenda.example.json')) {
-      const data = read('agenda.example.json');
-      if (Array.isArray(data)) candidates.push(...data);
-      else if (Array.isArray(data?.agenda)) candidates.push(...data.agenda);
     }
     if (candidates.length) {
       const mapped = candidates.map(wrapEvent);
@@ -187,36 +170,21 @@ async function seedExampleDataIfEmpty() {
     }
   }
   if (cMsg === 0) {
-    if (exists('mensajes.example.json')) {
-      await models.Message.insertMany(read('mensajes.example.json'));
+    if (exists('messages.json')) {
+      await models.Message.insertMany(read('messages.json'));
       actions.push('Message');
-    } else if (exists('comentarios.example.json')) {
-      const legacy = read('comentarios.example.json');
-      const mapped = (Array.isArray(legacy) ? legacy : []).map(it => ({
-        name: it.nombre || 'Guest',
-        email: it.email || '',
-        content: it.comentario || '',
-        createdAt: it.fecha ? new Date(it.fecha) : undefined,
-        updatedAt: it.fecha ? new Date(it.fecha) : undefined,
-        // Carry over legacy reactions as-is; schema has alias reacciones -> reactions
-        reactions: it.reacciones || undefined,
-      }));
-      if (mapped.length) {
-        await models.Message.insertMany(mapped);
-        actions.push('Message');
-      }
     }
   }
-  if (cMenu === 0 && exists('menu.example.json')) {
-    const src = read('menu.example.json');
+  if (cMenu === 0 && exists('menu.json')) {
+    const src = read('menu.json');
     const mapped = {
       options: toMenuOptions(src),
     };
     await models.Menu.create(mapped);
     actions.push('Menu');
   }
-  if (cCard === 0 && exists('cash-gift-cards.example.json')) {
-    const raw = read('cash-gift-cards.example.json');
+  if (cCard === 0 && exists('cash-gift-cards.json')) {
+    const raw = read('cash-gift-cards.json');
     const seen = new Set();
     const items = (Array.isArray(raw) ? raw : [])
       .filter(x => x && x.code)
@@ -230,8 +198,8 @@ async function seedExampleDataIfEmpty() {
       actions.push('CashGiftCard');
     }
   }
-  if (cCfg === 0 && exists('config.example.json')) {
-    await models.Config.create(read('config.example.json'));
+  if (cCfg === 0 && exists('config.json')) {
+    await models.Config.create(read('config.json'));
     actions.push('Config');
   }
 

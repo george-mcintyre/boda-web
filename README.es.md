@@ -165,12 +165,12 @@ curl -s -X POST http://localhost:3000/api/login \
 Comportamiento del seeding:
 - Al iniciar el servidor en no‑producción, la app auto‑siembra si las colecciones están vacías.
 - El seeder soporta archivos de ejemplo en inglés y español y nombres de campos legacy:
-  - Guests: `guests.example.json` o `invitados.example.json`.
-  - Events: `events.example.json`, `eventos.example.json` o `agenda.example.json`.
-  - Messages: `mensajes.example.json` (o legacy `comentarios.example.json`).
-  - Menu: `menu.example.json`.
-  - Cash gift cards: `cash-gift-cards.example.json`.
-  - Config: `config.example.json`.
+  - Guests: `guests.json`.
+  - Events: `events.json`.
+  - Messages: `mensajes.json` (o legacy `comentarios.example.json`).
+  - Menu: `menu.json`.
+  - Cash gift cards: `cash-gift-cards.json`.
+  - Config: `config.json`.
 
 Notas de compatibilidad de esquema:
 - Guests: campos en español como `nombre`, `estado`/`asistencia`, `acompañantes`, `menuEspecial` y `notas` se mapean al nuevo esquema (`name`, `status`, `companions`, `specialMenu`, `message`).
