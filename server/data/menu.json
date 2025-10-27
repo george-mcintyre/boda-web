@@ -1,0 +1,100 @@
+{
+  "starters": [
+    {
+      "id": "dish_1",
+      "name": { "en": "Prawn salad", "es": "Ensalada de langostinos" },
+      "description": { "en": "Fresh salad with prawns, avocado, and lemon vinaigrette", "es": "Ensalada fresca con langostinos, aguacate y vinagreta de limón" },
+      "allergens": ["Shellfish", "Gluten"]
+    },
+    {
+      "id": "dish_2",
+      "name": { "en": "Chilled melon soup with ham", "es": "Sopa de melón con jamón" },
+      "description": { "en": "Chilled melon soup with Iberian ham and aromatic herbs", "es": "Sopa fría de melón con jamón ibérico y hierbas aromáticas" },
+      "allergens": []
+    },
+    {
+      "id": "dish_3",
+      "name": { "en": "Assorted cheese board", "es": "Tabla de quesos variados" },
+      "description": { "en": "Selection of artisanal cheeses with honey and nuts", "es": "Selección de quesos artesanos con miel y frutos secos" },
+      "allergens": ["Dairy", "Nuts"]
+    },
+    {
+      "id": "dish_4",
+      "name": { "en": "Assorted cured meats from Extremadura", "es": "Tabla de Embutidos variados de Extremadura" },
+      "description": { "en": "Gourmet selection of the finest cured meats from Extremadura", "es": "Selección Gourmet de los mejores embutidos del planeta Tierra procedentes de Extremadura" },
+      "allergens": []
+    }
+  ],
+  "mains": [
+    {
+      "id": "dish_4",
+      "name": { "en": "Beef sirloin", "es": "Solomillo de ternera" },
+      "description": { "en": "Grilled beef sirloin with red wine sauce and potatoes", "es": "Solomillo de ternera a la parrilla con salsa de vino tinto y patatas" },
+      "allergens": ["Gluten"]
+    },
+    {
+      "id": "dish_5",
+      "name": { "en": "Baked sea bass", "es": "Lubina al horno" },
+      "description": { "en": "Fresh baked sea bass with Provençal herbs and vegetables", "es": "Lubina fresca al horno con hierbas provenzales y verduras" },
+      "allergens": ["Fish"]
+    },
+    {
+      "id": "dish_6",
+      "name": { "en": "Mushroom risotto", "es": "Risotto de setas" },
+      "description": { "en": "Creamy risotto with wild mushrooms and parmesan (vegetarian)", "es": "Risotto cremoso con setas silvestres y parmesano (vegetariano)" },
+      "allergens": ["Dairy", "Gluten"]
+    },
+    {
+      "id": "dish_7",
+      "name": { "en": "Retinto beef ribeye (Extremadura)", "es": "Chuletón de Retinto Extremeño" },
+      "description": { "en": "Retinto beef ribeye from Extremadura", "es": "Chuletón de Retinto Extremeño" },
+      "allergens": []
+    }
+  ],
+  "desserts": [
+    {
+      "id": "dish_7",
+      "name": { "en": "Wedding cake", "es": "Tarta nupcial" },
+      "description": { "en": "Traditional wedding cake with custard and fruit", "es": "Tarta tradicional de boda con crema pastelera y frutas" },
+      "allergens": ["Gluten", "Dairy", "Eggs"]
+    },
+    {
+      "id": "dish_8",
+      "name": { "en": "Fresh fruit", "es": "Fruta fresca" },
+      "description": { "en": "Selection of seasonal fresh fruits", "es": "Selección de frutas frescas de temporada" },
+      "allergens": []
+    },
+    {
+      "id": "dish_9",
+      "name": { "en": "Artisanal ice cream", "es": "Helado artesanal" },
+      "description": { "en": "Artisanal ice cream with a choice of three flavors", "es": "Helado artesanal con tres sabores a elegir" },
+      "allergens": ["Dairy"]
+    },
+    {
+      "id": "dish_10",
+      "name": { "en": "Old Gossip's Sponge Cake", "es": "Bizcocho de la Vieja del Visillo" },
+      "description": { "en": "Sponge cake infused with the essence of neighborhood gossip", "es": "Bizcocho a las esencias del cotilleo del portal de la Vieja del Visillo" },
+      "allergens": ["Eggs"]
+    }
+  ],
+  "drinks": [
+    {
+      "id": "dish_10",
+      "name": { "en": "Red wine", "es": "Vino tinto" },
+      "description": { "en": "Regional red wine aged 12 months", "es": "Vino tinto de la región con crianza de 12 meses" },
+      "allergens": []
+    },
+    {
+      "id": "dish_11",
+      "name": { "en": "White wine", "es": "Vino blanco" },
+      "description": { "en": "Young and fresh white wine", "es": "Vino blanco joven y fresco" },
+      "allergens": []
+    },
+    {
+      "id": "dish_12",
+      "name": { "en": "Mineral water", "es": "Agua mineral" },
+      "description": { "en": "Natural mineral water, sparkling or still", "es": "Agua mineral natural con gas o sin gas" },
+      "allergens": []
+    }
+  ]
+}
