@@ -1104,44 +1104,74 @@
       };
     }
 
-    // Función para cargar eventos dinámicamente
+    // Función para cargar eventos dinámicamente desde la base de datos y agrupar por día
     async function loadEvents() {
       const eventsGrid = document.getElementById('events-grid');
       if (!eventsGrid) return;
 
       try {
-        const response = await fetch('/api/events');
-        const data = await response.json();
+        const response = await fetch('/api/event'); // devuelve un array de eventos localizados
+        const events = response.ok ? await response.json() : [];
 
-        if (response.ok && data && data.events && data.events.length > 0) {
-          // Usar los eventos actualizados del panel de administración
-          const events = data.events;
-          
-          // Generar HTML para los eventos en una fila
-          const eventsHTML = events.map(event => {
-            const hasCoords = event.coordenadas && typeof event.coordenadas.lat === 'number' && typeof event.coordenadas.lng === 'number';
-            const mapsQuery = hasCoords 
-              ? `${event.coordenadas.lat},${event.coordenadas.lng}` 
-              : encodeURIComponent(`${event.lugar || ''} ${event.direccion || ''}`.trim());
-            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`;
-            return `
-            <div class="info-card">
-              <div class="info-icon">
-                <i class="${event.icono || getEventIcon(event.titulo)}"></i>
+        if (Array.isArray(events) && events.length > 0) {
+          // Normalizar fecha a clave de día (YYYY-MM-DD) y etiqueta visible (event.day o fecha formateada)
+          const groups = new Map(); // key -> { label, items: [] }
+          for (const ev of events) {
+            const dt = ev.date ? new Date(ev.date) : null;
+            const key = dt ? dt.toISOString().slice(0,10) : (ev.day || '');
+            const label = ev.day || (dt ? dt.toLocaleDateString(undefined, { weekday:'long', year:'numeric', month:'long', day:'numeric' }) : '');
+            const item = {
+              title: ev.title || '',
+              description: ev.description || '',
+              venue: ev.venue || '',
+              address: ev.address || '',
+              time: ev.time || '',
+            };
+            if (!groups.has(key)) groups.set(key, { label, items: [] });
+            groups.get(key).items.push(item);
+          }
+
+          // Crear HTML por cada día, máx 3 tarjetas; resto como subeventos
+          const daysHtml = Array.from(groups.entries()).map(([key, group]) => {
+            const firstThree = group.items.slice(0,3);
+            const rest = group.items.slice(3);
+
+            const cards = firstThree.map(event => {
+              const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${event.venue} ${event.address}`.trim())}`;
+              return `
+                <div class="info-card">
+                  <div class="info-icon">
+                    <i class="${getEventIcon(event.title || '')}"></i>
+                  </div>
+                  <h3>${event.title}</h3>
+                  ${event.venue ? `<p><strong>${event.venue}</strong></p>` : ''}
+                  ${event.address ? `<p>${event.address}</p>` : ''}
+                  ${event.time ? `<p class=\"time\"><i class=\"fas fa-clock\"></i> ${event.time}</p>` : ''}
+                  ${event.description ? `<p class=\"event-description\">${event.description}</p>` : ''}
+                  ${(event.venue || event.address) ? `<a class=\"btn-ver-mapa\" href=\"${mapsUrl}\" target=\"_blank\" rel=\"noopener\">\n                    <i class=\"fas fa-map\"></i> ${translate('wedding:location.viewMap')}\n                  </a>` : ''}
+                </div>
+              `;
+            }).join('');
+
+            const subEvents = rest.length ? `
+              <div class="sub-events">
+                <h4>${group.label ? `${group.label} -` : ''} ${rest.length} ${rest.length===1? 'more event':'more events'}</h4>
+                <ul>
+                  ${rest.map(ev => `<li>${ev.time ? `<strong>${ev.time}</strong> - `: ''}${ev.title}${ev.venue?` @ ${ev.venue}`:''}</li>`).join('')}
+                </ul>
               </div>
-              <h3>${event.titulo}</h3>
-              <p><strong>${event.lugar}</strong></p>
-              <p>${event.direccion}</p>
-              <p class="time"><i class="fas fa-clock"></i> ${event.horaInicio}${event.horaFin ? ` - ${event.horaFin}` : ''}</p>
-              ${event.descripcion ? `<p class="event-description">${event.descripcion}</p>` : ''}
-              <a class="btn-ver-mapa" href="${mapsUrl}" target="_blank" rel="noopener">
-                <i class="fas fa-map"></i> ${translate('wedding:location.viewMap')}
-              </a>
-            </div>
+            ` : '';
+
+            return `
+              <div class="day-group">
+                ${group.label ? `<h3 style=\"text-align:center; margin: 0.5rem 0 0;\">${group.label}</h3>` : ''}
+                <div class="events-row">${cards}</div>
+                ${subEvents}
+              </div>
             `;
           }).join('');
 
-          // Generar la tarjeta de ubicación centrada
+          // Tarjeta de ubicación centrada
           const locationCard = `
             <div class="info-card location-card">
               <div class="info-icon">
@@ -1155,64 +1185,30 @@
             </div>
           `;
 
-          // Estructura con eventos en fila y ubicación centrada abajo
           eventsGrid.innerHTML = `
             <div class="events-container">
-              <div class="events-row">
-                ${eventsHTML}
-              </div>
-              <div class="location-section">
-                ${locationCard}
-              </div>
+              ${daysHtml}
+              <div class="location-section">${locationCard}</div>
             </div>
           `;
         } else {
-          // Mostrar eventos por defecto si no hay eventos
+          // Si no hay eventos, solo mostrar ubicación
           showDefaultEvents();
         }
       } catch (error) {
         console.error('Error loading events:', error);
-        // Mostrar eventos por defecto si hay error de conexión
+        // Si falla la carga, solo ubicación
         showDefaultEvents();
       }
     }
 
-    // Función para mostrar eventos por defecto
+    // Función para mostrar vista por defecto (sin eventos, solo ubicación)
     function showDefaultEvents() {
       const eventsGrid = document.getElementById('events-grid');
       if (!eventsGrid) return;
 
       eventsGrid.innerHTML = `
         <div class="events-container">
-          <div class="events-row">
-            <div class="info-card">
-              <div class="info-icon">
-                <i class="fas fa-church"></i>
-              </div>
-              <h3>${translate('wedding:ceremony.title')}</h3>
-              <p><strong>${translate('wedding:ceremony.venue')}</strong></p>
-              <p>${translate('wedding:ceremony.address')}</p>
-              <p>${translate('wedding:ceremony.city')}</p>
-              <a class="btn-ver-mapa" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(translate('wedding:ceremony.venue') + ' ' + translate('wedding:ceremony.address'))}" target="_blank" rel="noopener">
-                <i class="fas fa-map"></i> ${translate('wedding:location.viewMap')}
-              </a>
-              <p class="time"><i class="fas fa-clock"></i> ${translate('wedding:ceremony.time')}</p>
-            </div>
-            
-            <div class="info-card">
-              <div class="info-icon">
-                <i class="fas fa-glass-cheers"></i>
-              </div>
-              <h3>${translate('wedding:celebration.title')}</h3>
-              <p><strong>${translate('wedding:celebration.venue')}</strong></p>
-              <p>${translate('wedding:celebration.address')}</p>
-              <p>${translate('wedding:celebration.city')}</p>
-              <a class="btn-ver-mapa" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(translate('wedding:celebration.venue') + ' ' + translate('wedding:celebration.address'))}" target="_blank" rel="noopener">
-                <i class="fas fa-map"></i> ${translate('wedding:location.viewMap')}
-              </a>
-              <p class="time"><i class="fas fa-clock"></i> ${translate('wedding:celebration.time')}</p>
-            </div>
-          </div>
           <div class="location-section">
             <div class="info-card location-card">
               <div class="info-icon">
