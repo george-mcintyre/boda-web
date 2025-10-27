@@ -119,9 +119,28 @@ class CommentsSystem {
 
     // Agregar/quitar reacción
     async toggleReaction(commentId, emoji) {
-        // Reactions are not supported in the unified Messages system
-        this.showToast('Las reacciones no están disponibles actualmente.', 'error');
-        return;
+        try {
+            const token = localStorage.getItem('token') || '';
+            const res = await fetch(`/api/messages/${commentId}/reaction`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ emoji })
+            });
+            const data = await res.json().catch(()=>({}));
+            if (!res.ok) {
+                const msg = data && (data.error || data.message) || 'Error al actualizar reacción';
+                this.showToast(msg, 'error');
+                return;
+            }
+            // Recargar comentarios para reflejar conteos actualizados
+            await this.loadComments();
+        } catch (err) {
+            console.error('Error al aplicar reacción:', err);
+            this.showToast('Error de conexión al aplicar reacción', 'error');
+        }
     }
 
     // Verificar si el usuario actual reaccionó con un emoji específico

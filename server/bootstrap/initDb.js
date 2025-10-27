@@ -161,6 +161,8 @@ async function seedExampleDataIfEmpty() {
         content: it.comentario || '',
         createdAt: it.fecha ? new Date(it.fecha) : undefined,
         updatedAt: it.fecha ? new Date(it.fecha) : undefined,
+        // Carry over legacy reactions as-is; schema has alias reacciones -> reactions
+        reactions: it.reacciones || undefined,
       }));
       if (mapped.length) {
         await models.Message.insertMany(mapped);
