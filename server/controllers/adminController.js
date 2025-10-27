@@ -135,22 +135,47 @@ async function deleteAgendaItem(req, res) {
 }
 
 // ========== Menu (file-backed CRUD) ==========
+function normalizeMenu(data) {
+  // Accept either an array of menu items or an object of categories -> items
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === 'object') {
+    const result = [];
+    for (const [tipo, list] of Object.entries(data)) {
+      if (!Array.isArray(list)) continue;
+      list.forEach((it, idx) => {
+        // Try to pick Spanish or English name/description if nested
+        const nombre = it.nombre || (it.name && (it.name.es || it.name.en)) || it.name || '';
+        const descripcion = it.descripcion || (it.description && (it.description.es || it.description.en)) || it.description || '';
+        const id = it.id || `${tipo}_${idx + 1}`; // ensure uniqueness across categories
+        result.push({ id, nombre, descripcion, tipo, ...it });
+      });
+    }
+    return result;
+  }
+  return [];
+}
+
 async function listMenus(req, res) {
   ensureFile(files.menu, files.menuExample);
-  const items = readJson(files.menu, []);
+  const raw = readJson(files.menu, []);
+  const items = normalizeMenu(raw);
   res.json(withIds(items));
 }
 
 async function createMenu(req, res) {
-  const items = readJson(files.menu, []);
-  const item = { ...req.body, id: nextId(items) };
+  const raw = readJson(files.menu, []);
+  const items = normalizeMenu(raw);
+  const item = { ...req.body };
+  // If no id provided, generate a numeric one using nextId over current numeric ids
+  if (!item.id) item.id = nextId(items);
   items.push(item);
   writeJson(files.menu, items);
   res.status(201).json(item);
 }
 
 async function updateMenu(req, res) {
-  const items = readJson(files.menu, []);
+  const raw = readJson(files.menu, []);
+  const items = normalizeMenu(raw);
   const id = req.params.id;
   const idx = items.findIndex(it => String(it.id) === String(id));
   if (idx === -1) return res.status(404).json({ error: 'Menu item not found' });
@@ -160,7 +185,8 @@ async function updateMenu(req, res) {
 }
 
 async function deleteMenu(req, res) {
-  const items = readJson(files.menu, []);
+  const raw = readJson(files.menu, []);
+  const items = normalizeMenu(raw);
   const id = req.params.id;
   const filtered = items.filter(it => String(it.id) !== String(id));
   writeJson(files.menu, filtered);
