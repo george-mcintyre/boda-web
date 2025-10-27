@@ -113,8 +113,8 @@ async function seedExampleDataIfEmpty() {
     await models.Admin.insertMany(read('admin.example.json'));
     actions.push('Admin');
   }
-  if (cGuest === 0 && exists('invitados.example.json')) {
-    await models.Guest.insertMany(read('invitados.example.json'));
+  if (cGuest === 0 && exists('guests.example.json')) {
+    await models.Guest.insertMany(read('guests.example.json'));
     actions.push('Guest');
   }
   if (cEvent === 0) {

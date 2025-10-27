@@ -16,13 +16,13 @@
     <div class="test-section">
         <h3>Test de Carga</h3>
         <button onclick="testLoad()">Probar Carga</button>
-        <button onclick="testFetch()">Probar Fetch Invitados</button>
+        <button onclick="testFetch()">Probar Fetch guests</button>
     </div>
     
     <div id="results"></div>
     
     <script>
-        console.log('🚀 Test Panel Admin - Script cargado');
+        console.log('🚀 Test Panel Admin - Script loaded');
         
         function testLoad() {
             console.log('✅ Función testLoad ejecutada');
@@ -31,18 +31,18 @@
         
         async function testFetch() {
             try {
-                console.log('🔍 Probando fetch a /api/admin/invitados...');
-                const response = await fetch('/api/admin/invitados', {
+                console.log('🔍 Probando fetch a /api/admin/guests...');
+                const response = await fetch('/api/admin/guests', {
                     headers: { 'Authorization': 'test-token' }
                 });
                 console.log('📡 Respuesta:', response.status, response.statusText);
                 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('📊 Datos de invitados:', data);
+                    console.log('📊 Datos de guests:', data);
                     document.getElementById('results').innerHTML = `
                         <h3>✅ Fetch exitoso</h3>
-                        <p>Cantidad de invitados: ${Array.isArray(data) ? data.length : 'No es array'}</p>
+                        <p>Cantidad de guests: ${Array.isArray(data) ? data.length : 'No es array'}</p>
                         <pre>${JSON.stringify(data, null, 2)}</pre>
                     `;
                 } else {

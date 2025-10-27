@@ -22,8 +22,8 @@
 - Stripe (setup, variables y webhooks)
 
 ## ✨ Visión general
-- Invitados: login por email, perfil del invitado, selección de menú, mensajes, lista de regalos.
-- Administración: gestión de invitados y demás entidades (extensible), autenticación JWT.
+- guests: login por email, perfil del invitado, selección de menú, mensajes, lista de regalos.
+- Administración: gestión de guests y demás entidades (extensible), autenticación JWT.
 - Backend modular con Express + MongoDB (Mongoose) y JWT.
 
 ## 📁 Estructura del proyecto (actual)
@@ -102,7 +102,7 @@ Existen varias formas de crear estos datos iniciales:
      { "email": "admin@example.com", "password": "admin123" }
    ]
    ```
-   - `server/data/invitados.json`
+   - `server/data/guests.json`
    ```json
    [
      { "nombre": "Juan Pérez", "email": "juan@example.com" }
@@ -166,11 +166,11 @@ curl -s -X POST http://localhost:3000/api/login \
   - Invitado: email sin password → devuelve `{ token, tipo:"invitado" }`.
   - Admin: email + password → `{ token, tipo:"admin" }`.
 - Perfil de invitado: `GET /api/invitado` con `Authorization: Bearer <token>` (rol invitado).
-- Administración de invitados (rol admin):
-  - `GET /api/invitados`
-  - `POST /api/invitados`
-  - `PUT /api/invitados/:id`
-  - `DELETE /api/invitados/:id`
+- Administración de guests (rol admin):
+  - `GET /api/guests`
+  - `POST /api/guests`
+  - `PUT /api/guests/:id`
+  - `DELETE /api/guests/:id`
 
 ## 🌐 Frontend
 - Al consumir endpoints autenticados, envíe el header: `Authorization: Bearer <token>`.

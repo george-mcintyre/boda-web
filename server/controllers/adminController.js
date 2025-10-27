@@ -202,26 +202,45 @@ function readConfig() {
 
 function writeConfig(cfg) { writeJson(files.config, cfg || {}); }
 
-async function getAgendaBloqueo(req, res) {
+async function getBlockedEvent(req, res) {
   const cfg = readConfig();
+  // Migrate legacy cfg.agenda -> cfg.event (English-only)
+  let migrated = false;
+  if (!cfg.event && cfg.agenda) {
+    cfg.event = {
+      blocked: !!(cfg.agenda.blocked ?? cfg.agenda.bloqueada),
+      reason: cfg.agenda.reason ?? cfg.agenda.motivoBloqueo ?? '',
+      blockedAt: cfg.agenda.blockedAt ?? cfg.agenda.fechaBloqueo ?? null,
+    };
+    delete cfg.agenda;
+    migrated = true;
+  }
+  cfg.event = cfg.event || { blocked: false, reason: '', blockedAt: null };
+  if (migrated) writeConfig(cfg);
   res.json(cfg);
 }
 
 async function setAgendaBloqueo(req, res) {
   const cfg = readConfig();
   const now = new Date().toISOString();
-  cfg.agenda = cfg.agenda || {};
-  cfg.agenda.bloqueada = true;
-  cfg.agenda.motivoBloqueo = req.body && req.body.motivoBloqueo || cfg.agenda.motivoBloqueo || '';
-  cfg.agenda.fechaBloqueo = cfg.agenda.fechaBloqueo || now;
+  cfg.event = cfg.event || {};
+  const reason = (req.body && req.body.reason) || cfg.event.reason || '';
+  cfg.event.blocked = true;
+  cfg.event.reason = reason;
+  cfg.event.blockedAt = cfg.event.blockedAt || now;
+  // Remove any legacy agenda key to avoid duplication
+  if (cfg.agenda) delete cfg.agenda;
   writeConfig(cfg);
   res.json(cfg);
 }
 
 async function clearAgendaBloqueo(req, res) {
   const cfg = readConfig();
-  cfg.agenda = cfg.agenda || {};
-  cfg.agenda.bloqueada = false;
+  cfg.event = cfg.event || {};
+  cfg.event.blocked = false;
+  cfg.event.reason = '';
+  cfg.event.blockedAt = null;
+  if (cfg.agenda) delete cfg.agenda;
   writeConfig(cfg);
   res.json(cfg);
 }
@@ -234,7 +253,7 @@ module.exports = {
   // agenda
   listAgendaAdmin, createAgendaItem, updateAgendaItem, deleteAgendaItem,
   // menu
-  listMenus, createMenu, updateMenu, deleteMenu,
+  listMenus, createMenu: createMenu, updateMenu, deleteMenu,
   // settings
-  getAgendaBloqueo, setAgendaBloqueo, clearAgendaBloqueo,
+  getBlockedEvent, setBlockedEvent: setAgendaBloqueo, clearBlockedEvent: clearAgendaBloqueo,
 };

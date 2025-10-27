@@ -953,11 +953,11 @@ footer {
 }
 
 /* Styles for configuration */
-.configuracion-section {
+.configuration-section {
   padding: 1rem 0;
 }
 
-.configuracion-section h3 {
+.configuration-section h3 {
   color: var(--primary-color);
   margin-bottom: 2rem;
   display: flex;

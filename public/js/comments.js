@@ -1,4 +1,4 @@
-// Sistema de comentarios para la página de invitados
+// Sistema de comentarios para la página de guests
 class CommentsSystem {
     constructor() {
         this.comments = [];

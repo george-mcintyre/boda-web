@@ -158,9 +158,9 @@
     <!-- Sistema de pestañas -->
     <div class="tabs-container">
       <div class="tabs-header">
-        <button class="tab-btn active" data-tab="invitados">
+        <button class="tab-btn active" data-tab="guests">
           <i class="fas fa-users"></i>
-          Invitados
+          guests
         </button>
         <button class="tab-btn" data-tab="mensajes">
           <i class="fas fa-comments"></i>
@@ -174,7 +174,7 @@
           <i class="fas fa-utensils"></i>
           Gestión de Menús
         </button>
-        <button class="tab-btn" data-tab="configuracion">
+        <button class="tab-btn" data-tab="configuration">
           <i class="fas fa-cog"></i>
           Configuración
         </button>
@@ -247,13 +247,13 @@
         
         // Determinar URL
         let url = '';
-        if (tab === 'invitados') url = '/api/admin/invitados';
+        if (tab === 'guests') url = '/api/admin/guests';
         if (tab === 'regalos') url = '/api/admin/regalos';
         if (tab === 'mensajes') url = '/api/admin/mensajes';
         if (tab === 'agenda') url = '/api/admin/agenda';
         if (tab === 'menu') url = '/api/admin/menu';
-        if (tab === 'configuracion') {
-          showConfiguracion();
+        if (tab === 'configuration') {
+          showConfiguration();
           return;
         }
         
@@ -299,8 +299,8 @@
           console.log('Datos recibidos:', data);
           
           // Renderizar contenido según la pestaña
-          if (tab === 'invitados') {
-            renderInvitados(data);
+          if (tab === 'guests') {
+            renderguests(data);
           } else if (tab === 'regalos') {
             renderRegalos(data);
           } else if (tab === 'mensajes') {
@@ -328,16 +328,16 @@
       }
 
       // Funciones de renderizado
-      function renderInvitados(invitados) {
-        // Ordenar invitados alfabéticamente por nombre
-        const invitadosOrdenados = [...invitados].sort((a, b) => 
+      function renderguests(guests) {
+        // Ordenar guests alfabéticamente por nombre
+        const guestsOrdenados = [...guests].sort((a, b) =>
           a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
         );
         
         adminContent.innerHTML = `
           <div class="admin-section">
             <div class="admin-header-section">
-              <h3><i class="fas fa-users"></i> Lista de Invitados (${invitadosOrdenados.length})</h3>
+              <h3><i class="fas fa-users"></i> Lista de guests (${guestsOrdenados.length})</h3>
               <button onclick="addInvitado()" class="admin-action">
                 <i class="fas fa-plus"></i> Añadir Invitado
               </button>
@@ -356,7 +356,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  ${invitadosOrdenados.map(inv => `
+                  ${guestsOrdenados.map(inv => `
                     <tr>
                       <td><strong>${inv.nombre}</strong></td>
                       <td>${inv.email}</td>
@@ -452,7 +452,7 @@
         adminContent.innerHTML = `
           <div class="admin-section">
             <div class="admin-header-section">
-              <h3><i class="fas fa-comments"></i> Mensajes de Invitados (${mensajes.length})</h3>
+              <h3><i class="fas fa-comments"></i> Mensajes de guests (${mensajes.length})</h3>
             </div>
             <div class="messages-container">
               ${mensajes.map(msg => `
@@ -506,13 +506,13 @@
             </div>
             <div class="menu-stats">
               <h4>Estadísticas de Selección de Menús</h4>
-              <p>Total de invitados con menú seleccionado: ${data.totalSelecciones || 0}</p>
+              <p>Total de guests con menú seleccionado: ${data.totalSelecciones || 0}</p>
             </div>
           </div>
         `;
       }
 
-      function showConfiguracion() {
+      function showConfiguration() {
         adminContent.innerHTML = `
           <div class="admin-section">
             <div class="admin-header-section">
@@ -646,7 +646,7 @@
           }
           
           // Hacer la llamada al backend
-          const response = await fetch('/api/admin/invitados', {
+          const response = await fetch('/api/admin/guests', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -672,7 +672,7 @@
           
           // Cerrar modal y recargar la lista
           closeModal();
-          showTab('invitados'); // Recargar la pestaña de invitados
+          showTab('guests'); // Recargar la pestaña de guests
           
         } catch (error) {
           console.error('Error al añadir invitado:', error);
@@ -694,8 +694,8 @@
         }
       };
 
-      // Cargar la pestaña de invitados por defecto
-      showTab('invitados');
+      // Cargar la pestaña de guests por defecto
+      showTab('guests');
     });
   </script>
 </body>

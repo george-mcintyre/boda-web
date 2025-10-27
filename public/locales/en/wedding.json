@@ -134,7 +134,6 @@
       "name": "Name",
       "email": "Email",
       "attendance": "Attendance",
-      "menu": "Menu",
       "actions": "Actions",
       "description": "Description",
       "price": "Price",
@@ -191,9 +190,7 @@
       "authError": "Authentication error. Please log in again.",
       "duplicateEmailError": "A guest with that email already exists. Please use a different email.",
       "addGuestError": "Error adding guest",
-      "unknownError": "Unknown error",
-      "guestAddedSuccess": "Guest added successfully",
-      "connectionError": "Connection error. Please try again."
+      "guestAddedSuccess": "Guest added successfully"
     },
     "login": {
       "title": "Login",

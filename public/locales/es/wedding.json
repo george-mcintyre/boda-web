@@ -37,7 +37,7 @@
       }
     },
     "guestZone": {
-      "title": "Zona de Invitados",
+      "title": "Zona de invitados",
       "welcome": "Bienvenido a la zona de invitados",
       "description": "Aquí puedes gestionar todos los detalles de tu participación en nuestra boda."
     },
@@ -123,18 +123,17 @@
       "home": "Inicio",
       "loading": "Cargando panel de administración...",
       "loadingGeneric": "Cargando...",
-      "guestsList": "Lista de Invitados",
+      "guestsList": "Lista de invitados",
       "addGuest": "Añadir Invitado",
       "giftsList": "Lista de Regalos",
       "addGift": "Añadir Regalo",
-      "guestMessages": "Mensajes de Invitados",
+      "guestMessages": "Mensajes de invitados",
       "eventSchedule": "Agenda de Eventos",
       "menuManagement": "Gestión de Menús",
       "systemConfig": "Configuración del Sistema",
       "name": "Nombre",
       "email": "Email",
       "attendance": "Asistencia",
-      "menu": "Menú",
       "actions": "Acciones",
       "description": "Descripción",
       "price": "Precio",
@@ -191,9 +190,7 @@
       "authError": "Error de autenticación. Por favor, inicia sesión nuevamente.",
       "duplicateEmailError": "Ya existe un invitado con ese email. Por favor, usa un email diferente.",
       "addGuestError": "Error al añadir invitado",
-      "unknownError": "Error desconocido",
-      "guestAddedSuccess": "Invitado añadido correctamente",
-      "connectionError": "Error de conexión. Por favor, intenta nuevamente."
+      "guestAddedSuccess": "Invitado añadido correctamente"
     },
     "login": {
       "title": "Iniciar Sesión",

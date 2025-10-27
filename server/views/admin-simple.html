@@ -33,9 +33,9 @@
       </div>
       
       <div class="button-grid">
-        <button class="adminTab active" data-tab="invitados">
+        <button class="adminTab active" data-tab="guests">
           <i class="fas fa-users"></i>
-          Invitados
+          guests
         </button>
         <button class="adminTab" data-tab="regalos">
           <i class="fas fa-gift"></i>
@@ -84,8 +84,8 @@
         tab.addEventListener('click', () => showTab(tab.dataset.tab));
       });
 
-      // Cargar la pestaña de invitados por defecto
-      showTab('invitados');
+      // Cargar la pestaña de guests por defecto
+      showTab('guests');
 
       async function showTab(tab) {
         console.log('Mostrando pestaña:', tab);
@@ -95,7 +95,7 @@
         adminContent.innerHTML = '<div class="admin-loading"><i class="fas fa-spinner fa-spin"></i><p>Cargando...</p></div>';
         
         let url = '';
-        if (tab === 'invitados') url = '/api/admin/invitados';
+        if (tab === 'guests') url = '/api/admin/guests';
         if (tab === 'regalos') url = '/api/admin/regalos';
         if (tab === 'mensajes') url = '/api/admin/mensajes';
         if (tab === 'agenda') url = '/api/admin/agenda';
@@ -130,19 +130,19 @@
           const data = await res.json();
           console.log('Datos recibidos:', data);
           
-          if (tab === 'invitados') {
-            const totalInvitados = data.length;
+          if (tab === 'guests') {
+            const totalguests = data.length;
             const confirmados = data.filter(inv => inv.asistencia === 'si').length;
             const noConfirmados = data.filter(inv => inv.asistencia === 'no').length;
-            const pendientes = totalInvitados - confirmados - noConfirmados;
+            const pendientes = totalguests - confirmados - noConfirmados;
             const conMenu = data.filter(inv => inv.seleccionMenu).length;
             
             adminContent.innerHTML = `
               <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                <h3>📊 Estadísticas de invitados</h3>
+                <h3>📊 Estadísticas de guests</h3>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;">
                   <div style="text-align: center; padding: 10px; background: white; border-radius: 5px;">
-                    <strong>${totalInvitados}</strong><br>Total
+                    <strong>${totalguests}</strong><br>Total
                   </div>
                   <div style="text-align: center; padding: 10px; background: #d4edda; border-radius: 5px;">
                     <strong>${confirmados}</strong><br>Confirmados
@@ -158,7 +158,7 @@
                   </div>
                 </div>
               </div>
-              <h3>👥 Lista de invitados</h3>
+              <h3>👥 Lista de guests</h3>
               <div style="max-height: 400px; overflow-y: auto;">
                 <table style="width: 100%; border-collapse: collapse;">
                   <thead>
@@ -257,7 +257,7 @@
           
           if (tab === 'mensajes') {
             adminContent.innerHTML = `
-              <h3>💬 Mensajes de invitados</h3>
+              <h3>💬 Mensajes de guests</h3>
               <div style="max-height: 400px; overflow-y: auto;">
                 ${data.length > 0 ? data.map(msg => `
                   <div style="margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #28a745;">

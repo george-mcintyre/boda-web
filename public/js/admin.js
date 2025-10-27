@@ -125,19 +125,19 @@
 
   // ========== Guests ==========
   async function showGuests(){
-    activate('invitados');
+    activate('guests');
     setLoading('Loading guests...');
     try {
-      const res = await api('/api/admin/invitados');
+      const res = await api('/api/admin/guests');
       if (!res.ok) throw new Error('Failed to load guests');
       const data = await res.json();
       const rows = (data||[]).map(g => `
         <tr>
-          <td>${g.name || g.nombre || ''}</td>
+          <td>${g.name || ''}</td>
           <td>${g.email||''}</td>
-          <td>${g.status || g.estado || 'pending'}</td>
-          <td>${g.companions ?? g.acompanantes ?? 0}</td>
-          <td>${g.specialMenu || g.menuEspecial || ''}</td>
+          <td>${g.status || 'pending'}</td>
+          <td>${g.companions ?? 0}</td>
+          <td>${g.specialMenu || ''}</td>
           <td>
             <button class="admin-action" data-action="edit" data-id="${g._id}"><i class="fas fa-edit"></i></button>
             <button class="admin-action danger" data-action="del" data-id="${g._id}"><i class="fas fa-trash"></i></button>
@@ -152,7 +152,7 @@
         const current = (data||[]).find(x => String(x._id) === String(id)) || {};
         if (action==='del'){
           if (!confirm('Delete this guest?')) return;
-          const r = await api(`/api/admin/invitados/${id}`, { method:'DELETE' });
+          const r = await api(`/api/admin/guests/${id}`, { method:'DELETE' });
           if (r.ok) showGuests(); else notify('Error deleting', 'error');
         } else if (action==='edit'){
           openFormModal({
@@ -166,14 +166,14 @@
               { name:'specialMenu', label:'Special menu', help:'Allergies or special request' },
             ],
             initialValues: {
-              name: current.name || current.nombre || '',
+              name: current.name || '',
               email: current.email || '',
-              status: current.status || current.estado || 'pending',
-              companions: current.companions ?? current.acompanantes ?? 0,
-              specialMenu: current.specialMenu || current.menuEspecial || ''
+              status: current.status || 'pending',
+              companions: current.companions ?? 0,
+              specialMenu: current.specialMenu || ''
             },
             onSubmit: async (values, close) => {
-              const r = await api(`/api/admin/invitados/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+              const r = await api(`/api/admin/guests/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
               if (!r.ok) throw new Error('Failed to update');
               close();
               showGuests();
@@ -190,7 +190,7 @@
             { name:'email', label:'Email', type:'email', required:true }
           ],
           onSubmit: async (values, close) => {
-            const r = await api('/api/admin/invitados', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+            const r = await api('/api/admin/guests', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
             if (!r.ok) throw new Error('Failed to create');
             close();
             showGuests();
@@ -202,13 +202,13 @@
 
   // ========== Gift list ==========
   async function showGifts(){
-    activate('regalos');
+    activate('gifts');
     setLoading('Loading gift list...');
-    const res = await api('/api/admin/regalos');
+    const res = await api('/api/admin/gifts');
     const data = res.ok ? await res.json() : [];
     const rows = (data||[]).map(it => `
       <tr>
-        <td>${it.nombre || it.name || ''}</td>
+        <td>${it.nombre || ''}</td>
         <td>${it.descripcion||''}</td>
         <td>${it.precio||''}</td>
         <td>${it.categoria||''}</td>
@@ -226,7 +226,7 @@
       const current = (data||[]).find(x => String(x.id) === String(id)) || {};
       if (action==='del'){
         if (!confirm('Delete this gift?')) return;
-        const r = await api(`/api/admin/regalos/${id}`, { method:'DELETE' }); if (r.ok) showGifts(); else notify('Error','error');
+        const r = await api(`/api/admin/gifts/${id}`, { method:'DELETE' }); if (r.ok) showGifts(); else notify('Error','error');
       } else if (action==='edit'){
         openFormModal({
           title: 'Edit gift', submitText: 'Save',
@@ -238,14 +238,14 @@
             { name:'url', label:'URL' },
           ],
           initialValues: {
-            nombre: current.nombre || current.name || '',
+            nombre: current.nombre || '',
             descripcion: current.descripcion || '',
             precio: current.precio || '',
             categoria: current.categoria || '',
             url: current.url || ''
           },
           onSubmit: async (values, close) => {
-            const r = await api(`/api/admin/regalos/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+            const r = await api(`/api/admin/gifts/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
             if (!r.ok) throw new Error('Failed to update');
             close();
             showGifts();
@@ -264,7 +264,7 @@
           { name:'url', label:'URL' },
         ],
         onSubmit: async (values, close) => {
-          const r = await api('/api/admin/regalos', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+          const r = await api('/api/admin/gifts', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
           if (!r.ok) throw new Error('Failed to create');
           close();
           showGifts();
@@ -275,15 +275,15 @@
 
   // ========== Messages ==========
   async function showMessages(){
-    activate('mensajes');
+    activate('messages');
     setLoading('Loading messages...');
-    const res = await api('/api/admin/mensajes');
+    const res = await api('/api/admin/messages');
     const data = res.ok ? await res.json() : [];
     const rows = (data||[]).map(m => `
       <tr>
-        <td>${m.nombre||''}</td>
+        <td>${m.name || ''}</td>
         <td>${m.email||''}</td>
-        <td>${(m.contenido||'').slice(0,120)}</td>
+        <td>${(m.content || '').slice(0,120)}</td>
         <td>${new Date(m.createdAt).toLocaleString()}</td>
         <td><button class="admin-action danger" data-id="${m._id}"><i class="fas fa-trash"></i></button></td>
       </tr>`).join('');
@@ -292,20 +292,20 @@
     tbody.addEventListener('click', async (e)=>{
       const btn = e.target.closest('button'); if(!btn) return;
       if (!confirm('Delete this message?')) return;
-      const r = await api(`/api/admin/mensajes/${btn.dataset.id}`, { method:'DELETE' });
+      const r = await api(`/api/admin/messages/${btn.dataset.id}`, { method:'DELETE' });
       if (r.ok) showMessages(); else notify('Error','error');
     });
   }
 
   // ========== Event schedule ==========
-  async function showAgenda(){
-    activate('agenda');
+  async function showEvent(){
+    activate('event');
     setLoading('Loading event schedule...');
     const res = await api('/api/admin/agenda');
     const data = res.ok ? await res.json() : [];
     const rows = (data||[]).map(ev => `
       <tr>
-        <td>${ev.evento||ev.nombre||''}</td>
+        <td>${ev.evento||''}</td>
         <td>${ev.fecha||''}</td>
         <td>${ev.hora||''}</td>
         <td>${ev.lugar||''}</td>
@@ -316,14 +316,14 @@
         </td>
       </tr>`).join('');
     content.innerHTML = renderTable({title:'Event Schedule', columns:['Event','Date','Time','Place','Description','Actions']}, rows,
-      `<button id="addEvt" class="admin-action"><i class=\"fas fa-plus\"></i> Add</button>`);
+      `<button id="addEvent" class="admin-action"><i class=\"fas fa-plus\"></i> Add</button>`);
     const tbody = content.querySelector('tbody');
     tbody.addEventListener('click', async (e)=>{
       const btn = e.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
       const current = (data||[]).find(x => String(x.id) === String(id)) || {};
       if (action==='del'){
         if (!confirm('Delete this event?')) return;
-        const r = await api(`/api/admin/agenda/${id}`, { method:'DELETE' }); if (r.ok) showAgenda(); else notify('Error','error');
+        const r = await api(`/api/admin/agenda/${id}`, { method:'DELETE' }); if (r.ok) showEvent(); else notify('Error','error');
       } else if (action==='edit'){
         openFormModal({
           title: 'Edit event', submitText: 'Save',
@@ -345,12 +345,12 @@
             const r = await api(`/api/admin/agenda/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
             if (!r.ok) throw new Error('Failed to update');
             close();
-            showAgenda();
+            showEvent();
           }
         });
       }
     });
-    content.querySelector('#addEvt').addEventListener('click', async ()=>{
+    content.querySelector('#addEvent').addEventListener('click', async ()=>{
       openFormModal({
         title: 'Add event', submitText: 'Add',
         fields: [
@@ -437,23 +437,23 @@
 
   // ========== Settings ==========
   async function showSettings(){
-    activate('configuracion');
+    activate('configuration');
     setLoading('Loading settings...');
-    const res = await api('/api/config/agenda/bloqueo');
+    const res = await api('/api/config/agenda/blocked');
     const cfg = res.ok ? await res.json() : {};
-    const bloqueada = !!(cfg.agenda && cfg.agenda.bloqueada);
-    const motivo = (cfg.agenda && cfg.agenda.motivoBloqueo) || '';
+    const isBlocked = !!(cfg.event && cfg.event.blocked);
+    const reason = (cfg.event && cfg.event.reason) || '';
     content.innerHTML = `
       <div class="admin-content">
         <h3><i class="fas fa-cog"></i> Settings</h3>
         <div class="config-grid">
           <div class="config-card">
-            <h4>Agenda lock</h4>
-            <p>Current state: <strong>${bloqueada?'Locked':'Open'}</strong></p>
-            ${bloqueada?`<p>Reason: ${motivo||'-'}</p>`:''}
+            <h4>Event lock</h4>
+            <p>Current state: <strong>${isBlocked?'Locked':'Open'}</strong></p>
+            ${isBlocked?`<p>Reason: ${reason||'-'}</p>`:''}
             <div style="display:flex; gap:8px; margin-top:8px;">
-              <button id="btnLock" class="admin-action ${bloqueada?'disabled':''}" ${bloqueada?'disabled':''}><i class="fas fa-lock"></i> Lock</button>
-              <button id="btnUnlock" class="admin-action ${!bloqueada?'disabled':''}" ${!bloqueada?'disabled':''}><i class="fas fa-lock-open"></i> Unlock</button>
+              <button id="btnLock" class="admin-action ${isBlocked?'disabled':''}" ${isBlocked?'disabled':''}><i class="fas fa-lock"></i> Lock</button>
+              <button id="btnUnlock" class="admin-action ${!isBlocked?'disabled':''}" ${!isBlocked?'disabled':''}><i class="fas fa-lock-open"></i> Unlock</button>
             </div>
           </div>
         </div>
@@ -462,10 +462,10 @@
     const btnUnlock = document.getElementById('btnUnlock');
     if (btnLock) btnLock.addEventListener('click', async ()=>{
       openFormModal({
-        title: 'Lock agenda', submitText: 'Lock',
-        fields: [ { name:'motivoBloqueo', label:'Reason', type:'textarea' } ],
+        title: 'Lock event', submitText: 'Lock',
+        fields: [ { name:'reason', label:'Reason', type:'textarea' } ],
         onSubmit: async (values, close) => {
-          const r = await api('/api/config/agenda/bloqueo', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+          const r = await api('/api/config/agenda/blocked', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
           if (!r.ok) throw new Error('Failed to lock');
           close();
           showSettings();
@@ -473,7 +473,7 @@
       });
     });
     if (btnUnlock) btnUnlock.addEventListener('click', async ()=>{
-      const r = await api('/api/config/agenda/bloqueo', { method:'DELETE' });
+      const r = await api('/api/config/agenda/blocked', { method:'DELETE' });
       if (r.ok) showSettings(); else notify('Error','error');
     });
   }
@@ -481,12 +481,12 @@
   // Router for tabs
   function showTab(tab){
     switch(tab){
-      case 'invitados': return showGuests();
-      case 'regalos': return showGifts();
-      case 'mensajes': return showMessages();
-      case 'agenda': return showAgenda();
+      case 'guests': return showGuests();
+      case 'gifts': return showGifts();
+      case 'messages': return showMessages();
+      case 'event': return showEvent();
       case 'menu': return showMenu();
-      case 'configuracion': return showSettings();
+      case 'configuration': return showSettings();
       default:
         setLoading('Loading...');
     }
@@ -503,5 +503,5 @@
   tabs.forEach(tab => tab.addEventListener('click', ()=> showTab(tab.dataset.tab)));
 
   // Default
-  showTab('invitados');
+  showTab('guests');
 })();

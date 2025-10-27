@@ -5,7 +5,7 @@
     "day": { "en": "June 5", "es": "5 de junio" },
     "time": "21:00",
     "title": { "en": "Welcome Cocktail", "es": "Cocktail de Bienvenida" },
-    "description": { "en": "Informal celebration to welcome all guests", "es": "Celebración informal para dar la bienvenida a todos los invitados" },
+    "description": { "en": "Informal celebration to welcome all guests", "es": "Celebración informal para dar la bienvenida a todos los guests" },
     "venue": { "en": "Hotel Palace Madrid", "es": "Hotel Palace Madrid" },
     "address": { "en": "Plaza de las Cortes, 7, Madrid", "es": "Plaza de las Cortes, 7, Madrid" }
   },
@@ -24,7 +24,7 @@
     "date": "2026-06-06",
     "day": { "en": "June 6", "es": "6 de Junio" },
     "time": "17:00",
-    "title": { "en": "Guest Reception", "es": "Recepción de Invitados" },
+    "title": { "en": "Guest Reception", "es": "Recepción de guests" },
     "description": { "en": "Main celebration with dinner and dancing", "es": "Celebración principal con cena y baile" },
     "venue": { "en": "Palace of the Dukes", "es": "Palacio de los Duques" },
     "address": { "en": "Gran Vía Street, 28, Madrid", "es": "Calle Gran Vía, 28, Madrid" }
@@ -35,7 +35,7 @@
     "day": { "en": "June 7", "es": "7 de junio" },
     "time": "14:00",
     "title": { "en": "Farewell Brunch", "es": "Brunch de Despedida" },
-    "description": { "en": "Casual breakfast to bid farewell to guests", "es": "Desayuno informal para despedir a los invitados" },
+    "description": { "en": "Casual breakfast to bid farewell to guests", "es": "Desayuno informal para despedir a los guests" },
     "venue": { "en": "\"El Jardín\" Restaurant", "es": "Restaurante \"El Jardín\"" },
     "address": { "en": "Calle de Alcalá, 15, Madrid", "es": "Calle de Alcalá, 15, Madrid" }
   }

@@ -82,7 +82,7 @@
         --gradient-primary: linear-gradient(135deg, #8B5A96 0%, #D4A5A5 100%);
       }
 
-      /* Header con el mismo estilo que la página de invitados */
+      /* Header con el mismo estilo que la página de guests */
       header {
         background: var(--gradient-primary);
         color: var(--white);
@@ -715,7 +715,7 @@
         gap: 8px;
       }
 
-      /* Estilos para el modal de añadir invitados */
+      /* Estilos para el modal de añadir guests */
       .modal-overlay {
         position: fixed;
         top: 0;
@@ -967,7 +967,7 @@
         z-index: 1000;
       }
 
-      /* Estilos para el botón de acceso a invitados */
+      /* Estilos para el botón de acceso a guests */
       .guests-access-btn {
         display: flex;
         align-items: center;
@@ -1122,7 +1122,7 @@
             </div>
           </div>
         </div>
-        <a href="login-i18n.html" class="guests-access-btn" title="Acceso para invitados" aria-label="Acceso para invitados">
+        <a href="login-i18n.html" class="guests-access-btn" title="Acceso para guests" aria-label="Acceso para guests">
           <i class="fas fa-user"></i>
         </a>
       </div>
@@ -1145,9 +1145,9 @@
       <!-- Sistema de pestañas -->
       <div class="tabs-container">
         <div class="tabs-header">
-          <button class="tab-btn active" data-tab="invitados">
+          <button class="tab-btn active" data-tab="guests">
             <i class="fas fa-users"></i>
-            <span data-i18n="wedding:admin.guests">Invitados</span>
+            <span data-i18n="wedding:admin.guests">guests</span>
           </button>
           <button class="tab-btn" data-tab="agenda">
             <i class="fas fa-calendar-alt"></i>
@@ -1194,7 +1194,7 @@
         "wedding:admin.title": "Panel de Administración",
         "wedding:admin.welcome": "Bienvenido, Administrador",
         "wedding:admin.welcomeMessage": "Gestiona toda la información de la boda de Iluminada y George",
-        "wedding:admin.guests": "Invitados",
+        "wedding:admin.guests": "guests",
         "wedding:admin.gifts": "Lista de Regalos",
         "wedding:admin.messages": "Mensajes",
         "wedding:admin.comments": "Comentarios",
@@ -1205,15 +1205,15 @@
 
         "wedding:admin.logout": "Cerrar sesión",
         "wedding:admin.home": "Inicio",
-        "wedding:admin.accessGuests": "Acceso Invitados",
+        "wedding:admin.accessGuests": "Acceso guests",
         "wedding:admin.loading": "Cargando panel de administración...",
         "wedding:admin.loadingGeneric": "Cargando...",
-        "wedding:admin.guestsList": "Lista de Invitados",
+        "wedding:admin.guestsList": "Lista de guests",
         "wedding:admin.addGuest": "Añadir Invitado",
         "wedding:admin.giftsList": "Lista de Regalos",
         "wedding:admin.addGift": "Añadir Regalo",
-        "wedding:admin.guestMessages": "Mensajes de Invitados",
-        "wedding:admin.guestComments": "Comentarios de Invitados",
+        "wedding:admin.guestMessages": "Mensajes de guests",
+        "wedding:admin.guestComments": "Comentarios de guests",
         "wedding:admin.eventSchedule": "Agenda de Eventos",
         "wedding:admin.menuManagement": "Gestión de Menús",
 
@@ -1236,7 +1236,7 @@
         "wedding:admin.location": "Lugar",
         "wedding:admin.address": "Dirección",
         "wedding:admin.menuStats": "Estadísticas de Selección de Menús",
-        "wedding:admin.totalMenuSelections": "Total de invitados con menú seleccionado",
+        "wedding:admin.totalMenuSelections": "Total de guests con menú seleccionado",
 
 
 
@@ -1547,7 +1547,7 @@
       async function showTab(tab) {
         console.log('🚀 showTab() ejecutándose con tab:', tab);
         console.log('🚀 Tipo de tab:', typeof tab);
-        console.log('🚀 Tab es igual a "invitados":', tab === 'invitados');
+        console.log('🚀 Tab es igual a "guests":', tab === 'guests');
         console.log('🚀 Timestamp de ejecución:', new Date().toISOString());
         
         // Actualizar pestañas activas
@@ -1563,7 +1563,7 @@
         
         // Determinar URL
         let url = '';
-        if (tab === 'invitados') url = '/api/admin/invitados';
+        if (tab === 'guests') url = '/api/admin/guests';
         if (tab === 'regalos') url = '/api/admin/regalos';
         if (tab === 'mensajes') url = '/api/admin/mensajes';
         if (tab === 'comentarios') url = '/api/admin/comentarios';
@@ -1631,10 +1631,10 @@
           
                       // Renderizar contenido según la pestaña
             console.log('🔍 Debug - Renderizando pestaña:', tab);
-            if (tab === 'invitados') {
-                      console.log('🔍 Debug - Llamando a renderInvitados');
-        console.log('🔍 Debug - Datos que se pasan a renderInvitados:', data);
-        await renderInvitados(data);
+            if (tab === 'guests') {
+                      console.log('🔍 Debug - Llamando a renderguests');
+        console.log('🔍 Debug - Datos que se pasan a renderguests:', data);
+        await renderguests(data);
             } else if (tab === 'regalos') {
               console.log('🔍 Debug - Datos de regalos recibidos:', data);
               if (Array.isArray(data)) {
@@ -1700,29 +1700,29 @@
           eventosDisponibles = {
             '1': 'Cocktail de Bienvenida',
             '2': 'Ceremonia de Boda',
-            '3': 'Recepción de Invitados',
+            '3': 'Recepción de guests',
             '4': 'Brunch de Despedida'
           };
         }
       }
 
       // Funciones de renderizado
-      async function renderInvitados(invitados) {
-        console.log('🎯 FUNCIÓN renderInvitados EJECUTADA');
-        console.log('🎯 Datos de invitados recibidos:', invitados);
+      async function renderguests(guests) {
+        console.log('🎯 FUNCIÓN renderguests EJECUTADA');
+        console.log('🎯 Datos de guests recibidos:', guests);
 
         // Cargar eventos disponibles si no están cargados
         if (Object.keys(eventosDisponibles).length === 0) {
           await cargarEventosDisponibles();
         }
         
-        // Ordenar invitados alfabéticamente por nombre
-        const invitadosOrdenados = [...invitados].sort((a, b) => 
+        // Ordenar guests alfabéticamente por nombre
+        const guestsOrdenados = [...guests].sort((a, b) =>
           a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
         );
         
         // Log detallado de la estructura de cada invitado
-        invitadosOrdenados.forEach((inv, index) => {
+        guestsOrdenados.forEach((inv, index) => {
           console.log(`Invitado ${index + 1} - ${inv.nombre}:`, {
             seleccionMenu: inv.seleccionMenu,
             seleccionEventos: inv.seleccionEventos,
@@ -1737,7 +1737,7 @@
         adminContent.innerHTML = `
           <div class="admin-section">
             <div class="admin-header-section">
-              <h3><i class="fas fa-users"></i> <span data-i18n="wedding:admin.guestsList">Lista de Invitados</span> (${invitadosOrdenados.length})</h3>
+              <h3><i class="fas fa-users"></i> <span data-i18n="wedding:admin.guestsList">Lista de guests</span> (${guestsOrdenados.length})</h3>
               <button onclick="addInvitado()" class="admin-action">
                 <i class="fas fa-plus"></i> <span data-i18n="wedding:admin.addGuest">Añadir Invitado</span>
               </button>
@@ -1755,7 +1755,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  ${invitadosOrdenados.map(inv => `
+                  ${guestsOrdenados.map(inv => `
                     <tr>
                       <td>${inv.nombre}</td>
                       <td>${inv.email}</td>
@@ -2003,7 +2003,7 @@
         adminContent.innerHTML = `
           <div class="admin-section">
             <div class="admin-header-section">
-              <h3><i class="fas fa-comments"></i> <span data-i18n="wedding:admin.guestMessages">Mensajes de Invitados</span> (${mensajes.length})</h3>
+              <h3><i class="fas fa-comments"></i> <span data-i18n="wedding:admin.guestMessages">Mensajes de guests</span> (${mensajes.length})</h3>
             </div>
             <div class="messages-container">
               ${mensajes.map(msg => `
@@ -2027,7 +2027,7 @@
         adminContent.innerHTML = `
           <div class="admin-section">
             <div class="admin-header-section">
-              <h3><i class="fas fa-comment-dots"></i> <span data-i18n="wedding:admin.guestComments">Comentarios de Invitados</span> (${comentarios.length}) <small style="color: #6c757d; font-size: 0.8rem;">🕒 Más recientes primero</small></h3>
+              <h3><i class="fas fa-comment-dots"></i> <span data-i18n="wedding:admin.guestComments">Comentarios de guests</span> (${comentarios.length}) <small style="color: #6c757d; font-size: 0.8rem;">🕒 Más recientes primero</small></h3>
             </div>
             <div class="messages-container">
               ${comentarios.sort((a, b) => new Date(b.fecha) - new Date(a.fecha)).map(comment => {
@@ -2169,7 +2169,7 @@
             
             <div class="menu-stats">
               <h4 data-i18n="wedding:admin.menuStats">Estadísticas de Selección de Menús</h4>
-              <p data-i18n="wedding:admin.totalMenuSelections">Total de invitados con menú seleccionado: ${estadisticas.totalSelecciones || 0}</p>
+              <p data-i18n="wedding:admin.totalMenuSelections">Total de guests con menú seleccionado: ${estadisticas.totalSelecciones || 0}</p>
             </div>
           </div>
         `;
@@ -2268,7 +2268,7 @@
           }
           
           // Hacer la llamada al backend
-          const response = await fetch('/api/admin/invitados', {
+          const response = await fetch('/api/admin/guests', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -2294,7 +2294,7 @@
           
           // Cerrar modal y recargar la lista
           closeModal();
-          showTab('invitados'); // Recargar la pestaña de invitados
+          showTab('guests'); // Recargar la pestaña de guests
           
         } catch (error) {
           console.error('Error al añadir invitado:', error);
@@ -2306,7 +2306,7 @@
       window.editInvitado = async (email) => {
         try {
           // Obtener datos del invitado
-          const response = await fetch(`/api/admin/invitados/${email}`, {
+          const response = await fetch(`/api/admin/guests/${email}`, {
             headers: {
               'Authorization': localStorage.getItem('adminToken')
             }
@@ -2328,7 +2328,7 @@
       window.deleteInvitado = async (email) => {
         if (confirm(i18n.translate('wedding:admin.deleteGuestConfirm'))) {
           try {
-            const response = await fetch(`/api/admin/invitados/${email}`, {
+            const response = await fetch(`/api/admin/guests/${email}`, {
               method: 'DELETE',
               headers: {
                 'Authorization': localStorage.getItem('adminToken')
@@ -2341,7 +2341,7 @@
             
             const result = await response.json();
             alert(i18n.translate('wedding:admin.guestDeletedSuccess'));
-            showTab('invitados'); // Recargar la lista
+            showTab('guests'); // Recargar la lista
           } catch (error) {
             console.error('Error:', error);
             alert(i18n.translate('wedding:admin.errorDeletingGuest'));
@@ -2711,7 +2711,7 @@
         };
         
         try {
-          const response = await fetch(`/api/admin/invitados/${email}`, {
+          const response = await fetch(`/api/admin/guests/${email}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -2727,7 +2727,7 @@
           const result = await response.json();
           alert(i18n.translate('wedding:admin.guestUpdatedSuccess'));
           window.closeEditGuestForm();
-          showTab('invitados'); // Recargar la lista
+          showTab('guests'); // Recargar la lista
         } catch (error) {
           console.error('Error:', error);
           alert(i18n.translate('wedding:admin.errorUpdatingGuest'));
@@ -3012,9 +3012,9 @@
         alert('Token actual: ' + localStorage.getItem('adminToken'));
       }
 
-      // Cargar la pestaña de invitados por defecto
-      console.log('🚀 Cargando pestaña de invitados por defecto...');
-      showTab('invitados');
+      // Cargar la pestaña de guests por defecto
+      console.log('🚀 Cargando pestaña de guests por defecto...');
+      showTab('guests');
       
       // Escuchar cambios de idioma
       window.addEventListener('languageChanged', (event) => {
@@ -3311,7 +3311,7 @@
                   <div class="empty-state" style="text-align: center; padding: 40px; color: #6c757d;">
                     <i class="fas fa-gift" style="font-size: 3em; margin-bottom: 15px; opacity: 0.5;"></i>
                     <h4>No hay regalos recibidos aún</h4>
-                    <p>Los regalos en efectivo aparecerán aquí cuando los invitados realicen pagos.</p>
+                    <p>Los regalos en efectivo aparecerán aquí cuando los guests realicen pagos.</p>
                   </div>
                 ` : ''}
               </div>

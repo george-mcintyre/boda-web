@@ -104,7 +104,7 @@ There are several ways to create this initial data:
      { "email": "admin@example.com", "password": "admin123" }
    ]
    ```
-   - `server/data/invitados.json`
+   - `server/data/guests.json`
    ```json
    [
      { "nombre": "Juan Pérez", "email": "juan@example.com" }
@@ -169,10 +169,10 @@ curl -s -X POST http://localhost:3000/api/login \
   - Admin: email + password → `{ token, tipo:"admin" }`.
 - Guest profile: `GET /api/invitado` with `Authorization: Bearer <token>` (guest role).
 - Guest administration (admin role):
-  - `GET /api/invitados`
-  - `POST /api/invitados`
-  - `PUT /api/invitados/:id`
-  - `DELETE /api/invitados/:id`
+  - `GET /api/guests`
+  - `POST /api/guests`
+  - `PUT /api/guests/:id`
+  - `DELETE /api/guests/:id`
 
 ## 🌐 Frontend
 - When calling authenticated endpoints, send the header: `Authorization: Bearer <token>`.

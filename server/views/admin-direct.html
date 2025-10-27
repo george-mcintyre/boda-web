@@ -348,9 +348,9 @@
       </div>
       
       <div class="button-grid">
-        <button class="adminTab active" data-tab="invitados">
+        <button class="adminTab active" data-tab="guests">
           <i class="fas fa-users"></i>
-          Invitados
+          guests
         </button>
 
         <button class="adminTab" data-tab="mensajes">
@@ -365,7 +365,7 @@
           <i class="fas fa-utensils"></i>
           Gestión de Menús
         </button>
-        <button class="adminTab" data-tab="configuracion">
+        <button class="adminTab" data-tab="configuration">
           <i class="fas fa-cog"></i>
           Configuración
         </button>
@@ -416,7 +416,7 @@
         this.setupEventListeners();
         
         // Cargar pestaña inicial
-        this.showTab('invitados');
+        this.showTab('guests');
       }
       
       setupEventListeners() {
@@ -461,8 +461,8 @@
           let endpoint = '';
           
           switch(tab) {
-            case 'invitados':
-              endpoint = '/api/admin/invitados';
+            case 'guests':
+              endpoint = '/api/admin/guests';
               break;
             case 'regalos':
               endpoint = '/api/admin/regalos';
@@ -476,8 +476,8 @@
             case 'menu':
               endpoint = '/api/admin/menu';
               break;
-            case 'configuracion':
-              this.showConfiguracion();
+            case 'configuration':
+              this.showConfiguration();
               return;
             default:
               throw new Error('Pestaña no válida');
@@ -503,8 +503,8 @@
           
           // Renderizar contenido según la pestaña
           switch(tab) {
-            case 'invitados':
-              this.renderInvitados(data);
+            case 'guests':
+              this.renderguests(data);
               break;
             case 'regalos':
               this.renderRegalos(data);
@@ -567,16 +567,16 @@
       }
       
       // Renderizado de contenido
-      renderInvitados(data) {
-        // Ordenar invitados alfabéticamente por nombre
-        const invitadosOrdenados = [...data].sort((a, b) => 
+      renderguests(data) {
+        // Ordenar guests alfabéticamente por nombre
+        const guestsOrdenados = [...data].sort((a, b) =>
           a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
         );
         
         this.adminContent.innerHTML = `
           <div class="admin-section">
             <div class="admin-header-section">
-              <h3><i class="fas fa-users"></i> Gestión de Invitados</h3>
+              <h3><i class="fas fa-users"></i> Gestión de guests</h3>
               <div class="action-buttons">
                 <button onclick="adminPanel.addInvitado()" class="btn-primary">
                   <i class="fas fa-plus"></i>
@@ -588,22 +588,22 @@
                          <div class="stats-grid">
                <div class="stat-card">
                  <i class="fas fa-users"></i>
-                 <span class="stat-number">${invitadosOrdenados.length}</span>
-                 <h4>Total Invitados</h4>
+                 <span class="stat-number">${guestsOrdenados.length}</span>
+                 <h4>Total guests</h4>
                </div>
                <div class="stat-card">
                  <i class="fas fa-utensils"></i>
-                 <span class="stat-number">${invitadosOrdenados.filter(inv => inv.seleccionMenu).length}</span>
+                 <span class="stat-number">${guestsOrdenados.filter(inv => inv.seleccionMenu).length}</span>
                  <h4>Con Menú</h4>
                </div>
                <div class="stat-card">
                  <i class="fas fa-calendar-alt"></i>
-                 <span class="stat-number">${invitadosOrdenados.filter(inv => inv.confirmacionesAgenda && Object.keys(inv.confirmacionesAgenda).length > 0).length}</span>
+                 <span class="stat-number">${guestsOrdenados.filter(inv => inv.confirmacionesAgenda && Object.keys(inv.confirmacionesAgenda).length > 0).length}</span>
                  <h4>Con Agenda</h4>
                </div>
                <div class="stat-card">
                  <i class="fas fa-comments"></i>
-                 <span class="stat-number">${invitadosOrdenados.filter(inv => inv.mensajes && inv.mensajes.length > 0).length}</span>
+                 <span class="stat-number">${guestsOrdenados.filter(inv => inv.mensajes && inv.mensajes.length > 0).length}</span>
                  <h4>Con Mensajes</h4>
                </div>
              </div>
@@ -620,7 +620,7 @@
                  </tr>
                </thead>
                <tbody>
-                 ${invitadosOrdenados.map(inv => `
+                 ${guestsOrdenados.map(inv => `
                    <tr>
                      <td><strong>${inv.nombre}</strong></td>
                      <td>${inv.email}</td>
@@ -733,7 +733,7 @@
         this.adminContent.innerHTML = `
           <div class="admin-section">
             <div class="admin-header-section">
-              <h3><i class="fas fa-comments"></i> Mensajes de Invitados</h3>
+              <h3><i class="fas fa-comments"></i> Mensajes de guests</h3>
             </div>
             
             <div class="stats-grid">
@@ -871,7 +871,7 @@
         `;
       }
       
-      showConfiguracion() {
+      showConfiguration() {
         this.adminContent.innerHTML = `
           <div class="admin-section">
             <div class="admin-header-section">
@@ -913,7 +913,7 @@
         if (!email) return;
         
         try {
-          const response = await fetch('/api/admin/invitados', {
+          const response = await fetch('/api/admin/guests', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -930,7 +930,7 @@
           
           if (response.ok) {
             this.showSuccess('Invitado añadido correctamente');
-            this.showTab('invitados');
+            this.showTab('guests');
           } else {
             alert('Error: ' + data.error);
           }
@@ -947,7 +947,7 @@
          if (!newEmail) return;
          
          try {
-           const response = await fetch(`/api/admin/invitados/${id}`, {
+           const response = await fetch(`/api/admin/guests/${id}`, {
              method: 'PUT',
              headers: {
                'Content-Type': 'application/json',
@@ -963,7 +963,7 @@
           
           if (response.ok) {
             this.showSuccess('Invitado actualizado correctamente');
-            this.showTab('invitados');
+            this.showTab('guests');
           } else {
             alert('Error: ' + data.error);
           }
@@ -976,7 +976,7 @@
         if (!confirm(`¿Estás seguro de que quieres eliminar al invitado "${nombre}"?`)) return;
         
         try {
-          const response = await fetch(`/api/admin/invitados/${id}`, {
+          const response = await fetch(`/api/admin/guests/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': this.token }
           });
@@ -985,7 +985,7 @@
           
           if (response.ok) {
             this.showSuccess('Invitado eliminado correctamente');
-            this.showTab('invitados');
+            this.showTab('guests');
           } else {
             alert('Error: ' + data.error);
           }
