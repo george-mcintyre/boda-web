@@ -4,6 +4,7 @@ class CommentsSystem {
         this.comments = [];
         this.currentUser = this.getCurrentUser();
         this.isAdmin = this.checkIfAdmin();
+        this.injectStyles();
         this.init();
     }
 
@@ -105,6 +106,28 @@ class CommentsSystem {
         this.renderComments();
     }
 
+    // Inyectar estilos para el selector flotante de reacciones
+    injectStyles() {
+        if (document.getElementById('reaction-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'reaction-styles';
+        style.textContent = `
+          .reaction-wrapper { position: relative; display: inline-block; }
+          .heart-btn { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:16px; border:1px solid #eee; background:#fff; cursor:pointer; transition: all .2s ease; }
+          .heart-btn.active { background:#ffe6ea; border-color:#ffb3c1; color:#d6336c; }
+          .heart-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+          .heart-count { font-size:.9em; color:#555; }
+          /* Position picker directly above the button with a slight overlap so cursor stays within hover area */
+          .emoji-picker { position:absolute; left:0; bottom: calc(100% - 6px); display:flex; gap:6px; background:#fff; border:1px solid #eee; border-radius:20px; padding:6px; box-shadow: 0 6px 20px rgba(0,0,0,.12); opacity:0; transform: translateY(6px); pointer-events:none; transition: all .15s ease; transition-delay: 0ms; z-index: 10; }
+          /* Add a small delay before showing on hover; hide immediately on mouseout */
+          .reaction-wrapper:hover .emoji-picker { opacity:1; transform: translateY(0); pointer-events:auto; transition-delay: 250ms; }
+          .emoji-option { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #eee; background:#fff; cursor:pointer; position:relative; }
+          .emoji-option.active { outline: 2px solid #8B5A96; }
+          .emoji-option .count { position:absolute; bottom:-10px; right:-6px; background:#8B5A96; color:#fff; border-radius:10px; padding:0 6px; font-size:.7em; line-height:18px; height:18px; }
+        `;
+        document.head.appendChild(style);
+    }
+
     // Emojis disponibles para reacciones
     getAvailableEmojis() {
         return [
@@ -148,6 +171,30 @@ class CommentsSystem {
         if (!reacciones || !reacciones[emoji]) return false;
         const userEmail = localStorage.getItem('email');
         return reacciones[emoji].includes(userEmail);
+    }
+
+    // Obtener el emoji seleccionado por el usuario (una sola selección)
+    getUserSelectedEmoji(reacciones) {
+        const userEmail = localStorage.getItem('email');
+        if (!userEmail || !reacciones) return null;
+        for (const [emoji, list] of Object.entries(reacciones)) {
+            if (Array.isArray(list) && list.includes(userEmail)) return emoji;
+        }
+        return null;
+    }
+
+    getCountFor(reacciones, emoji) {
+        return (reacciones && Array.isArray(reacciones[emoji])) ? reacciones[emoji].length : 0;
+    }
+
+    // Total reactions across all emojis
+    getTotalReactionsCount(reacciones) {
+        if (!reacciones) return 0;
+        let sum = 0;
+        for (const v of Object.values(reacciones)) {
+            if (Array.isArray(v)) sum += v.length;
+        }
+        return sum;
     }
 
     // Agregar nuevo comentario
@@ -245,22 +292,30 @@ class CommentsSystem {
         const commentsHTML = sortedComments.map(comment => {
             const reacciones = comment.reacciones || {};
             const emojisDisponibles = this.getAvailableEmojis();
-            
-            // Generar HTML de reacciones
-            const reaccionesHTML = emojisDisponibles.map(({ emoji, name }) => {
-                const count = reacciones[emoji] ? reacciones[emoji].length : 0;
-                const hasReacted = this.hasUserReacted(reacciones, emoji);
-                const isActive = hasReacted ? 'active' : '';
-                
+
+            // Main button shows heart with total count; hover shows picker with per-emoji counts
+            const selectedEmoji = this.getUserSelectedEmoji(reacciones);
+            const totalCount = this.getTotalReactionsCount(reacciones);
+
+            const pickerHTML = emojisDisponibles.map(({ emoji, name }) => {
+                const count = this.getCountFor(reacciones, emoji);
+                const isActive = selectedEmoji === emoji ? 'active' : '';
                 return `
-                    <button class="reaction-btn ${isActive}" 
-                            onclick="commentsSystem.toggleReaction('${comment.id}', '${emoji}')" 
-                            title="${name}">
-                        <span class="reaction-emoji">${emoji}</span>
-                        ${count > 0 ? `<span class="reaction-count">${count}</span>` : ''}
-                    </button>
-                `;
+                  <button class="emoji-option ${isActive}" title="${name}" onclick="commentsSystem.toggleReaction('${comment.id}', '${emoji}')">
+                    <span>${emoji}</span>
+                    ${count > 0 ? `<span class=\"count\">${count}</span>` : ''}
+                  </button>`;
             }).join('');
+
+            const reaccionesHTML = `
+              <div class="reaction-wrapper">
+                <button class="heart-btn ${selectedEmoji ? 'active' : ''}" onclick="commentsSystem.toggleReaction('${comment.id}', '❤️')" title="${selectedEmoji ? 'Actualizar a ❤️ o quitar si ya es ❤️' : 'Me gusta (❤️)'}">
+                  <span>❤️</span>
+                  ${totalCount > 0 ? `<span class=\"heart-count\">${totalCount}</span>` : ''}
+                </button>
+                <div class="emoji-picker">${pickerHTML}</div>
+              </div>
+            `;
             
             return `
                 <div class="comment-item" data-comment-id="${comment.id}">
