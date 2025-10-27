@@ -30,6 +30,9 @@ app.use(helmet({
         "https://cdn.jsdelivr.net",
         "https://unpkg.com"
       ],
+      "script-src-attr": [
+        "'unsafe-inline'" // allow inline on* handlers until refactor to addEventListener
+      ],
       "style-src": [
         "'self'",
         "'unsafe-inline'",

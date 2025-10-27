@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
       }
     } catch (err) {
-      console.error('Error al cargar el status de la agenda:', err);
+      console.error('Error loading the Event Status:', err);
     }
   }
   
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         mensajesDiv.innerHTML = '<p class="no-messages">Aún no hay mensajes. ¡Sé el primero en dejar uno!</p>';
       }
     } catch (err) {
-      document.getElementById('mensajesContent').innerHTML = '<p class="error">Error de conexión al cargar los mensajes.</p>';
+      document.getElementById('mensajesContent').innerHTML = '<p class="error">Error loading the Messages.</p>';
     }
   }
 
