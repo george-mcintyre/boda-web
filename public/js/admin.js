@@ -23,9 +23,12 @@
 
   // Fetch helper with auth header and cache-busting
   function api(path, opts){
-    const headers = Object.assign({ 'Authorization': token }, (opts && opts.headers)||{});
-    const options = Object.assign({ headers }, opts||{});
-    return fetch(path + (path.includes('?')?'':'?') + `_t=${Date.now()}`, options);
+    const options = Object.assign({}, opts || {});
+    // Merge headers correctly without dropping Authorization on methods that set Content-Type
+    const mergedHeaders = Object.assign({ 'Authorization': `Bearer ${token}` }, options.headers || {});
+    options.headers = mergedHeaders;
+    const sep = path.includes('?') ? '&' : '?';
+    return fetch(path + sep + `_t=${Date.now()}`, options);
   }
 
   // Tab activation helper
@@ -301,7 +304,7 @@
   async function showEvent(){
     activate('event');
     setLoading('Loading event schedule...');
-    const res = await api('/api/admin/agenda');
+    const res = await api('/api/admin/events');
     const data = res.ok ? await res.json() : [];
     const rows = (data||[]).map(ev => `
       <tr>
@@ -323,7 +326,7 @@
       const current = (data||[]).find(x => String(x.id) === String(id)) || {};
       if (action==='del'){
         if (!confirm('Delete this event?')) return;
-        const r = await api(`/api/admin/agenda/${id}`, { method:'DELETE' }); if (r.ok) showEvent(); else notify('Error','error');
+        const r = await api(`/api/admin/events/${id}`, { method:'DELETE' }); if (r.ok) showEvent(); else notify('Error','error');
       } else if (action==='edit'){
         openFormModal({
           title: 'Edit event', submitText: 'Save',
@@ -342,7 +345,7 @@
             descripcion: current.descripcion || ''
           },
           onSubmit: async (values, close) => {
-            const r = await api(`/api/admin/agenda/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+            const r = await api(`/api/admin/events/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
             if (!r.ok) throw new Error('Failed to update');
             close();
             showEvent();
@@ -361,10 +364,10 @@
           { name:'descripcion', label:'Description', type:'textarea' },
         ],
         onSubmit: async (values, close) => {
-          const r = await api('/api/admin/agenda', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+          const r = await api('/api/admin/events', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
           if (!r.ok) throw new Error('Failed to create');
           close();
-          showAgenda();
+          showEvent();
         }
       });
     });
