@@ -1,4 +1,4 @@
-require('dotenv').config();
+try { require('dotenv').config(); } catch (_) { /* dotenv optional at runtime */ }
 
 function required(name, def) {
   const val = process.env[name] ?? def;

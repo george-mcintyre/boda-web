@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-require('dotenv').config();
-const mongoose = require('mongoose');
+const mongoose = require('../server/node_modules/mongoose');
+const { MONGODB_URI, MONGODB_DB } = require('../server/config/env');
 
 (async function inspect() {
   try {
-    const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
-    const dbName = process.env.MONGODB_DB || 'boda-web';
+    const uri = MONGODB_URI;
+    const dbName = MONGODB_DB;
     console.log(`[DB] Connecting to ${uri}/${dbName} ...`);
     await mongoose.connect(uri, { dbName });
 

@@ -160,6 +160,22 @@ curl -s -X POST http://localhost:3000/api/login \
 ## 🔄 Utilidades de base de datos
 - Inspeccionar colecciones: `node scripts/inspect-db.js`
 - Limpiar colecciones o DROPar DB: `node scripts/clean-db.js [--drop] [--force]`
+- Sembrar datos de ejemplo (no producción): `node scripts/seed-db.js` (use `--force` para limpiar y luego sembrar)
+
+Comportamiento del seeding:
+- Al iniciar el servidor en no‑producción, la app auto‑siembra si las colecciones están vacías.
+- El seeder soporta archivos de ejemplo en inglés y español y nombres de campos legacy:
+  - Guests: `guests.example.json` o `invitados.example.json`.
+  - Events: `events.example.json`, `eventos.example.json` o `agenda.example.json`.
+  - Messages: `mensajes.example.json` (o legacy `comentarios.example.json`).
+  - Menu: `menu.example.json`.
+  - Cash gift cards: `cash-gift-cards.example.json`.
+  - Config: `config.example.json`.
+
+Notas de compatibilidad de esquema:
+- Guests: campos en español como `nombre`, `estado`/`asistencia`, `acompañantes`, `menuEspecial` y `notas` se mapean al nuevo esquema (`name`, `status`, `companions`, `specialMenu`, `message`).
+- Events: se mapean cadenas localizadas; fechas desde `fecha` se parsean; `hora` va a `time`.
+- Messages: `mensaje` → `content`; se preserva el mapa de reacciones; `fecha` se mapea a timestamps.
 
 ## 🔐 API y autenticación
 - Login: `POST /api/login`  { email, password? }

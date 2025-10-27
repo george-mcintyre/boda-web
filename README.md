@@ -162,6 +162,22 @@ curl -s -X POST http://localhost:3000/api/login \
 ## 🔄 Database utilities
 - Inspect collections: `node scripts/inspect-db.js`
 - Clean collections or DROP DB: `node scripts/clean-db.js [--drop] [--force]`
+- Seed example data (non‑production): `node scripts/seed-db.js` (use `--force` to clean then seed)
+
+Seeding behavior:
+- On server start in non‑production, the app auto‑seeds if collections are empty.
+- The seeder supports both English and Spanish example files and legacy field names:
+  - Guests: `guests.example.json` or `invitados.example.json`.
+  - Events: `events.example.json`, `eventos.example.json`, or `agenda.example.json`.
+  - Messages: `mensajes.example.json` (or legacy `comentarios.example.json`).
+  - Menu: `menu.example.json`.
+  - Cash gift cards: `cash-gift-cards.example.json`.
+  - Config: `config.example.json`.
+
+Schema compatibility notes:
+- Guests: Spanish fields like `nombre`, `estado`/`asistencia`, `acompañantes`, `menuEspecial` and `notas` are mapped to the new schema fields (`name`, `status`, `companions`, `specialMenu`, `message`).
+- Events: Localized strings are mapped; dates from `fecha` are parsed; `hora` goes into `time`.
+- Messages: `mensaje` → `content`; reactions map preserved; `fecha` mapped to timestamps.
 
 ## 🔐 API and authentication
 - Login: `POST /api/login`  { email, password? }

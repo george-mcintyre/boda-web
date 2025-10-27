@@ -93,6 +93,24 @@ async function seedExampleDataIfEmpty() {
     return collected;
   };
 
+  // Normalize legacy special menu selections into a plain string for Guest.specialMenu
+  function normalizeSpecialMenu(v) {
+    if (v == null) return '';
+    if (typeof v === 'string') return v;
+    if (Array.isArray(v)) return v.map(x => (x == null ? '' : String(x))).filter(Boolean).join(', ');
+    if (typeof v === 'object') {
+      const { entrante, principal, postre, alergias } = v || {};
+      const parts = [];
+      if (entrante) parts.push(`Entrante: ${entrante}`);
+      if (principal) parts.push(`Principal: ${principal}`);
+      if (postre) parts.push(`Postre: ${postre}`);
+      if (alergias) parts.push(`Alergias: ${alergias}`);
+      if (parts.length) return parts.join(' | ');
+      try { return JSON.stringify(v); } catch { return String(v); }
+    }
+    return String(v);
+  }
+
   const actions = [];
 
   const counts = await Promise.all([
@@ -111,9 +129,28 @@ async function seedExampleDataIfEmpty() {
     await models.Admin.insertMany(read('admin.example.json'));
     actions.push('Admin');
   }
-  if (cGuest === 0 && exists('guests.example.json')) {
-    await models.Guest.insertMany(read('guests.example.json'));
-    actions.push('Guest');
+  if (cGuest === 0) {
+    let guests = [];
+    if (exists('guests.example.json')) guests = read('guests.example.json');
+    else if (exists('invitados.example.json')) guests = read('invitados.example.json');
+    const wrapGuest = (g) => ({
+      name: g.name ?? g.nombre,
+      email: g.email,
+      status: (function(){
+        if (g.status) return g.status;
+        const s = (g.estado || g.asistencia || '').toString().toLowerCase();
+        if (s.includes('confirm')) return 'confirmed';
+        if (s.includes('declin') || s.includes('rechaz')) return 'declined';
+        return 'pending';
+      })(),
+      companions: g.companions ?? g.acompanantes ?? g['acompañantes'] ?? 0,
+      specialMenu: normalizeSpecialMenu(g.specialMenu ?? g.menuEspecial ?? g.seleccionMenu),
+      message: g.message ?? g.mensaje ?? g.notas ?? '',
+    });
+    if (Array.isArray(guests) && guests.length) {
+      await models.Guest.insertMany(guests.map(wrapGuest));
+      actions.push('Guest');
+    }
   }
   if (cEvent === 0) {
     const wrapEvent = (e) => ({

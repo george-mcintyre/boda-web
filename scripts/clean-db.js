@@ -9,8 +9,7 @@
 
   Uses env: MONGODB_URI, MONGODB_DB (or dev defaults when NODE_ENV!=='production').
 */
-require('dotenv').config();
-const mongoose = require('mongoose');
+const mongoose = require('../server/node_modules/mongoose');
 const readline = require('readline');
 const models = require('../server/models');
 

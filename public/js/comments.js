@@ -124,6 +124,10 @@ class CommentsSystem {
           .emoji-option { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #eee; background:#fff; cursor:pointer; position:relative; }
           .emoji-option.active { outline: 2px solid #8B5A96; }
           .emoji-option .count { position:absolute; bottom:-10px; right:-6px; background:#8B5A96; color:#fff; border-radius:10px; padding:0 6px; font-size:.7em; line-height:18px; height:18px; }
+          /* Summary list when there are reactions */
+          .reaction-summary { display:inline-flex; align-items:center; gap:8px; padding:4px 6px; border:1px solid #eee; border-radius:16px; background:#fff; }
+          .summary-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 8px; border-radius:12px; background:#f8f9fa; border:1px solid #eee; font-size:.9em; }
+          .summary-pill .count { color:#555; font-weight:600; }
         `;
         document.head.appendChild(style);
     }
@@ -271,7 +275,7 @@ class CommentsSystem {
         }
     }
 
-    // Renderizar comentarios
+    // Render Comments
     renderComments() {
         const commentsList = document.getElementById('commentsList');
         if (!commentsList) return;
@@ -293,7 +297,10 @@ class CommentsSystem {
             const reacciones = comment.reacciones || {};
             const emojisDisponibles = this.getAvailableEmojis();
 
-            // Main button shows heart with total count; hover shows picker with per-emoji counts
+            // Render, according to requirement:
+            // 1) If no reactions yet -> show a single heart button (no count). Hover shows picker.
+            // 2) If one or more reactions exist -> show a summary list of emojis with their counts instead of the heart.
+            // 3) Hover over the summary list also shows the picker for selection.
             const selectedEmoji = this.getUserSelectedEmoji(reacciones);
             const totalCount = this.getTotalReactionsCount(reacciones);
 
@@ -307,12 +314,27 @@ class CommentsSystem {
                   </button>`;
             }).join('');
 
+            let triggerAreaHTML = '';
+            if (totalCount <= 0) {
+              // Show only heart icon with no count when no reactions have been made
+              triggerAreaHTML = `
+                <button class="heart-btn" onclick="commentsSystem.toggleReaction('${comment.id}', '❤️')" title="Me gusta (❤️)">
+                  <span>❤️</span>
+                </button>`;
+            } else {
+              // Build summary list of reactions with their counts
+              const summaryPills = emojisDisponibles.map(({ emoji }) => {
+                const c = this.getCountFor(reacciones, emoji);
+                if (c <= 0) return '';
+                const isMine = selectedEmoji === emoji ? ' style="outline:2px solid #8B5A96;"' : '';
+                return `<span class="summary-pill"${isMine}><span>${emoji}</span><span class=\"count\">${c}</span></span>`;
+              }).join('');
+              triggerAreaHTML = `<div class="reaction-summary">${summaryPills}</div>`;
+            }
+
             const reaccionesHTML = `
               <div class="reaction-wrapper">
-                <button class="heart-btn ${selectedEmoji ? 'active' : ''}" onclick="commentsSystem.toggleReaction('${comment.id}', '❤️')" title="${selectedEmoji ? 'Actualizar a ❤️ o quitar si ya es ❤️' : 'Me gusta (❤️)'}">
-                  <span>❤️</span>
-                  ${totalCount > 0 ? `<span class=\"heart-count\">${totalCount}</span>` : ''}
-                </button>
+                ${triggerAreaHTML}
                 <div class="emoji-picker">${pickerHTML}</div>
               </div>
             `;

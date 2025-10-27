@@ -106,6 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const data = await response.json();
       
       const menuStatusContent = document.getElementById('menuStatusContent');
+      if (!menuStatusContent) return;
       
       if (response.ok && data.seleccionMenu) {
         const seleccion = data.seleccionMenu;
@@ -156,10 +157,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       method: 'GET',
       headers: { 'Authorization': token }
     });
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
     if (response.ok) {
-      // Mostrar nombre del invitado en algún lugar si es necesario
-      console.log(`Bienvenido, ${data.nombre}!`);
+      const nombre = data.name || data.nombre || 'invitado';
+      console.log(`Bienvenido, ${nombre}!`);
     } else {
       localStorage.removeItem('token');
       window.location.href = 'login.html';
@@ -172,21 +173,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function cargarStatusAgenda() {
     try {
       // Obtener tanto la agenda como las confirmaciones
-      const [agendaRes, confirmacionesRes] = await Promise.all([
+      const [agendaRes, guestRes] = await Promise.all([
         fetch('/api/event'),
-        fetch('/api/event/confirm', {
+        fetch('/api/invitado', {
           headers: { 'Authorization': token }
         })
       ]);
       
-      const agenda = await agendaRes.json();
-      const data = await confirmacionesRes.json();
+      const agenda = await agendaRes.json().catch(() => []);
+      const guestData = await guestRes.json().catch(() => ({}));
       
       const agendaStatusContent = document.getElementById('agendaStatusContent');
+      if (!agendaStatusContent) return;
       
-      if (confirmacionesRes.ok && data.confirmaciones && Object.keys(data.confirmaciones).length > 0) {
-        const confirmaciones = data.confirmaciones;
-        
+      const data = guestRes.ok ? guestData : {};
+      const confirmaciones = data.confirmaciones || data.confirmacionesAgenda || {};
+      
+      if (Object.keys(confirmaciones).length > 0) {
         // Crear un mapa de eventos por ID para obtener los nombres
         const eventosMap = {};
         agenda.forEach(evento => {
@@ -312,12 +315,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
   async function cargarMensajes() {
+    // If the mensajes container isn't present on this page, skip
+    const mensajesDiv = document.getElementById('mensajesContent') || document.getElementById('commentsList');
+    if (!mensajesDiv) return;
     try {
       const res = await fetch('/api/messages');
-      const mensajes = await res.json();
-      const mensajesDiv = document.getElementById('mensajesContent');
+      const mensajes = await res.json().catch(() => []);
       
-      if (res.ok && mensajes.length > 0) {
+      if (res.ok && Array.isArray(mensajes) && mensajes.length > 0) {
         // Obtener el email del usuario actual
         const userEmail = localStorage.getItem('email');
         
@@ -346,7 +351,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         mensajesDiv.innerHTML = '<p class="no-messages">Aún no hay mensajes. ¡Sé el primero en dejar uno!</p>';
       }
     } catch (err) {
-      document.getElementById('mensajesContent').innerHTML = '<p class="error">Error loading the Messages.</p>';
+      if (mensajesDiv) mensajesDiv.innerHTML = '<p class="error">Error loading the Messages.</p>';
     }
   }
 
@@ -581,19 +586,17 @@ document.addEventListener('DOMContentLoaded', async () => {
      const agendaContent = document.getElementById('agendaContent');
      
      try {
-       const [agendaRes, confirmacionesRes, bloqueoRes] = await Promise.all([
+       const [agendaRes, guestRes] = await Promise.all([
          fetch('/api/event'),
-         fetch('/api/event/confirm', {
+         fetch('/api/invitado', {
            headers: { 'Authorization': token }
-         }),
-         fetch('/api/config/event/bloqueo')
+         })
        ]);
-       
-       const agenda = await agendaRes.json();
-       const confirmacionesData = await confirmacionesRes.json();
-       const confirmaciones = confirmacionesData.confirmaciones || confirmacionesData;
-       const configBloqueo = await bloqueoRes.json();
-       const agendaBloqueada = configBloqueo.agenda && configBloqueo.agenda.bloqueada;
+      
+       const agenda = await agendaRes.json().catch(() => []);
+       const guestData = await guestRes.json().catch(() => ({}));
+       const confirmaciones = (guestRes.ok ? (guestData.confirmaciones || guestData.confirmacionesAgenda) : {}) || {};
+       const agendaBloqueada = false;
        
        if (agendaRes.ok) {
          let agendaHTML = '';
