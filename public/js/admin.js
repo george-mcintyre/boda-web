@@ -442,7 +442,7 @@
   async function showSettings(){
     activate('configuration');
     setLoading('Loading settings...');
-    const res = await api('/api/config/agenda/blocked');
+    const res = await api('/api/config/event/blocked');
     const cfg = res.ok ? await res.json() : {};
     const isBlocked = !!(cfg.event && cfg.event.blocked);
     const reason = (cfg.event && cfg.event.reason) || '';
@@ -468,7 +468,7 @@
         title: 'Lock event', submitText: 'Lock',
         fields: [ { name:'reason', label:'Reason', type:'textarea' } ],
         onSubmit: async (values, close) => {
-          const r = await api('/api/config/agenda/blocked', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
+          const r = await api('/api/config/event/blocked', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
           if (!r.ok) throw new Error('Failed to lock');
           close();
           showSettings();
@@ -476,7 +476,7 @@
       });
     });
     if (btnUnlock) btnUnlock.addEventListener('click', async ()=>{
-      const r = await api('/api/config/agenda/blocked', { method:'DELETE' });
+      const r = await api('/api/config/event/blocked', { method:'DELETE' });
       if (r.ok) showSettings(); else notify('Error','error');
     });
   }

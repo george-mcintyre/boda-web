@@ -3,7 +3,7 @@ const path = require('path');
 const { Event } = require('../models');
 const { localizeEvent } = require('../utils/i18n');
 
-async function listAgenda(req, res, next) {
+async function listEvents(req, res, next) {
   try {
     const events = await Event.find({}).sort({ fecha: 1, orden: 1, createdAt: 1 }).lean();
     const items = events.map(e => localizeEvent(e, req.lang, req.defaultLang));
@@ -52,12 +52,12 @@ function writeEventos(payload) {
   fs.renameSync(tmp, EVENTOS_FILE);
 }
 
-async function getEventos(req, res) {
+async function getEvents(req, res) {
   const data = readEventos();
   res.json(data);
 }
 
-async function postEventos(req, res) {
+async function postEvents(req, res) {
   const body = req.body || {};
   if (!body || !Array.isArray(body.eventos)) {
     return res.status(400).json({ error: 'Invalid payload: expected { eventos: [...] }' });
@@ -70,4 +70,4 @@ async function postEventos(req, res) {
   }
 }
 
-module.exports = { listAgenda, getEventos, postEventos };
+module.exports = { listEvents: listEvents, getEvents, postEvents };

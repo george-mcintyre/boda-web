@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  // Función para mostrar mensajes
   function showMessage(elementId, msg, type = 'error') {
     const element = document.getElementById(elementId);
     element.textContent = msg;
@@ -174,8 +173,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       // Obtener tanto la agenda como las confirmaciones
       const [agendaRes, confirmacionesRes] = await Promise.all([
-        fetch('/api/agenda'),
-        fetch('/api/agenda/confirmaciones', {
+        fetch('/api/event'),
+        fetch('/api/event/confirm', {
           headers: { 'Authorization': token }
         })
       ]);
@@ -312,10 +311,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 
-  // Cargar mensajes del invitado actual
   async function cargarMensajes() {
     try {
-      const res = await fetch('/api/mensajes');
+      const res = await fetch('/api/messages');
       const mensajes = await res.json();
       const mensajesDiv = document.getElementById('mensajesContent');
       
@@ -584,11 +582,11 @@ document.addEventListener('DOMContentLoaded', async () => {
      
      try {
        const [agendaRes, confirmacionesRes, bloqueoRes] = await Promise.all([
-         fetch('/api/agenda'),
-         fetch('/api/agenda/confirmaciones', {
+         fetch('/api/event'),
+         fetch('/api/event/confirm', {
            headers: { 'Authorization': token }
          }),
-         fetch('/api/config/agenda/bloqueo')
+         fetch('/api/config/event/bloqueo')
        ]);
        
        const agenda = await agendaRes.json();
@@ -723,7 +721,7 @@ document.addEventListener('DOMContentLoaded', async () => {
    // Función global para confirmar eventos
    window.confirmarEvento = async (eventoId, confirmar) => {
      try {
-       const res = await fetch('/api/agenda/confirmar', {
+       const res = await fetch('/api/event/confirm', {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',
@@ -836,7 +834,7 @@ document.addEventListener('DOMContentLoaded', async () => {
        if (!mensaje) return;
        
        try {
-         const res = await fetch('/api/mensajes', {
+         const res = await fetch('/api/messages', {
            method: 'POST',
            headers: {
              'Content-Type': 'application/json',

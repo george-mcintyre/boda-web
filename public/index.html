@@ -931,7 +931,7 @@
         }, { once: true });
 
         // Obtener eventos del backend
-        const response = await fetch('/api/eventos');
+        const response = await fetch('/api/events');
         const data = await response.json();
         const events = Array.isArray(data?.eventos) ? data.eventos : [];
 
@@ -1110,7 +1110,7 @@
       if (!eventsGrid) return;
 
       try {
-        const response = await fetch('/api/eventos');
+        const response = await fetch('/api/events');
         const data = await response.json();
 
         if (response.ok && data && data.eventos && data.eventos.length > 0) {

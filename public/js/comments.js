@@ -84,7 +84,7 @@ class CommentsSystem {
     // Cargar comentarios desde el servidor
     async loadComments() {
         try {
-            const response = await fetch('/api/comentarios');
+            const response = await fetch('/api/comments');
             if (response.ok) {
                 this.comments = await response.json();
             } else {
@@ -112,7 +112,7 @@ class CommentsSystem {
     // Agregar/quitar reacción
     async toggleReaction(commentId, emoji) {
         try {
-            const response = await fetch(`/api/comentarios/${commentId}/reaccion`, {
+            const response = await fetch(`/api/comments/${commentId}/reaccion`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -157,7 +157,7 @@ class CommentsSystem {
         }
 
         try {
-            const response = await fetch('/api/comentarios', {
+            const response = await fetch('/api/comments', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -194,7 +194,7 @@ class CommentsSystem {
 
         if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
             try {
-                const response = await fetch(`/api/comentarios/${commentId}`, {
+                const response = await fetch(`/api/comments/${commentId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': localStorage.getItem('adminToken')
