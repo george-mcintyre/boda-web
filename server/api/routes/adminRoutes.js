@@ -31,6 +31,12 @@ router.post('/api/admin/menu', auth('admin'), adminCtrl.createMenu);
 router.put('/api/admin/menu/:id', auth('admin'), adminCtrl.updateMenu);
 router.delete('/api/admin/menu/:id', auth('admin'), adminCtrl.deleteMenu);
 
+// Cash Gift Cards
+router.get('/api/admin/cash-gift-cards', auth('admin'), adminCtrl.listCashGiftCards);
+router.post('/api/admin/cash-gift-cards', auth('admin'), adminCtrl.createCashGiftCard);
+router.put('/api/admin/cash-gift-cards/:id', auth('admin'), adminCtrl.updateCashGiftCard);
+router.delete('/api/admin/cash-gift-cards/:id', auth('admin'), adminCtrl.deleteCashGiftCard);
+
 // Settings
 router.get('/api/config/event/blocked', auth('admin'), adminCtrl.getBlockedEvent);
 router.put('/api/config/event/blocked', auth('admin'), adminCtrl.setBlockedEvent);

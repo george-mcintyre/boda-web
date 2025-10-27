@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { Message } = require('../models');
+const { Message, Menu, Config, CashGiftCard, Event } = require('../models');
 
 // Data dir and helpers
 const DATA_DIR = path.join(__dirname, '..', 'data');
@@ -97,159 +97,265 @@ async function deleteGift(req, res) {
   res.json({ ok: true });
 }
 
-// ========== Events (file-backed CRUD) ==========
-async function listEventsAdmin(req, res) {
-  ensureFile(files.events);
-  const items = readJson(files.events, []);
-  res.json(withIds(items));
+// ========== Events (MongoDB-backed CRUD) ==========
+function toEventPayload(body = {}) {
+  // Accept Spanish or English keys
+  const evento = body.evento ?? body.titulo ?? body.title ?? body.nombre;
+  const descripcion = body.descripcion ?? body.description;
+  const lugar = body.lugar ?? body.venue;
+  const fecha = body.fecha ?? body.date;
+  const hora = body.hora ?? body.time;
+  const order = body.orden ?? body.order;
+  const mapOrUndef = (v) => {
+    if (v == null || v === '') return undefined;
+    if (typeof v === 'object') return v; // already localized
+    return { en: String(v) };
+  };
+  const payload = {
+    title: mapOrUndef(evento),
+    description: mapOrUndef(descripcion),
+    venue: mapOrUndef(lugar),
+    date: fecha ? new Date(fecha) : undefined,
+    time: hora != null ? String(hora) : undefined,
+    order: order != null ? Number(order) : undefined,
+  };
+  // remove undefined keys so updates don't unset unintentionally
+  Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
+  return payload;
 }
 
-async function createEventsItem(req, res) {
-  const items = readJson(files.events, []);
-  const item = { ...req.body, id: nextId(items) };
-  items.push(item);
-  writeJson(files.events, items);
-  res.status(201).json(item);
+function presentEvent(doc) {
+  if (!doc) return null;
+  const asStr = (m) => {
+    if (!m) return '';
+    if (typeof m === 'string') return m;
+    if (m && typeof m.get === 'function') return m.get('es') || m.get('en') || '';
+    if (m && typeof m === 'object') return m.es || m.en || '';
+    return '';
+  };
+  return {
+    id: String(doc._id || doc.id),
+    evento: asStr(doc.title),
+    descripcion: asStr(doc.description),
+    lugar: asStr(doc.venue),
+    fecha: doc.date ? new Date(doc.date).toISOString().slice(0, 10) : '',
+    hora: doc.time || '',
+    orden: doc.order ?? undefined,
+  };
 }
 
-async function updateEventsItem(req, res) {
-  const items = readJson(files.events, []);
-  const id = req.params.id;
-  const idx = items.findIndex(it => String(it.id) === String(id));
-  if (idx === -1) return res.status(404).json({ error: 'Agenda item not found' });
-  items[idx] = { ...items[idx], ...req.body, id };
-  writeJson(files.events, items);
-  res.json(items[idx]);
+async function listEventsAdmin(req, res, next) {
+  try {
+    const items = await Event.find({}).sort({ order: 1, createdAt: 1 }).lean();
+    res.json(items.map(presentEvent));
+  } catch (e) { next(e); }
 }
 
-async function deleteEventsItem(req, res) {
-  const items = readJson(files.events, []);
-  const id = req.params.id;
-  const filtered = items.filter(it => String(it.id) !== String(id));
-  writeJson(files.events, filtered);
-  res.json({ ok: true });
+async function createEventsItem(req, res, next) {
+  try {
+    const payload = toEventPayload(req.body || {});
+    const created = await Event.create(payload);
+    res.status(201).json(presentEvent(created));
+  } catch (e) { next(e); }
 }
 
-// ========== Menu (file-backed CRUD) ==========
-function normalizeMenu(data) {
-  // Accept either an array of menu items or an object of categories -> items
-  if (Array.isArray(data)) return data;
-  if (data && typeof data === 'object') {
-    const result = [];
-    for (const [tipo, list] of Object.entries(data)) {
-      if (!Array.isArray(list)) continue;
-      list.forEach((it, idx) => {
-        // Try to pick Spanish or English name/description if nested
-        const nombre = it.nombre || (it.name && (it.name.es || it.name.en)) || it.name || '';
-        const descripcion = it.descripcion || (it.description && (it.description.es || it.description.en)) || it.description || '';
-        const id = it.id || `${tipo}_${idx + 1}`; // ensure uniqueness across categories
-        result.push({ id, nombre, descripcion, tipo, ...it });
-      });
-    }
-    return result;
-  }
-  return [];
+async function updateEventsItem(req, res, next) {
+  try {
+    const id = req.params.id;
+    const payload = toEventPayload(req.body || {});
+    const updated = await Event.findByIdAndUpdate(id, payload, { new: true });
+    if (!updated) return res.status(404).json({ error: 'Agenda item not found' });
+    res.json(presentEvent(updated));
+  } catch (e) { next(e); }
 }
 
-async function listMenus(req, res) {
-  ensureFile(files.menu);
-  const raw = readJson(files.menu, []);
-  const items = normalizeMenu(raw);
-  res.json(withIds(items));
+async function deleteEventsItem(req, res, next) {
+  try {
+    const id = req.params.id;
+    await Event.findByIdAndDelete(id);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
 }
 
-async function createMenu(req, res) {
-  const raw = readJson(files.menu, []);
-  const items = normalizeMenu(raw);
-  const item = { ...req.body };
-  // If no id provided, generate a numeric one using nextId over current numeric ids
-  if (!item.id) item.id = nextId(items);
-  items.push(item);
-  writeJson(files.menu, items);
-  res.status(201).json(item);
+// ========== Menu (MongoDB-backed CRUD) ==========
+function toOptionPayload(body) {
+  const nombre = body?.nombre ?? body?.name ?? '';
+  const descripcion = body?.descripcion ?? body?.description ?? '';
+  const mapOrUndef = (v) => {
+    if (v == null || v === '') return undefined;
+    if (typeof v === 'object') return v; // already localized
+    return { en: String(v) };
+  };
+  return { name: mapOrUndef(nombre), description: mapOrUndef(descripcion) };
 }
 
-async function updateMenu(req, res) {
-  const raw = readJson(files.menu, []);
-  const items = normalizeMenu(raw);
-  const id = req.params.id;
-  const idx = items.findIndex(it => String(it.id) === String(id));
-  if (idx === -1) return res.status(404).json({ error: 'Menu item not found' });
-  items[idx] = { ...items[idx], ...req.body, id };
-  writeJson(files.menu, items);
-  res.json(items[idx]);
+async function getMenuDoc() {
+  let doc = await Menu.findOne();
+  if (!doc) doc = await Menu.create({ options: [] });
+  return doc;
 }
 
-async function deleteMenu(req, res) {
-  const raw = readJson(files.menu, []);
-  const items = normalizeMenu(raw);
-  const id = req.params.id;
-  const filtered = items.filter(it => String(it.id) !== String(id));
-  writeJson(files.menu, filtered);
-  res.json({ ok: true });
-}
-
-// ========== Settings: Agenda bloqueo ==========
-function readConfig() {
-  ensureFile(files.config);
-  const cfg = readJson(files.config, {});
-  return (cfg && typeof cfg === 'object') ? cfg : {};
-}
-
-function writeConfig(cfg) { writeJson(files.config, cfg || {}); }
-
-async function getBlockedEvent(req, res) {
-  const cfg = readConfig();
-  // Migrate legacy cfg.agenda -> cfg.event (English-only)
-  let migrated = false;
-  if (!cfg.event && cfg.agenda) {
-    cfg.event = {
-      blocked: !!(cfg.events.blocked ),
-      reason: cfg.events.reason ?? '',
-      blockedAt: cfg.events.blockedAt ?? null,
+function presentOptions(options) {
+  const arr = Array.isArray(options) ? options : [];
+  return arr.map((opt, idx) => {
+    const asStr = (m) => {
+      if (!m) return '';
+      if (typeof m === 'string') return m;
+      if (m && typeof m.get === 'function') return m.get('es') || m.get('en') || '';
+      if (m && typeof m === 'object') return m.es || m.en || '';
+      return '';
     };
-    delete cfg.agenda;
-    migrated = true;
-  }
-  cfg.event = cfg.event || { blocked: false, reason: '', blockedAt: null };
-  if (migrated) writeConfig(cfg);
-  res.json(cfg);
+    return {
+      id: String(idx + 1),
+      nombre: asStr(opt.name),
+      descripcion: asStr(opt.description),
+    };
+  });
 }
 
-async function setBlockedEvent(req, res) {
-  const cfg = readConfig();
-  const now = new Date().toISOString();
-  cfg.event = cfg.event || {};
-  const reason = (req.body && req.body.reason) || cfg.event.reason || '';
-  cfg.event.blocked = true;
-  cfg.event.reason = reason;
-  cfg.event.blockedAt = cfg.event.blockedAt || now;
-  // Remove any legacy agenda key to avoid duplication
-  if (cfg.agenda) delete cfg.agenda;
-  writeConfig(cfg);
-  res.json(cfg);
+async function listMenus(req, res, next) {
+  try {
+    const doc = await getMenuDoc();
+    res.json(presentOptions(doc.options));
+  } catch (e) { next(e); }
 }
 
-async function clearBlockedEvent(req, res) {
-  const cfg = readConfig();
-  cfg.event = cfg.event || {};
-  cfg.event.blocked = false;
-  cfg.event.reason = '';
-  cfg.event.blockedAt = null;
-  if (cfg.agenda) delete cfg.agenda;
-  writeConfig(cfg);
-  res.json(cfg);
+async function createMenu(req, res, next) {
+  try {
+    const doc = await getMenuDoc();
+    const payload = toOptionPayload(req.body || {});
+    doc.options.push(payload);
+    await doc.save();
+    const items = presentOptions(doc.options);
+    res.status(201).json(items[items.length - 1]);
+  } catch (e) { next(e); }
+}
+
+async function updateMenu(req, res, next) {
+  try {
+    const id = String(req.params.id || '');
+    const doc = await getMenuDoc();
+    const idx = presentOptions(doc.options).findIndex(it => it.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'Menu item not found' });
+    const payload = toOptionPayload(req.body || {});
+    doc.options[idx] = { ...doc.options[idx].toObject?.() ?? doc.options[idx], ...payload };
+    await doc.save();
+    res.json(presentOptions(doc.options)[idx]);
+  } catch (e) { next(e); }
+}
+
+async function deleteMenu(req, res, next) {
+  try {
+    const id = String(req.params.id || '');
+    const doc = await getMenuDoc();
+    const idx = presentOptions(doc.options).findIndex(it => it.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'Menu item not found' });
+    doc.options.splice(idx, 1);
+    await doc.save();
+    res.json({ ok: true });
+  } catch (e) { next(e); }
+}
+
+// ========== Settings: Agenda bloqueo (MongoDB) ==========
+async function getConfigDoc() {
+  let cfg = await Config.findOne();
+  if (!cfg) cfg = await Config.create({ defaultLanguage: 'es', otherOptions: {} });
+  return cfg;
+}
+
+function ensureEventInConfig(cfgObj) {
+  cfgObj.otherOptions = cfgObj.otherOptions || {};
+  const ev = cfgObj.otherOptions.event || { blocked: false, reason: '', blockedAt: null };
+  cfgObj.otherOptions.event = {
+    blocked: !!ev.blocked,
+    reason: ev.reason || '',
+    blockedAt: ev.blockedAt || null,
+  };
+  // expose top-level event for backward compatibility
+  cfgObj.event = cfgObj.otherOptions.event;
+  return cfgObj;
+}
+
+async function getBlockedEvent(req, res, next) {
+  try {
+    const cfg = await getConfigDoc();
+    const obj = ensureEventInConfig(cfg.toObject());
+    // save migration if event was absent
+    await Config.updateOne({ _id: cfg._id }, { $set: { otherOptions: obj.otherOptions } });
+    res.json(obj);
+  } catch (e) { next(e); }
+}
+
+async function setBlockedEvent(req, res, next) {
+  try {
+    const cfg = await getConfigDoc();
+    const now = new Date().toISOString();
+    const obj = ensureEventInConfig(cfg.toObject());
+    const reason = (req.body && req.body.reason) || obj.event.reason || '';
+    obj.otherOptions.event.blocked = true;
+    obj.otherOptions.event.reason = reason;
+    obj.otherOptions.event.blockedAt = obj.otherOptions.event.blockedAt || now;
+    await Config.updateOne({ _id: cfg._id }, { $set: { otherOptions: obj.otherOptions } });
+    res.json(obj);
+  } catch (e) { next(e); }
+}
+
+async function clearBlockedEvent(req, res, next) {
+  try {
+    const cfg = await getConfigDoc();
+    const obj = ensureEventInConfig(cfg.toObject());
+    obj.otherOptions.event.blocked = false;
+    obj.otherOptions.event.reason = '';
+    obj.otherOptions.event.blockedAt = null;
+    await Config.updateOne({ _id: cfg._id }, { $set: { otherOptions: obj.otherOptions } });
+    res.json(obj);
+  } catch (e) { next(e); }
+}
+
+// ========== Cash Gift Cards (MongoDB CRUD) ==========
+async function listCashGiftCards(req, res, next) {
+  try {
+    const items = await CashGiftCard.find({}).sort({ createdAt: -1 }).lean();
+    res.json(items);
+  } catch (e) { next(e); }
+}
+
+async function createCashGiftCard(req, res, next) {
+  try {
+    const { code, amount, used } = req.body || {};
+    const item = await CashGiftCard.create({ code, amount, used });
+    res.status(201).json(item);
+  } catch (e) { next(e); }
+}
+
+async function updateCashGiftCard(req, res, next) {
+  try {
+    const { id } = req.params;
+    const updated = await CashGiftCard.findByIdAndUpdate(id, req.body || {}, { new: true }).lean();
+    if (!updated) return res.status(404).json({ error: 'Cash gift card not found' });
+    res.json(updated);
+  } catch (e) { next(e); }
+}
+
+async function deleteCashGiftCard(req, res, next) {
+  try {
+    const { id } = req.params;
+    await CashGiftCard.findByIdAndDelete(id);
+    res.json({ ok: true });
+  } catch (e) { next(e); }
 }
 
 module.exports = {
   // messages
   listMessages, deleteMessage,
-  // gifts
+  // gifts (still file-backed)
   listGifts, createGift, updateGift, deleteGift,
-  // agenda
+  // agenda (DB-backed)
   listEventsAdmin, createEventsItem, updateEventsItem, deleteEventsItem,
-  // menu
+  // menu (DB-backed)
   listMenus, createMenu, updateMenu, deleteMenu,
-  // settings
+  // settings (DB-backed)
   getBlockedEvent, setBlockedEvent, clearBlockedEvent,
+  // cash gift cards (DB-backed)
+  listCashGiftCards, createCashGiftCard, updateCashGiftCard, deleteCashGiftCard,
 };
