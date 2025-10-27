@@ -84,9 +84,17 @@ class CommentsSystem {
     // Cargar comentarios desde el servidor
     async loadComments() {
         try {
-            const response = await fetch('/api/comments');
+            const response = await fetch('/api/messages');
             if (response.ok) {
-                this.comments = await response.json();
+                const items = await response.json();
+                // Normalize server fields (Message) to comments UI format
+                this.comments = (Array.isArray(items) ? items : []).map(it => ({
+                    id: it._id || it.id,
+                    nombre: it.name || it.nombre || 'Guest',
+                    comentario: it.content || it.contenido || '',
+                    fecha: it.createdAt || it.fecha || Date.now(),
+                    reacciones: it.reacciones || {}
+                }));
             } else {
                 this.comments = [];
             }
@@ -111,27 +119,9 @@ class CommentsSystem {
 
     // Agregar/quitar reacción
     async toggleReaction(commentId, emoji) {
-        try {
-            const response = await fetch(`/api/comments/${commentId}/reaccion`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': localStorage.getItem('token')
-                },
-                body: JSON.stringify({ emoji })
-            });
-
-            if (response.ok) {
-                // Recargar comentarios para mostrar las reacciones actualizadas
-                await this.loadComments();
-            } else {
-                const errorData = await response.json();
-                this.showToast(errorData.error || 'Error al reaccionar', 'error');
-            }
-        } catch (error) {
-            console.error('Error al reaccionar:', error);
-            this.showToast('Error de conexión al reaccionar', 'error');
-        }
+        // Reactions are not supported in the unified Messages system
+        this.showToast('Las reacciones no están disponibles actualmente.', 'error');
+        return;
     }
 
     // Verificar si el usuario actual reaccionó con un emoji específico
@@ -157,13 +147,13 @@ class CommentsSystem {
         }
 
         try {
-            const response = await fetch('/api/comments', {
+            const response = await fetch('/api/messages', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': localStorage.getItem('token')
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
                 },
-                body: JSON.stringify({ comentario: content })
+                body: JSON.stringify({ content })
             });
 
             if (response.ok) {
@@ -194,10 +184,10 @@ class CommentsSystem {
 
         if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
             try {
-                const response = await fetch(`/api/comments/${commentId}`, {
+                const response = await fetch(`/api/messages/${commentId}`, {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': localStorage.getItem('adminToken')
+                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`
                     }
                 });
 

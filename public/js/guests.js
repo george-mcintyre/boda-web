@@ -322,19 +322,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const userEmail = localStorage.getItem('email');
         
         // Filtrar solo los mensajes del usuario actual
-        const misMensajes = mensajes.filter(m => m.email === userEmail);
+        const misMensajes = (Array.isArray(mensajes) ? mensajes : []).filter(m => m.email === userEmail);
         
         if (misMensajes.length > 0) {
           mensajesDiv.innerHTML = `
-            <h4><i class="fas fa-comments"></i> Mis mensajes enviados</h4>
-            <div class="messages-grid">
+            <h4><i class=\"fas fa-comments\"></i> Mis mensajes enviados</h4>
+            <div class=\"messages-grid\">
               ${misMensajes.map(m => `
-                <div class="message-block">
-                  <div class="message-header">
-                    <span class="message-author">${m.nombre}</span>
-                    <span class="message-date">${new Date(m.fecha).toLocaleDateString('es-ES')}</span>
+                <div class=\"message-block\">
+                  <div class=\"message-header\">
+                    <span class=\"message-author\">${m.name || m.nombre || 'Guest'}</span>
+                    <span class=\"message-date\">${new Date(m.createdAt || m.fecha).toLocaleDateString('es-ES')}</span>
                   </div>
-                  <div class="message-content">${m.mensaje}</div>
+                  <div class=\"message-content\">${m.content || m.contenido || ''}</div>
                 </div>
               `).join('')}
             </div>
@@ -838,15 +838,16 @@ document.addEventListener('DOMContentLoaded', async () => {
            method: 'POST',
            headers: {
              'Content-Type': 'application/json',
-             'Authorization': token
+             'Authorization': `Bearer ${token}`
            },
            body: JSON.stringify({ mensaje })
          });
          const data = await res.json();
          if (res.ok) {
-           showMessage('mensajeStatus', data.mensaje, 'success');
+           showMessage('mensajeStatus', 'Mensaje enviado con éxito', 'success');
            showToast('Mensaje enviado con éxito');
            mensajeForm.reset();
+           cargarMensajes();
          } else {
            showMessage('mensajeStatus', data.error || 'Error al enviar el mensaje.', 'error');
          }

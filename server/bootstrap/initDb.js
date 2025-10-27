@@ -15,7 +15,6 @@ async function ensureCollectionsAndIndexes() {
     Guest: models.Guest,
     Event: models.Event,
     Message: models.Message,
-    Comment: models.Comment,
     Menu: models.Menu,
     CashGiftCard: models.CashGiftCard,
     Config: models.Config,
@@ -101,13 +100,12 @@ async function seedExampleDataIfEmpty() {
     models.Guest.countDocuments(),
     models.Event.countDocuments(),
     models.Message.countDocuments(),
-    models.Comment.countDocuments(),
     models.Menu.countDocuments(),
     models.CashGiftCard.countDocuments(),
     models.Config.countDocuments(),
   ]);
 
-  const [cAdmin, cGuest, cEvent, cMsg, cCom, cMenu, cCard, cCfg] = counts;
+  const [cAdmin, cGuest, cEvent, cMsg, cMenu, cCard, cCfg] = counts;
 
   if (cAdmin === 0 && exists('admin.example.json')) {
     await models.Admin.insertMany(read('admin.example.json'));
@@ -151,13 +149,24 @@ async function seedExampleDataIfEmpty() {
       actions.push('Event');
     }
   }
-  if (cMsg === 0 && exists('mensajes.example.json')) {
-    await models.Message.insertMany(read('mensajes.example.json'));
-    actions.push('Message');
-  }
-  if (cCom === 0 && exists('comentarios.example.json')) {
-    await models.Comment.insertMany(read('comentarios.example.json'));
-    actions.push('Comment');
+  if (cMsg === 0) {
+    if (exists('mensajes.example.json')) {
+      await models.Message.insertMany(read('mensajes.example.json'));
+      actions.push('Message');
+    } else if (exists('comentarios.example.json')) {
+      const legacy = read('comentarios.example.json');
+      const mapped = (Array.isArray(legacy) ? legacy : []).map(it => ({
+        name: it.nombre || 'Guest',
+        email: it.email || '',
+        content: it.comentario || '',
+        createdAt: it.fecha ? new Date(it.fecha) : undefined,
+        updatedAt: it.fecha ? new Date(it.fecha) : undefined,
+      }));
+      if (mapped.length) {
+        await models.Message.insertMany(mapped);
+        actions.push('Message');
+      }
+    }
   }
   if (cMenu === 0 && exists('menu.example.json')) {
     const src = read('menu.example.json');

@@ -3,6 +3,7 @@ const router = require('express').Router();
 router.use('/api', require('./authRoutes'));
 router.use('/api', require('./guestRoutes'));
 router.use('/api', require('./eventRoutes'));
+router.use('/api', require('./messageRoutes'));
 router.use('/', require('./adminRoutes'));
 
 module.exports = router;
