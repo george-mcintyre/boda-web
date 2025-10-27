@@ -6,6 +6,7 @@
   <title data-i18n="wedding:title">Boda de Iluminada & George</title>
   <meta name="description" content="Celebra con nosotros nuestro día especial" data-i18n="wedding:hero.description">
   <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="assets/css/home-wix.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <style>
@@ -389,7 +390,77 @@
     }
   </style>
 </head>
-<body>
+<body class="wix-landing-active">
+
+  <!-- Temporary Wix-inspired mobile-first landing -->
+  <div class="wix-landing">
+    <div class="container">
+      <section class="wix-hero">
+        <div class="wix-left">
+          <p class="eyebrow">We’re getting married</p>
+          <h1>Iluminada & George</h1>
+          <p class="date">June 6, 2026 • Marbella, Spain</p>
+          <p class="lede">We can’t wait to celebrate with our favorite people. Here you’ll find the basics — we’ll add more details soon.</p>
+          <div class="cta-row">
+            <a class="btn" href="login.html"><i class="fas fa-heart"></i> Guest zone</a>
+            <a class="link" href="guests.html">Event details</a>
+          </div>
+        </div>
+        <div class="wix-right">
+          <div class="stack-section">
+            <div class="stack-gallery">
+              <div class="stack-viewport">
+                <div class="stack-inner">
+                  <div class="stack-card"><img src="assets/images/home.png" alt="Iluminada and George" loading="eager"></div>
+                  <div class="stack-card"><img src="assets/images/kiss.png" alt="Kiss" loading="lazy"></div>
+                  <div class="stack-card"><img src="assets/images/marbella.png" alt="Marbella" loading="lazy"></div>
+                  <div class="stack-card"><img src="assets/images/paradise.png" alt="Paradise" loading="lazy"></div>
+                  <div class="stack-card"><img src="assets/images/reception.png" alt="Reception" loading="lazy"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="wix-details">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <img src="assets/images/event.png" alt="Ceremony">
+            <div>
+              <p class="title">Ceremony</p>
+              <p class="desc">We’ll say “I do” surrounded by friends and family.</p>
+            </div>
+          </div>
+          <div class="detail-item">
+            <img src="assets/images/dinner.png" alt="Dinner">
+            <div>
+              <p class="title">Dinner & Toasts</p>
+              <p class="desc">A warm, laid‑back celebration with great food and stories.</p>
+            </div>
+          </div>
+          <div class="detail-item">
+            <img src="assets/images/celebrate.png" alt="Party">
+            <div>
+              <p class="title">Let’s Celebrate</p>
+              <p class="desc">Dress to feel amazing; bring your best dance moves.</p>
+            </div>
+          </div>
+          <div class="detail-item">
+            <img src="assets/images/last.png" alt="More info">
+            <div>
+              <p class="title">More details soon</p>
+              <p class="desc">We’re polishing the full site. Check back for travel, schedule, and more.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="mini-footer">
+        Iluminada & George • <a class="link" href="/admin-login.html">Admin</a>
+      </div>
+    </div>
+  </div>
   <header>
     <div class="header-content">
       <div class="header-left">
@@ -1230,5 +1301,6 @@
       loadEvents();
     });
   </script>
+  <script src="js/stack-gallery.js"></script>
 </body>
 </html>
