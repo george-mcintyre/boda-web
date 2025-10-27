@@ -130,11 +130,11 @@
         return;
       }
       
-      // If token exists, load simplified admin script
+      // If token exists, load full admin script
       const script = document.createElement('script');
-      script.src = 'js/admin-simple.js';
+      script.src = 'js/admin.js';
       script.onload = () => {
-        console.log('Admin simplified script loaded correctly');
+        console.log('Admin script loaded correctly');
       };
       document.body.appendChild(script);
     });
