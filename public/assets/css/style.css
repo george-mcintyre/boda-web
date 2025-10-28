@@ -4,20 +4,20 @@
 /* CSS variables for the color palette */
 :root {
   /* Main elegant palette */
-  --primary-color: #8B5A96;      /* Soft purple */
-  --secondary-color: #D4A5A5;    /* Pale pink */
-  --accent-color: #F4E4D6;       /* Warm beige */
-  --text-dark: #2C1810;          /* Dark brown */
-  --text-light: #6B4E3D;         /* Light brown */
+  --primary-color: #939293;      /* Soft purple */
+  --secondary-color: #d0c8c8;    /* Pale pink */
+  --accent-color: #f6eeec;       /* Warm beige */
+  --text-dark: #2f1f1a;          /* Dark brown */
+  --text-light: #605047;         /* Light brown */
   --white: #FFFFFF;
   --light-bg: #FDFBF7;           /* Very light background */
-  --shadow: rgba(139, 90, 150, 0.1);
-  --shadow-hover: rgba(139, 90, 150, 0.2);
+  --shadow: rgba(142, 119, 147, 0.1);
+  --shadow-hover: rgba(142, 119, 148, 0.2);
   
   /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #8B5A96 0%, #D4A5A5 100%);
-  --gradient-secondary: linear-gradient(135deg, #F4E4D6 0%, #FFFFFF 100%);
-  --gradient-accent: linear-gradient(135deg, #D4A5A5 0%, #F4E4D6 100%);
+  --gradient-primary: linear-gradient(135deg, rgb(190, 190, 190) 0%, #000000 100%);
+  --gradient-secondary: linear-gradient(135deg, #f8edec 0%, #FFFFFF 100%);
+  --gradient-accent: linear-gradient(135deg, #d5d5d5 0%, #f1e2d5 100%);
 }
 
 /* Reset and base configuration */
