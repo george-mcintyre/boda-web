@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/home-wix.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <style>
     /* Estilos para el header con selector de idiomas */
@@ -408,14 +409,13 @@
         </div>
         <div class="wix-right">
           <div class="stack-section">
-            <div class="stack-gallery">
+            <div class="stack-gallery wow-stack">
               <div class="stack-viewport">
                 <div class="stack-inner">
-                  <div class="stack-card"><img src="assets/images/home.png" alt="Iluminada and George" loading="eager"></div>
-                  <div class="stack-card"><img src="assets/images/kiss.png" alt="Kiss" loading="lazy"></div>
+                  <div class="stack-card"><img src="assets/images/home.png" alt="Home" loading="eager"></div>
+                  <div class="stack-card"><img src="assets/images/home.png" alt="Home 2" loading="lazy"></div>
+                  <div class="stack-card"><img src="assets/images/celebrate.png" alt="Celebrate" loading="lazy"></div>
                   <div class="stack-card"><img src="assets/images/marbella.png" alt="Marbella" loading="lazy"></div>
-                  <div class="stack-card"><img src="assets/images/paradise.png" alt="Paradise" loading="lazy"></div>
-                  <div class="stack-card"><img src="assets/images/reception.png" alt="Reception" loading="lazy"></div>
                 </div>
               </div>
             </div>
@@ -1300,6 +1300,14 @@
     document.addEventListener('DOMContentLoaded', () => {
       loadEvents();
     });
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+  <script>
+    // Initialize WOW.js with Animate.css v4 compatibility
+    if (window.WOW) {
+      window._wowInstance = new WOW({ boxClass: 'wow', animateClass: 'animate__animated', offset: 0, mobile: true, live: false });
+      window._wowInstance.init();
+    }
   </script>
   <script src="js/stack-gallery.js"></script>
 </body>
