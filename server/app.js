@@ -21,14 +21,16 @@ app.use(helmet({
         "'unsafe-inline'", // allow inline handlers used in current frontend
         "https://cdnjs.cloudflare.com",
         "https://cdn.jsdelivr.net",
-        "https://unpkg.com"
+        "https://unpkg.com",
+        "chrome-extension:"
       ],
       "script-src-elem": [
         "'self'",
         "'unsafe-inline'",
         "https://cdnjs.cloudflare.com",
         "https://cdn.jsdelivr.net",
-        "https://unpkg.com"
+        "https://unpkg.com",
+        "chrome-extension:"
       ],
       "script-src-attr": [
         "'unsafe-inline'" // allow inline on* handlers until refactor to addEventListener

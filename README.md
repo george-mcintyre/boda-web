@@ -10,6 +10,40 @@
 - 4) Visit: http://localhost:3000/index.html → Login → guests.html
 - Optional: use ./start-server.sh (macOS/Linux) or start-server.bat/ps1 (Windows)
 
+### Accessing from another device on your LAN (macOS)
+- The dev server runs over HTTP by default. Use: http://<your-mac-hostname>.local:3000 or http://<your-mac-ip>:3000
+- If you see ERR_SSL_PROTOCOL_ERROR, it means you tried to open https://…:3000 but the dev server isn’t using TLS. Use http:// instead, or enable local HTTPS (below).
+- Tip: On macOS, you can check your Local Hostname in System Settings → Sharing. If it’s “mcinpro”, then the URL is http://mcinpro.local:3000
+
+### Optional: enable local HTTPS in development (macOS)
+The dev server always serves HTTP on PORT (default 3000). If you enable HTTPS, it will additionally serve HTTPS on HTTPS_PORT (default 3443). One simple way to get trusted local certs is mkcert.
+
+1) Install mkcert and the local CA:
+```
+brew install mkcert
+mkcert -install
+```
+2) Create a cert for your hostname (adjust as needed):
+```
+mkcert mcinpro.local
+# This produces two files, e.g.:
+#  - mcinpro.local-key.pem
+#  - mcinpro.local.pem
+```
+3) Create/update your .env in the repo root with:
+```
+DEV_HTTPS=true
+SSL_KEY_PATH=./mcinpro.local-key.pem
+SSL_CERT_PATH=./mcinpro.local.pem
+PORT=3000
+HTTPS_PORT=3443
+```
+4) Start the server: `npm start` (or `./start-server.sh`). Now visit: https://mcinpro.local:3443 (HTTP remains available at http://mcinpro.local:3000)
+
+Notes:
+- If you don’t enable DEV_HTTPS, use http://…:3000. If a browser/extension upgrades to HTTPS, just use the HTTPS port (3443) when DEV_HTTPS=true, otherwise stick to HTTP.
+- From phones/tablets on the same Wi‑Fi, you can also use your Mac’s IP: http://<ip>:3000 and https://<ip>:3443 (when enabled).
+
 Quick index:
 - Overview and features
 - Project structure

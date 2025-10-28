@@ -34,10 +34,16 @@ if (usingDefaults.length) {
 module.exports = {
   NODE_ENV,
   PORT: parseInt(process.env.PORT || '3000', 10),
+  HTTPS_PORT: parseInt(process.env.HTTPS_PORT || '3443', 10),
   MONGODB_URI,
   MONGODB_DB: process.env.MONGODB_DB || 'boda-web',
   JWT_SECRET,
   // Stripe key is optional at boot. Specific features will error if missing at runtime.
   STRIPE_SECRET_KEY: optional('STRIPE_SECRET_KEY', ''),
   CORS_ORIGIN: process.env.CORS_ORIGIN || '*',
+  // Dev HTTPS support (optional). If DEV_HTTPS=true and CERT/KEY are provided, server will also start HTTPS on HTTPS_PORT.
+  DEV_HTTPS: String(process.env.DEV_HTTPS || '').toLowerCase() === 'true',
+  SSL_KEY_PATH: optional('SSL_KEY_PATH', ''),
+  SSL_CERT_PATH: optional('SSL_CERT_PATH', ''),
+  SSL_CA_PATH: optional('SSL_CA_PATH', ''),
 };

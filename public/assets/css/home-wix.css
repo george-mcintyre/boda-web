@@ -93,7 +93,7 @@ body.wix-landing-active footer { display: none !important; }
 }
 
 /* Right-side stacked gallery */
-.wix-landing .wix-right { position: absolute; right: 0; top: 10px; bottom: 0; width: 50%; }
+.wix-landing .wix-right { position: relative }
 
 .wix-landing .stack-section { position: relative; }
 
@@ -110,7 +110,7 @@ body.wix-landing-active footer { display: none !important; }
   min-height: 420px;
 }
 
-.wix-landing .stack-inner { position: relative; width: 100%; height: 100%; }
+.wix-landing .stack-inner { position: relative; width: 100%; height: 85%; }
 
 .wix-landing .stack-card {
   position: absolute;
