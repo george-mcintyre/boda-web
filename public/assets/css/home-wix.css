@@ -178,6 +178,27 @@ body.wix-landing-active footer { display: none !important; }
   font-size: 13px;
 }
 
+/* Fixed bottom date banner (fills width, black background, soft shadow) */
+.date-banner {
+  position: fixed;
+  left: 65%;
+  right: 15%;
+  bottom: 0;
+  transform: translateY(30%); /* overshoot the bottom by 30% of its own height */
+  background: #000;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18); /* same soft shadow as stack cards */
+  border-top-left-radius: var(--wix-radius);
+  border-top-right-radius: var(--wix-radius);
+  overflow: hidden;
+  z-index: 9999; /* above everything else */
+  pointer-events: none; /* don't block clicks or scroll */
+}
+.date-banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 /* Desktop */
 @media (min-width: 860px) {
   .wix-landing .wix-hero {
