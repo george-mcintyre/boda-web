@@ -95,15 +95,38 @@
 
     // Scroll lock mechanics while in hero and sequence not completed
     let touchStartY = 0;
+    let releasedTop = false; // allow natural page scroll when at top and user keeps scrolling up
     function wheelHandler(e){
       if (!sectionInView(section)) return;
       const lastIndex = cards.length - 1;
-      // Reverse (scroll up) always available while hero is in view if not at first card
-      if (e.deltaY < -6 && index > 0){
-        e.preventDefault();
-        animatePrev();
+
+      // If we're released at the top, allow default scrolling until user reverses (scrolls down)
+      if (releasedTop) {
+        if (e.deltaY > 6) { // user reversed direction (down)
+          releasedTop = false;
+          if (!completed && index < lastIndex) {
+            e.preventDefault();
+            animateNext();
+            return;
+          }
+        }
+        // Continue letting the page scroll naturally
         return;
       }
+
+      // Reverse (scroll up) within the stack when not at the first card
+      if (e.deltaY < -6) {
+        if (index > 0) {
+          e.preventDefault();
+          animatePrev();
+          return;
+        } else {
+          // At the top with further up-scroll: release the page
+          releasedTop = true;
+          return; // do not preventDefault → allow normal page scroll
+        }
+      }
+
       // Forward (scroll down) only while not completed and not at last card
       if (!completed && e.deltaY > 6 && index < lastIndex){
         e.preventDefault();
@@ -120,14 +143,35 @@
       if (!sectionInView(section)) return;
       const y = (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
       const dy = touchStartY - y; // swipe up => positive, swipe down => negative
+
+      // If released at top: allow natural scroll while swiping down (dy < -10)
+      if (releasedTop) {
+        if (dy > 10) { // user reversed (swipe up → scroll down)
+          releasedTop = false;
+          if (!busy && !completed && index < cards.length - 1){
+            e.preventDefault();
+            animateNext();
+            return;
+          }
+        }
+        // keep allowing default while continuing to swipe down
+        return;
+      }
+
       // Forward only if not completed and we have a next card
       if (dy > 10 && !busy && !completed && index < cards.length - 1){
         e.preventDefault();
         animateNext();
       // Reverse allowed whenever not at first card
-      } else if (dy < -10 && !busy && index > 0){
-        e.preventDefault();
-        animatePrev();
+      } else if (dy < -10 && !busy){
+        if (index > 0){
+          e.preventDefault();
+          animatePrev();
+        } else {
+          // At top and swiping down: release to allow page to scroll
+          releasedTop = true;
+          // do not preventDefault
+        }
       } else if (!completed) {
         // Keep page from scrolling while the hero sequence is active
         e.preventDefault();

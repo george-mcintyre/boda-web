@@ -138,7 +138,7 @@ body.wix-landing-active footer { display: none !important; }
 
 /* WOW-driven full-viewport stack variant */
 .wix-landing .wow-stack.stack-gallery { height: 100vh; min-height: 560px; }
-.wix-landing .wow-stack .stack-viewport { position: sticky; top: 0; height: 100vh; min-height: 560px; }
+.wix-landing .wow-stack .stack-viewport { top: 0; height: 100vh; min-height: 560px; }
 .wix-landing .wow-stack .stack-card { opacity: 0; transform: translateY(100%); }
 .wix-landing .wow-stack .stack-card:first-child { opacity: 1; transform: translateY(0); }
 /* Cancel default layered offsets for wow variant */
