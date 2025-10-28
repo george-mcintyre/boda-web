@@ -1,10 +1,10 @@
 (function(){
   function clamp(v, min, max){ return v < min ? min : v > max ? max : v; }
 
-  function sectionInView(el){
+  function sectionInView(el, down = false){
     const rect = el.getBoundingClientRect();
     const h = window.innerHeight || document.documentElement.clientHeight;
-    return rect.top <= h * 0.4 && rect.bottom >= h * 0.4; // middle of viewport is within section
+    return (down && rect.top <= h * 0.2) || (!down && rect.bottom >= h * 0.95);
   }
 
   function initWowStack(gallery){
@@ -41,6 +41,7 @@
       if (busy) return;
       if (index >= cards.length - 1){
         completed = true;
+          if (sectionInView(section)) lockScroll();
         // Do not unlock here; keep listeners so user can reverse with scroll up
         return;
       }
@@ -73,7 +74,7 @@
       // If we had completed, re-lock because we are reversing within hero
       if (completed){
         completed = false;
-        if (sectionInView(section)) lockScroll();
+        if (sectionInView(section, true)) lockScroll();
       }
       busy = true;
       const current = cards[index];
@@ -97,10 +98,10 @@
     let touchStartY = 0;
     let releasedTop = false; // allow natural page scroll when at top and user keeps scrolling up
     function wheelHandler(e){
-      if (!sectionInView(section)) return;
+      if (!sectionInView(section, false)) return;
       const lastIndex = cards.length - 1;
 
-      // If we're released at the top, allow default scrolling until user reverses (scrolls down)
+      // If we're released at the top, allow default scrolling until the user reverses (scrolls down)
       if (releasedTop) {
         if (e.deltaY > 6) { // user reversed direction (down)
           releasedTop = false;
@@ -140,9 +141,9 @@
     }
     function touchStart(e){ touchStartY = (e.touches && e.touches[0] ? e.touches[0].clientY : 0); }
     function touchMove(e){
-      if (!sectionInView(section)) return;
       const y = (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
       const dy = touchStartY - y; // swipe up => positive, swipe down => negative
+      if (!sectionInView(section, dy < 0)) return;
 
       // If released at top: allow natural scroll while swiping down (dy < -10)
       if (releasedTop) {
@@ -179,14 +180,15 @@
     }
 
     function keyHandler(e){
-      if (!sectionInView(section)) return;
       const nextKeys = ['ArrowDown','PageDown','Space',' '];
       const prevKeys = ['ArrowUp','PageUp'];
       const lastIndex = cards.length - 1;
       if (prevKeys.includes(e.key) && index > 0){
+        if (!sectionInView(section, false)) return;
         e.preventDefault();
         animatePrev();
       } else if (nextKeys.includes(e.key) && !busy && !completed && index < lastIndex){
+        if (!sectionInView(section, true)) return;
         e.preventDefault();
         animateNext();
       } else if (nextKeys.includes(e.key) || prevKeys.includes(e.key)){
@@ -210,11 +212,67 @@
     // Lock scroll initially while hero is in view
     lockScroll();
 
-    // If the user scrolls away somehow, unlock; if they come back and not completed, re-lock
-    document.addEventListener('scroll', () => {
+    // Track scroll position to support scrollbar drags in addition to wheel/touch
+    let lastScrollY = window.scrollY;
+    function onDocumentScroll(){
+      const currentY = window.scrollY;
+      let dy = currentY - lastScrollY; // positive → scrolling down, negative → up
+      lastScrollY = currentY;
+
+      // If sequence completed, nothing special to do (allow natural scroll)
       if (completed) return;
-      if (sectionInView(section)) lockScroll(); else unlockScroll();
-    }, { passive: true });
+
+      const inView = sectionInView(section);
+
+      // Maintain lock/unlock behavior while the hero is in view
+      if (inView) {
+        lockScroll();
+      } else {
+        unlockScroll();
+        return; // Do not drive animations when the hero isn't in view
+      }
+
+      // Ignore tiny deltas to reduce accidental triggers
+      if (Math.abs(dy) < 2) return;
+
+      const lastIndex = cards.length - 1;
+
+      // If released at the very top: let natural scroll continue until user reverses direction
+      if (releasedTop) {
+        if (dy > 2) { // reversed (down)
+          releasedTop = false;
+          if (!busy && index < lastIndex) {
+            animateNext();
+          }
+        }
+        return;
+      }
+
+      // When scrolling up via scrollbar
+      if (dy < -2) {
+        if (!busy) {
+          if (index > 0) {
+            animatePrev();
+          } else {
+            // At the top and still going up: release to allow page scroll until reversed
+            releasedTop = true;
+          }
+        }
+        return;
+      }
+
+      // When scrolling down via scrollbar
+      if (dy > 2) {
+        if (!busy && index < lastIndex) {
+          animateNext();
+        } else {
+          // At the end, allow natural scroll to proceed
+        }
+      }
+    }
+
+    // If the user scrolls away somehow, unlock; if they come back and not completed, re-lock
+    document.addEventListener('scroll', onDocumentScroll, { passive: true });
   }
 
   function initParallaxStack(gallery){
