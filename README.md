@@ -42,8 +42,6 @@ boda-web/
 │  ├─ utils/          # server utilities
 │  ├─ app.js          # Express app
 │  └─ server.js       # server bootstrap
-├─ infra/             # local infrastructure
-│  └─ docker-compose.yml  # local MongoDB
 ├─ start-server.sh | start-server.bat | start-server.ps1
 ├─ env-vercel.example
 └─ README.md (this file)
@@ -74,7 +72,7 @@ MONGODB_DB=boda-web
 # Change this secret in production.
 JWT_SECRET=dev-secret-change-me
 
-# Stripe (only required if you enable payments/donations)
+# Stripe (only required if you enable payments)
 # Stripe secret key (test or live). Required for server-side operations with Stripe.
 STRIPE_SECRET_KEY=sk_test_xxx
 # Optional: publishable key for the frontend, if you integrate Stripe Elements/Checkout on the client.
@@ -89,7 +87,7 @@ Notes:
 
 ## 🧪 Minimum required data in the database (bootstrap)
 To get the site running in a minimally functional state, you need at least:
-- One Admin user (collection `admins`) with `email` and `password` (plaintext for current compatibility).
+- One Admin user (collection `admins`) with `email` and `password`.
 - At least one Guest (collection `guests`) with `email` and, optionally, `name`.
 
 There are several ways to create this initial data:
@@ -206,7 +204,6 @@ Schema compatibility notes:
 - The `STRIPE_SECRET_KEY` is loaded from `.env`. It is required only if you enable payment/donation-related features (e.g., cash gifts). If you don't set it, the server starts but those features should be disabled or will fail with a clear message.
 - If you integrate Stripe on the frontend, use `STRIPE_PUBLISHABLE_KEY` on the client (do not share the secret key).
 - For webhooks, configure `STRIPE_WEBHOOK_SECRET` and point Stripe to your public endpoint (e.g., via ngrok or a cloud deployment).
-
 
 # 🔐 Wedding API Specification
 
