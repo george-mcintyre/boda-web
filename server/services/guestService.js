@@ -16,7 +16,7 @@ function normalizeGuestInput(data = {}) {
 
 async function getByEmail(email) { return Guest.findOne({ email }); }
 async function list() { 
-  const guests = await Guest.find().sort({ createdAt: -1 }).lean();
+  const guests = await Guest.find().sort({ name: 1 }).lean();
   const items = guests.map(guest => ({
     id: guest._id.toString(),
     name: guest.name,
