@@ -201,10 +201,14 @@
       // Handle both paginated and non-paginated responses
       const guests = data.items || data || [];
       
+      // Calculate total guest count (sum of all party sizes)
+      const totalGuests = guests.reduce((sum, g) => sum + (g.partySize || 1), 0);
+      
       const rows = guests.map(g => `
         <tr>
           <td>${g.name || ''}</td>
           <td>${g.email || ''}</td>
+          <td>${g.partySize || 1}</td>
           <td>
             <button class="admin-action" data-action="manage-party" data-id="${g.id || g._id}" title="Manage Party">
               <i class="fas fa-users"></i>
@@ -218,9 +222,13 @@
           </td>
         </tr>`).join('');
       
-      content.innerHTML = renderTable({title:'Guests', columns:['Name','Email','Actions']}, rows,
+      content.innerHTML = renderTable({title:'Guests', columns:['Name','Email','Party Size','Actions']}, rows,
         `<button id="addGuest" class="admin-action"><i class="fas fa-user-plus"></i> Add Guest</button>
-         <button id="bulkUploadGuests" class="admin-action" style="background:#17a2b8;"><i class="fas fa-file-upload"></i> Bulk Upload CSV</button>`);
+         <button id="bulkUploadGuests" class="admin-action" style="background:#17a2b8;"><i class="fas fa-file-upload"></i> Bulk Upload CSV</button>
+         <div class="guest-summary" style="background:#f8f9fa;padding:15px;border-radius:8px;margin-top:15px;border-left:4px solid #28a745;">
+           <h4 style="margin:0 0 8px 0;color:#28a745;"><i class="fas fa-users"></i> Total Guests: ${totalGuests}</h4>
+           <p style="margin:0;color:#666;font-size:0.9em;">Across ${guests.length} party${guests.length !== 1 ? 'ies' : ''}</p>
+         </div>`);
       
       const tbody = content.querySelector('tbody');
       tbody.addEventListener('click', async (e)=>{

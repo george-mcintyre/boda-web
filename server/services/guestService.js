@@ -20,7 +20,9 @@ async function list() {
   const items = guests.map(guest => ({
     id: guest._id.toString(),
     name: guest.name,
-    email: guest.email
+    email: guest.email,
+    partySize: 1 + (guest.partyMembers ? guest.partyMembers.length : 0), // 1 for primary guest + party members
+    partyMembers: guest.partyMembers || []
   }));
   return { items, nextCursor: null }; // TODO: Implement proper pagination later
 }
