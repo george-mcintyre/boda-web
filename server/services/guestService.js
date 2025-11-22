@@ -47,4 +47,54 @@ async function remove(id) {
   await Guest.findByIdAndDelete(id);
 }
 
-module.exports = { getByEmail, list, create, update, remove };
+async function bulkCreate(guestsData) {
+  const results = {
+    success: [],
+    errors: [],
+    skipped: []
+  };
+
+  for (const data of guestsData) {
+    try {
+      // Skip empty rows
+      if (!data.name || data.name.trim() === '') {
+        results.skipped.push({ data, reason: 'Empty name' });
+        continue;
+      }
+
+      // Check if guest already exists (only if email is provided)
+      if (data.email && data.email.trim() !== '') {
+        const existing = await Guest.findOne({ email: data.email });
+        if (existing) {
+          results.skipped.push({ data, reason: 'Email already exists' });
+          continue;
+        }
+      }
+
+      // Prepare guest data with party members
+      const guestInput = {
+        name: data.name.trim(),
+        email: data.email ? data.email.trim() : '',
+        partyMembers: data.partyMembers || []
+      };
+
+      // Create the guest with party members
+      const guestDoc = await Guest.create(normalizeGuestInput(guestInput));
+      
+      results.success.push({
+        id: guestDoc._id.toString(),
+        name: guestDoc.name,
+        email: guestDoc.email
+      });
+    } catch (error) {
+      results.errors.push({ 
+        data, 
+        error: error.message 
+      });
+    }
+  }
+
+  return results;
+}
+
+module.exports = { getByEmail, list, create, update, remove, bulkCreate };

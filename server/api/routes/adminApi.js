@@ -15,6 +15,7 @@ router.delete('/events/:id', auth('admin'), adminCtrl.deleteEventsItem);
 // Guests & Party Management (existing functionality)
 router.get('/guests', auth('admin'), guestCtrl.list);
 router.post('/guests', auth('admin'), guestCtrl.create);
+router.post('/guests/bulk-upload', auth('admin'), guestCtrl.bulkUpload);
 router.get('/guests/:id', auth('admin'), guestCtrl.getById);
 router.put('/guests/:id', auth('admin'), guestCtrl.update);
 router.delete('/guests/:id', auth('admin'), guestCtrl.remove);

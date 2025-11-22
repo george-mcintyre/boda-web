@@ -153,6 +153,21 @@ async function create(req, res, next) { try { res.status(201).json(await guestSe
 async function update(req, res, next) { try { res.json(await guestService.update(req.params.id, req.body)); } catch (e) { next(e); } }
 async function remove(req, res, next) { try { await guestService.remove(req.params.id); res.status(204).end(); } catch (e) { next(e); } }
 
+async function bulkUpload(req, res, next) {
+  try {
+    const { guests } = req.body;
+    
+    if (!Array.isArray(guests) || guests.length === 0) {
+      return res.status(400).json({ error: 'Invalid guests data' });
+    }
+
+    const results = await guestService.bulkCreate(guests);
+    res.status(200).json(results);
+  } catch (e) { 
+    next(e); 
+  }
+}
+
 // ========== Guest Gift Functions ==========
 async function getGifts(req, res, next) {
   try {
@@ -226,6 +241,7 @@ module.exports = {
   create, 
   update, 
   remove,
+  bulkUpload,
   getGifts,
   getGiftChoices,
   createPaymentSession

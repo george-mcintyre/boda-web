@@ -36,6 +36,67 @@
     tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   }
 
+  // CSV Parser for guest bulk upload
+  function parseCSV(text) {
+    const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+    if (lines.length === 0) return [];
+    
+    // Parse header
+    const headers = lines[0].split(',').map(h => h.trim());
+    const guests = [];
+    
+    // Parse data rows
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(',').map(v => v.trim());
+      
+      // Skip empty rows (all values empty)
+      if (values.every(v => !v)) continue;
+      
+      const row = {};
+      headers.forEach((header, idx) => {
+        row[header] = values[idx] || '';
+      });
+      
+      // Map CSV columns to guest object
+      const guest = {
+        name: row['Name'] || row['name'] || '',
+        email: row['email'] || row['Email'] || '',
+        partyMembers: []
+      };
+      
+      // Parse party size information
+      const inParty = parseInt(row['In Party'] || row['in_party'] || '0');
+      const adultsInParty = parseInt(row['Adults in Party'] || row['adults_in_party'] || '0');
+      const childrenInParty = parseInt(row['Children In Party'] || row['children_in_party'] || '0');
+      
+      // Create party members (excluding the primary guest)
+      if (inParty > 1) {
+        const totalMembers = inParty - 1; // Subtract primary guest
+        
+        // Add adults (excluding primary guest who is always adult)
+        const additionalAdults = Math.max(0, adultsInParty - 1);
+        for (let j = 0; j < additionalAdults; j++) {
+          guest.partyMembers.push({
+            name: `${guest.name} - Guest ${j + 1}`,
+            adult: true
+          });
+        }
+        
+        // Add children
+        for (let j = 0; j < childrenInParty; j++) {
+          guest.partyMembers.push({
+            name: `${guest.name} - Child ${j + 1}`,
+            adult: false
+          });
+        }
+      }
+      
+      guests.push(guest);
+    }
+    
+    return guests;
+  }
+
   // Reusable modal form
   function openFormModal({ title = 'Form', submitText = 'Save', fields = [], initialValues = {}, onSubmit }){
     const overlay = document.createElement('div');
@@ -158,7 +219,8 @@
         </tr>`).join('');
       
       content.innerHTML = renderTable({title:'Guests', columns:['Name','Email','Actions']}, rows,
-        `<button id="addGuest" class="admin-action"><i class="fas fa-user-plus"></i> Add Guest</button>`);
+        `<button id="addGuest" class="admin-action"><i class="fas fa-user-plus"></i> Add Guest</button>
+         <button id="bulkUploadGuests" class="admin-action" style="background:#17a2b8;"><i class="fas fa-file-upload"></i> Bulk Upload CSV</button>`);
       
       const tbody = content.querySelector('tbody');
       tbody.addEventListener('click', async (e)=>{
@@ -217,6 +279,66 @@
             showGuests();
           }
         });
+      });
+
+      // Bulk upload CSV handler
+      content.querySelector('#bulkUploadGuests').addEventListener('click', async ()=>{
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.csv';
+        input.onchange = async (e) => {
+          const file = e.target.files[0];
+          if (!file) return;
+          
+          try {
+            const text = await file.text();
+            const guests = parseCSV(text);
+            
+            if (guests.length === 0) {
+              notify('No valid guests found in CSV file', 'error');
+              return;
+            }
+            
+            // Show confirmation dialog with preview
+            const preview = guests.slice(0, 5).map(g => 
+              `${g.name} (${g.email || 'no email'})`
+            ).join('\n');
+            const more = guests.length > 5 ? `\n... and ${guests.length - 5} more` : '';
+            
+            if (!confirm(`Upload ${guests.length} guests?\n\nPreview:\n${preview}${more}`)) {
+              return;
+            }
+            
+            setLoading('Uploading guests...');
+            
+            const r = await api('/api/admin/guests/bulk-upload', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({ guests })
+            });
+            
+            if (!r.ok) throw new Error('Failed to upload guests');
+            
+            const results = await r.json();
+            
+            // Show results
+            let message = `Upload complete!\n\n`;
+            message += `✓ Successfully created: ${results.success.length}\n`;
+            message += `⊘ Skipped (duplicates/empty): ${results.skipped.length}\n`;
+            message += `✗ Errors: ${results.errors.length}`;
+            
+            if (results.errors.length > 0) {
+              message += `\n\nFirst error: ${results.errors[0].error}`;
+            }
+            
+            alert(message);
+            showGuests();
+          } catch (err) {
+            notify('Error uploading CSV: ' + err.message, 'error');
+            console.error('CSV upload error:', err);
+          }
+        };
+        input.click();
       });
     } catch(e){ 
       console.error('Error loading guests:', e); 

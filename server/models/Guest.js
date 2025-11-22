@@ -10,7 +10,7 @@ const partyMemberSchema = new Schema({
 // Canonical English field names; avoid aliases to prevent ambiguity
 const guestSchema = new Schema({
   name: { type: String, alias: 'nombre' },
-  email: { type: String, unique: true, required: true },
+  email: { type: String, unique: true, sparse: true }, // sparse allows multiple null/empty values
   status: { type: String, enum: ['pending', 'confirmed', 'declined'], default: 'pending', alias: 'estado' },
   companions: { type: Number, default: 0 }, // Legacy field, maintained for backward compatibility
   partyMembers: [partyMemberSchema], // New field for individual party members
