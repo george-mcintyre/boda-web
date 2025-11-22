@@ -1,5 +1,5 @@
 const guestService = require('../services/guestService');
-const { Guest } = require('../models');
+const { Guest, Gift, GiftChoice } = require('../models');
 
 async function getMe(req, res, next) {
   try {
@@ -149,6 +149,68 @@ async function create(req, res, next) { try { res.status(201).json(await guestSe
 async function update(req, res, next) { try { res.json(await guestService.update(req.params.id, req.body)); } catch (e) { next(e); } }
 async function remove(req, res, next) { try { await guestService.remove(req.params.id); res.status(204).end(); } catch (e) { next(e); } }
 
+// ========== Guest Gift Functions ==========
+async function getGifts(req, res, next) {
+  try {
+    const gifts = await Gift.find({ enabled: true, available: { $gt: 0 } }).sort({ createdAt: -1 }).lean();
+    const items = gifts.map(gift => ({
+      id: gift._id.toString(),
+      title: gift.title,
+      description: gift.description,
+      amount: gift.amount,
+      available: gift.available,
+      image: gift.image
+    }));
+    res.json(items);
+  } catch (e) { next(e); }
+}
+
+async function getGiftChoices(req, res, next) {
+  try {
+    const me = await guestService.getByEmail(req.user.email);
+    if (!me) return res.status(404).json({ error: 'Guest not found' });
+
+    const giftChoices = await GiftChoice.find({ guestId: me._id })
+      .populate('giftId', 'title amount')
+      .sort({ date: -1 })
+      .lean();
+
+    const items = giftChoices.map(choice => ({
+      giftId: choice.giftId._id.toString(),
+      date: choice.date.toISOString(),
+      message: choice.message
+    }));
+
+    res.json(items);
+  } catch (e) { next(e); }
+}
+
+async function createPaymentSession(req, res, next) {
+  try {
+    const { giftId, message } = req.body;
+    const me = await guestService.getByEmail(req.user.email);
+    if (!me) return res.status(404).json({ error: 'Guest not found' });
+
+    const gift = await Gift.findById(giftId);
+    if (!gift || !gift.enabled || gift.available <= 0) {
+      return res.status(404).json({ error: 'Gift not found or not available' });
+    }
+
+    // Create a record of the gift choice (pending payment)
+    const giftChoice = await GiftChoice.create({
+      giftId: gift._id,
+      guestId: me._id,
+      message: message || null
+    });
+
+    // TODO: Implement Stripe integration
+    // For now, return a mock checkout URL
+    const checkoutUrl = `https://checkout.stripe.com/pay/mock_session_${giftChoice._id}`;
+    
+    res.json({ checkoutUrl });
+  } catch (e) { next(e); }
+}
+
 module.exports = { 
   getMe, 
   getParty, 
@@ -159,5 +221,8 @@ module.exports = {
   list, 
   create, 
   update, 
-  remove 
+  remove,
+  getGifts,
+  getGiftChoices,
+  createPaymentSession
 };

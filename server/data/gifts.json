@@ -1,10 +1,58 @@
 [
   {
-    "nombre": "ewerw",
-    "descripcion": "werwer",
-    "precio": "12",
-    "categoria": "",
-    "url": "",
-    "id": "1"
+    "title": "Welcome Champagne",
+    "description": "Help us start our celebration with a toast",
+    "amount": 25,
+    "available": 10,
+    "image": 1
+  },
+  {
+    "title": "Wedding Flowers",
+    "description": "Beautiful bouquet for our special day",
+    "amount": 50,
+    "available": 8,
+    "image": 3
+  },
+  {
+    "title": "Reception Dinner",
+    "description": "Contribute to our wedding dinner experience",
+    "amount": 100,
+    "available": 15,
+    "image": 5
+  },
+  {
+    "title": "Honeymoon Accommodation",
+    "description": "Help fund our romantic getaway",
+    "amount": 200,
+    "available": 5,
+    "image": 8
+  },
+  {
+    "title": "Dream Honeymoon",
+    "description": "Make our honeymoon unforgettable",
+    "amount": 500,
+    "available": 3,
+    "image": 12
+  },
+  {
+    "title": "Cocktail Reception",
+    "description": "Support our welcome cocktails for guests",
+    "amount": 25,
+    "available": 12,
+    "image": 15
+  },
+  {
+    "title": "Wedding Cake",
+    "description": "Help us get the perfect wedding cake",
+    "amount": 50,
+    "available": 6,
+    "image": 18
+  },
+  {
+    "title": "Photography Package",
+    "description": "Capture our precious memories",
+    "amount": 100,
+    "available": 4,
+    "image": 22
   }
 ]

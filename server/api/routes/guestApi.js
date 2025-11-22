@@ -32,10 +32,9 @@ router.put('/menu-choices', auth('guest'), require('../../controllers/menuContro
 // router.get('/menu-choices', auth('guest'), guestCtrl.getMenuChoices);
 // router.put('/menu-choices', auth('guest'), guestCtrl.updateMenuChoices);
 
-// TODO: Add these in Phase 6
 // Gifts
-// router.get('/gifts', auth('guest'), adminCtrl.listGifts);
-// router.get('/gift-choices', auth('guest'), guestCtrl.getGiftChoices);
-// router.post('/create-payment-session', auth('guest'), guestCtrl.createPaymentSession);
+router.get('/gifts', auth('guest'), guestCtrl.getGifts);
+router.get('/gift-choices', auth('guest'), guestCtrl.getGiftChoices);
+router.post('/create-payment-session', auth('guest'), guestCtrl.createPaymentSession);
 
 module.exports = router;

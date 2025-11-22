@@ -43,17 +43,16 @@ router.post('/gifts', auth('admin'), adminCtrl.createGift);
 router.put('/gifts/:id', auth('admin'), adminCtrl.updateGift);
 router.delete('/gifts/:id', auth('admin'), adminCtrl.deleteGift);
 
-// TODO: Add these in Phase 7
-// router.get('/gift-choices', auth('admin'), adminCtrl.getGiftChoices);
+// Gift choices overview
+router.get('/gift-choices', auth('admin'), adminCtrl.getGiftChoices);
 
 // Legacy settings (to be migrated)
 router.get('/config/event/blocked', auth('admin'), adminCtrl.getBlockedEvent);
 router.put('/config/event/blocked', auth('admin'), adminCtrl.setBlockedEvent);
 router.delete('/config/event/blocked', auth('admin'), adminCtrl.clearBlockedEvent);
 
-// TODO: Add these in Phase 7
 // Settings / Feature Toggles
-// router.get('/settings', auth('admin'), adminCtrl.getSettings);
-// router.put('/settings', auth('admin'), adminCtrl.updateSettings);
+router.get('/settings', auth('admin'), adminCtrl.getSettings);
+router.put('/settings', auth('admin'), adminCtrl.updateSettings);
 
 module.exports = router;

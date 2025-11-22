@@ -7,6 +7,8 @@ module.exports = {
   Comment: require('./Comment'),
   Menu: require('./Menu'),
   MenuChoice: require('./MenuChoice'),
-  CashGiftCard: require('./CashGiftCard'),
+  Gift: require('./Gift'),
+  GiftChoice: require('./GiftChoice'),
+  CashGiftCard: require('./CashGiftCard'), // Legacy - will be removed in Phase 8
   Config: require('./Config'),
 };

@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { Message, Menu, Config, CashGiftCard, Event } = require('../models');
+const { Message, Menu, Config, CashGiftCard, Event, Gift, GiftChoice } = require('../models');
 
 // Format event for API response according to README specification
 function formatEventForApi(event) {
@@ -62,47 +62,92 @@ function writeJson(file, payload) {
 
 
 
-// ========== Gift List (file-backed) ==========
-function withIds(arr) {
-  return (arr || []).map((it, idx) => ({ id: it.id || String(idx + 1), ...it }));
+// ========== Gifts (MongoDB-backed) ==========
+async function listGifts(req, res, next) {
+  try {
+    const gifts = await Gift.find({ enabled: true }).sort({ createdAt: -1 }).lean();
+    const items = gifts.map(gift => ({
+      id: gift._id.toString(),
+      title: gift.title,
+      description: gift.description,
+      amount: gift.amount,
+      available: gift.available,
+      image: gift.image
+    }));
+    res.json(items);
+  } catch (e) { next(e); }
 }
 
-function nextId(arr) {
-  let max = 0;
-  (arr || []).forEach(it => { const n = parseInt(it.id, 10); if (!isNaN(n) && n > max) max = n; });
-  return String(max + 1);
+async function createGift(req, res, next) {
+  try {
+    const { title, description, amount, available, image } = req.body;
+    const gift = await Gift.create({ title, description, amount, available, image });
+    res.status(201).json({
+      id: gift._id.toString(),
+      title: gift.title,
+      description: gift.description,
+      amount: gift.amount,
+      available: gift.available,
+      image: gift.image
+    });
+  } catch (e) { next(e); }
 }
 
-async function listGifts(req, res) {
-  ensureFile(files.gifts);
-  const items = readJson(files.gifts, []);
-  res.json(withIds(items));
+async function updateGift(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { title, description, amount, available, image } = req.body;
+    
+    const gift = await Gift.findByIdAndUpdate(id, {
+      ...(title && { title }),
+      ...(description && { description }),
+      ...(amount && { amount }),
+      ...(available !== undefined && { available }),
+      ...(image && { image })
+    }, { new: true });
+
+    if (!gift) return res.status(404).json({ error: 'Gift not found' });
+
+    res.json({
+      id: gift._id.toString(),
+      title: gift.title,
+      description: gift.description,
+      amount: gift.amount,
+      available: gift.available,
+      image: gift.image
+    });
+  } catch (e) { next(e); }
 }
 
-async function createGift(req, res) {
-  const items = readJson(files.gifts, []);
-  const item = { ...req.body, id: nextId(items) };
-  items.push(item);
-  writeJson(files.gifts, items);
-  res.status(201).json(item);
+async function deleteGift(req, res, next) {
+  try {
+    const { id } = req.params;
+    // Soft delete by setting enabled to false
+    const gift = await Gift.findByIdAndUpdate(id, { enabled: false }, { new: true });
+    if (!gift) return res.status(404).json({ error: 'Gift not found' });
+    res.json({ status: 'ok' });
+  } catch (e) { next(e); }
 }
 
-async function updateGift(req, res) {
-  const items = readJson(files.gifts, []);
-  const id = req.params.id;
-  const idx = items.findIndex(it => String(it.id) === String(id));
-  if (idx === -1) return res.status(404).json({ error: 'Gift not found' });
-  items[idx] = { ...items[idx], ...req.body, id };
-  writeJson(files.gifts, items);
-  res.json(items[idx]);
-}
+async function getGiftChoices(req, res, next) {
+  try {
+    const giftChoices = await GiftChoice.find({})
+      .populate('giftId', 'title amount')
+      .populate('guestId', 'nombre name email')
+      .sort({ date: -1 })
+      .lean();
 
-async function deleteGift(req, res) {
-  const items = readJson(files.gifts, []);
-  const id = req.params.id;
-  const filtered = items.filter(it => String(it.id) !== String(id));
-  writeJson(files.gifts, filtered);
-  res.json({ ok: true });
+    const items = giftChoices.map(choice => ({
+      guestId: choice.guestId._id.toString(),
+      guestName: choice.guestId.nombre || choice.guestId.name || choice.guestId.email,
+      giftId: choice.giftId._id.toString(),
+      amount: choice.giftId.amount,
+      date: choice.date.toISOString(),
+      message: choice.message
+    }));
+
+    res.json(items);
+  } catch (e) { next(e); }
 }
 
 // ========== Events (MongoDB-backed CRUD) ==========
@@ -329,6 +374,47 @@ async function clearBlockedEvent(req, res, next) {
   } catch (e) { next(e); }
 }
 
+// ========== Settings / Feature Toggles ==========
+async function getSettings(req, res, next) {
+  try {
+    const cfg = await getConfigDoc();
+    res.json({
+      eventsEnabled: cfg.eventsEnabled,
+      guestsEnabled: cfg.guestsEnabled,
+      menuEnabled: cfg.menuEnabled,
+      messagesEnabled: cfg.messagesEnabled,
+      giftsEnabled: cfg.giftsEnabled
+    });
+  } catch (e) { next(e); }
+}
+
+async function updateSettings(req, res, next) {
+  try {
+    const { eventsEnabled, guestsEnabled, menuEnabled, messagesEnabled, giftsEnabled } = req.body;
+    
+    const cfg = await getConfigDoc();
+    await Config.updateOne({ _id: cfg._id }, {
+      $set: {
+        ...(eventsEnabled !== undefined && { eventsEnabled }),
+        ...(guestsEnabled !== undefined && { guestsEnabled }),
+        ...(menuEnabled !== undefined && { menuEnabled }),
+        ...(messagesEnabled !== undefined && { messagesEnabled }),
+        ...(giftsEnabled !== undefined && { giftsEnabled })
+      }
+    });
+
+    // Return updated settings
+    const updatedCfg = await Config.findById(cfg._id);
+    res.json({
+      eventsEnabled: updatedCfg.eventsEnabled,
+      guestsEnabled: updatedCfg.guestsEnabled,
+      menuEnabled: updatedCfg.menuEnabled,
+      messagesEnabled: updatedCfg.messagesEnabled,
+      giftsEnabled: updatedCfg.giftsEnabled
+    });
+  } catch (e) { next(e); }
+}
+
 // ========== Cash Gift Cards (MongoDB CRUD) ==========
 async function listCashGiftCards(req, res, next) {
   try {
@@ -363,14 +449,15 @@ async function deleteCashGiftCard(req, res, next) {
 }
 
 module.exports = {
-  // gifts (still file-backed)
-  listGifts, createGift, updateGift, deleteGift,
+  // gifts (DB-backed)
+  listGifts, createGift, updateGift, deleteGift, getGiftChoices,
   // agenda (DB-backed)
   listEventsAdmin, createEventsItem, updateEventsItem, deleteEventsItem,
   // menu (DB-backed)
   listMenus, createMenu, updateMenu, deleteMenu,
   // settings (DB-backed)
   getBlockedEvent, setBlockedEvent, clearBlockedEvent,
-  // cash gift cards (DB-backed)
+  getSettings, updateSettings,
+  // cash gift cards (DB-backed) - Legacy, to be removed in Phase 8
   listCashGiftCards, createCashGiftCard, updateCashGiftCard, deleteCashGiftCard,
 };
