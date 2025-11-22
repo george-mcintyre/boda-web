@@ -1,7 +1,7 @@
 /* Mobile-first landing styles inspired by the Wix placeholder
    Scope everything under .wix-landing to avoid conflicts */
 :root {
-  --wix-bg: #faf8f6;
+  --wix-bg: #fcfcfc;
   --wix-fg: #1c1b1a;
   --wix-muted: #6d6863;
   --wix-accent: #c7a27a; /* warm sand */
@@ -25,6 +25,26 @@ body.wix-landing-active footer { display: none !important; }
 .wix-landing .container {
   width: min(90%, 100%);
   margin-inline: auto;
+}
+
+/* Top-right actions inside Wix landing */
+.wix-landing .wix-top-actions {
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 0 0;
+}
+
+.wix-landing .wix-top-actions .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .wix-landing .wix-top-actions { padding-top: 8px; }
 }
 
 /* Hero */

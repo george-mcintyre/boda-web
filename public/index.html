@@ -30,8 +30,19 @@
       z-index: 1000;
     }
 
+    /* Acciones del encabezado (top-right) */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1000;
+    }
+
     /* Estilos para el icono de acceso al login */
     .login-access-icon {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       margin-left: 15px;
       z-index: 1000;
     }
@@ -50,6 +61,12 @@
       text-decoration: none;
       transition: all 0.3s ease;
       backdrop-filter: blur(10px);
+    }
+
+    @media (max-width: 600px) {
+      .header-actions { gap: 8px; }
+      .language-selector-toggle { min-width: auto; padding: 8px; }
+      .login-access-icon a { width: 36px; height: 36px; font-size: 16px; }
     }
 
     .login-access-icon a:hover {
@@ -118,10 +135,10 @@
       gap: 8px;
       padding: 8px 12px;
       height: 40px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgb(213, 213, 213);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
-      color: white;
+      color: #605047;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
@@ -396,6 +413,45 @@
   <!-- Temporary Wix-inspired mobile-first landing -->
   <div class="wix-landing">
     <div class="container">
+      <div class="wix-top-actions">
+        <div class="header-actions" aria-label="Top-right actions">
+          <div class="language-selector">
+            <div class="language-selector-wrapper">
+              <div class="language-selector-dropdown">
+                <button class="language-selector-toggle" id="language-toggle" aria-label="Select language">
+                  <span class="current-language">
+                    <span class="flag">🇪🇸</span>
+                    <span class="name">Español</span>
+                  </span>
+                  <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="language-selector-menu" id="language-menu">
+                  <button class="language-option active" data-lang="es">
+                    <span class="flag">🇪🇸</span>
+                    <span class="name">Español</span>
+                  </button>
+                  <button class="language-option" data-lang="en">
+                    <span class="flag">🇬🇧</span>
+                    <span class="name">English</span>
+                  </button>
+                  <button class="language-option" data-lang="fr">
+                    <span class="flag">🇫🇷</span>
+                    <span class="name">Français</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="login-access-icon">
+            <a href="login.html" class="guests-access-btn" title="Acceso para invitados" aria-label="Acceso para invitados">
+              <i class="fas fa-user" aria-hidden="true"></i>
+            </a>
+            <a href="/admin-login.html" class="guests-access-btn" title="Acceso de administrador" aria-label="Acceso de administrador">
+              <i class="fas fa-cog" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+      </div>
       <section class="wix-hero">
         <div class="wix-left">
           <p class="eyebrow">We’re getting married</p>
@@ -471,41 +527,44 @@
           <span data-i18n="wedding:date">6 de Junio, 2026</span>
         </div>
       </div>
-      <div class="language-selector">
-        <div class="language-selector-wrapper">
-          <div class="language-selector-dropdown">
-            <button class="language-selector-toggle" id="language-toggle" aria-label="Select language">
-              <span class="current-language">
-                <span class="flag">🇪🇸</span>
-                <span class="name">Español</span>
-              </span>
-              <i class="fas fa-chevron-down"></i>
-            </button>
-            <div class="language-selector-menu" id="language-menu">
-              <button class="language-option active" data-lang="es">
-                <span class="flag">🇪🇸</span>
-                <span class="name">Español</span>
+
+      <!-- Actions pinned to the top-right: language, guest, admin -->
+      <div class="header-actions" aria-label="Top-right actions">
+        <div class="language-selector">
+          <div class="language-selector-wrapper">
+            <div class="language-selector-dropdown">
+              <button class="language-selector-toggle" id="language-toggle" aria-label="Select language">
+                <span class="current-language">
+                  <span class="flag">🇪🇸</span>
+                  <span class="name">Español</span>
+                </span>
+                <i class="fas fa-chevron-down"></i>
               </button>
-              <button class="language-option" data-lang="en">
-                <span class="flag">🇬🇧</span>
-                <span class="name">English</span>
-              </button>
-              <button class="language-option" data-lang="fr">
-                <span class="flag">🇫🇷</span>
-                <span class="name">Français</span>
-              </button>
-              
+              <div class="language-selector-menu" id="language-menu">
+                <button class="language-option active" data-lang="es">
+                  <span class="flag">🇪🇸</span>
+                  <span class="name">Español</span>
+                </button>
+                <button class="language-option" data-lang="en">
+                  <span class="flag">🇬🇧</span>
+                  <span class="name">English</span>
+                </button>
+                <button class="language-option" data-lang="fr">
+                  <span class="flag">🇫🇷</span>
+                  <span class="name">Français</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="login-access-icon" style="display:flex; gap:10px;">
-        <a href="login.html" title="Acceso para guests" aria-label="Acceso para guests">
-          <i class="fas fa-user"></i>
-        </a>
-        <a href="/admin-login.html" title="Admin access" aria-label="Admin access">
-          <i class="fas fa-cog"></i>
-        </a>
+        <div class="login-access-icon">
+          <a href="login.html" class="guests-access-btn" title="Acceso para invitados" aria-label="Acceso para invitados">
+            <i class="fas fa-user" aria-hidden="true"></i>
+          </a>
+          <a href="/admin-login.html" class="guests-access-btn" title="Acceso de administrador" aria-label="Acceso de administrador">
+            <i class="fas fa-cog" aria-hidden="true"></i>
+          </a>
+        </div>
       </div>
     </div>
   </header>
@@ -1310,10 +1369,12 @@
     }
   </script>
 
-  <!-- Fixed bottom date banner -->
+<!--
+  &lt;!&ndash; Fixed bottom date banner &ndash;&gt;
   <div class="date-banner" aria-hidden="true">
     <img src="assets/images/date.png" alt="Wedding date">
   </div>
+-->
 
   <script src="js/stack-gallery.js"></script>
 </body>
