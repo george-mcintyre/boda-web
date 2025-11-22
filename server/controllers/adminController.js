@@ -60,126 +60,7 @@ function writeJson(file, payload) {
   fs.renameSync(tmp, file);
 }
 
-// ========== Messages (MongoDB) ==========
-async function listMessages(req, res, next) {
-  try {
-    const { cursor, limit = 10 } = req.query;
-    const query = Message.find({}).sort({ createdAt: -1 });
-    
-    if (cursor) {
-      query.where({ _id: { $lt: cursor } });
-    }
-    
-    const items = await query.limit(parseInt(limit) + 1).lean();
-    const hasMore = items.length > limit;
-    const itemsToReturn = hasMore ? items.slice(0, limit) : items;
-    
-    const formattedItems = itemsToReturn.map(message => ({
-      id: message._id.toString(),
-      body: message.content || message.body,
-      createdAt: message.createdAt.toISOString(),
-      author: message.author || null,
-      reactions: (message.reactions || []).map(reaction => ({
-        emoji: reaction.emoji,
-        count: reaction.count || 0,
-        reacted: false // Admin reactions will be handled separately
-      }))
-    }));
-    
-    const response = {
-      items: formattedItems,
-      nextCursor: hasMore ? itemsToReturn[itemsToReturn.length - 1]._id.toString() : null
-    };
-    
-    res.json(response);
-  } catch (e) { next(e); }
-}
 
-async function createMessage(req, res, next) {
-  try {
-    const { body } = req.body;
-    if (!body) return res.status(400).json({ error: 'Message body is required' });
-    
-    const message = await Message.create({
-      content: body,
-      body: body, // backward compatibility
-      author: 'admin'
-    });
-    
-    res.status(201).json({
-      id: message._id.toString(),
-      body: message.content || message.body,
-      createdAt: message.createdAt.toISOString(),
-      author: message.author,
-      reactions: []
-    });
-  } catch (e) { next(e); }
-}
-
-async function reactToMessage(req, res, next) {
-  try {
-    const { id } = req.params;
-    const { emoji } = req.body;
-    if (!emoji) return res.status(400).json({ error: 'Emoji is required' });
-    
-    const message = await Message.findById(id);
-    if (!message) return res.status(404).json({ error: 'Message not found' });
-    
-    // Initialize reactions array if it doesn't exist
-    if (!message.reactions) message.reactions = [];
-    
-    // Find existing reaction
-    const existingReaction = message.reactions.find(r => r.emoji === emoji);
-    
-    if (existingReaction) {
-      existingReaction.count = (existingReaction.count || 0) + 1;
-    } else {
-      message.reactions.push({ emoji, count: 1 });
-    }
-    
-    await message.save();
-    
-    res.json({ status: 'ok' });
-  } catch (e) { next(e); }
-}
-
-async function updateMessage(req, res, next) {
-  try {
-    const { id } = req.params;
-    const { body } = req.body;
-    if (!body) return res.status(400).json({ error: 'Message body is required' });
-    
-    const message = await Message.findByIdAndUpdate(
-      id,
-      { 
-        content: body,
-        body: body // backward compatibility
-      },
-      { new: true }
-    );
-    
-    if (!message) return res.status(404).json({ error: 'Message not found' });
-    
-    res.json({
-      id: message._id.toString(),
-      body: message.content || message.body,
-      createdAt: message.createdAt.toISOString(),
-      author: message.author,
-      reactions: (message.reactions || []).map(reaction => ({
-        emoji: reaction.emoji,
-        count: reaction.count || 0,
-        reacted: false
-      }))
-    });
-  } catch (e) { next(e); }
-}
-
-async function deleteMessage(req, res, next) {
-  try {
-    await Message.findByIdAndDelete(req.params.id);
-    res.json({ status: 'ok' });
-  } catch (e) { next(e); }
-}
 
 // ========== Gift List (file-backed) ==========
 function withIds(arr) {
@@ -482,8 +363,6 @@ async function deleteCashGiftCard(req, res, next) {
 }
 
 module.exports = {
-  // messages
-  listMessages, createMessage, reactToMessage, updateMessage, deleteMessage,
   // gifts (still file-backed)
   listGifts, createGift, updateGift, deleteGift,
   // agenda (DB-backed)

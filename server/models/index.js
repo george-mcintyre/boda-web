@@ -6,6 +6,7 @@ module.exports = {
   Message: require('./Message'),
   Comment: require('./Comment'),
   Menu: require('./Menu'),
+  MenuChoice: require('./MenuChoice'),
   CashGiftCard: require('./CashGiftCard'),
   Config: require('./Config'),
 };

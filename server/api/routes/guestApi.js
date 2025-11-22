@@ -16,10 +16,15 @@ router.get('/events', auth('guest'), eventCtrl.listEvents);
 router.get('/event-choices', auth('guest'), eventCtrl.getEventChoices);
 router.put('/event-choices', auth('guest'), eventCtrl.updateEventChoices);
 
-// Messages (use existing message controller)
-router.get('/messages', auth('guest'), messageCtrl.list);
-router.post('/messages', auth('guest'), messageCtrl.create);
-router.post('/messages/:id/reaction', auth('guest'), messageCtrl.react);
+// Messages
+router.get('/messages', auth('guest'), messageCtrl.listGuestMessages);
+router.post('/messages', auth('guest'), messageCtrl.createGuestMessage);
+router.post('/messages/:id/reaction', auth('guest'), messageCtrl.reactGuest);
+
+// Menu
+router.get('/menu', auth('guest'), require('../../controllers/menuController').listMenu);
+router.get('/menu-choices', auth('guest'), require('../../controllers/menuController').getMenuChoices);
+router.put('/menu-choices', auth('guest'), require('../../controllers/menuController').updateMenuChoices);
 
 // TODO: Add these in Phase 5
 // Menu

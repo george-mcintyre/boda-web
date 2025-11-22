@@ -27,19 +27,15 @@ router.post('/menu', auth('admin'), adminCtrl.createMenu);
 router.put('/menu/:id', auth('admin'), adminCtrl.updateMenu);
 router.delete('/menu/:id', auth('admin'), adminCtrl.deleteMenu);
 
-// TODO: Add these in Phase 7
-// router.get('/menu-choices', auth('admin'), adminCtrl.getMenuChoices);
+// Menu choices overview
+router.get('/menu-choices', auth('admin'), require('../../controllers/menuController').getMenuChoicesOverview);
 
-// Messages (Admin Console) - use existing functionality
-router.get('/messages', auth('admin'), adminCtrl.listMessages);
-router.delete('/messages/:id', auth('admin'), adminCtrl.deleteMessage);
-
-// Messages (Admin Console) - use existing functionality
-router.get('/messages', auth('admin'), adminCtrl.listMessages);
-router.post('/messages', auth('admin'), adminCtrl.createMessage);
-router.post('/messages/:id/reaction', auth('admin'), adminCtrl.reactToMessage);
-router.put('/messages/:id', auth('admin'), adminCtrl.updateMessage);
-router.delete('/messages/:id', auth('admin'), adminCtrl.deleteMessage);
+// Messages (Admin Console)
+router.get('/messages', auth('admin'), messageCtrl.listAdminMessages);
+router.post('/messages', auth('admin'), messageCtrl.createAdminMessage);
+router.post('/messages/:id/reaction', auth('admin'), messageCtrl.reactAdmin);
+router.put('/messages/:id', auth('admin'), messageCtrl.updateAdminMessage);
+router.delete('/messages/:id', auth('admin'), messageCtrl.deleteAdminMessage);
 
 // Gifts Management (existing functionality)
 router.get('/gifts', auth('admin'), adminCtrl.listGifts);
