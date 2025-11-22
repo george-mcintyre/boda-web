@@ -178,5 +178,10 @@ module.exports = {
   deleteEvent,
   // Legacy endpoints (for backward compatibility)
   getEvents: listEventsAdmin,
-  postEvents: createEvent
+  postEvents: createEvent,
+  createEventsItem: createEvent,
+  updateEventsItem: updateEvent,
+  deleteEventsItem: deleteEvent,
+  listEvents: listEvents,
+  listEventsGuest: listEvents
 };

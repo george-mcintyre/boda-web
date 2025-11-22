@@ -34,10 +34,12 @@ router.delete('/menu/:id', auth('admin'), adminCtrl.deleteMenu);
 router.get('/messages', auth('admin'), adminCtrl.listMessages);
 router.delete('/messages/:id', auth('admin'), adminCtrl.deleteMessage);
 
-// TODO: Add these in Phase 4
-// router.post('/messages', auth('admin'), adminCtrl.createMessage);
-// router.post('/messages/:id/reaction', auth('admin'), adminCtrl.reactToMessage);
-// router.put('/messages/:id', auth('admin'), adminCtrl.updateMessage);
+// Messages (Admin Console) - use existing functionality
+router.get('/messages', auth('admin'), adminCtrl.listMessages);
+router.post('/messages', auth('admin'), adminCtrl.createMessage);
+router.post('/messages/:id/reaction', auth('admin'), adminCtrl.reactToMessage);
+router.put('/messages/:id', auth('admin'), adminCtrl.updateMessage);
+router.delete('/messages/:id', auth('admin'), adminCtrl.deleteMessage);
 
 // Gifts Management (existing functionality)
 router.get('/gifts', auth('admin'), adminCtrl.listGifts);

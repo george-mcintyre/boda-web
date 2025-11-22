@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { auth } = require('../../auth/middleware');
 const guestCtrl = require('../../controllers/guestController');
 const messageCtrl = require('../../controllers/messageController');
-const adminCtrl = require('../../controllers/adminController');
+const eventCtrl = require('../../controllers/eventController');
 
 // Guest Profile (existing functionality - just renamed route)
 router.get('/profile', auth('guest'), guestCtrl.getMe);
@@ -11,12 +11,10 @@ router.get('/profile', auth('guest'), guestCtrl.getMe);
 router.get('/party', auth('guest'), guestCtrl.getParty);
 router.put('/party', auth('guest'), guestCtrl.updateParty);
 
-// Events (use existing admin event listing for now)
-router.get('/events', auth('guest'), adminCtrl.listEventsAdmin);
-
-// TODO: Add these in Phase 3
-// router.get('/event-choices', auth('guest'), guestCtrl.getEventChoices);
-// router.put('/event-choices', auth('guest'), guestCtrl.updateEventChoices);
+// Events
+router.get('/events', auth('guest'), eventCtrl.listEvents);
+router.get('/event-choices', auth('guest'), eventCtrl.getEventChoices);
+router.put('/event-choices', auth('guest'), eventCtrl.updateEventChoices);
 
 // Messages (use existing message controller)
 router.get('/messages', auth('guest'), messageCtrl.list);

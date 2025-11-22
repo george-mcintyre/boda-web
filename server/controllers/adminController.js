@@ -2,6 +2,27 @@ const fs = require('fs');
 const path = require('path');
 const { Message, Menu, Config, CashGiftCard, Event } = require('../models');
 
+// Format event for API response according to README specification
+function formatEventForApi(event) {
+  return {
+    id: event._id.toString(),
+    name: event.name,
+    date: event.date ? event.date.toISOString() : null,
+    end: event.end ? event.end.toISOString() : null,
+    location: event.location,
+    title: event.title ? (typeof event.title === 'string' ? event.title : event.title.get('en') || event.title.get('es')) : null,
+    description: event.description ? (typeof event.description === 'string' ? event.description : event.description.get('en') || event.description.get('es')) : null,
+    image: event.image || null,
+    sub_events: (event.sub_events || []).map(sub => ({
+      name: sub.name,
+      date: sub.date ? sub.date.toISOString() : null,
+      end: sub.end ? sub.end.toISOString() : null,
+      description: sub.description || null,
+      icon: sub.icon
+    }))
+  };
+}
+
 // Data dir and helpers
 const DATA_DIR = path.join(__dirname, '..', 'data');
 const files = {
@@ -42,15 +63,121 @@ function writeJson(file, payload) {
 // ========== Messages (MongoDB) ==========
 async function listMessages(req, res, next) {
   try {
-    const items = await Message.find({}).sort({ createdAt: -1 }).lean();
-    res.json(items);
+    const { cursor, limit = 10 } = req.query;
+    const query = Message.find({}).sort({ createdAt: -1 });
+    
+    if (cursor) {
+      query.where({ _id: { $lt: cursor } });
+    }
+    
+    const items = await query.limit(parseInt(limit) + 1).lean();
+    const hasMore = items.length > limit;
+    const itemsToReturn = hasMore ? items.slice(0, limit) : items;
+    
+    const formattedItems = itemsToReturn.map(message => ({
+      id: message._id.toString(),
+      body: message.content || message.body,
+      createdAt: message.createdAt.toISOString(),
+      author: message.author || null,
+      reactions: (message.reactions || []).map(reaction => ({
+        emoji: reaction.emoji,
+        count: reaction.count || 0,
+        reacted: false // Admin reactions will be handled separately
+      }))
+    }));
+    
+    const response = {
+      items: formattedItems,
+      nextCursor: hasMore ? itemsToReturn[itemsToReturn.length - 1]._id.toString() : null
+    };
+    
+    res.json(response);
+  } catch (e) { next(e); }
+}
+
+async function createMessage(req, res, next) {
+  try {
+    const { body } = req.body;
+    if (!body) return res.status(400).json({ error: 'Message body is required' });
+    
+    const message = await Message.create({
+      content: body,
+      body: body, // backward compatibility
+      author: 'admin'
+    });
+    
+    res.status(201).json({
+      id: message._id.toString(),
+      body: message.content || message.body,
+      createdAt: message.createdAt.toISOString(),
+      author: message.author,
+      reactions: []
+    });
+  } catch (e) { next(e); }
+}
+
+async function reactToMessage(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { emoji } = req.body;
+    if (!emoji) return res.status(400).json({ error: 'Emoji is required' });
+    
+    const message = await Message.findById(id);
+    if (!message) return res.status(404).json({ error: 'Message not found' });
+    
+    // Initialize reactions array if it doesn't exist
+    if (!message.reactions) message.reactions = [];
+    
+    // Find existing reaction
+    const existingReaction = message.reactions.find(r => r.emoji === emoji);
+    
+    if (existingReaction) {
+      existingReaction.count = (existingReaction.count || 0) + 1;
+    } else {
+      message.reactions.push({ emoji, count: 1 });
+    }
+    
+    await message.save();
+    
+    res.json({ status: 'ok' });
+  } catch (e) { next(e); }
+}
+
+async function updateMessage(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { body } = req.body;
+    if (!body) return res.status(400).json({ error: 'Message body is required' });
+    
+    const message = await Message.findByIdAndUpdate(
+      id,
+      { 
+        content: body,
+        body: body // backward compatibility
+      },
+      { new: true }
+    );
+    
+    if (!message) return res.status(404).json({ error: 'Message not found' });
+    
+    res.json({
+      id: message._id.toString(),
+      body: message.content || message.body,
+      createdAt: message.createdAt.toISOString(),
+      author: message.author,
+      reactions: (message.reactions || []).map(reaction => ({
+        emoji: reaction.emoji,
+        count: reaction.count || 0,
+        reacted: false
+      }))
+    });
   } catch (e) { next(e); }
 }
 
 async function deleteMessage(req, res, next) {
   try {
     await Message.findByIdAndDelete(req.params.id);
-    res.json({ ok: true });
+    res.json({ status: 'ok' });
   } catch (e) { next(e); }
 }
 
@@ -98,82 +225,91 @@ async function deleteGift(req, res) {
 }
 
 // ========== Events (MongoDB-backed CRUD) ==========
-function toEventPayload(body = {}) {
-  // Accept Spanish or English keys
-  const evento = body.evento ?? body.titulo ?? body.title ?? body.nombre;
-  const descripcion = body.descripcion ?? body.description;
-  const lugar = body.lugar ?? body.venue;
-  const fecha = body.fecha ?? body.date;
-  const hora = body.hora ?? body.time;
-  const order = body.orden ?? body.order;
-  const mapOrUndef = (v) => {
-    if (v == null || v === '') return undefined;
-    if (typeof v === 'object') return v; // already localized
-    return { en: String(v) };
-  };
-  const payload = {
-    title: mapOrUndef(evento),
-    description: mapOrUndef(descripcion),
-    venue: mapOrUndef(lugar),
-    date: fecha ? new Date(fecha) : undefined,
-    time: hora != null ? String(hora) : undefined,
-    order: order != null ? Number(order) : undefined,
-  };
-  // remove undefined keys so updates don't unset unintentionally
-  Object.keys(payload).forEach(k => payload[k] === undefined && delete payload[k]);
-  return payload;
-}
-
-function presentEvent(doc) {
-  if (!doc) return null;
-  const asStr = (m) => {
-    if (!m) return '';
-    if (typeof m === 'string') return m;
-    if (m && typeof m.get === 'function') return m.get('es') || m.get('en') || '';
-    if (m && typeof m === 'object') return m.es || m.en || '';
-    return '';
-  };
-  return {
-    id: String(doc._id || doc.id),
-    evento: asStr(doc.title),
-    descripcion: asStr(doc.description),
-    lugar: asStr(doc.venue),
-    fecha: doc.date ? new Date(doc.date).toISOString().slice(0, 10) : '',
-    hora: doc.time || '',
-    orden: doc.order ?? undefined,
-  };
-}
-
 async function listEventsAdmin(req, res, next) {
   try {
-    const items = await Event.find({}).sort({ order: 1, createdAt: 1 }).lean();
-    res.json(items.map(presentEvent));
+    const events = await Event.find({}).sort({ date: 1, order: 1, createdAt: 1 }).lean();
+    const items = events.map(formatEventForApi);
+    res.json(items);
   } catch (e) { next(e); }
 }
 
 async function createEventsItem(req, res, next) {
   try {
-    const payload = toEventPayload(req.body || {});
-    const created = await Event.create(payload);
-    res.status(201).json(presentEvent(created));
+    const { name, date, end, location, title, description, image, sub_events } = req.body;
+    
+    // Convert strings to localized maps if needed
+    const convertToMap = (value) => {
+      if (!value) return undefined;
+      if (typeof value === 'string') return { en: value };
+      if (typeof value === 'object') return value;
+      return undefined;
+    };
+    
+    const event = await Event.create({
+      name,
+      date: date ? new Date(date) : null,
+      end: end ? new Date(end) : null,
+      location,
+      title: convertToMap(title),
+      description: convertToMap(description),
+      image,
+      sub_events: (sub_events || []).map(sub => ({
+        name: sub.name,
+        date: sub.date ? new Date(sub.date) : null,
+        end: sub.end ? new Date(sub.end) : null,
+        description: convertToMap(sub.description),
+        icon: sub.icon
+      }))
+    });
+
+    res.status(201).json(formatEventForApi(event));
   } catch (e) { next(e); }
 }
 
 async function updateEventsItem(req, res, next) {
   try {
-    const id = req.params.id;
-    const payload = toEventPayload(req.body || {});
-    const updated = await Event.findByIdAndUpdate(id, payload, { new: true });
-    if (!updated) return res.status(404).json({ error: 'Agenda item not found' });
-    res.json(presentEvent(updated));
+    const { id } = req.params;
+    const { name, date, end, location, title, description, image, sub_events } = req.body;
+
+    // Convert strings to localized maps if needed
+    const convertToMap = (value) => {
+      if (!value) return undefined;
+      if (typeof value === 'string') return { en: value };
+      if (typeof value === 'object') return value;
+      return undefined;
+    };
+
+    const event = await Event.findByIdAndUpdate(id, {
+      ...(name && { name }),
+      ...(date && { date: new Date(date) }),
+      ...(end && { end: new Date(end) }),
+      ...(location && { location }),
+      ...(title && { title: convertToMap(title) }),
+      ...(description && { description: convertToMap(description) }),
+      ...(image && { image }),
+      ...(sub_events && { 
+        sub_events: sub_events.map(sub => ({
+          name: sub.name,
+          date: sub.date ? new Date(sub.date) : null,
+          end: sub.end ? new Date(sub.end) : null,
+          description: convertToMap(sub.description),
+          icon: sub.icon
+        }))
+      })
+    }, { new: true });
+
+    if (!event) return res.status(404).json({ error: 'Event not found' });
+
+    res.json(formatEventForApi(event));
   } catch (e) { next(e); }
 }
 
 async function deleteEventsItem(req, res, next) {
   try {
-    const id = req.params.id;
-    await Event.findByIdAndDelete(id);
-    res.json({ ok: true });
+    const { id } = req.params;
+    const event = await Event.findByIdAndDelete(id);
+    if (!event) return res.status(404).json({ error: 'Event not found' });
+    res.json({ status: 'ok' });
   } catch (e) { next(e); }
 }
 
@@ -347,7 +483,7 @@ async function deleteCashGiftCard(req, res, next) {
 
 module.exports = {
   // messages
-  listMessages, deleteMessage,
+  listMessages, createMessage, reactToMessage, updateMessage, deleteMessage,
   // gifts (still file-backed)
   listGifts, createGift, updateGift, deleteGift,
   // agenda (DB-backed)
