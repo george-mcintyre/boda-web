@@ -140,7 +140,11 @@ async function getById(req, res, next) {
   try {
     const guest = await Guest.findById(req.params.id);
     if (!guest) return res.status(404).json({ error: 'Guest not found' });
-    res.json(guest);
+    res.json({
+      id: guest._id.toString(),
+      name: guest.name,
+      email: guest.email
+    });
   } catch (e) { next(e); }
 }
 

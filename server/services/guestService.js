@@ -15,9 +15,36 @@ function normalizeGuestInput(data = {}) {
 }
 
 async function getByEmail(email) { return Guest.findOne({ email }); }
-async function list() { return Guest.find().sort({ createdAt: -1 }); }
-async function create(data) { return Guest.create(normalizeGuestInput(data)); }
-async function update(id, data) { return Guest.findByIdAndUpdate(id, normalizeGuestInput(data), { new: true }); }
-async function remove(id) { return Guest.findByIdAndDelete(id); }
+async function list() { 
+  const guests = await Guest.find().sort({ createdAt: -1 }).lean();
+  const items = guests.map(guest => ({
+    id: guest._id.toString(),
+    name: guest.name,
+    email: guest.email
+  }));
+  return { items, nextCursor: null }; // TODO: Implement proper pagination later
+}
+async function create(data) { 
+  const guest = await Guest.create(normalizeGuestInput(data));
+  return {
+    id: guest._id.toString(),
+    name: guest.name,
+    email: guest.email
+  };
+}
+
+async function update(id, data) { 
+  const guest = await Guest.findByIdAndUpdate(id, normalizeGuestInput(data), { new: true });
+  if (!guest) return null;
+  return {
+    id: guest._id.toString(),
+    name: guest.name,
+    email: guest.email
+  };
+}
+
+async function remove(id) { 
+  await Guest.findByIdAndDelete(id);
+}
 
 module.exports = { getByEmail, list, create, update, remove };

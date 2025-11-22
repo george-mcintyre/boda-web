@@ -131,59 +131,73 @@
     activate('guests');
     setLoading('Loading guests...');
     try {
-      const res = await api('/api/admin/guests');
+      // Use pagination for large guest lists
+      let url = '/api/admin/guests';
+      const res = await api(url);
       if (!res.ok) throw new Error('Failed to load guests');
       const data = await res.json();
-      const rows = (data||[]).map(g => `
+      
+      // Handle both paginated and non-paginated responses
+      const guests = data.items || data || [];
+      
+      const rows = guests.map(g => `
         <tr>
           <td>${g.name || ''}</td>
-          <td>${g.email||''}</td>
-          <td>${g.status || 'pending'}</td>
-          <td>${g.companions ?? 0}</td>
-          <td>${g.specialMenu || ''}</td>
+          <td>${g.email || ''}</td>
           <td>
-            <button class="admin-action" data-action="edit" data-id="${g._id}"><i class="fas fa-edit"></i></button>
-            <button class="admin-action danger" data-action="del" data-id="${g._id}"><i class="fas fa-trash"></i></button>
+            <button class="admin-action" data-action="manage-party" data-id="${g.id || g._id}" title="Manage Party">
+              <i class="fas fa-users"></i>
+            </button>
+            <button class="admin-action" data-action="edit" data-id="${g.id || g._id}">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="admin-action danger" data-action="del" data-id="${g.id || g._id}">
+              <i class="fas fa-trash"></i>
+            </button>
           </td>
         </tr>`).join('');
-      content.innerHTML = renderTable({title:'Guests', columns:['Name','Email','Status','Companions','Special menu','Actions']}, rows,
-        `<button id="addGuest" class="admin-action"><i class="fas fa-user-plus"></i> Add</button>`);
+      
+      content.innerHTML = renderTable({title:'Guests', columns:['Name','Email','Actions']}, rows,
+        `<button id="addGuest" class="admin-action"><i class="fas fa-user-plus"></i> Add Guest</button>`);
+      
       const tbody = content.querySelector('tbody');
       tbody.addEventListener('click', async (e)=>{
         const btn = e.target.closest('button'); if(!btn) return;
         const id = btn.dataset.id; const action = btn.dataset.action;
-        const current = (data||[]).find(x => String(x._id) === String(id)) || {};
+        const current = guests.find(x => String(x.id || x._id) === String(id)) || {};
+        
         if (action==='del'){
-          if (!confirm('Delete this guest?')) return;
+          if (!confirm('Delete this guest and their entire party?')) return;
           const r = await api(`/api/admin/guests/${id}`, { method:'DELETE' });
-          if (r.ok) showGuests(); else notify('Error deleting', 'error');
+          if (r.ok) showGuests(); else notify('Error deleting guest', 'error');
         } else if (action==='edit'){
           openFormModal({
             title: 'Edit guest',
             submitText: 'Save',
             fields: [
               { name:'name', label:'Name', required:true },
-              { name:'email', label:'Email', type:'email', required:true },
-              { name:'status', label:'Status', type:'select', options:['pending','confirmed','declined'], required:true },
-              { name:'companions', label:'Companions', type:'number', help:'Number of additional guests' },
-              { name:'specialMenu', label:'Special menu', help:'Allergies or special request' },
+              { name:'email', label:'Email', type:'email', required:true }
             ],
             initialValues: {
               name: current.name || '',
-              email: current.email || '',
-              status: current.status || 'pending',
-              companions: current.companions ?? 0,
-              specialMenu: current.specialMenu || ''
+              email: current.email || ''
             },
             onSubmit: async (values, close) => {
-              const r = await api(`/api/admin/guests/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
-              if (!r.ok) throw new Error('Failed to update');
+              const r = await api(`/api/admin/guests/${id}`, { 
+                method:'PUT', 
+                headers:{'Content-Type':'application/json'}, 
+                body: JSON.stringify(values)
+              });
+              if (!r.ok) throw new Error('Failed to update guest');
               close();
               showGuests();
             }
           });
+        } else if (action==='manage-party'){
+          showPartyManager(id, current.name || current.nombre || '');
         }
       });
+      
       content.querySelector('#addGuest').addEventListener('click', async ()=>{
         openFormModal({
           title: 'Add guest',
@@ -193,14 +207,226 @@
             { name:'email', label:'Email', type:'email', required:true }
           ],
           onSubmit: async (values, close) => {
-            const r = await api('/api/admin/guests', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
-            if (!r.ok) throw new Error('Failed to create');
+            const r = await api('/api/admin/guests', { 
+              method:'POST', 
+              headers:{'Content-Type':'application/json'}, 
+              body: JSON.stringify(values)
+            });
+            if (!r.ok) throw new Error('Failed to create guest');
             close();
             showGuests();
           }
         });
       });
-    } catch(e){ notify(e.message,'error'); }
+    } catch(e){ 
+      console.error('Error loading guests:', e); 
+      notify('Error loading guests: ' + e.message, 'error'); 
+      content.innerHTML = `
+        <div class="admin-content">
+          <h3>Guests</h3>
+          <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Guests</h3>
+            <p>Failed to load guests: ${e.message}</p>
+            <button onclick="showGuests()" class="btn-retry">
+              <i class="fas fa-redo"></i> Retry
+            </button>
+          </div>
+        </div>`;
+    }
+  }
+
+  // ========== Party Management ==========
+  async function showPartyManager(guestId, guestName){
+    activate('guests');
+    setLoading('Loading party members...');
+    
+    try {
+      // Load current party members
+      const res = await api(`/api/admin/guests/${guestId}/party`);
+      if (!res.ok) throw new Error('Failed to load party members');
+      const partyMembers = await res.json();
+      
+      // Separate primary guest from party members
+      const primaryGuest = partyMembers.find(member => member.primary) || null;
+      const party = partyMembers.filter(member => !member.primary) || [];
+      
+      const partyRows = party.map((member, index) => `
+        <tr>
+          <td>${member.name || ''}</td>
+          <td>${member.adult ? 'Adult' : 'Child'}</td>
+          <td>
+            <button class="admin-action" data-action="edit-member" data-index="${index}" data-id="${member.id || ''}">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="admin-action danger" data-action="remove-member" data-index="${index}">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>`).join('');
+      
+      const partyTable = party.length > 0 ? `
+        <div class="table-container">
+          <table class="data-table">
+            <thead><tr><th>Name</th><th>Age Group</th><th>Actions</th></tr></thead>
+            <tbody>${partyRows}</tbody>
+          </table>
+        </div>` : `
+        <div class="no-party-members">
+          <i class="fas fa-users" style="font-size: 2em; color: #ccc; margin-bottom: 10px;"></i>
+          <p>No party members added yet.</p>
+        </div>`;
+      
+      content.innerHTML = `
+        <div class="admin-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <div>
+              <h3 style="margin:0;">Manage Party: ${guestName}</h3>
+              <p style="margin:5px 0 0 0;color:#666;">Manage party members for this guest</p>
+            </div>
+            <button id="backToGuests" class="admin-action">
+              <i class="fas fa-arrow-left"></i> Back to Guests
+            </button>
+          </div>
+          
+          <div class="party-section">
+            <h4><i class="fas fa-user"></i> Primary Guest</h4>
+            <div class="primary-guest-info">
+              <strong>${primaryGuest ? primaryGuest.name : 'Unknown'}</strong> 
+              <span class="badge badge-primary">Primary</span>
+            </div>
+          </div>
+          
+          <div class="party-section">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
+              <h4><i class="fas fa-users"></i> Party Members</h4>
+              <button id="addPartyMember" class="admin-action">
+                <i class="fas fa-user-plus"></i> Add Member
+              </button>
+            </div>
+            ${partyTable}
+          </div>
+        </div>`;
+      
+      // Back button
+      document.getElementById('backToGuests').addEventListener('click', showGuests);
+      
+      // Add party member
+      document.getElementById('addPartyMember').addEventListener('click', ()=>{
+        openFormModal({
+          title: 'Add Party Member',
+          submitText: 'Add',
+          fields: [
+            { name:'name', label:'Name', required:true },
+            { name:'adult', label:'Age Group', type:'select', options:[
+              { value: 'true', label: 'Adult (18+)' },
+              { value: 'false', label: 'Child (Under 18)' }
+            ], required:true }
+          ],
+          onSubmit: async (values, close) => {
+            const newMember = {
+              name: values.name,
+              adult: values.adult === 'true',
+              id: null // New member, no ID yet
+            };
+            
+            const updatedParty = [...party, newMember];
+            const r = await api(`/api/admin/guests/${guestId}/party`, { 
+              method:'PUT', 
+              headers:{'Content-Type':'application/json'}, 
+              body: JSON.stringify(updatedParty)
+            });
+            
+            if (!r.ok) throw new Error('Failed to add party member');
+            close();
+            showPartyManager(guestId, guestName);
+          }
+        });
+      });
+      
+      // Handle party member actions
+      const tbody = content.querySelector('tbody');
+      if (tbody) {
+        tbody.addEventListener('click', async (e)=>{
+          const btn = e.target.closest('button'); if(!btn) return;
+          const action = btn.dataset.action;
+          const index = parseInt(btn.dataset.index);
+          
+          if (action==='remove-member'){
+            if (!confirm('Remove this party member?')) return;
+            
+            const updatedParty = party.filter((_, i) => i !== index);
+            const r = await api(`/api/admin/guests/${guestId}/party`, { 
+              method:'PUT', 
+              headers:{'Content-Type':'application/json'}, 
+              body: JSON.stringify(updatedParty)
+            });
+            
+            if (!r.ok) throw new Error('Failed to remove party member');
+            showPartyManager(guestId, guestName);
+          } else if (action==='edit-member'){
+            const member = party[index];
+            openFormModal({
+              title: 'Edit Party Member',
+              submitText: 'Save',
+              fields: [
+                { name:'name', label:'Name', required:true },
+                { name:'adult', label:'Age Group', type:'select', options:[
+                  { value: 'true', label: 'Adult (18+)' },
+                  { value: 'false', label: 'Child (Under 18)' }
+                ], required:true }
+              ],
+              initialValues: {
+                name: member.name || '',
+                adult: member.adult ? 'true' : 'false'
+              },
+              onSubmit: async (values, close) => {
+                const updatedMember = {
+                  ...member,
+                  name: values.name,
+                  adult: values.adult === 'true'
+                };
+                
+                const updatedParty = [...party];
+                updatedParty[index] = updatedMember;
+                
+                const r = await api(`/api/admin/guests/${guestId}/party`, { 
+                  method:'PUT', 
+                  headers:{'Content-Type':'application/json'}, 
+                  body: JSON.stringify(updatedParty)
+                });
+                
+                if (!r.ok) throw new Error('Failed to update party member');
+                close();
+                showPartyManager(guestId, guestName);
+              }
+            });
+          }
+        });
+      }
+      
+    } catch(e){ 
+      console.error('Error loading party:', e); 
+      notify('Error loading party members: ' + e.message, 'error'); 
+      content.innerHTML = `
+        <div class="admin-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h3>Manage Party: ${guestName}</h3>
+            <button id="backToGuests" class="admin-action">
+              <i class="fas fa-arrow-left"></i> Back to Guests
+            </button>
+          </div>
+          <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Party</h3>
+            <p>Failed to load party members: ${e.message}</p>
+            <button onclick="showPartyManager('${guestId}', '${guestName}')" class="btn-retry">
+              <i class="fas fa-redo"></i> Retry
+            </button>
+          </div>
+        </div>`;
+      document.getElementById('backToGuests').addEventListener('click', showGuests);
+    }
   }
 
   // ========== Gift list ==========
@@ -438,6 +664,176 @@
     });
   }
 
+  // ========== Styles for Party Management ==========
+  function addPartyStyles(){
+    if (document.getElementById('party-styles')) return;
+    
+    const style = document.createElement('style');
+    style.id = 'party-styles';
+    style.textContent = `
+      .party-section {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
+      
+      .party-section h4 {
+        margin: 0 0 15px 0;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .primary-guest-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid var(--primary-color, #8B5A96);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      
+      .badge-primary {
+        background: var(--primary-color, #8B5A96);
+        color: white;
+      }
+      
+      .no-party-members {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6c757d;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 2px dashed #dee2e6;
+      }
+      
+      .error-message {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        margin: 20px 0;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+      }
+      
+      .error-message i {
+        font-size: 2em;
+        margin-bottom: 10px;
+        display: block;
+      }
+      
+      .error-message h3 {
+        margin: 0 0 10px 0;
+        font-size: 1.3em;
+      }
+      
+      .error-message p {
+        margin: 0 0 15px 0;
+        line-height: 1.4;
+      }
+      
+      .btn-retry {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .btn-retry:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
+      }
+      
+      .admin-action {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      
+      .admin-action:hover {
+        background: #0056b3;
+        transform: translateY(-1px);
+      }
+      
+      .admin-action.danger {
+        background: #dc3545;
+      }
+      
+      .admin-action.danger:hover {
+        background: #c82333;
+      }
+      
+      .admin-action:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+      }
+      
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      
+      .data-table th,
+      .data-table td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+      
+      .data-table th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #333;
+      }
+      
+      .data-table tbody tr:hover {
+        background: #f8f9fa;
+      }
+      
+      .table-container {
+        margin-top: 15px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
   // ========== Settings ==========
   async function showSettings(){
     activate('configuration');
@@ -483,6 +879,9 @@
 
   // Router for tabs
   function showTab(tab){
+    // Add styles for party management
+    addPartyStyles();
+    
     switch(tab){
       case 'guests': return showGuests();
       case 'gifts': return showGifts();
