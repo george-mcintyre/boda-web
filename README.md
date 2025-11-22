@@ -1,5 +1,3 @@
-
-
 # Wedding Web · George & Iluminada
 
 ## Quick Start (local)
@@ -10,41 +8,7 @@
 - 4) Visit: http://localhost:3000/index.html → Login → guests.html
 - Optional: use ./start-server.sh (macOS/Linux) or start-server.bat/ps1 (Windows)
 
-### Accessing from another device on your LAN (macOS)
-- The dev server runs over HTTP by default. Use: http://<your-mac-hostname>.local:3000 or http://<your-mac-ip>:3000
-- If you see ERR_SSL_PROTOCOL_ERROR, it means you tried to open https://…:3000 but the dev server isn’t using TLS. Use http:// instead, or enable local HTTPS (below).
-- Tip: On macOS, you can check your Local Hostname in System Settings → Sharing. If it’s “mcinpro”, then the URL is http://mcinpro.local:3000
-
-### Optional: enable local HTTPS in development (macOS)
-The dev server always serves HTTP on PORT (default 3000). If you enable HTTPS, it will additionally serve HTTPS on HTTPS_PORT (default 3443). One simple way to get trusted local certs is mkcert.
-
-1) Install mkcert and the local CA:
-```
-brew install mkcert
-mkcert -install
-```
-2) Create a cert for your hostname (adjust as needed):
-```
-mkcert mcinpro.local
-# This produces two files, e.g.:
-#  - mcinpro.local-key.pem
-#  - mcinpro.local.pem
-```
-3) Create/update your .env in the repo root with:
-```
-DEV_HTTPS=true
-SSL_KEY_PATH=./mcinpro.local-key.pem
-SSL_CERT_PATH=./mcinpro.local.pem
-PORT=3000
-HTTPS_PORT=3443
-```
-4) Start the server: `npm start` (or `./start-server.sh`). Now visit: https://mcinpro.local:3443 (HTTP remains available at http://mcinpro.local:3000)
-
-Notes:
-- If you don’t enable DEV_HTTPS, use http://…:3000. If a browser/extension upgrades to HTTPS, just use the HTTPS port (3443) when DEV_HTTPS=true, otherwise stick to HTTP.
-- From phones/tablets on the same Wi‑Fi, you can also use your Mac’s IP: http://<ip>:3000 and https://<ip>:3443 (when enabled).
-
-Quick index:
+# Quick index:
 - Overview and features
 - Project structure
 - Setup and run
@@ -58,14 +22,16 @@ Quick index:
 - Stripe (setup, variables, and webhooks)
 
 ## ✨ Overview
-- Guests: login by email, guest profile, menu selection, messages, gift list.
-- Admin: manage guests and other entities (extensible), JWT authentication.
+- Guests: login by email → guest profile, event attendance, menu selection, messages, gift registry.
+- Admin: manage guests, events, menus, messags, gift registry, and global settings
+- JWT authentication.
 - Modular backend with Express + MongoDB (Mongoose) and JWT.
 
-## 📁 Project structure (current)
+## 📁 Project structure
 ```
 boda-web/
 ├─ public/            # client static files (HTML, CSS, JS, assets, locales)
+├─ scripts/           # local utilities (e.g., DB: inspect, clean)
 ├─ server/            # Node code (auth, api, protected views)
 │  ├─ auth/           # auth handlers, JWT/session utils
 │  ├─ api/            # API routes (CRUD, etc.)
@@ -76,7 +42,6 @@ boda-web/
 │  ├─ utils/          # server utilities
 │  ├─ app.js          # Express app
 │  └─ server.js       # server bootstrap
-├─ scripts/           # local utilities (e.g., DB: inspect, clean)
 ├─ infra/             # local infrastructure
 │  └─ docker-compose.yml  # local MongoDB
 ├─ start-server.sh | start-server.bat | start-server.ps1
@@ -212,17 +177,6 @@ Schema compatibility notes:
 - Events: Localized strings are mapped; dates from `fecha` are parsed; `hora` goes into `time`.
 - Messages: `mensaje` → `content`; reactions map preserved; `fecha` mapped to timestamps.
 
-## 🔐 API and authentication
-- Login: `POST /api/login`  { email, password? }
-  - Guest: email without password → returns `{ token, tipo:"invitado" }`.
-  - Admin: email + password → `{ token, tipo:"admin" }`.
-- Guest profile: `GET /api/invitado` with `Authorization: Bearer <token>` (guest role).
-- Guest administration (admin role):
-  - `GET /api/guests`
-  - `POST /api/guests`
-  - `PUT /api/guests/:id`
-  - `DELETE /api/guests/:id`
-
 ## 🌐 Frontend
 - When calling authenticated endpoints, send the header: `Authorization: Bearer <token>`.
 - Static files are served from `public/`.
@@ -253,6 +207,969 @@ Schema compatibility notes:
 - If you integrate Stripe on the frontend, use `STRIPE_PUBLISHABLE_KEY` on the client (do not share the secret key).
 - For webhooks, configure `STRIPE_WEBHOOK_SECRET` and point Stripe to your public endpoint (e.g., via ngrok or a cloud deployment).
 
-## 📄 Notes
-- This README replaces the older scattered documents: ESQUEMA_DISENO_PROYECTO.md, ESTRATEGIA_ESTILOS_CENTRALIZADOS.txt, ESTRUCTURA_SITIO_WEB.txt, GUIA_ESTILOS_BODA_WEB.txt, README-GESTION-EVENTOS.md, STRIPE_SETUP.md, and STRIPE_WEBHOOKS_SETUP.md.
-- If you need to recover any detail, check the Git history prior to this consolidation.
+
+# 🔐 Wedding API Specification
+
+API for the wedding guest & admin portals.
+
+- **Base URL**: `/api`
+- **Auth**: JWT in `Authorization: Bearer <token>`
+- **Roles**: `guest`, `admin`
+- **Namespaces**:
+  - Guest portal: `/api/guest/...`
+  - Admin portal: `/api/admin/...`
+
+---
+
+## 1. Authentication
+
+### `POST /api/login`
+
+Authenticate a user as guest or admin based on whether a password is provided.
+
+**Request body**
+
+    {
+      "email": "string",
+      "password": "string | null"
+    }
+
+**Behaviour**
+
+- **Guest login**: email only (no password)  
+  Returns a guest token.
+- **Admin login**: email + password  
+  Returns an admin token.
+
+**Response (both cases)**
+
+    {
+      "token": "jwt-string",
+      "type": "guest | admin"
+    }
+
+Use the token in all subsequent calls:
+
+    Authorization: Bearer <token>
+
+
+---
+
+## 2. Guest Portal API
+
+All endpoints require a valid **guest** token.
+
+Base path: `/api/guest`
+
+
+### 2.1 Guest Profile & Party
+
+#### `GET /api/guest/profile`
+
+Returns information about the primary guest associated with the token.
+
+**Response**
+```json
+    {
+      "id": "string",
+      "name": "string",
+      "email": "string",
+    }
+```
+Notes:
+
+- The primary guest is the one who logs in and owns the party.
+
+
+#### `GET /api/guest/party`
+
+Returns all members of the guest’s party.
+
+**Response**
+```json
+    [
+      {
+        "id": "string",
+        "name": "string",
+        "adult": true,
+        "primary": true
+      }
+    ]
+```
+Notes:
+
+- `primary: true` for the primary guest.
+- Adults are guests over 18 (`adult: true`).
+- Party members may be matched server-side using case-insensitive, whitespace-insensitive names.
+- The primary guest is automatically added to the list of party members by the server
+
+
+#### `PUT /api/guest/party`
+
+Replace/update the full party for this guest.
+
+**Request body**
+```json
+    [
+      {
+        "id": "string | null",
+        "name": "string",
+        "adult": true
+      }
+    ]
+```
+- `id` may be `null` for new party members.
+- guest must not be included in the list of party members, it is automatically appended by the server.
+
+**Response**
+
+- Same as `GET /api/guest/party`.
+
+
+---
+
+### 2.2 Events
+
+#### `GET /api/guest/events`
+
+List of events configured by the couple.
+
+**Response**
+```json
+    [
+      {
+        "id": "string",
+        "name": "string",
+        "date": "ISO8601",
+        "end": "ISO8601",
+        "location": "string",
+        "title": "string",
+        "description": "string | null",
+        "image": "string | null",
+        "sub_events" : [
+          {
+            "name": "string",
+            "date": "ISO8601",
+            "end": "ISO8601",
+            "description": "string | null",
+            "icon": "string" 
+          }
+        ]
+      }
+    ]
+```
+`icon` is one of  "ceremony", "cocktails", "reception", "dancing"
+
+#### `GET /api/guest/event-choices`
+
+Get attendance choices per party member for each event.
+
+**Response**
+```json
+    [
+      {
+        "partyGuestId": "string",
+        "choices": [
+          {
+            "eventId": "string",
+            "attending": true
+          }
+        ]
+      }
+    ]
+
+```
+#### `PUT /api/guest/event-choices`
+
+Create or update event attendance choices.
+
+**Request body**
+
+Same shape as the response above:
+```json
+    [
+      {
+        "partyGuestId": "string",
+        "choices": [
+          {
+            "eventId": "string",
+            "attending": true
+          }
+        ]
+      }
+    ]
+
+```**Response**
+
+- Updated choices (same shape).
+
+
+---
+
+### 2.3 Messages (Guest View)
+
+Messages visible to the guest (announcements, notes, etc.).
+
+#### `GET /api/guest/messages?cursor=&limit=`
+
+Returns a paginated list of messages.
+
+**Response**
+```json
+    {
+      "items": [
+        {
+          "id": "string",
+          "body": "string",
+          "createdAt": "ISO8601",
+          "author": "string | null",
+          "reactions": [
+            {
+              "emoji": "string",
+              "count": 3,
+              "reacted": true
+            }
+          ]
+        }
+      ],
+      "nextCursor": "string | null"
+    }
+
+```Notes:
+
+- `author` may be `null` for system messages.
+- `reacted: true` indicates the current guest has reacted with that emoji.
+
+
+#### `POST /api/guest/messages`
+
+Guest sends a message (e.g. to the couple).
+
+**Request body**
+```json
+    {
+      "body": "string"
+    }
+```
+**Response**
+
+- Created message, same shape as items in `GET /api/guest/messages`.
+
+
+#### `POST /api/guest/messages/:id/reaction`
+
+Set or change the reaction of the current guest to a message.
+
+**Request body**
+```json
+    {
+      "emoji": "string"
+    }
+
+```**Response**
+
+Confirmation:
+```json
+    {
+      "status": "ok"
+    }
+
+```
+---
+
+### 2.4 Menu (Guest Choices)
+
+#### `GET /api/guest/menu`
+
+List menu parts and options (starters, mains, desserts, etc.).
+
+**Response**
+```json
+    [
+      {
+        "id": "string",
+        "course": "starter | main | dessert | drinks",
+        "label": "string",
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "image": "string",
+            "description": "string | null"
+          }
+        ]
+      }
+    ]
+
+```
+#### `GET /api/guest/menu-choices`
+
+Get menu selections per party member.
+
+**Response**
+```json
+    [
+      {
+        "partyGuestId": "string",
+        "choices": [
+          {
+            "menuPartId": "string",
+            "optionId": "string | null"
+          }
+        ],
+        "specialRequest": "string | null",
+        "specialRequestDetail": "string | null"
+      }
+    ]
+```
+- `specialRequest` is selected from a set of choices "vegan", "vegetarian", "nut allergy", "other".  If other then `specialRequestDetail` is a free text field to describe the special request.
+
+
+#### `PUT /api/guest/menu-choices`
+
+Update menu selections.
+
+**Request body**
+
+Same shape as the response above.
+
+**Response**
+
+- Updated choices.
+
+
+---
+
+### 2.5 Gifts
+
+#### `GET /api/guest/gifts`
+
+List available gift card options.
+
+**Response**
+```json
+    [
+      {
+        "id": "string",
+        "title": "string",
+        "description": "string",
+        "amount": 100,
+        "available": 1,
+        "image": 10
+      }
+    ]
+```
+
+- only shows gifts who's hidden field `enabled` is true.
+- `amount` is selected from a fixed set of values `25`, `50`, `100`, `200`, and `500` 
+- `image` is selected from a fixed set of images that are baked into the site: `/images/gift-cards/image_01.jpg` - `/images/gift-cards/image_30.jpg` only the number needs to be stored as the rest of the uri is fixed.
+- the number of these gifts that are still available 
+
+
+#### `GET /api/guest/gift-choices`
+
+List gifts already donated by this guest.
+
+**Response**
+```json
+    [
+      {
+        "giftId": "string",
+        "date": "ISO8601",
+        "message": "string | null"
+      }
+    ]
+```
+
+#### `POST /api/guest/create-payment-session`
+
+Create a Stripe checkout session for a specific gift.
+
+**Request body**
+```json
+    {
+      "giftId": "string",
+      "message": "string | null"
+    }
+```
+**Response**
+```json
+    {
+      "checkoutUrl": "string"
+    }
+
+```
+
+- when transaction completes successfully then the amount of that gift remaining is decremented by one.
+
+---
+
+## 3. Admin Portal API
+
+All endpoints require a valid **admin** token.
+
+Base path: `/api/admin`
+
+
+### 3.1 Events Management
+
+#### `GET /api/admin/events`
+
+List all events.
+
+**Response**
+```json
+    [
+      {
+        "id": "string",
+        "name": "string",
+        "date": "ISO8601",
+        "end": "ISO8601",
+        "location": "string",
+        "title": "string",
+        "description": "string | null",
+        "image": "string | null",
+        "sub_events" : [
+          {
+            "name": "string",
+            "date": "ISO8601",
+            "end": "ISO8601",
+            "description": "string | null",
+            "icon": "string" 
+          }
+        ]
+      }
+    ]
+```
+
+#### `POST /api/admin/events`
+
+Create a new event.
+
+**Request body**
+```json
+    {
+      "name": "string",
+      "date": "ISO8601",
+      "end": "ISO8601",
+      "location": "string",
+      "title": "string",
+      "description": "string | null",
+      "image": "string | null",
+      "sub_events" : [
+        {
+          "name": "string",
+          "date": "ISO8601",
+          "end": "ISO8601",
+          "description": "string | null",
+          "icon": "string" 
+        }
+      ]
+    }
+```
+
+**Response**
+
+- Created event (with `id`).
+
+
+#### `PUT /api/admin/events/:id`
+
+Update an existing event.
+
+**Request body**
+
+- Same as `POST /api/admin/events` (full).
+
+
+#### `DELETE /api/admin/events/:id`
+
+Delete (or soft-delete) an event.
+
+**Response**
+```json
+    {
+      "status": "ok"
+    }
+
+```
+---
+
+### 3.2 Guests & Party Management
+
+#### `GET /api/admin/guests?cursor=&limit=`
+
+List all guests (paginated).
+
+**Response**
+```json
+    {
+      "items": [
+        {
+          "id": "string",
+          "name": "string",
+          "email": "string",
+        }
+      ],
+      "nextCursor": "string | null"
+    }
+```
+
+#### `POST /api/admin/guests`
+
+Create a new guest (primary).
+
+**Request body**
+```json
+    {
+      "name": "string",
+      "email": "string",
+    }
+```
+**Response**
+
+- Created guest (with `id`).
+
+
+#### `GET /api/admin/guests/:id`
+
+Get a single guest.
+
+**Response**
+```json
+    {
+      "id": "string",
+      "name": "string",
+      "email": "string",
+    }
+
+```
+#### `PUT /api/admin/guests/:id`
+
+Update guest details.
+
+**Request body**
+```json
+    {
+      "name": "string",
+      "email": "string",
+    }
+
+```
+#### `DELETE /api/admin/guests/:id`
+
+Delete guest and their party.
+
+**Response**
+```json
+    {
+      "status": "ok"
+    }
+
+```
+#### `GET /api/admin/guests/:id/party`
+
+Get full party for this guest.
+
+**Response**
+
+Same schema as `/api/guest/party`, but for any chosen guest, for example:
+```json
+    [
+      {
+        "id": "string",
+        "name": "string",
+        "adult": true,
+        "primary": true
+      }
+    ]
+```
+
+#### `PUT /api/admin/guests/:id/party`
+
+Replace/update the guest’s party.
+
+**Request body**
+
+Same as the guest-side `PUT /api/guest/party`, but targeting the specified guest, does not include guest themselves:
+```json
+    [
+      {
+        "id": "string | null",
+        "name": "string",
+        "adult": true
+      }
+    ]
+```
+**Response**
+
+- Updated party list.
+
+
+---
+
+### 3.3 Menu Definition & Overview
+
+#### `GET /api/admin/menu`
+
+Get the list of all menu parts.
+
+**Response**
+
+Same schema as `GET /api/guest/menu`:
+```json
+    [
+      {
+        "id": "string",
+        "course": "starter | main | dessert | drinks",
+        "label": "string",
+        "options": [
+          {
+            "id": "string",
+            "label": "string",
+            "image": "string",
+            "description": "string | null"
+          }
+        ]
+      }
+    ]
+```
+
+#### `POST /api/admin/menu`
+
+Create a new menu part.
+
+**Request body**
+```json
+    {
+      "course": "starter | main | dessert | drinks",
+      "label": "string",
+      "options": [
+        {
+          "label": "string",
+          "image": "string",
+          "description": "string | null"
+        }
+      ]
+    }
+```
+**Response**
+
+- Created menu part (with `id` and option `id`s).
+
+
+#### `PUT /api/admin/menu/:id`
+
+Update an existing menu part.
+
+**Request body**
+```json
+    {
+      "course": "starter | main | dessert | drinks",
+      "label": "string",
+      "options": [
+        {
+          "id": "string | null",
+          "label": "string",
+          "image": "string",
+          "description": "string | null"
+        }
+      ]
+    }
+```
+
+#### `DELETE /api/admin/menu/:id`
+
+Delete a menu part.
+
+**Response**
+```json
+    {
+      "status": "ok"
+    }
+```
+
+#### `GET /api/admin/menu-choices`
+
+Overview of menu selections per guest.
+
+**Response**
+```json
+    [
+      {
+        "guestId": "string",
+        "guestName": "string",
+        "partyGuestId": "string",
+        "partyGuestName": "string",
+        "choices": [
+          {
+            "menuPartId": "string",
+            "optionId": "string | null"
+          }
+        ],
+        "specialRequest": "string | null",
+        "specialRequestDetail": "string | null"
+      }
+    ]
+```
+
+- `specialRequest` is selected from a set of choices "vegan", "vegetarian", "nut allergy", "other".  If other then `specialRequestDetail` is a free text field to describe the special request.
+
+---
+
+### 3.4 Messages (Admin Console)
+
+#### `GET /api/admin/messages?cursor=&limit=`
+
+List all messages (guest and admin/system), paginated.
+
+**Response**
+
+Same message schema as guest messages but includes all messages, for example:
+```json
+    {
+      "items": [
+        {
+          "id": "string",
+          "body": "string",
+          "createdAt": "ISO8601",
+          "author": "string | null",
+          "reactions": [
+            {
+              "emoji": "string",
+              "count": 3,
+              "reacted": false
+            }
+          ]
+        }
+      ],
+      "nextCursor": "string | null"
+    }
+```
+
+#### `POST /api/admin/messages`
+
+Create a new message (e.g. announcement).
+
+**Request body**
+```json
+    {
+      "body": "string"
+    }
+```
+**Response**
+
+- Created message object.
+
+
+#### `POST /api/admin/messages/:id/reaction`
+
+Add or change an admin reaction to a message.
+
+**Request body**
+```json
+    {
+      "emoji": "string"
+    }
+```
+
+#### `PUT /api/admin/messages/:id`
+
+Edit a message.
+
+**Request body**
+```json
+    {
+      "body": "string"
+    }
+```
+
+#### `DELETE /api/admin/messages/:id`
+
+Delete a message.
+
+**Response**
+```json
+    {
+      "status": "ok"
+    }
+```
+
+---
+
+### 3.5 Gifts Management
+
+#### `GET /api/admin/gifts`
+
+Get list of all defined gifts.
+
+**Response**
+```json
+    [
+      {
+        "id": "string",
+        "title": "string",
+        "description": "string",
+        "amount": 100,
+        "available": 1,
+        "image": 10
+      }
+    ]
+```
+
+- only shows gifts who's hidden field `enabled` is true. (set to false when deleted)
+- `amount` is selected from a fixed set of values `25`, `50`, `100`, `200`, and `500` 
+- `image` is selected from a fixed set of images that are baked into the site: `/images/gift-cards/image_01.jpg` - `/images/gift-cards/image_30.jpg` only the number needs to be stored as the rest of the uri is fixed.
+- the number of these gifts that are still available 
+
+#### `POST /api/admin/gifts`
+
+Create a new gift.
+
+**Request body**
+```json
+    {
+      "title": "string",
+      "description": "string",
+      "amount": 100,
+      "available": 1,
+      "image": 10
+    }
+```
+**Response**
+
+- Created gift (with `id`).
+
+
+#### `PUT /api/admin/gifts/:id`
+
+Update an existing gift.
+
+**Request body**
+```json
+    {
+      "title": "string",
+      "description": "string",
+      "amount": 100,
+      "available": 4,
+      "image": 10
+    }
+```
+
+#### `DELETE /api/admin/gifts/:id`
+
+Soft-delete a gift (e.g. hidden field `enabled = false`).
+
+**Response**
+```json
+    {
+      "status": "ok"
+    }
+```
+
+#### `GET /api/admin/gift-choices`
+
+List all gift choices/donations grouped by guest.
+
+**Response**
+```json
+    [
+      {
+        "guestId": "string",
+        "guestName": "string",
+        "giftId": "string",
+        "amount": 100,
+        "date": "ISO8601",
+        "message": "string | null"
+      }
+    ]
+
+```
+---
+
+### 3.6 Settings / Feature Toggles
+
+#### `GET /api/admin/settings`
+
+Returns frontend feature toggles.
+
+**Response**
+```json
+    {
+      "eventsEnabled": true,
+      "guestsEnabled": true,
+      "menuEnabled": true,
+      "messagesEnabled": true,
+      "giftsEnabled": true
+    }
+```
+
+#### `PUT /api/admin/settings`
+
+Update feature toggles.
+
+**Request body**
+
+```json
+    {
+      "eventsEnabled": true,
+      "guestsEnabled": true,
+      "menuEnabled": false,
+      "messagesEnabled": false,
+      "giftsEnabled": false
+    }
+```
+**Response**
+
+- Updated settings:
+```json
+    {
+      "eventsEnabled": true,
+      "guestsEnabled": true,
+      "menuEnabled": false,
+      "messagesEnabled": false,
+      "giftsEnabled": false
+    }
+```
+
+---
+
+## 4. Global Conventions
+
+- **Auth**:  
+  `Authorization: Bearer <jwt>`
+
+- **Roles**:  
+  Encoded in JWT (`guest` vs `admin`); backend enforces access to `/api/guest/*` and `/api/admin/*`.
+
+- **Pluralization**:  
+  Collections use plural resource names (e.g. `/guests`, `/gifts`, `/events`, `/messages`).
+
+- **Dates**:  
+  ISO 8601 strings, e.g. `"2026-06-06T17:00:00Z"`.
+
+- **Pagination**:  
+  For large lists (messages, guests), use cursor-based pagination:
+  
+```http
+    GET /api/.../resource?cursor=<cursor>&limit=<n>
+```
+  Responses:
+```json
+    {
+      "items": [ /* ... */ ],
+      "nextCursor": "string | null"
+    }
+```
+- **Errors** (example format):
+```json
+    {
+      "error": {
+        "code": "INVALID_INPUT",
+        "message": "Email is required",
+        "details": {
+          "field": "email"
+        }
+      }
+    }
+```

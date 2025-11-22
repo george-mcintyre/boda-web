@@ -13,6 +13,9 @@ Components must be isolated, testable, and documentable with clear purpose.
 - New comments must be provided in English only
 - Any Spanish comments found in any code being refactored MUST be converted to English comments
 
+### Documentation
+After every new feature README.md and its corresponding README.es.md MUST be updated to incorporate the new feature.
+
 ### i18n
 - All pages MUST use i18n to provide content in user's chosen language.  This includes:
   - All static page content
