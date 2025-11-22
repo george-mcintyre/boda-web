@@ -13,6 +13,12 @@ Components must be isolated, testable, and documentable with clear purpose.
 - New comments must be provided in English only
 - Any Spanish comments found in any code being refactored MUST be converted to English comments
 
+### i18n
+- All pages MUST use i18n to provide content in user's chosen language.  This includes:
+  - All static page content
+  - All error messages
+  - All labels, hints, and tool tips
+
 ### Web-Only Interface
 Access to the application will be via web browsers only.  No CLI access will be possible or provided.
 
