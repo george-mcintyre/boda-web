@@ -762,50 +762,46 @@ document.addEventListener('DOMContentLoaded', async () => {
      const regalosContent = document.getElementById('regalosContent');
      
      try {
-       const regalosRes = await fetch('/api/regalos');
+       const regalosRes = await fetch('/api/invitado/regalos', {
+         headers: { 'Authorization': token }
+       });
        const regalos = await regalosRes.json();
        
-       if (regalosRes.ok) {
-         const userEmail = localStorage.getItem('email');
-         
+       if (regalosRes.ok && Array.isArray(regalos)) {
          let regalosHTML = '<div class="gift-grid">';
          
          regalos.forEach(regalo => {
-           const esMio = regalo.reservadoPor === userEmail;
-           const estaReservado = regalo.reservadoPor && regalo.reservadoPor !== userEmail;
+           const available = regalo.available - regalo.purchased;
+           const isAvailable = available > 0;
            
            regalosHTML += `
-             <div class="gift-card ${esMio ? 'reservado-por-mi' : ''}">
-               <div class="gift-info">
-                 <h4>${regalo.nombre}</h4>
-                 <p>${regalo.descripcion}</p>
-                 ${regalo.enlace ? `
-                   <a href="${regalo.enlace}" target="_blank" class="gift-link">
-                     <i class="fas fa-external-link-alt"></i>
-                     Ver en tienda
-                   </a>
-                 ` : ''}
+             <div class="gift-card">
+               <div class="gift-card-image">
+                 <img src="${regalo.imageUrl}" alt="${regalo.name}" />
                </div>
-               <div class="regalo-accion">
-                 ${esMio ? `
-                   <span class="status-badge status-confirmado">Reservado por ti</span>
-                   <button onclick="cancelarRegalo('${regalo.id}')" class="btn-cancelar">
-                     <i class="fas fa-times"></i>
-                     Cancelar
-                   </button>
-                 ` : estaReservado ? `
-                   <span class="status-badge status-no-confirmado">Reservado por otro</span>
-                   <button disabled class="btn-disabled">
-                     <i class="fas fa-lock"></i>
-                     No disponible
-                   </button>
-                 ` : `
-                   <span class="status-badge status-available">Disponible</span>
-                   <button onclick="reservarRegalo('${regalo.id}')" class="btn-confirmar">
-                     <i class="fas fa-gift"></i>
-                     Reservar
-                   </button>
-                 `}
+               <div class="gift-card-content">
+                 <h4>${regalo.name}</h4>
+                 <p class="gift-description">${regalo.description}</p>
+                 <div class="gift-details">
+                   <div class="gift-price">${regalo.priceDisplay}</div>
+                   <div class="gift-availability">
+                     <span class="available-count">${available} available</span>
+                     <span class="purchased-count">${regalo.purchased} purchased</span>
+                   </div>
+                 </div>
+                 <div class="gift-actions">
+                   ${isAvailable ? `
+                     <button onclick="comprarRegalo('${regalo.id}')" class="btn-buy-gift">
+                       <i class="fas fa-gift"></i>
+                       Purchase Gift
+                     </button>
+                   ` : `
+                     <button disabled class="btn-disabled">
+                       <i class="fas fa-times"></i>
+                       Sold Out
+                     </button>
+                   `}
+                 </div>
                </div>
              </div>
            `;
@@ -911,6 +907,36 @@ document.addEventListener('DOMContentLoaded', async () => {
        }
      } catch (err) {
        showToast('Error de conexión al cancelar el regalo.', 'error');
+     }
+   };
+
+   // Función global para comprar regalos
+   window.comprarRegalo = async (giftId) => {
+     try {
+       const message = prompt('Leave a message with your gift (optional):');
+       
+       const res = await fetch('/api/invitado/create-payment-session', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+           'Authorization': token
+         },
+         body: JSON.stringify({ giftId, message })
+       });
+       
+       const data = await res.json();
+       if (res.ok) {
+         showToast('Gift added to cart! Redirecting to checkout...', 'success');
+         // Redirect to checkout (implement based on your payment system)
+         setTimeout(() => {
+           window.open(data.checkoutUrl, '_blank');
+           cargarContenidoRegalos(); // Recargar la lista de regalos
+         }, 1000);
+       } else {
+         showToast(data.error || 'Error al procesar el regalo.', 'error');
+       }
+     } catch (err) {
+       showToast('Error de conexión al procesar el regalo.', 'error');
      }
    };
 

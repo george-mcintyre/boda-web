@@ -2856,3 +2856,229 @@ footer {
   outline: none;
   box-shadow: 0 0 0 3px rgba(139, 90, 150, 0.25), 0 8px 20px rgba(139, 90, 150, 0.35);
 }
+
+/* Gift Card Styles */
+.gift-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.gift-card {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  gap: 15px;
+  min-height: 200px;
+}
+
+.gift-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.gift-card-image {
+  flex-shrink: 0;
+  width: 80px;
+  height: 50px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.gift-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gift-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gift-card-content h4 {
+  margin: 0;
+  font-size: 1.1em;
+  color: #333;
+  font-weight: 600;
+}
+
+.gift-description {
+  margin: 0;
+  font-size: 0.9em;
+  color: #666;
+  line-height: 1.4;
+  flex-grow: 1;
+}
+
+.gift-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.gift-price {
+  font-size: 1.2em;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.gift-availability {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.8em;
+}
+
+.available-count {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.purchased-count {
+  color: #6c757d;
+}
+
+.gift-actions {
+  margin-top: auto;
+}
+
+.btn-buy-gift {
+  background: linear-gradient(135deg, var(--primary-color), #A569BD);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  justify-content: center;
+}
+
+.btn-buy-gift:hover {
+  background: linear-gradient(135deg, #7B4F82, #954DAD);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 90, 150, 0.3);
+}
+
+.btn-buy-gift:active {
+  transform: translateY(0);
+}
+
+.btn-disabled {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: not-allowed;
+  font-size: 0.9em;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+
+/* Admin table styles for gifts */
+.admin-content .gift-card-admin {
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+}
+
+.admin-content .gift-info-admin {
+  display: grid;
+  grid-template-columns: 60px 1fr 80px 80px 80px;
+  gap: 15px;
+  align-items: center;
+}
+
+.admin-content .gift-image-admin {
+  width: 60px;
+  height: 38px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.admin-content .gift-details-admin {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.admin-content .gift-name-admin {
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.admin-content .gift-desc-admin {
+  font-size: 0.9em;
+  color: #666;
+  margin: 0;
+}
+
+.admin-content .gift-stats-admin {
+  text-align: center;
+  font-size: 0.9em;
+}
+
+.admin-content .gift-price-admin {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 1.1em;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .gift-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .gift-card {
+    padding: 15px;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .gift-card-image {
+    width: 100%;
+    height: 120px;
+    align-self: center;
+  }
+  
+  .gift-details {
+    justify-content: center;
+  }
+  
+  .admin-content .gift-info-admin {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .admin-content .gift-image-admin {
+    width: 80px;
+    height: 50px;
+    justify-self: center;
+  }
+}

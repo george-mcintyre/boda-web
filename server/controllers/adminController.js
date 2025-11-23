@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { Message, Menu, Config, CashGiftCard, Event, Gift, GiftChoice } = require('../models');
+const { getAvailableGiftCardImages, isValidImageNumber } = require('../utils/imageUtils');
 
 // Format event for API response according to README specification
 function formatEventForApi(event) {
@@ -66,13 +67,31 @@ function writeJson(file, payload) {
 async function listGifts(req, res, next) {
   try {
     const gifts = await Gift.find({ enabled: true }).sort({ createdAt: -1 }).lean();
+    
+    // Get purchase counts for each gift
+    const giftIds = gifts.map(gift => gift._id);
+    const purchaseCounts = await GiftChoice.aggregate([
+      { $match: { giftId: { $in: giftIds } } },
+      { $group: { _id: '$giftId', count: { $sum: 1 } } }
+    ]);
+    
+    // Create a map of giftId to purchase count
+    const purchaseCountMap = {};
+    purchaseCounts.forEach(item => {
+      purchaseCountMap[item._id.toString()] = item.count;
+    });
+    
     const items = gifts.map(gift => ({
       id: gift._id.toString(),
+      name: gift.title, // Using 'name' as per requirements
       title: gift.title,
       description: gift.description,
       amount: gift.amount,
       available: gift.available,
-      image: gift.image
+      purchased: purchaseCountMap[gift._id.toString()] || 0,
+      image: gift.image,
+      imageUrl: `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`,
+      priceDisplay: `€${gift.amount}`
     }));
     res.json(items);
   } catch (e) { next(e); }
@@ -80,15 +99,47 @@ async function listGifts(req, res, next) {
 
 async function createGift(req, res, next) {
   try {
-    const { title, description, amount, available, image } = req.body;
-    const gift = await Gift.create({ title, description, amount, available, image });
+    const { name, title, description, amount, available, image } = req.body;
+    
+    // Validate required fields
+    if (!title && !name) {
+      return res.status(400).json({ error: 'Name/title is required' });
+    }
+    
+    if (!description) {
+      return res.status(400).json({ error: 'Description is required' });
+    }
+    
+    if (!amount || ![25, 50, 100, 200, 500].includes(amount)) {
+      return res.status(400).json({ error: 'Valid amount (€25, €50, €100, €200, or €500) is required' });
+    }
+    
+    if (available === undefined || available < 0) {
+      return res.status(400).json({ error: 'Valid number available is required' });
+    }
+    
+    if (!image || !isValidImageNumber(parseInt(image))) {
+      return res.status(400).json({ error: 'Valid image number (1-30) is required' });
+    }
+    
+    const gift = await Gift.create({ 
+      title: title || name, 
+      description, 
+      amount: parseInt(amount), 
+      available: parseInt(available), 
+      image: parseInt(image) 
+    });
     res.status(201).json({
       id: gift._id.toString(),
+      name: gift.title,
       title: gift.title,
       description: gift.description,
       amount: gift.amount,
       available: gift.available,
-      image: gift.image
+      purchased: 0,
+      image: gift.image,
+      imageUrl: `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`,
+      priceDisplay: `€${gift.amount}`
     });
   } catch (e) { next(e); }
 }
@@ -96,25 +147,42 @@ async function createGift(req, res, next) {
 async function updateGift(req, res, next) {
   try {
     const { id } = req.params;
-    const { title, description, amount, available, image } = req.body;
+    const { name, title, description, amount, available, image } = req.body;
+    
+    // Validate image number if provided
+    if (image && !isValidImageNumber(parseInt(image))) {
+      return res.status(400).json({ error: 'Valid image number (1-30) is required' });
+    }
+    
+    // Validate amount if provided
+    if (amount && ![25, 50, 100, 200, 500].includes(parseInt(amount))) {
+      return res.status(400).json({ error: 'Valid amount (€25, €50, €100, €200, or €500) is required' });
+    }
     
     const gift = await Gift.findByIdAndUpdate(id, {
-      ...(title && { title }),
+      ...(title || name) && { title: title || name },
       ...(description && { description }),
-      ...(amount && { amount }),
-      ...(available !== undefined && { available }),
-      ...(image && { image })
+      ...(amount && { amount: parseInt(amount) }),
+      ...(available !== undefined && { available: parseInt(available) }),
+      ...(image && { image: parseInt(image) })
     }, { new: true });
 
     if (!gift) return res.status(404).json({ error: 'Gift not found' });
+    
+    // Get updated purchase count
+    const purchaseCount = await GiftChoice.countDocuments({ giftId: gift._id });
 
     res.json({
       id: gift._id.toString(),
+      name: gift.title,
       title: gift.title,
       description: gift.description,
       amount: gift.amount,
       available: gift.available,
-      image: gift.image
+      purchased: purchaseCount,
+      image: gift.image,
+      imageUrl: `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`,
+      priceDisplay: `€${gift.amount}`
     });
   } catch (e) { next(e); }
 }
@@ -147,6 +215,13 @@ async function getGiftChoices(req, res, next) {
     }));
 
     res.json(items);
+  } catch (e) { next(e); }
+}
+
+async function getGiftCardImages(req, res, next) {
+  try {
+    const images = getAvailableGiftCardImages();
+    res.json(images);
   } catch (e) { next(e); }
 }
 
@@ -450,7 +525,7 @@ async function deleteCashGiftCard(req, res, next) {
 
 module.exports = {
   // gifts (DB-backed)
-  listGifts, createGift, updateGift, deleteGift, getGiftChoices,
+  listGifts, createGift, updateGift, deleteGift, getGiftChoices, getGiftCardImages,
   // agenda (DB-backed)
   listEventsAdmin, createEventsItem, updateEventsItem, deleteEventsItem,
   // menu (DB-backed)

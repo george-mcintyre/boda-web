@@ -171,14 +171,32 @@ async function bulkUpload(req, res, next) {
 // ========== Guest Gift Functions ==========
 async function getGifts(req, res, next) {
   try {
-    const gifts = await Gift.find({ enabled: true, available: { $gt: 0 } }).sort({ createdAt: -1 }).lean();
+    const gifts = await Gift.find({ enabled: true }).sort({ createdAt: -1 }).lean();
+    
+    // Get purchase counts for each gift
+    const giftIds = gifts.map(gift => gift._id);
+    const purchaseCounts = await GiftChoice.aggregate([
+      { $match: { giftId: { $in: giftIds } } },
+      { $group: { _id: '$giftId', count: { $sum: 1 } } }
+    ]);
+    
+    // Create a map of giftId to purchase count
+    const purchaseCountMap = {};
+    purchaseCounts.forEach(item => {
+      purchaseCountMap[item._id.toString()] = item.count;
+    });
+    
     const items = gifts.map(gift => ({
       id: gift._id.toString(),
+      name: gift.title, // Using 'name' as per requirements, but keeping 'title' for compatibility
       title: gift.title,
       description: gift.description,
       amount: gift.amount,
       available: gift.available,
-      image: gift.image
+      purchased: purchaseCountMap[gift._id.toString()] || 0,
+      image: gift.image,
+      imageUrl: `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`,
+      priceDisplay: `€${gift.amount}`
     }));
     res.json(items);
   } catch (e) { next(e); }

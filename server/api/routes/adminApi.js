@@ -44,6 +44,9 @@ router.post('/gifts', auth('admin'), adminCtrl.createGift);
 router.put('/gifts/:id', auth('admin'), adminCtrl.updateGift);
 router.delete('/gifts/:id', auth('admin'), adminCtrl.deleteGift);
 
+// Gift card images
+router.get('/gift-images', auth('admin'), adminCtrl.getGiftCardImages);
+
 // Gift choices overview
 router.get('/gift-choices', auth('admin'), adminCtrl.getGiftChoices);
 

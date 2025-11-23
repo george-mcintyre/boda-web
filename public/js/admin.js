@@ -575,68 +575,126 @@
   async function showGifts(){
     activate('gifts');
     setLoading('Loading gift list...');
-    const res = await api('/api/admin/gifts');
-    const data = res.ok ? await res.json() : [];
-    const rows = (data||[]).map(it => `
+    
+    // Load gifts and available images
+    const [giftsRes, imagesRes] = await Promise.all([
+      api('/api/admin/gifts'),
+      api('/api/admin/gift-images')
+    ]);
+    
+    const gifts = giftsRes.ok ? await giftsRes.json() : [];
+    const availableImages = imagesRes.ok ? await imagesRes.json() : [];
+    
+    const rows = (gifts||[]).map(it => `
       <tr>
-        <td>${it.nombre || ''}</td>
-        <td>${it.descripcion||''}</td>
-        <td>${it.precio||''}</td>
-        <td>${it.categoria||''}</td>
-        <td>${it.url?`<a href="${it.url}" target="_blank">link</a>`:''}</td>
+        <td>${it.name || it.title || ''}</td>
+        <td>${it.description || ''}</td>
+        <td>
+          <img src="${it.imageUrl}" alt="Gift card" style="width: 40px; height: 25px; object-fit: cover; border-radius: 4px;">
+        </td>
+        <td>${it.available}</td>
+        <td>€${it.amount}</td>
+        <td>${it.purchased}</td>
         <td>
           <button class="admin-action" data-action="edit" data-id="${it.id}"><i class="fas fa-edit"></i></button>
           <button class="admin-action danger" data-action="del" data-id="${it.id}"><i class="fas fa-trash"></i></button>
         </td>
       </tr>`).join('');
-    content.innerHTML = renderTable({title:'Gift List', columns:['Name','Description','Price','Category','URL','Actions']}, rows,
-      `<button id="addGift" class="admin-action"><i class=\"fas fa-plus\"></i> Add</button>`);
+      
+    content.innerHTML = renderTable({
+      title:'Gift List', 
+      columns:['Name','Description','Image','Available','Price','Purchased','Actions']
+    }, rows, `<button id="addGift" class="admin-action"><i class="fas fa-plus"></i> Add</button>`);
+    
     const tbody = content.querySelector('tbody');
     tbody.addEventListener('click', async (e)=>{
-      const btn = e.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
-      const current = (data||[]).find(x => String(x.id) === String(id)) || {};
-      if (action==='del'){
+      const btn = e.target.closest('button'); if(!btn) return; 
+      const id = btn.dataset.id; 
+      const action = btn.dataset.action;
+      const current = (gifts||[]).find(x => String(x.id) === String(id)) || {};
+      
+      if (action === 'del'){
         if (!confirm('Delete this gift?')) return;
-        const r = await api(`/api/admin/gifts/${id}`, { method:'DELETE' }); if (r.ok) showGifts(); else notify('Error','error');
-      } else if (action==='edit'){
+        const r = await api(`/api/admin/gifts/${id}`, { method:'DELETE' }); 
+        if (r.ok) showGifts(); else notify('Error deleting gift','error');
+      } else if (action === 'edit'){
         openFormModal({
-          title: 'Edit gift', submitText: 'Save',
+          title: 'Edit gift', 
+          submitText: 'Save',
           fields: [
-            { name:'nombre', label:'Name', required:true },
-            { name:'descripcion', label:'Description', type:'textarea' },
-            { name:'precio', label:'Price' },
-            { name:'categoria', label:'Category' },
-            { name:'url', label:'URL' },
+            { name:'name', label:'Name', required:true },
+            { name:'description', label:'Description', type:'textarea', required:true },
+            { name:'image', label:'Image', type:'select', required:true, 
+              options: availableImages.map(img => ({ value: img.id, label: `Image ${img.id}` })),
+              help: 'Select a gift card image' 
+            },
+            { name:'available', label:'Number Available', type:'number', min:'0', required:true },
+            { name:'amount', label:'Price', type:'select', required:true,
+              options: [
+                { value: '25', label: '€25' },
+                { value: '50', label: '€50' },
+                { value: '100', label: '€100' },
+                { value: '200', label: '€200' },
+                { value: '500', label: '€500' }
+              ]
+            }
           ],
           initialValues: {
-            nombre: current.nombre || '',
-            descripcion: current.descripcion || '',
-            precio: current.precio || '',
-            categoria: current.categoria || '',
-            url: current.url || ''
+            name: current.name || current.title || '',
+            description: current.description || '',
+            image: current.image,
+            available: current.available,
+            amount: String(current.amount)
           },
           onSubmit: async (values, close) => {
-            const r = await api(`/api/admin/gifts/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
-            if (!r.ok) throw new Error('Failed to update');
+            const r = await api(`/api/admin/gifts/${id}`, { 
+              method:'PUT', 
+              headers:{'Content-Type':'application/json'}, 
+              body: JSON.stringify(values)
+            });
+            if (!r.ok) {
+              const errorData = await r.json();
+              throw new Error(errorData.error || 'Failed to update gift');
+            }
             close();
             showGifts();
           }
         });
       }
     });
+    
     content.querySelector('#addGift').addEventListener('click', async ()=>{
       openFormModal({
-        title: 'Add gift', submitText: 'Add',
+        title: 'Add gift', 
+        submitText: 'Add',
         fields: [
-          { name:'nombre', label:'Name', required:true },
-          { name:'descripcion', label:'Description', type:'textarea' },
-          { name:'precio', label:'Price' },
-          { name:'categoria', label:'Category' },
-          { name:'url', label:'URL' },
+          { name:'name', label:'Name', required:true },
+          { name:'description', label:'Description', type:'textarea', required:true },
+          { name:'image', label:'Image', type:'select', required:true,
+            options: availableImages.map(img => ({ value: img.id, label: `Image ${img.id}` })),
+            help: 'Select a gift card image' 
+          },
+          { name:'available', label:'Number Available', type:'number', min:'0', required:true },
+          { name:'amount', label:'Price', type:'select', required:true,
+            options: [
+              { value: '25', label: '€25' },
+              { value: '50', label: '€50' },
+              { value: '100', label: '€100' },
+              { value: '200', label: '€200' },
+              { value: '500', label: '€500' }
+            ]
+          }
         ],
         onSubmit: async (values, close) => {
-          const r = await api('/api/admin/gifts', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
-          if (!r.ok) throw new Error('Failed to create');
+          const r = await api('/api/admin/gifts', { 
+            method:'POST', 
+            headers:{'Content-Type':'application/json'}, 
+            body: JSON.stringify(values)
+          });
+          if (!r.ok) {
+            const errorData = await r.json();
+            throw new Error(errorData.error || 'Failed to create gift');
+          }
           close();
           showGifts();
         }
