@@ -504,7 +504,7 @@
   }
 
   // Reusable modal form
-  function openFormModal({ title = 'Form', submitText = 'Save', fields = [], initialValues = {}, onSubmit }){
+  function openFormModal({ title = 'Form', submitText = 'Save', fields = [], initialValues = {}, onSubmit, ...additionalOptions }){
     const overlay = document.createElement('div');
     overlay.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;`;
     const modal = document.createElement('div');
@@ -516,6 +516,18 @@
       </div>
       <form id="mfForm" style="padding:18px 24px;">
         <div id="mfError" style="display:none;margin-bottom:10px;color:#dc3545;font-weight:600;"></div>
+        
+        ${additionalOptions.showCurrentImage ? `
+          <div style="margin-bottom:14px;">
+            <label style="display:block;margin:6px 0 6px 0;font-weight:600;color:#333;">Current Image</label>
+            <div style="border:1px solid #ddd;border-radius:8px;padding:10px;background:#f8f9fa;">
+              <img src="${additionalOptions.currentImageUrl}" alt="Current event image" style="max-width:200px;max-height:120px;object-fit:cover;border-radius:4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';">
+              <div style="color:#999; display: none;">Image not available</div>
+              <small style="color:#666;margin-top:5px;display:block;">Upload a new image below to replace this one</small>
+            </div>
+          </div>
+        ` : ''}
+        
         ${fields.map(f => {
           const id = `f_${f.name}`;
           const label = `<label for="${id}" style="display:block;margin:6px 0 6px 0;font-weight:600;color:#333;">${f.label}${f.required?' *':''}</label>`;
@@ -1360,8 +1372,42 @@
     const res = await api('/api/admin/events');
     const data = res.ok ? await res.json() : [];
     
+    // Helper function to get image URL
+    function getImageUrl(event) {
+      if (!event.image) return null;
+      
+      // Handle different image formats
+      if (typeof event.image === 'string') {
+        // Legacy URL-based image or base64 data
+        if (event.image.startsWith('data:')) {
+          return event.image; // Already base64 encoded
+        } else if (event.image.startsWith('/')) {
+          return event.image; // Legacy file path
+        } else {
+          // Assume it's an ObjectId, use the image endpoint
+          return `/api/admin/events/${event.id}/image/thumbnail`;
+        }
+      } else if (event.image && event.image.data) {
+        // Database-stored image with base64 data
+        return event.image;
+      } else if (event.image && event.image._id) {
+        // Image reference with populated data
+        if (event.image.data) {
+          const base64Data = event.image.data.toString('base64');
+          return `data:${event.image.contentType};base64,${base64Data}`;
+        } else {
+          // No populated data, use endpoint
+          return `/api/admin/events/${event.id}/image/thumbnail`;
+        }
+      }
+      
+      return null;
+    }
+
     // Create rows with new structure
-    const rows = (data||[]).map(ev => `
+    const rows = (data||[]).map(ev => {
+      const imageUrl = getImageUrl(ev);
+      return `
       <tr>
         <td>${ev.name || ''}</td>
         <td>${formatDateSpain(ev.date) || ''}</td>
@@ -1369,7 +1415,7 @@
         <td>${formatTimeSpain(ev.end) || ''}</td>
         <td>${ev.title || ''}</td>
         <td>
-          ${ev.image ? `<img src="${ev.image}" alt="Event image" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px;">` : '<span style="color: #999;">No image</span>'}
+          ${imageUrl ? `<img src="${imageUrl}" alt="Event image" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;">No image</span>` : '<span style="color: #999;">No image</span>'}
         </td>
         <td>
           <button class="admin-action" data-action="edit-subevents" data-id="${ev.id}" title="Edit Sub-events">
@@ -1382,7 +1428,8 @@
             <i class="fas fa-trash"></i>
           </button>
         </td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
     
     content.innerHTML = renderTable({
       title:'Event Schedule', 
@@ -1412,11 +1459,49 @@
     });
   }
 
+  // Helper function to get image URL for form display
+  function getImageUrlForForm(event) {
+    if (!event.image) return null;
+    
+    // Handle different image formats
+    if (typeof event.image === 'string') {
+      // Legacy URL-based image or base64 data
+      if (event.image.startsWith('data:')) {
+        return event.image; // Already base64 encoded
+      } else if (event.image.startsWith('/')) {
+        return event.image; // Legacy file path
+      } else {
+        // Assume it's an ObjectId, use the image endpoint
+        return `/api/admin/events/${event.id}/image`;
+      }
+    } else if (event.image && event.image.data) {
+      // Database-stored image with base64 data
+      return event.image;
+    } else if (event.image && event.image._id) {
+      // Image reference with populated data
+      if (event.image.data) {
+        const base64Data = event.image.data.toString('base64');
+        return `data:${event.image.contentType};base64,${base64Data}`;
+      } else {
+        // No populated data, use endpoint
+        return `/api/admin/events/${event.id}/image`;
+      }
+    }
+    
+    return null;
+  }
+
   // Open event add/edit form
   function openEventForm(event, isNew = false) {
+    // Get current image URL for display
+    const currentImageUrl = getImageUrlForForm(event);
+    const showCurrentImage = !isNew && currentImageUrl;
+    
     openFormModal({
       title: isNew ? 'Add Event' : 'Edit Event',
       submitText: isNew ? 'Add' : 'Save',
+      showCurrentImage: showCurrentImage,
+      currentImageUrl: currentImageUrl,
       fields: [
         { name:'name', label:'Name', required:true, help:'e.g. Wedding Ceremony' },
         { name:'date', label:'Date', type:'date', required:true, help:'Event date (Spain locale)' },
@@ -1486,12 +1571,30 @@
                 imageId: uploadData.imageId
               };
             }
-          } else if (event.image && !event.image.startsWith('/')) {
-            // Keep existing database-stored image reference
-            imageReference = event.image;
-          } else if (event.image && event.image.startsWith('/')) {
-            // Legacy URL-based image - keep as is for now
-            imageReference = event.image;
+          } else if (event.image) {
+            // Keep existing image reference for edit mode
+            if (typeof event.image === 'string') {
+              // Legacy URL-based image or ObjectId string
+              if (event.image.startsWith('/')) {
+                // Legacy URL-based image - keep as is
+                imageReference = event.image;
+              } else {
+                // ObjectId string - keep as is
+                imageReference = event.image;
+              }
+            } else if (event.image && typeof event.image === 'object') {
+              // Database-stored image object - keep the reference
+              if (event.image.imageId) {
+                // New format with imageId
+                imageReference = { imageId: event.image.imageId };
+              } else if (event.image._id) {
+                // MongoDB ObjectId reference
+                imageReference = event.image._id.toString();
+              } else {
+                // Other object format - keep as is
+                imageReference = event.image;
+              }
+            }
           }
           
           const eventData = {

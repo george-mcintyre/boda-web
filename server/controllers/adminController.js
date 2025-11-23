@@ -23,18 +23,21 @@ function formatEventForApi(event) {
   // Format image data for display
   let imageData = null;
   if (event.image && event.image.data) {
-    // Database-stored image
+    // Database-stored image with populated data
     const base64Data = event.image.data.toString('base64');
     imageData = `data:${event.image.contentType};base64,${base64Data}`;
   } else if (typeof event.image === 'string' && event.image.startsWith('/')) {
     // Legacy URL-based image
     imageData = event.image;
   } else if (event.image && event.image._id) {
-    // Image reference (will be populated separately)
+    // Image reference with populated data
     if (event.image.data) {
       const base64Data = event.image.data.toString('base64');
       imageData = `data:${event.image.contentType};base64,${base64Data}`;
     }
+  } else if (event.image && typeof event.image === 'string' && event.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(event.image)) {
+    // ObjectId reference - return the ObjectId string for frontend to use API endpoint
+    imageData = event.image;
   }
 
   return {
@@ -262,23 +265,10 @@ async function listEventsAdmin(req, res, next) {
   try {
     const events = await Event.find({})
       .sort({ date: 1, order: 1, createdAt: 1 })
+      .populate('image')
       .lean();
     
-    // Manually populate image field only for ObjectId references
-    const eventsWithImages = await Promise.all(events.map(async (event) => {
-      if (event.image && typeof event.image === 'string' && event.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(event.image)) {
-        try {
-          const populatedEvent = await Event.findById(event._id).populate('image').lean();
-          return populatedEvent;
-        } catch (err) {
-          // If populate fails, return original event
-          return event;
-        }
-      }
-      return event;
-    }));
-    
-    const items = eventsWithImages.map(formatEventForApi);
+    const items = events.map(formatEventForApi);
     res.json(items);
   } catch (e) { next(e); }
 }
