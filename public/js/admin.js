@@ -731,7 +731,7 @@
         err.style.display = 'block';
         return;
       }
-      Promise.resolve(onSubmit && onSubmit(data, close)).catch(err => {
+      Promise.resolve(onSubmit && onSubmit(data, close, modal)).catch(err => {
         const ebox = modal.querySelector('#mfError');
         ebox.textContent = err && err.message ? err.message : 'Failed to submit form';
         ebox.style.display = 'block';
@@ -1582,7 +1582,7 @@
         title: event.title || '',
         description: event.description || ''
       },
-      onSubmit: async (values, close) => {
+      onSubmit: async (values, close, modal) => {
         try {
           // Combine date and time into ISO format using UTC to prevent timezone shifts
           const startDateTime = values.date && values.startTime ? 
@@ -1594,12 +1594,23 @@
           const endDateTime = endDate && values.endTime ? 
             new Date(`${endDate}T${values.endTime}:00Z`).toISOString() : null;
           
-          // Get location value from the location component
-          const locationAddressEl = document.getElementById('f_location_address');
-          let locationValue = '';
-          
-          if (locationAddressEl) {
-            locationValue = locationAddressEl.value || '';
+          // Get location value from the location component - only if modal is available
+          let locationValue = values.location || '';
+          if (modal) {
+            const locationAddressEl = modal.querySelector('#f_location_address');
+            const locationLatEl = modal.querySelector('#f_location_lat');
+            const locationLngEl = modal.querySelector('#f_location_lng');
+            
+            const address = locationAddressEl ? locationAddressEl.value || '' : '';
+            const lat = locationLatEl ? locationLatEl.value || '' : '';
+            const lng = locationLngEl ? locationLngEl.value || '' : '';
+            
+            // Build location value with address and coordinates if available
+            if (address || (lat && lng)) {
+              locationValue = address;
+            } else {
+              locationValue = values.location || '';
+            }
           }
           
           // Handle image upload
