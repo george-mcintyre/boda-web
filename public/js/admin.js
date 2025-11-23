@@ -2187,9 +2187,8 @@
                   <i class="fas ${feature.icon}"></i>
                   <h5>${feature.label}</h5>
                   <div class="toggle-switch">
-                    <input type="checkbox" id="toggle-${feature.key}" ${settings[feature.key] ? 'checked' : ''} 
-                           onchange="updateFeatureToggle('${feature.key}', this.checked)">
-                    <label for="toggle-${feature.key}"></label>
+                    <input type="checkbox" id="toggle-${feature.key}" ${settings[feature.key] ? 'checked' : ''}>
+                    <label for="toggle-${feature.key}" onclick="updateFeatureToggle('${feature.key}', document.getElementById('toggle-${feature.key}').checked)"></label>
                   </div>
                 </div>
                 <p class="feature-desc">${feature.desc}</p>
@@ -2201,8 +2200,6 @@
               </div>
             `).join('')}
           </div>
-        </div>
-        
         </div>
       </div>`;
     
@@ -2216,13 +2213,16 @@
   // Update feature toggle function (global scope)
   window.updateFeatureToggle = async function(featureKey, enabled) {
     try {
+      // Get current state of all toggles
       const currentSettings = {
-        eventsEnabled: document.getElementById('toggle-eventsEnabled').checked,
-        guestsEnabled: document.getElementById('toggle-guestsEnabled').checked,
-        menuEnabled: document.getElementById('toggle-menuEnabled').checked,
-        messagesEnabled: document.getElementById('toggle-messagesEnabled').checked,
-        giftsEnabled: document.getElementById('toggle-giftsEnabled').checked
+        guestsEnabled: featureKey === 'guestsEnabled' ? !enabled : (document.getElementById('toggle-guestsEnabled')?.checked || false) ,
+        eventsEnabled: featureKey === 'eventsEnabled' ? !enabled : (document.getElementById('toggle-eventsEnabled')?.checked || false),
+        menuEnabled: featureKey === 'menuEnabled' ? !enabled : (document.getElementById('toggle-menuEnabled')?.checked || false),
+        messagesEnabled: featureKey === 'messagesEnabled' ? !enabled : (document.getElementById('toggle-messagesEnabled')?.checked || false),
+        giftsEnabled: featureKey === 'giftsEnabled' ? !enabled : (document.getElementById('toggle-giftsEnabled')?.checked || false)
       };
+      
+      console.log('Updating settings:', currentSettings);
       
       const r = await api('/api/admin/settings', {
         method: 'PUT',
@@ -2230,31 +2230,45 @@
         body: JSON.stringify(currentSettings)
       });
       
-      if (!r.ok) throw new Error('Failed to update settings');
-      
-      // Update visual feedback
-      const card = document.querySelector(`#toggle-${featureKey}`).closest('.feature-toggle-card');
-      const badge = card.querySelector('.status-badge');
-      
-      if (enabled) {
-        card.classList.remove('disabled');
-        card.classList.add('enabled');
-        badge.textContent = 'Enabled';
-        badge.classList.remove('inactive');
-        badge.classList.add('active');
-      } else {
-        card.classList.remove('enabled');
-        card.classList.add('disabled');
-        badge.textContent = 'Disabled';
-        badge.classList.remove('active');
-        badge.classList.add('inactive');
+      if (!r.ok) {
+        const errorData = await r.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP ${r.status}: Failed to update settings`);
       }
       
-      notify(`${featureKey} ${enabled ? 'enabled' : 'disabled'} successfully`);
+      const updatedSettings = await r.json();
+      console.log('Settings updated successfully:', updatedSettings);
+      
+      // Update visual feedback for the specific toggle that was changed
+      const toggle = document.getElementById(`toggle-${featureKey}`);
+      const card = toggle?.closest('.feature-toggle-card');
+      const badge = card?.querySelector('.status-badge');
+      
+      if (toggle && card && badge) {
+        if (enabled) {
+          card.classList.remove('disabled');
+          card.classList.add('enabled');
+          badge.textContent = 'Enabled';
+          badge.classList.remove('inactive');
+          badge.classList.add('active');
+        } else {
+          card.classList.remove('enabled');
+          card.classList.add('disabled');
+          badge.textContent = 'Disabled';
+          badge.classList.remove('active');
+          badge.classList.add('inactive');
+        }
+      }
+      
+      notify(`${featureKey} ${enabled ? 'enabled' : 'disabled'} successfully`, 'success');
     } catch (error) {
+      console.error('Error updating feature toggle:', error);
+      
       // Revert the toggle on error
       const toggle = document.getElementById(`toggle-${featureKey}`);
-      toggle.checked = !enabled;
+      if (toggle) {
+        toggle.checked = !enabled;
+      }
+      
       notify('Error updating setting: ' + error.message, 'error');
     }
   };
