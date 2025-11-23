@@ -110,7 +110,7 @@ async function createGift(req, res, next) {
       return res.status(400).json({ error: 'Description is required' });
     }
     
-    if (!amount || ![25, 50, 100, 200, 500].includes(amount)) {
+    if (!amount || ![25, 50, 100, 200, 500].includes(parseInt(amount))) {
       return res.status(400).json({ error: 'Valid amount (€25, €50, €100, €200, or €500) is required' });
     }
     

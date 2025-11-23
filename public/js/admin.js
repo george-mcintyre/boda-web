@@ -301,6 +301,7 @@
         let v = el ? el.value : '';
         if (f.type === 'number') v = v === '' ? '' : Number(v);
         if (f.required && (v === '' || v === null || v === undefined || (f.type==='number' && Number.isNaN(v)))) valid = false;
+        if (f.type === 'select' && f.required && (v === '' || v === null || v === undefined)) valid = false;
         data[f.name] = v;
       });
       if (!valid){
