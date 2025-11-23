@@ -36,12 +36,17 @@
     tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   }
 
-  // Date formatting utilities for Spain locale
-  function formatDateSpain(isoString) {
+  // Date formatting utilities that adapt to user's language preference
+  function getUserLanguage() {
+    return localStorage.getItem('i18nextLng') || 'es';
+  }
+
+  function formatDateLocalized(isoString) {
     if (!isoString) return '';
     try {
       const date = new Date(isoString);
-      return date.toLocaleDateString('es-ES', {
+      const userLang = getUserLanguage();
+      return date.toLocaleDateString(userLang, {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -51,11 +56,12 @@
     }
   }
 
-  function formatTimeSpain(isoString) {
+  function formatTimeLocalized(isoString) {
     if (!isoString) return '';
     try {
       const date = new Date(isoString);
-      return date.toLocaleTimeString('es-ES', {
+      const userLang = getUserLanguage();
+      return date.toLocaleTimeString(userLang, {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false
@@ -63,6 +69,15 @@
     } catch (e) {
       return isoString;
     }
+  }
+
+  // Legacy functions for backward compatibility
+  function formatDateSpain(isoString) {
+    return formatDateLocalized(isoString);
+  }
+
+  function formatTimeSpain(isoString) {
+    return formatTimeLocalized(isoString);
   }
 
   function extractDateFromISO(isoString) {
@@ -182,30 +197,74 @@
         return;
       }
       
-      // Simple geocoding simulation (in real implementation, use Google Geocoding API)
+      // Enhanced mock geocoding simulation
       const mockCoords = {
+        // Spanish cities
         'marbella': { lat: 36.5108, lng: -4.8890 },
         'malaga': { lat: 36.7213, lng: -4.4214 },
+        'malaga spain': { lat: 36.7213, lng: -4.4214 },
         'seville': { lat: 37.3886, lng: -5.9823 },
+        'sevilla': { lat: 37.3886, lng: -5.9823 },
         'madrid': { lat: 40.4168, lng: -3.7038 },
-        'barcelona': { lat: 41.3851, lng: 2.1734 }
+        'barcelona': { lat: 41.3851, lng: 2.1734 },
+        'valencia': { lat: 39.4699, lng: -0.3763 },
+        'bilbao': { lat: 43.2627, lng: -2.9253 },
+        'palma': { lat: 39.5696, lng: 2.6502 },
+        'las palmas': { lat: 28.1248, lng: -15.4300 },
+        // International cities
+        'paris': { lat: 48.8566, lng: 2.3522 },
+        'london': { lat: 51.5074, lng: -0.1278 },
+        'rome': { lat: 41.9028, lng: 12.4964 },
+        'lisbon': { lat: 38.7223, lng: -9.1393 },
+        // Common address patterns
+        'beach': { lat: 36.5108, lng: -4.8890 },
+        'restaurant': { lat: 36.5108, lng: -4.8890 },
+        'hotel': { lat: 36.5108, lng: -4.8890 },
+        'church': { lat: 36.5108, lng: -4.8890 },
+        'ceremony': { lat: 36.5108, lng: -4.8890 },
+        'reception': { lat: 36.5108, lng: -4.8890 },
+        // Generic Spain
+        'spain': { lat: 40.4637, lng: -3.7492 },
+        'españa': { lat: 40.4637, lng: -3.7492 },
+        'andalucia': { lat: 37.3886, lng: -5.9823 },
+        'andalusia': { lat: 37.3886, lng: -5.9823 },
+        'costa del sol': { lat: 36.5108, lng: -4.8890 }
       };
       
       const normalizedAddress = address.toLowerCase();
       let found = false;
+      let matchedKey = '';
       
+      // Try exact matches first
       for (const [key, coords] of Object.entries(mockCoords)) {
-        if (normalizedAddress.includes(key)) {
+        if (normalizedAddress === key) {
           latInput.value = coords.lat;
           lngInput.value = coords.lng;
           updateMapPreview(mapDiv, coords.lat, coords.lng);
           found = true;
+          matchedKey = key;
           break;
         }
       }
       
+      // Try partial matches if no exact match found
       if (!found) {
-        alert('Address not found in our mock database. Please enter coordinates manually.');
+        for (const [key, coords] of Object.entries(mockCoords)) {
+          if (normalizedAddress.includes(key)) {
+            latInput.value = coords.lat;
+            lngInput.value = coords.lng;
+            updateMapPreview(mapDiv, coords.lat, coords.lng);
+            found = true;
+            matchedKey = key;
+            break;
+          }
+        }
+      }
+      
+      if (found) {
+        alert(`Address matched with "${matchedKey}". Coordinates filled automatically.`);
+      } else {
+        alert('Address not found in our database. Please enter coordinates manually or try a more specific address (e.g., include city name like "Marbella", "Madrid", etc.).');
       }
     });
     
@@ -287,21 +346,21 @@
     return {
       container,
       getValue: () => {
-        const lat = latInput.value;
-        const lng = lngInput.value;
-        const address = addressInput.value;
-        
-        if (lat && lng) {
-          return `${address} (${lat},${lng})`;
-        }
-        return address || '';
+        return addressInput.value || '';
       },
       setValue: (value) => {
-        addressInput.value = value;
-        const coords = value.match(/(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/);
-        if (coords) {
-          latInput.value = coords[1];
-          lngInput.value = coords[2];
+        // Extract coordinates from parentheses if they exist
+        const coordMatch = value.match(/^(.+?)\s*\((-?\d+\.?\d*),\s*(-?\d+\.?\d*)\)$/);
+        if (coordMatch) {
+          // Value has coordinates in parentheses - extract address and coordinates separately
+          addressInput.value = coordMatch[1].trim();
+          latInput.value = coordMatch[2];
+          lngInput.value = coordMatch[3];
+        } else {
+          // No coordinates - just set the address
+          addressInput.value = value;
+          latInput.value = '';
+          lngInput.value = '';
         }
       }
     };
@@ -1410,9 +1469,9 @@
       return `
       <tr>
         <td>${ev.name || ''}</td>
-        <td>${formatDateSpain(ev.date) || ''}</td>
-        <td>${formatTimeSpain(ev.date) || ''}</td>
-        <td>${formatTimeSpain(ev.end) || ''}</td>
+        <td>${formatDateLocalized(ev.date) || ''}</td>
+        <td>${formatTimeLocalized(ev.date) || ''}</td>
+        <td>${formatTimeLocalized(ev.end) || ''}</td>
         <td>${ev.title || ''}</td>
         <td>
           ${imageUrl ? `<img src="${imageUrl}" alt="Event image" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;">No image</span>` : '<span style="color: #999;">No image</span>'}
@@ -1537,20 +1596,10 @@
           
           // Get location value from the location component
           const locationAddressEl = document.getElementById('f_location_address');
-          const locationLatEl = document.getElementById('f_location_lat');
-          const locationLngEl = document.getElementById('f_location_lng');
           let locationValue = '';
           
           if (locationAddressEl) {
-            const address = locationAddressEl.value;
-            const lat = locationLatEl?.value;
-            const lng = locationLngEl?.value;
-            
-            if (lat && lng) {
-              locationValue = `${address} (${lat},${lng})`;
-            } else {
-              locationValue = address || '';
-            }
+            locationValue = locationAddressEl.value || '';
           }
           
           // Handle image upload
@@ -1659,7 +1708,7 @@
                 <div style="flex:1;">
                   <strong>${sub.name}</strong><br>
                   <small style="color:#666;">
-                    ${formatDateSpain(sub.date)} ${formatTimeSpain(sub.date)} - ${formatTimeSpain(sub.end)}
+                    ${formatDateLocalized(sub.date)} ${formatTimeLocalized(sub.date)} - ${formatTimeLocalized(sub.end)}
                   </small><br>
                   <small style="color:#666;">${(sub.description || '').substring(0, 100)}${(sub.description || '').length > 100 ? '...' : ''}</small>
                 </div>

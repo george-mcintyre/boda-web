@@ -8,7 +8,7 @@ const { errorHandler } = require('./middleware/error');
 
 const app = express();
 app.use(cors({ origin: CORS_ORIGIN }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // Security headers and CSP (allow current frontend patterns while avoiding eval)
 app.use(helmet({
