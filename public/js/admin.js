@@ -1838,12 +1838,17 @@
       
       if (!r.ok) throw new Error('Failed to update sub-events');
       
+      // Get the updated event directly from the response
+      const updatedEvent = await r.json();
+      
       // Refresh the modal with updated data
       document.body.removeChild(modal);
-      const res = await api('/api/admin/events');
-      const data = res.ok ? await res.json() : [];
-      const updatedEvent = data.find(x => String(x.id) === String(eventId));
       openSubEventsManager(updatedEvent);
+      
+      // Also refresh the main events table to update cached event data
+      // This ensures that when user closes modal and opens sub-events manager again,
+      // it will have the freshest data from the database
+      await showEvent();
       
     } catch (error) {
       notify('Error updating sub-events: ' + error.message, 'error');

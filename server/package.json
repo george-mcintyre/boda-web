@@ -2,9 +2,9 @@
   "name": "backend",
   "version": "1.0.0",
   "private": true,
-  "main": "src/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node server.js",
     "db:clean": "node scripts/clean-db.js --force",
     "db:drop": "node scripts/clean-db.js --drop --force"
   },
