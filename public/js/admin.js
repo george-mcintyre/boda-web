@@ -97,51 +97,19 @@
     return guests;
   }
 
-  // Image preloading and caching
-  let imageCache = {};
-  let imagesPreloaded = false;
-
-  function preloadGiftCardImages() {
-    if (imagesPreloaded) return;
-    
-    // Preload all 30 gift card images
-    for (let i = 1; i <= 30; i++) {
-      const paddedNumber = String(i).padStart(2, '0');
-      const imageUrl = `/assets/images/gift-cards/image_${paddedNumber}.jpg`;
-      
-      const img = new Image();
-      img.src = imageUrl;
-      
-      // Cache the image for instant access
-      imageCache[i] = {
-        id: i,
-        label: `Gift Card ${i}`,
-        imageUrl: imageUrl,
-        element: img
-      };
-    }
-    
-    imagesPreloaded = true;
-    console.log('Preloaded all 30 gift card images');
-  }
-
-  function getCachedImageOptions(selectedValue) {
-    const options = [];
-    for (let i = 1; i <= 30; i++) {
-      options.push({
-        value: i,
-        label: `Gift Card ${i}`,
-        imageUrl: imageCache[i].imageUrl,
-        cached: true
-      });
-    }
-    return options;
-  }
-
   // Custom image dropdown component
   function createImageDropdown(id, name, options, selectedValue) {
     // Ensure styles are loaded
     addImageDropdownStyles();
+    
+    // Debug logging
+    console.log('createImageDropdown called with:', {
+      id,
+      name, 
+      optionsCount: options.length,
+      options: options.slice(0, 3), // Log first 3 options for debugging
+      selectedValue
+    });
     
     const selectedOption = options.find(opt => String(opt.value) === String(selectedValue)) || options[0];
     
@@ -164,7 +132,7 @@
     dropdown.id = `${id}_dropdown`;
     dropdown.className = 'image-dropdown-menu';
     
-    options.forEach(option => {
+    options.forEach((option, index) => {
       const optionDiv = document.createElement('div');
       optionDiv.className = 'image-dropdown-option';
       if (String(option.value) === String(selectedValue)) {
@@ -175,6 +143,16 @@
         <img src="${option.imageUrl}" alt="${option.label}">
         <span>${option.label}</span>
       `;
+      
+      // Debug logging for first few options
+      if (index < 3) {
+        console.log(`Creating dropdown option ${index + 1}:`, {
+          value: option.value,
+          label: option.label,
+          imageUrl: option.imageUrl,
+          isSelected: String(option.value) === String(selectedValue)
+        });
+      }
       
       optionDiv.addEventListener('click', () => {
         // Update button content
@@ -201,6 +179,9 @@
       
       dropdown.appendChild(optionDiv);
     });
+    
+    // Debug logging
+    console.log(`createImageDropdown - Created ${options.length} total options for dropdown`);
     
     // Toggle dropdown
     button.addEventListener('click', (e) => {
@@ -262,6 +243,15 @@
                 label: opt.label,
                 imageUrl: opt.imageUrl
               }));
+              
+              // Debug logging
+              console.log('openFormModal - image field:', {
+                fieldName: f.name,
+                originalOptionsCount: f.options.length,
+                mappedOptionsCount: imageOptions.length,
+                mappedOptions: imageOptions.slice(0, 3),
+                selectedValue: val
+              });
               
               // Create a placeholder div that will be replaced after the form is created
               inputHtml = `<div id="image-dropdown-placeholder-${f.name}" style="width:100%;"></div>`;
@@ -842,15 +832,32 @@
     activate('gifts');
     setLoading('Loading gift list...');
     
-    // Preload gift card images for instant dropdown access
-    preloadGiftCardImages();
+    // Load gifts and available images
+    const [giftsRes, imagesRes] = await Promise.all([
+      api('/api/admin/gifts'),
+      api('/api/admin/gift-images')
+    ]);
     
-    // Load gifts (we'll use cached images for the dropdown)
-    const giftsRes = await api('/api/admin/gifts');
     const gifts = giftsRes.ok ? await giftsRes.json() : [];
+    const availableImages = imagesRes.ok ? await imagesRes.json() : [];
     
-    // Use cached image options for instant access
-    const imageOptions = getCachedImageOptions();
+    // Debug logging
+    console.log('showGifts - availableImages:', {
+      count: availableImages.length,
+      images: availableImages.slice(0, 5) // First 5 images for debugging
+    });
+    
+    // Add image URLs to the available images for the dropdown
+    const imageOptions = availableImages.map(img => ({
+      value: img.id,
+      label: `Gift Card ${img.id}`,
+      imageUrl: img.url
+    }));
+    
+    console.log('showGifts - imageOptions:', {
+      count: imageOptions.length,
+      options: imageOptions.slice(0, 3) // First 3 options for debugging
+    });
     
     const rows = (gifts||[]).map(it => `
       <tr>
@@ -1350,9 +1357,6 @@
   function showTab(tab){
     // Add styles for party management
     addPartyStyles();
-    
-    // Preload gift card images when admin panel first loads
-    preloadGiftCardImages();
     
     switch(tab){
       case 'guests': return showGuests();
