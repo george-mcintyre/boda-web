@@ -27,7 +27,11 @@ function formatEventForApi(event) {
     name: event.name,
     date: event.date ? event.date.toISOString() : null,
     end: event.end ? event.end.toISOString() : null,
-    location: event.location,
+    locationAddress: event.locationAddress || '',
+    locationLatitude: event.locationLatitude || null,
+    locationLongitude: event.locationLongitude || null,
+    // Legacy location field for backward compatibility
+    location: event.location || event.locationAddress || '',
     title: event.title ? (typeof event.title === 'string' ? event.title : (event.title.get ? event.title.get('en') || event.title.get('es') : event.title.en || event.title.es || '')) : null,
     description: event.description ? (typeof event.description === 'string' ? event.description : (event.description.get ? event.description.get('en') || event.description.get('es') : event.description.en || event.description.es || '')) : null,
     image: imageData,
@@ -113,13 +117,27 @@ async function listEventsAdmin(req, res, next) {
 // Admin: Create new event
 async function createEvent(req, res, next) {
   try {
-    const { name, date, end, location, title, description, image, sub_events } = req.body;
+    const { name, date, end, location, locationAddress, locationLatitude, locationLongitude, title, description, image, sub_events } = req.body;
+    
+    console.log('Received event data:', {
+      name,
+      date,
+      location,
+      locationAddress,
+      locationLatitude,
+      locationLongitude,
+      title,
+      description
+    });
     
     const event = await Event.create({
       name,
       date: date ? new Date(date) : null,
       end: end ? new Date(end) : null,
-      location,
+      location: location || locationAddress || '',
+      locationAddress: locationAddress || location || '',
+      locationLatitude: locationLatitude ? parseFloat(locationLatitude) : null,
+      locationLongitude: locationLongitude ? parseFloat(locationLongitude) : null,
       title,
       description,
       image,
@@ -132,6 +150,7 @@ async function createEvent(req, res, next) {
       }))
     });
 
+    console.log('Created event:', event);
     res.status(201).json(formatEventForApi(event));
   } catch (e) {
     next(e);
@@ -142,13 +161,16 @@ async function createEvent(req, res, next) {
 async function updateEvent(req, res, next) {
   try {
     const { id } = req.params;
-    const { name, date, end, location, title, description, image, sub_events } = req.body;
+    const { name, date, end, location, locationAddress, locationLatitude, locationLongitude, title, description, image, sub_events } = req.body;
 
     const event = await Event.findByIdAndUpdate(id, {
       ...(name && { name }),
       ...(date && { date: new Date(date) }),
       ...(end && { end: new Date(end) }),
       ...(location && { location }),
+      ...(locationAddress && { locationAddress }),
+      ...(locationLatitude && { locationLatitude: parseFloat(locationLatitude) }),
+      ...(locationLongitude && { locationLongitude: parseFloat(locationLongitude) }),
       ...(title && { title }),
       ...(description && { description }),
       ...(image && { image }),

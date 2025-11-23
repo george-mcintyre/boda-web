@@ -45,7 +45,11 @@ function formatEventForApi(event) {
     name: event.name,
     date: event.date ? event.date.toISOString() : null,
     end: event.end ? event.end.toISOString() : null,
-    location: event.location,
+    locationAddress: event.locationAddress || '',
+    locationLatitude: event.locationLatitude || null,
+    locationLongitude: event.locationLongitude || null,
+    // Legacy location field for backward compatibility
+    location: event.location || event.locationAddress || '',
     title: getStringValue(event.title),
     description: getStringValue(event.description),
     image: imageData,
@@ -275,7 +279,7 @@ async function listEventsAdmin(req, res, next) {
 
 async function createEventsItem(req, res, next) {
   try {
-    const { name, date, end, location, title, description, image, sub_events } = req.body;
+    const { name, date, end, location, locationAddress, locationLatitude, locationLongitude, title, description, image, sub_events } = req.body;
     
     // Convert strings to localized maps if needed
     const convertToMap = (value) => {
@@ -300,6 +304,9 @@ async function createEventsItem(req, res, next) {
       date: date ? new Date(date) : null,
       end: end ? new Date(end) : null,
       location,
+      locationAddress: locationAddress || location || '',
+      locationLatitude: locationLatitude ? parseFloat(locationLatitude) : null,
+      locationLongitude: locationLongitude ? parseFloat(locationLongitude) : null,
       title: convertToMap(title),
       description: convertToMap(description),
       image: imageRef,
@@ -319,7 +326,7 @@ async function createEventsItem(req, res, next) {
 async function updateEventsItem(req, res, next) {
   try {
     const { id } = req.params;
-    const { name, date, end, location, title, description, image, sub_events } = req.body;
+    const { name, date, end, location, locationAddress, locationLatitude, locationLongitude, title, description, image, sub_events } = req.body;
 
     // Convert strings to localized maps if needed
     const convertToMap = (value) => {
@@ -349,6 +356,9 @@ async function updateEventsItem(req, res, next) {
       ...(date && { date: new Date(date) }),
       ...(end && { end: new Date(end) }),
       ...(location && { location }),
+      ...(locationAddress && { locationAddress }),
+      ...(locationLatitude && { locationLatitude: parseFloat(locationLatitude) }),
+      ...(locationLongitude && { locationLongitude: parseFloat(locationLongitude) }),
       ...(title && { title: convertToMap(title) }),
       ...(description && { description: convertToMap(description) }),
       ...(sub_events && { 

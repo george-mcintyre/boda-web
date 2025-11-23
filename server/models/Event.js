@@ -21,8 +21,16 @@ const eventSchema = new Schema({
   name: { type: String, required: true },            // Event name
   date: { type: Date, required: true },              // Start date/time
   end: { type: Date },                                // End date/time
-  location: { type: String, required: true },        // Location
-  title: { ...LocalizedString },                     // Localized title (legacy support)
+  
+  // Location fields (separate components)
+  locationAddress: { type: String },                 // Street address
+  locationLatitude: { type: Number },                // Latitude coordinate
+  locationLongitude: { type: Number },               // Longitude coordinate
+  
+  // Legacy location field (for backward compatibility during migration)
+  location: { type: String },                        // Legacy combined location field
+  
+  title: { ...LocalizedString },                     // Localized title
   description: { ...LocalizedString },               // Localized description
   image: { 
     type: Schema.Types.ObjectId,                      // Reference to Image model

@@ -120,7 +120,7 @@
   }
 
   // Location selection component
-  function createLocationSelector(id, initialValue = '') {
+  function createLocationSelector(id, initialValue = '', initialLatitude = '', initialLongitude = '') {
     const container = document.createElement('div');
     container.className = 'location-selector';
     container.innerHTML = `
@@ -160,14 +160,23 @@
     const addressInput = container.querySelector(`#${id}_address`);
     const mapDiv = container.querySelector(`#${id}_map`);
     
-    // Parse initial value if it contains coordinates
-    if (initialValue && initialValue.includes(',')) {
+    // Set initial values - prioritize separate lat/lng if provided, otherwise parse from initialValue
+    if (initialLatitude && initialLongitude) {
+      // Use separate latitude and longitude values
+      latInput.value = initialLatitude;
+      lngInput.value = initialLongitude;
+      updateMapPreview(mapDiv, parseFloat(initialLatitude), parseFloat(initialLongitude));
+    } else if (initialValue && initialValue.includes(',')) {
+      // Parse coordinates from initialValue (legacy format)
       const coords = initialValue.match(/(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/);
       if (coords) {
         latInput.value = coords[1];
         lngInput.value = coords[2];
         updateMapPreview(mapDiv, parseFloat(coords[1]), parseFloat(coords[2]));
       }
+    } else {
+      // No coordinates provided, just set the address
+      addressInput.value = initialValue;
     }
     
     // Update map preview when coordinates change
@@ -348,19 +357,21 @@
       getValue: () => {
         return addressInput.value || '';
       },
-      setValue: (value) => {
-        // Extract coordinates from parentheses if they exist
-        const coordMatch = value.match(/^(.+?)\s*\((-?\d+\.?\d*),\s*(-?\d+\.?\d*)\)$/);
-        if (coordMatch) {
-          // Value has coordinates in parentheses - extract address and coordinates separately
-          addressInput.value = coordMatch[1].trim();
-          latInput.value = coordMatch[2];
-          lngInput.value = coordMatch[3];
-        } else {
-          // No coordinates - just set the address
-          addressInput.value = value;
-          latInput.value = '';
-          lngInput.value = '';
+      setValue: (value, latitude = '', longitude = '') => {
+        // Set address
+        addressInput.value = value || '';
+        
+        // Set coordinates if provided
+        if (latitude !== '') {
+          latInput.value = latitude;
+        }
+        if (longitude !== '') {
+          lngInput.value = longitude;
+        }
+        
+        // Update map preview if we have coordinates
+        if (latInput.value && lngInput.value) {
+          updateMapPreview(mapDiv, parseFloat(latInput.value), parseFloat(lngInput.value));
         }
       }
     };
@@ -597,8 +608,12 @@
           if (f.type === 'textarea') {
             inputHtml = `<textarea id="${id}" name="${f.name}" rows="${f.rows||3}" style="${baseStyle}">${val!==undefined?String(val):''}</textarea>`;
           } else if (f.type === 'location') {
-            // Location selector with map integration
-            const locationSelector = createLocationSelector(id, val);
+            // Location selector with map integration - pass separate coordinates if available
+            const locationAddress = val || '';
+            const locationLatitude = initialValues[`${f.name}Latitude`] || '';
+            const locationLongitude = initialValues[`${f.name}Longitude`] || '';
+            
+            const locationSelector = createLocationSelector(id, locationAddress, locationLatitude, locationLongitude);
             inputHtml = '';
             setTimeout(() => {
               const placeholder = document.getElementById(`location-placeholder-${f.name}`);
@@ -683,6 +698,12 @@
           const lat = latEl ? latEl.value : '';
           const lng = lngEl ? lngEl.value : '';
           
+          // Store all location components in the data object
+          data[f.name] = address;
+          data[`${f.name}Address`] = address;
+          data[`${f.name}Latitude`] = lat;
+          data[`${f.name}Longitude`] = lng;
+          
           // Location is valid if address is filled OR both lat and lng are filled
           v = (address.trim() !== '') || (lat.trim() !== '' && lng.trim() !== '');
         } else {
@@ -694,7 +715,11 @@
         if (f.required && (v === '' || v === null || v === undefined || (f.type==='number' && Number.isNaN(v)))) valid = false;
         if (f.type === 'select' && f.required && (v === '' || v === null || v === undefined)) valid = false;
         if (f.type === 'location' && f.required && (v === '' || v === null || v === undefined)) valid = false;
-        data[f.name] = v;
+        
+        // For non-location fields, store the value in data
+        if (f.type !== 'location') {
+          data[f.name] = v;
+        }
       });
       if (!valid){
         const err = modal.querySelector('#mfError');
@@ -1579,6 +1604,9 @@
         endDate: extractDateFromISO(event.end) || '',
         endTime: extractTimeFromISO(event.end) || '',
         location: event.location || '',
+        locationAddress: event.locationAddress || event.location || '',
+        locationLatitude: event.locationLatitude || '',
+        locationLongitude: event.locationLongitude || '',
         title: event.title || '',
         description: event.description || ''
       },
@@ -1596,14 +1624,17 @@
           
           // Get location value from the location component - only if modal is available
           let locationValue = values.location || '';
+          let lat = '';
+          let lng = '';
+          
           if (modal) {
             const locationAddressEl = modal.querySelector('#f_location_address');
             const locationLatEl = modal.querySelector('#f_location_lat');
             const locationLngEl = modal.querySelector('#f_location_lng');
             
             const address = locationAddressEl ? locationAddressEl.value || '' : '';
-            const lat = locationLatEl ? locationLatEl.value || '' : '';
-            const lng = locationLngEl ? locationLngEl.value || '' : '';
+            lat = locationLatEl ? locationLatEl.value || '' : '';
+            lng = locationLngEl ? locationLngEl.value || '' : '';
             
             // Build location value with address and coordinates if available
             if (address || (lat && lng)) {
@@ -1662,6 +1693,9 @@
             date: startDateTime,
             end: endDateTime,
             location: locationValue,
+            locationAddress: values.locationAddress || values.location || '',
+            locationLatitude: values.locationLatitude || (lat ? parseFloat(lat) : null),
+            locationLongitude: values.locationLongitude || (lng ? parseFloat(lng) : null),
             title: values.title,
             description: values.description,
             image: imageReference
