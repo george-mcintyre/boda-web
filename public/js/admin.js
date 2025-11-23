@@ -36,6 +36,250 @@
     tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   }
 
+  // Date formatting utilities for Spain locale
+  function formatDateSpain(isoString) {
+    if (!isoString) return '';
+    try {
+      const date = new Date(isoString);
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (e) {
+      return isoString;
+    }
+  }
+
+  function formatTimeSpain(isoString) {
+    if (!isoString) return '';
+    try {
+      const date = new Date(isoString);
+      return date.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    } catch (e) {
+      return isoString;
+    }
+  }
+
+  function extractDateFromISO(isoString) {
+    if (!isoString) return '';
+    try {
+      // Handle as UTC to avoid timezone shifts
+      const date = new Date(isoString);
+      // Get UTC date components to avoid local timezone shifts
+      const year = date.getUTCFullYear();
+      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(date.getUTCDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  function extractTimeFromISO(isoString) {
+    if (!isoString) return '';
+    try {
+      // Handle as UTC to avoid timezone shifts
+      const date = new Date(isoString);
+      const hours = String(date.getUTCHours()).padStart(2, '0');
+      const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  // Sub-event icon utilities
+  function getSubEventIcon(iconType) {
+    const icons = {
+      ceremony: '/assets/icons/ceremony.svg',
+      cocktails: '/assets/icons/cocktails.svg',
+      reception: '/assets/icons/reception.svg',
+      dancing: '/assets/icons/dancing.svg'
+    };
+    return icons[iconType] || icons.ceremony;
+  }
+
+  // Location selection component
+  function createLocationSelector(id, initialValue = '') {
+    const container = document.createElement('div');
+    container.className = 'location-selector';
+    container.innerHTML = `
+      <div style="margin-bottom: 10px;">
+        <label style="display:block;margin-bottom:5px;font-weight:600;color:#333;">Address</label>
+        <input type="text" id="${id}_address" value="${initialValue}" placeholder="e.g. Urbanización las Chapas, s/n, 29604 Marbella, Málaga" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;">
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:10px;">
+        <div style="flex:1;">
+          <label style="display:block;margin-bottom:5px;font-weight:600;color:#333;">Latitude</label>
+          <input type="number" id="${id}_lat" step="any" placeholder="36.5108" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;">
+        </div>
+        <div style="flex:1;">
+          <label style="display:block;margin-bottom:5px;font-weight:600;color:#333;">Longitude</label>
+          <input type="number" id="${id}_lng" step="any" placeholder="-4.8890" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;">
+        </div>
+      </div>
+      <div id="${id}_map" style="width:100%;height:200px;border:1px solid #ddd;border-radius:8px;margin-bottom:10px;background:#f8f9fa;display:flex;align-items:center;justify-content:center;color:#666;">
+        <div style="text-align:center;">
+          <i class="fas fa-map-marked-alt" style="font-size:2em;margin-bottom:10px;"></i>
+          <div>Map preview will appear here</div>
+          <small>Enter coordinates to see map</small>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button type="button" id="${id}_use_map" class="admin-action" style="background:#17a2b8;">
+          <i class="fas fa-map"></i> Use Map
+        </button>
+        <button type="button" id="${id}_search" class="admin-action" style="background:#28a745;">
+          <i class="fas fa-search"></i> Search Address
+        </button>
+      </div>
+    `;
+    
+    const latInput = container.querySelector(`#${id}_lat`);
+    const lngInput = container.querySelector(`#${id}_lng`);
+    const addressInput = container.querySelector(`#${id}_address`);
+    const mapDiv = container.querySelector(`#${id}_map`);
+    
+    // Parse initial value if it contains coordinates
+    if (initialValue && initialValue.includes(',')) {
+      const coords = initialValue.match(/(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/);
+      if (coords) {
+        latInput.value = coords[1];
+        lngInput.value = coords[2];
+        updateMapPreview(mapDiv, parseFloat(coords[1]), parseFloat(coords[2]));
+      }
+    }
+    
+    // Update map preview when coordinates change
+    latInput.addEventListener('change', updateMapPreview);
+    lngInput.addEventListener('change', updateMapPreview);
+    
+    // Use map button - opens Google Maps in new tab
+    container.querySelector(`#${id}_use_map`).addEventListener('click', () => {
+      const lat = latInput.value;
+      const lng = lngInput.value;
+      const address = addressInput.value;
+      
+      if (lat && lng) {
+        window.open(`https://www.google.com/maps?q=${lat},${lng}`, '_blank');
+      } else if (address) {
+        window.open(`https://www.google.com/maps/search/${encodeURIComponent(address)}`, '_blank');
+      } else {
+        alert('Please enter an address or coordinates');
+      }
+    });
+    
+    // Search address button - simple geocoding simulation
+    container.querySelector(`#${id}_search`).addEventListener('click', async () => {
+      const address = addressInput.value;
+      if (!address) {
+        alert('Please enter an address to search');
+        return;
+      }
+      
+      // Simple geocoding simulation (in real implementation, use Google Geocoding API)
+      const mockCoords = {
+        'marbella': { lat: 36.5108, lng: -4.8890 },
+        'malaga': { lat: 36.7213, lng: -4.4214 },
+        'seville': { lat: 37.3886, lng: -5.9823 },
+        'madrid': { lat: 40.4168, lng: -3.7038 },
+        'barcelona': { lat: 41.3851, lng: 2.1734 }
+      };
+      
+      const normalizedAddress = address.toLowerCase();
+      let found = false;
+      
+      for (const [key, coords] of Object.entries(mockCoords)) {
+        if (normalizedAddress.includes(key)) {
+          latInput.value = coords.lat;
+          lngInput.value = coords.lng;
+          updateMapPreview(mapDiv, coords.lat, coords.lng);
+          found = true;
+          break;
+        }
+      }
+      
+      if (!found) {
+        alert('Address not found in our mock database. Please enter coordinates manually.');
+      }
+    });
+    
+    // Update map preview function
+    function updateMapPreview(div, lat, lng) {
+      if (lat && lng) {
+        // Use OpenStreetMap instead of Google Maps to avoid API key issues
+        const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${(lng-0.01).toFixed(6)},${(lat-0.01).toFixed(6)},${(lng+0.01).toFixed(6)},${(lat+0.01).toFixed(6)}&layer=mapnik&marker=${lat.toFixed(6)},${lng.toFixed(6)}`;
+        const osmUrl = `https://www.openstreetmap.org/?mlat=${lat.toFixed(6)}&mlon=${lng.toFixed(6)}#map=16/${lat.toFixed(6)}/${lng.toFixed(6)}`;
+        
+        div.innerHTML = `
+          <div style="position:relative;width:100%;height:100%;border-radius:8px;overflow:hidden;">
+            <iframe 
+              src="${mapUrl}" 
+              width="100%" 
+              height="100%" 
+              frameborder="0" 
+              style="border:0;border-radius:8px;"
+              allowfullscreen>
+            </iframe>
+            <div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.7);color:white;padding:5px 10px;border-radius:4px;font-size:12px;z-index:1000;">
+              ${lat.toFixed(4)}, ${lng.toFixed(4)}
+            </div>
+            <a href="${osmUrl}" target="_blank" style="position:absolute;bottom:10px;right:10px;background:rgba(255,255,255,0.9);padding:3px 8px;border-radius:4px;font-size:11px;text-decoration:none;color:#333;z-index:1000;">
+              View Larger Map
+            </a>
+          </div>
+        `;
+      }
+    }
+    
+    // Return functions to get/set values
+    return {
+      container,
+      getValue: () => {
+        const lat = latInput.value;
+        const lng = lngInput.value;
+        const address = addressInput.value;
+        
+        if (lat && lng) {
+          return `${address} (${lat},${lng})`;
+        }
+        return address || '';
+      },
+      setValue: (value) => {
+        addressInput.value = value;
+        const coords = value.match(/(-?\d+\.?\d*),\s*(-?\d+\.?\d*)/);
+        if (coords) {
+          latInput.value = coords[1];
+          lngInput.value = coords[2];
+        }
+      }
+    };
+  }
+
+  function updateMapPreview(div, lat, lng) {
+    if (lat && lng) {
+      div.innerHTML = `
+        <div style="position:relative;width:100%;height:100%;border-radius:8px;overflow:hidden;">
+          <div style="width:100%;height:100%;background:linear-gradient(45deg,#f0f0f0,#e0e0e0);display:flex;align-items:center;justify-content:center;border-radius:8px;">
+            <div style="text-align:center;color:#666;">
+              <i class="fas fa-map-marker-alt" style="font-size:2em;color:#e74c3c;margin-bottom:10px;"></i>
+              <div>Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
+              <small>Open in Google Maps to view</small>
+            </div>
+          </div>
+          <div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.7);color:white;padding:5px 10px;border-radius:4px;font-size:12px;">
+            ${lat.toFixed(4)}, ${lng.toFixed(4)}
+          </div>
+        </div>
+      `;
+    }
+  }
+
   // CSV Parser for guest bulk upload
   function parseCSV(text) {
     const lines = text.split('\n').map(line => line.trim()).filter(line => line);
@@ -235,6 +479,20 @@
           
           if (f.type === 'textarea') {
             inputHtml = `<textarea id="${id}" name="${f.name}" rows="${f.rows||3}" style="${baseStyle}">${val!==undefined?String(val):''}</textarea>`;
+          } else if (f.type === 'location') {
+            // Location selector with map integration
+            const locationSelector = createLocationSelector(id, val);
+            inputHtml = '';
+            setTimeout(() => {
+              const placeholder = document.getElementById(`location-placeholder-${f.name}`);
+              if (placeholder) {
+                placeholder.parentNode.replaceChild(locationSelector.container, placeholder);
+                // Store reference to get value function
+                locationSelector._getValue = locationSelector.getValue;
+                locationSelector.getValue = () => locationSelector._getValue();
+              }
+            }, 0);
+            inputHtml = `<div id="location-placeholder-${f.name}" style="width:100%;"></div>`;
           } else if (f.type === 'select') {
             // Check if this is an image dropdown
             if (f.showImages && f.options && f.options.length > 0 && f.options[0].imageUrl) {
@@ -297,16 +555,62 @@
       const data = {};
       let valid = true;
       fields.forEach(f => {
-        const el = modal.querySelector(`#f_${f.name}`);
-        let v = el ? el.value : '';
+        let v = '';
+        if (f.type === 'location') {
+          // Handle location field which has a custom component
+          const addressEl = modal.querySelector(`#f_${f.name}_address`);
+          const latEl = modal.querySelector(`#f_${f.name}_lat`);
+          const lngEl = modal.querySelector(`#f_${f.name}_lng`);
+          
+          const address = addressEl ? addressEl.value : '';
+          const lat = latEl ? latEl.value : '';
+          const lng = lngEl ? lngEl.value : '';
+          
+          // Location is valid if address is filled OR both lat and lng are filled
+          v = (address.trim() !== '') || (lat.trim() !== '' && lng.trim() !== '');
+        } else {
+          const el = modal.querySelector(`#f_${f.name}`);
+          v = el ? el.value : '';
+        }
+        
         if (f.type === 'number') v = v === '' ? '' : Number(v);
         if (f.required && (v === '' || v === null || v === undefined || (f.type==='number' && Number.isNaN(v)))) valid = false;
         if (f.type === 'select' && f.required && (v === '' || v === null || v === undefined)) valid = false;
+        if (f.type === 'location' && f.required && (v === '' || v === null || v === undefined)) valid = false;
         data[f.name] = v;
       });
       if (!valid){
         const err = modal.querySelector('#mfError');
-        err.textContent = 'Please fill all required fields correctly.';
+        // Find which required field is missing
+        const missingFields = fields.filter(f => {
+          if (!f.required) return false;
+          
+          if (f.type === 'location') {
+            const addressEl = document.querySelector(`#f_${f.name}_address`);
+            const latEl = document.querySelector(`#f_${f.name}_lat`);
+            const lngEl = document.querySelector(`#f_${f.name}_lng`);
+            
+            const address = addressEl?.value?.trim() || '';
+            const lat = latEl?.value?.trim() || '';
+            const lng = lngEl?.value?.trim() || '';
+            
+            // Location is missing if no address AND (no lat OR no lng)
+            return (address === '') && (lat === '' || lng === '');
+          } else {
+            const fieldValue = data[f.name];
+            return !fieldValue || fieldValue.toString().trim() === '';
+          }
+        });
+        
+        if (missingFields.length > 0) {
+          const fieldNames = missingFields.map(f => {
+            if (f.type === 'location') return 'Location (address or coordinates)';
+            return f.label;
+          }).join(', ');
+          err.textContent = `Please fill all required fields: ${fieldNames}`;
+        } else {
+          err.textContent = 'Please fill all required fields correctly.';
+        }
         err.style.display = 'block';
         return;
       }
@@ -1009,71 +1313,334 @@
     setLoading('Loading event schedule...');
     const res = await api('/api/admin/events');
     const data = res.ok ? await res.json() : [];
+    
+    // Create rows with new structure
     const rows = (data||[]).map(ev => `
       <tr>
-        <td>${ev.evento||''}</td>
-        <td>${ev.fecha||''}</td>
-        <td>${ev.hora||''}</td>
-        <td>${ev.lugar||''}</td>
-        <td>${ev.descripcion||''}</td>
+        <td>${ev.name || ''}</td>
+        <td>${formatDateSpain(ev.date) || ''}</td>
+        <td>${formatTimeSpain(ev.date) || ''}</td>
+        <td>${formatTimeSpain(ev.end) || ''}</td>
+        <td>${ev.title || ''}</td>
         <td>
-          <button class="admin-action" data-action="edit" data-id="${ev.id}"><i class="fas fa-edit"></i></button>
-          <button class="admin-action danger" data-action="del" data-id="${ev.id}"><i class="fas fa-trash"></i></button>
+          ${ev.image ? `<img src="${ev.image}" alt="Event image" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px;">` : '<span style="color: #999;">No image</span>'}
+        </td>
+        <td>
+          <button class="admin-action" data-action="edit-subevents" data-id="${ev.id}" title="Edit Sub-events">
+            <i class="fas fa-list"></i>
+          </button>
+          <button class="admin-action" data-action="edit" data-id="${ev.id}">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button class="admin-action danger" data-action="del" data-id="${ev.id}">
+            <i class="fas fa-trash"></i>
+          </button>
         </td>
       </tr>`).join('');
-    content.innerHTML = renderTable({title:'Event Schedule', columns:['Event','Date','Time','Place','Description','Actions']}, rows,
-      `<button id="addEvent" class="admin-action"><i class=\"fas fa-plus\"></i> Add</button>`);
+    
+    content.innerHTML = renderTable({
+      title:'Event Schedule', 
+      columns:['Name','Date','Start Time','End Time','Title','Image','Actions']
+    }, rows, `<button id="addEvent" class="admin-action"><i class="fas fa-plus"></i> Add Event</button>`);
+    
     const tbody = content.querySelector('tbody');
     tbody.addEventListener('click', async (e)=>{
-      const btn = e.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
+      const btn = e.target.closest('button'); if(!btn) return; 
+      const id = btn.dataset.id; 
+      const action = btn.dataset.action;
       const current = (data||[]).find(x => String(x.id) === String(id)) || {};
+      
       if (action==='del'){
         if (!confirm('Delete this event?')) return;
-        const r = await api(`/api/admin/events/${id}`, { method:'DELETE' }); if (r.ok) showEvent(); else notify('Error','error');
+        const r = await api(`/api/admin/events/${id}`, { method:'DELETE' }); 
+        if (r.ok) showEvent(); else notify('Error deleting event', 'error');
       } else if (action==='edit'){
-        openFormModal({
-          title: 'Edit event', submitText: 'Save',
-          fields: [
-            { name:'evento', label:'Event', required:true },
-            { name:'fecha', label:'Date', type:'date' },
-            { name:'hora', label:'Time', type:'time' },
-            { name:'lugar', label:'Place' },
-            { name:'descripcion', label:'Description', type:'textarea' },
-          ],
-          initialValues: {
-            evento: current.evento || current.titulo || current.nombre || '',
-            fecha: current.fecha || '',
-            hora: current.hora || '',
-            lugar: current.lugar || '',
-            descripcion: current.descripcion || ''
-          },
-          onSubmit: async (values, close) => {
-            const r = await api(`/api/admin/events/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
-            if (!r.ok) throw new Error('Failed to update');
-            close();
-            showEvent();
-          }
-        });
+        openEventForm(current, false);
+      } else if (action==='edit-subevents'){
+        openSubEventsManager(current);
       }
     });
+    
     content.querySelector('#addEvent').addEventListener('click', async ()=>{
-      openFormModal({
-        title: 'Add event', submitText: 'Add',
-        fields: [
-          { name:'evento', label:'Event', required:true },
-          { name:'fecha', label:'Date', type:'date' },
-          { name:'hora', label:'Time', type:'time' },
-          { name:'lugar', label:'Place' },
-          { name:'descripcion', label:'Description', type:'textarea' },
-        ],
-        onSubmit: async (values, close) => {
-          const r = await api('/api/admin/events', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
-          if (!r.ok) throw new Error('Failed to create');
+      openEventForm({}, true);
+    });
+  }
+
+  // Open event add/edit form
+  function openEventForm(event, isNew = false) {
+    openFormModal({
+      title: isNew ? 'Add Event' : 'Edit Event',
+      submitText: isNew ? 'Add' : 'Save',
+      fields: [
+        { name:'name', label:'Name', required:true, help:'e.g. Wedding Ceremony' },
+        { name:'date', label:'Date', type:'date', required:true, help:'Event date (Spain locale)' },
+        { name:'startTime', label:'Start Time', type:'time', required:true, help:'Start time (24h format)' },
+        { name:'endDate', label:'End Date', type:'date', help:'End date (optional, for events that span multiple days)' },
+        { name:'endTime', label:'End Time', type:'time', help:'End time (24h format, can be next day if end date is set)' },
+        { name:'location', label:'Location', type:'location', required:true, help:'Use map tool to select precise location' },
+        { name:'title', label:'Title', help:'e.g. Oyana Beach Restaurant' },
+        { name:'description', label:'Description', type:'textarea', rows: 3, help:'Event description or additional details (do not use for location address)' },
+        { name:'image', label:'Image', type:'file', help:'Upload event image (will be stored in database)' }
+      ],
+      initialValues: {
+        name: event.name || '',
+        date: extractDateFromISO(event.date) || '',
+        startTime: extractTimeFromISO(event.date) || '',
+        endDate: extractDateFromISO(event.end) || '',
+        endTime: extractTimeFromISO(event.end) || '',
+        location: event.location || '',
+        title: event.title || '',
+        description: event.description || ''
+      },
+      onSubmit: async (values, close) => {
+        try {
+          // Combine date and time into ISO format using UTC to prevent timezone shifts
+          const startDateTime = values.date && values.startTime ? 
+            new Date(`${values.date}T${values.startTime}:00Z`).toISOString() : null;
+          
+          // For end date/time, use endDate if provided, otherwise use start date
+          // This allows events that end on the next day (or any other day)
+          const endDate = values.endDate || values.date;
+          const endDateTime = endDate && values.endTime ? 
+            new Date(`${endDate}T${values.endTime}:00Z`).toISOString() : null;
+          
+          // Get location value from the location component
+          const locationAddressEl = document.getElementById('f_location_address');
+          const locationLatEl = document.getElementById('f_location_lat');
+          const locationLngEl = document.getElementById('f_location_lng');
+          let locationValue = '';
+          
+          if (locationAddressEl) {
+            const address = locationAddressEl.value;
+            const lat = locationLatEl?.value;
+            const lng = locationLngEl?.value;
+            
+            if (lat && lng) {
+              locationValue = `${address} (${lat},${lng})`;
+            } else {
+              locationValue = address || '';
+            }
+          }
+          
+          // Handle image upload
+          let imageUrl = event.image || null;
+          const imageFile = document.getElementById('f_image')?.files[0];
+          if (imageFile) {
+            const formData = new FormData();
+            formData.append('image', imageFile);
+            const uploadRes = await fetch('/api/admin/events/upload-image', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${token}` },
+              body: formData
+            });
+            if (uploadRes.ok) {
+              const uploadData = await uploadRes.json();
+              imageUrl = uploadData.url;
+            }
+          }
+          
+          const eventData = {
+            name: values.name,
+            date: startDateTime,
+            end: endDateTime,
+            location: locationValue,
+            title: values.title,
+            description: values.description,
+            image: imageUrl
+          };
+          
+          const url = isNew ? '/api/admin/events' : `/api/admin/events/${event.id}`;
+          const method = isNew ? 'POST' : 'PUT';
+          
+          const r = await api(url, { 
+            method, 
+            headers:{'Content-Type':'application/json'}, 
+            body: JSON.stringify(eventData)
+          });
+          
+          if (!r.ok) throw new Error(isNew ? 'Failed to create event' : 'Failed to update event');
+          
           close();
           showEvent();
+        } catch (error) {
+          throw error;
         }
-      });
+      }
     });
+  }
+
+  // Open sub-events manager
+  function openSubEventsManager(event) {
+    const subEvents = event.sub_events || [];
+    
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;
+      display:flex;align-items:center;justify-content:center;
+    `;
+    
+    modal.innerHTML = `
+      <div style="
+        background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.25);
+        width:min(800px,95vw);max-height:90vh;overflow:auto;
+      ">
+        <div style="padding:22px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
+          <h3 style="margin:0;color:#333;">Manage Sub-events: ${event.name}</h3>
+          <button id="closeSubEvents" class="admin-action" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:8px;">Close</button>
+        </div>
+        <div style="padding:18px 24px;">
+          <div style="margin-bottom:20px;">
+            <button id="addSubEvent" class="admin-action">
+              <i class="fas fa-plus"></i> Add Sub-event
+            </button>
+          </div>
+          <div id="subEventsList">
+            ${subEvents.length > 0 ? subEvents.map((sub, index) => `
+              <div style="border:1px solid #ddd;border-radius:8px;padding:15px;margin-bottom:10px;display:flex;align-items:center;gap:15px;">
+                <img src="${getSubEventIcon(sub.icon)}" alt="${sub.icon}" style="width:24px;height:24px;">
+                <div style="flex:1;">
+                  <strong>${sub.name}</strong><br>
+                  <small style="color:#666;">
+                    ${formatDateSpain(sub.date)} ${formatTimeSpain(sub.date)} - ${formatTimeSpain(sub.end)}
+                  </small><br>
+                  <small style="color:#666;">${(sub.description || '').substring(0, 100)}${(sub.description || '').length > 100 ? '...' : ''}</small>
+                </div>
+                <div>
+                  <button class="admin-action" data-action="edit-sub" data-index="${index}">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="admin-action danger" data-action="del-sub" data-index="${index}">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            `).join('') : '<p style="text-align:center;color:#999;padding:20px;">No sub-events yet</p>'}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Close modal
+    modal.querySelector('#closeSubEvents').addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+    
+    // Add sub-event
+    modal.querySelector('#addSubEvent').addEventListener('click', () => {
+      openSubEventForm(event, null, modal);
+    });
+    
+    // Handle sub-event actions
+    modal.querySelector('#subEventsList').addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      
+      const action = btn.dataset.action;
+      const index = parseInt(btn.dataset.index);
+      
+      if (action === 'edit-sub') {
+        openSubEventForm(event, subEvents[index], modal, index);
+      } else if (action === 'del-sub') {
+        if (confirm('Delete this sub-event?')) {
+          const updatedSubEvents = subEvents.filter((_, i) => i !== index);
+          updateEventSubEvents(event.id, updatedSubEvents, modal);
+        }
+      }
+    });
+  }
+
+  // Open sub-event add/edit form
+  function openSubEventForm(event, subEvent, modal, index = null) {
+    const isNew = !subEvent;
+    const defaultDate = extractDateFromISO(event.date);
+    const defaultStartTime = extractTimeFromISO(event.date);
+    const defaultEndTime = extractTimeFromISO(event.end) || '23:59';
+    
+    openFormModal({
+      title: isNew ? 'Add Sub-event' : 'Edit Sub-event',
+      submitText: isNew ? 'Add' : 'Save',
+      fields: [
+        { name:'name', label:'Name', required:true, help:'e.g. Welcome Cocktails' },
+        { name:'date', label:'Date', type:'date', required:true, default: defaultDate },
+        { name:'startTime', label:'Start Time', type:'time', required:true, default: defaultStartTime },
+        { name:'endTime', label:'End Time', type:'time', required:true, default: defaultEndTime },
+        { name:'description', label:'Description', type:'textarea', rows: 3, help:'e.g. Enjoy cocktails and hor d\'oeuvres by the fountain while meeting other attendees' },
+        { name:'icon', label:'Icon', type:'select', required:true, 
+          options: [
+            { value: 'ceremony', label: 'Ceremony' },
+            { value: 'cocktails', label: 'Cocktails' },
+            { value: 'reception', label: 'Reception' },
+            { value: 'dancing', label: 'Dancing' }
+          ]
+        }
+      ],
+      initialValues: {
+        name: subEvent?.name || '',
+        date: extractDateFromISO(subEvent?.date) || defaultDate,
+        startTime: extractTimeFromISO(subEvent?.date) || defaultStartTime,
+        endTime: extractTimeFromISO(subEvent?.end) || defaultEndTime,
+        description: subEvent?.description || '',
+        icon: subEvent?.icon || 'ceremony'
+      },
+      onSubmit: async (values, close) => {
+        try {
+          // Combine date and time into ISO format using UTC to prevent timezone shifts
+          const startDateTime = values.date && values.startTime ? 
+            new Date(`${values.date}T${values.startTime}:00Z`).toISOString() : null;
+          
+          // For end date/time, use endDate if provided, otherwise use start date
+          // This allows events that end on the next day (or any other day)
+          const endDate = values.endDate || values.date;
+          const endDateTime = endDate && values.endTime ? 
+            new Date(`${endDate}T${values.endTime}:00Z`).toISOString() : null;
+          
+          const newSubEvent = {
+            name: values.name,
+            date: startDateTime,
+            end: endDateTime,
+            description: values.description,
+            icon: values.icon
+          };
+          
+          let updatedSubEvents = [...(event.sub_events || [])];
+          if (isNew) {
+            updatedSubEvents.push(newSubEvent);
+          } else {
+            updatedSubEvents[index] = newSubEvent;
+          }
+          
+          await updateEventSubEvents(event.id, updatedSubEvents, modal);
+          close();
+        } catch (error) {
+          throw error;
+        }
+      }
+    });
+  }
+
+  // Update event sub-events
+  async function updateEventSubEvents(eventId, subEvents, modal) {
+    try {
+      const r = await api(`/api/admin/events/${eventId}`, {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ sub_events: subEvents })
+      });
+      
+      if (!r.ok) throw new Error('Failed to update sub-events');
+      
+      // Refresh the modal with updated data
+      document.body.removeChild(modal);
+      const res = await api('/api/admin/events');
+      const data = res.ok ? await res.json() : [];
+      const updatedEvent = data.find(x => String(x.id) === String(eventId));
+      openSubEventsManager(updatedEvent);
+      
+    } catch (error) {
+      notify('Error updating sub-events: ' + error.message, 'error');
+    }
   }
 
   // ========== Menu management ==========

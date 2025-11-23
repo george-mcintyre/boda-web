@@ -3,6 +3,35 @@ const { auth } = require('../../auth/middleware');
 const guestCtrl = require('../../controllers/guestController');
 const adminCtrl = require('../../controllers/adminController');
 const messageCtrl = require('../../controllers/messageController');
+const multer = require('multer');
+
+// Configure multer for event image uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'temp_uploads/'); // Temporary upload directory
+  },
+  filename: function (req, file, cb) {
+    // Generate unique filename
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + '-' + file.originalname);
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: function (req, file, cb) {
+    // Allow only image files
+    const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.'));
+    }
+  }
+});
 
 // Admin base namespace routes
 
@@ -11,6 +40,7 @@ router.get('/events', auth('admin'), adminCtrl.listEventsAdmin);
 router.post('/events', auth('admin'), adminCtrl.createEventsItem);
 router.put('/events/:id', auth('admin'), adminCtrl.updateEventsItem);
 router.delete('/events/:id', auth('admin'), adminCtrl.deleteEventsItem);
+router.post('/events/upload-image', auth('admin'), upload.single('image'), adminCtrl.uploadEventImage);
 
 // Guests & Party Management (existing functionality)
 router.get('/guests', auth('admin'), guestCtrl.list);

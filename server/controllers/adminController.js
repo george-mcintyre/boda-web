@@ -273,7 +273,7 @@ async function createEventsItem(req, res, next) {
         name: sub.name,
         date: sub.date ? new Date(sub.date) : null,
         end: sub.end ? new Date(sub.end) : null,
-        description: convertToMap(sub.description),
+        description: sub.description, // Keep sub-event description as plain string
         icon: sub.icon
       }))
     });
@@ -308,7 +308,7 @@ async function updateEventsItem(req, res, next) {
           name: sub.name,
           date: sub.date ? new Date(sub.date) : null,
           end: sub.end ? new Date(sub.end) : null,
-          description: convertToMap(sub.description),
+          description: sub.description, // Keep sub-event description as plain string
           icon: sub.icon
         }))
       })
