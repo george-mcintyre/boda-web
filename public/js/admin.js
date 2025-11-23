@@ -41,7 +41,7 @@
     return localStorage.getItem('i18nextLng') || 'es';
   }
 
-  function formatDateLocalized(isoString) {
+  function formatDate(isoString) {
     if (!isoString) return '';
     try {
       const date = new Date(isoString);
@@ -49,14 +49,15 @@
       return date.toLocaleDateString(userLang, {
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: 'Europe/Madrid'
       });
     } catch (e) {
       return isoString;
     }
   }
 
-  function formatTimeLocalized(isoString) {
+  function formatTime(isoString) {
     if (!isoString) return '';
     try {
       const date = new Date(isoString);
@@ -64,45 +65,56 @@
       return date.toLocaleTimeString(userLang, {
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false
+        hour12: false,
+        timeZone: 'Europe/Madrid'
       });
     } catch (e) {
       return isoString;
     }
   }
 
-  // Legacy functions for backward compatibility
-  function formatDateSpain(isoString) {
-    return formatDateLocalized(isoString);
-  }
-
-  function formatTimeSpain(isoString) {
-    return formatTimeLocalized(isoString);
-  }
-
   function extractDateFromISO(isoString) {
     if (!isoString) return '';
     try {
-      // Handle as UTC to avoid timezone shifts
-      const date = new Date(isoString);
-      // Get UTC date components to avoid local timezone shifts
-      const year = date.getUTCFullYear();
-      const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-      const day = String(date.getUTCDate()).padStart(2, '0');
+      const date = new Date(isoString); // uses the +01:00/+02:00 in the string
+  
+      const formatter = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Madrid',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+  
+      // en-CA gives YYYY-MM-DD, but use formatToParts so we’re explicit
+      const parts = formatter.formatToParts(date);
+      const year  = parts.find(p => p.type === 'year').value;
+      const month = parts.find(p => p.type === 'month').value;
+      const day   = parts.find(p => p.type === 'day').value;
+  
       return `${year}-${month}-${day}`;
     } catch (e) {
       return '';
     }
   }
+  
 
   function extractTimeFromISO(isoString) {
     if (!isoString) return '';
     try {
-      // Handle as UTC to avoid timezone shifts
       const date = new Date(isoString);
-      const hours = String(date.getUTCHours()).padStart(2, '0');
-      const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-      return `${hours}:${minutes}`;
+  
+      const formatter = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Madrid',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
+  
+      const parts = formatter.formatToParts(date);
+      const hour   = parts.find(p => p.type === 'hour').value;
+      const minute = parts.find(p => p.type === 'minute').value;
+  
+      return `${hour}:${minute}`;
     } catch (e) {
       return '';
     }
@@ -1494,9 +1506,9 @@
       return `
       <tr>
         <td>${ev.name || ''}</td>
-        <td>${formatDateLocalized(ev.date) || ''}</td>
-        <td>${formatTimeLocalized(ev.date) || ''}</td>
-        <td>${formatTimeLocalized(ev.end) || ''}</td>
+        <td>${formatDate(ev.date) || ''}</td>
+        <td>${formatTime(ev.date) || ''}</td>
+        <td>${formatTime(ev.end) || ''}</td>
         <td>${ev.title || ''}</td>
         <td>
           ${imageUrl ? `<img src="${imageUrl}" alt="Event image" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;">No image</span>` : '<span style="color: #999;">No image</span>'}
@@ -1594,7 +1606,7 @@
         { name:'endTime', label:'End Time', type:'time', help:'End time (24h format, can be next day if end date is set)' },
         { name:'location', label:'Location', type:'location', required:true, help:'Use map tool to select precise location' },
         { name:'title', label:'Title', help:'e.g. Oyana Beach Restaurant' },
-        { name:'description', label:'Description', type:'textarea', rows: 3, help:'Event description or additional details (do not use for location address)' },
+        { name:'description', label:'Description', type:'textarea', rows: 3, help:'Event description or additional details' },
         { name:'image', label:'Image', type:'file', help:'Upload event image (will be stored in database)' }
       ],
       initialValues: {
@@ -1612,15 +1624,15 @@
       },
       onSubmit: async (values, close, modal) => {
         try {
-          // Combine date and time into ISO format using UTC to prevent timezone shifts
+          // Combine date and time into ISO format using Madrid Summer offset
           const startDateTime = values.date && values.startTime ? 
-            new Date(`${values.date}T${values.startTime}:00Z`).toISOString() : null;
+            new Date(`${values.date}T${values.startTime}:00+02:00`).toISOString() : null;
           
           // For end date/time, use endDate if provided, otherwise use start date
           // This allows events that end on the next day (or any other day)
           const endDate = values.endDate || values.date;
           const endDateTime = endDate && values.endTime ? 
-            new Date(`${endDate}T${values.endTime}:00Z`).toISOString() : null;
+            new Date(`${endDate}T${values.endTime}:00+02:00`).toISOString() : null;
           
           // Get location value from the location component - only if modal is available
           let locationValue = values.location || '';
@@ -1753,7 +1765,7 @@
                 <div style="flex:1;">
                   <strong>${sub.name}</strong><br>
                   <small style="color:#666;">
-                    ${formatDateLocalized(sub.date)} ${formatTimeLocalized(sub.date)} - ${formatTimeLocalized(sub.end)}
+                    ${formatDate(sub.date)} ${formatTime(sub.date)} - ${formatTime(sub.end)}
                   </small><br>
                   <small style="color:#666;">${(sub.description || '').substring(0, 100)}${(sub.description || '').length > 100 ? '...' : ''}</small>
                 </div>
@@ -1838,15 +1850,15 @@
       },
       onSubmit: async (values, close) => {
         try {
-          // Combine date and time into ISO format using UTC to prevent timezone shifts
+          // Combine date and time into ISO format using Madrid Summer offset
           const startDateTime = values.date && values.startTime ? 
-            new Date(`${values.date}T${values.startTime}:00Z`).toISOString() : null;
+            new Date(`${values.date}T${values.startTime}:00+02:00`).toISOString() : null;
           
           // For end date/time, use endDate if provided, otherwise use start date
           // This allows events that end on the next day (or any other day)
           const endDate = values.endDate || values.date;
           const endDateTime = endDate && values.endTime ? 
-            new Date(`${endDate}T${values.endTime}:00Z`).toISOString() : null;
+            new Date(`${endDate}T${values.endTime}:00+02:00`).toISOString() : null;
           
           const newSubEvent = {
             name: values.name,
