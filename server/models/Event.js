@@ -24,7 +24,10 @@ const eventSchema = new Schema({
   location: { type: String, required: true },        // Location
   title: { ...LocalizedString },                     // Localized title (legacy support)
   description: { ...LocalizedString },               // Localized description
-  image: { type: String },                           // Image URL
+  image: { 
+    type: Schema.Types.ObjectId,                      // Reference to Image model
+    ref: 'EventImage'                                 // Reference to EventImage collection
+  },                                                  // Reference to stored image
 
   // Sub-events within the main event
   sub_events: [subEventSchema],

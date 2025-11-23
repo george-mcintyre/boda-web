@@ -5,15 +5,32 @@ const { localizeEvent } = require('../utils/i18n');
 
 // Format event for API response according to README specification
 function formatEventForApi(event) {
+  // Format image data for display
+  let imageData = null;
+  if (event.image && event.image.data) {
+    // Database-stored image with populated data
+    const base64Data = event.image.data.toString('base64');
+    imageData = `data:${event.image.contentType};base64,${base64Data}`;
+  } else if (typeof event.image === 'string' && event.image.startsWith('/')) {
+    // Legacy URL-based image
+    imageData = event.image;
+  } else if (event.image && event.image._id) {
+    // Image reference (will be populated separately in admin calls)
+    if (event.image.data) {
+      const base64Data = event.image.data.toString('base64');
+      imageData = `data:${event.image.contentType};base64,${base64Data}`;
+    }
+  }
+
   return {
     id: event._id.toString(),
     name: event.name,
     date: event.date ? event.date.toISOString() : null,
     end: event.end ? event.end.toISOString() : null,
     location: event.location,
-    title: event.title ? (typeof event.title === 'string' ? event.title : event.title.get('en') || event.title.get('es')) : null,
-    description: event.description ? (typeof event.description === 'string' ? event.description : event.description.get('en') || event.description.get('es')) : null,
-    image: event.image || null,
+    title: event.title ? (typeof event.title === 'string' ? event.title : (event.title.get ? event.title.get('en') || event.title.get('es') : event.title.en || event.title.es || '')) : null,
+    description: event.description ? (typeof event.description === 'string' ? event.description : (event.description.get ? event.description.get('en') || event.description.get('es') : event.description.en || event.description.es || '')) : null,
+    image: imageData,
     sub_events: (event.sub_events || []).map(sub => ({
       name: sub.name,
       date: sub.date ? sub.date.toISOString() : null,

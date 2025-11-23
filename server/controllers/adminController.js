@@ -20,6 +20,23 @@ function formatEventForApi(event) {
     return null;
   };
 
+  // Format image data for display
+  let imageData = null;
+  if (event.image && event.image.data) {
+    // Database-stored image
+    const base64Data = event.image.data.toString('base64');
+    imageData = `data:${event.image.contentType};base64,${base64Data}`;
+  } else if (typeof event.image === 'string' && event.image.startsWith('/')) {
+    // Legacy URL-based image
+    imageData = event.image;
+  } else if (event.image && event.image._id) {
+    // Image reference (will be populated separately)
+    if (event.image.data) {
+      const base64Data = event.image.data.toString('base64');
+      imageData = `data:${event.image.contentType};base64,${base64Data}`;
+    }
+  }
+
   return {
     id: event._id.toString(),
     name: event.name,
@@ -28,7 +45,7 @@ function formatEventForApi(event) {
     location: event.location,
     title: getStringValue(event.title),
     description: getStringValue(event.description),
-    image: event.image || null,
+    image: imageData,
     sub_events: (event.sub_events || []).map(sub => ({
       name: sub.name,
       date: sub.date ? sub.date.toISOString() : null,
@@ -243,8 +260,25 @@ async function getGiftCardImages(req, res, next) {
 // ========== Events (MongoDB-backed CRUD) ==========
 async function listEventsAdmin(req, res, next) {
   try {
-    const events = await Event.find({}).sort({ date: 1, order: 1, createdAt: 1 }).lean();
-    const items = events.map(formatEventForApi);
+    const events = await Event.find({})
+      .sort({ date: 1, order: 1, createdAt: 1 })
+      .lean();
+    
+    // Manually populate image field only for ObjectId references
+    const eventsWithImages = await Promise.all(events.map(async (event) => {
+      if (event.image && typeof event.image === 'string' && event.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(event.image)) {
+        try {
+          const populatedEvent = await Event.findById(event._id).populate('image').lean();
+          return populatedEvent;
+        } catch (err) {
+          // If populate fails, return original event
+          return event;
+        }
+      }
+      return event;
+    }));
+    
+    const items = eventsWithImages.map(formatEventForApi);
     res.json(items);
   } catch (e) { next(e); }
 }
@@ -260,6 +294,16 @@ async function createEventsItem(req, res, next) {
       if (typeof value === 'object') return value;
       return undefined;
     };
+
+    // Handle image reference
+    let imageRef = undefined;
+    if (image && image.imageId) {
+      // New format - reference to uploaded image
+      imageRef = image.imageId;
+    } else if (typeof image === 'string' && image.startsWith('/')) {
+      // Legacy URL-based image
+      imageRef = image;
+    }
     
     const event = await Event.create({
       name,
@@ -268,7 +312,7 @@ async function createEventsItem(req, res, next) {
       location,
       title: convertToMap(title),
       description: convertToMap(description),
-      image,
+      image: imageRef,
       sub_events: (sub_events || []).map(sub => ({
         name: sub.name,
         date: sub.date ? new Date(sub.date) : null,
@@ -295,14 +339,28 @@ async function updateEventsItem(req, res, next) {
       return undefined;
     };
 
-    const event = await Event.findByIdAndUpdate(id, {
+    // Handle image reference
+    let imageRef = undefined;
+    if (image !== undefined) {
+      if (!image) {
+        // Image explicitly set to null/empty, remove it
+        imageRef = undefined;
+      } else if (image.imageId) {
+        // New format - reference to uploaded image
+        imageRef = image.imageId;
+      } else if (typeof image === 'string' && image.startsWith('/')) {
+        // Legacy URL-based image
+        imageRef = image;
+      }
+    }
+
+    const updateData = {
       ...(name && { name }),
       ...(date && { date: new Date(date) }),
       ...(end && { end: new Date(end) }),
       ...(location && { location }),
       ...(title && { title: convertToMap(title) }),
       ...(description && { description: convertToMap(description) }),
-      ...(image && { image }),
       ...(sub_events && { 
         sub_events: sub_events.map(sub => ({
           name: sub.name,
@@ -312,7 +370,14 @@ async function updateEventsItem(req, res, next) {
           icon: sub.icon
         }))
       })
-    }, { new: true });
+    };
+
+    // Add image reference to update if provided
+    if (imageRef !== undefined) {
+      updateData.image = imageRef;
+    }
+
+    const event = await Event.findByIdAndUpdate(id, updateData, { new: true });
 
     if (!event) return res.status(404).json({ error: 'Event not found' });
 
@@ -557,25 +622,29 @@ async function uploadEventImage(req, res, next) {
       return res.status(400).json({ error: 'File too large. Maximum size is 5MB.' });
     }
 
-    // Generate unique filename
+    // Read the file and store in database
     const fs = require('fs');
-    const path = require('path');
-    const ext = path.extname(req.file.originalname);
-    const filename = `event_${Date.now()}_${Math.random().toString(36).substring(2)}${ext}`;
-    const filepath = path.join(__dirname, '..', 'public', 'assets', 'images', 'events', filename);
+    const imageData = fs.readFileSync(req.file.path);
+    const { EventImage } = require('../models');
+    
+    // Clean up temporary file
+    fs.unlinkSync(req.file.path);
 
-    // Ensure directory exists
-    const dir = path.dirname(filepath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
+    // Store image in database
+    const eventImage = await EventImage.create({
+      data: imageData,
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
 
-    // Move file to public directory
-    fs.renameSync(req.file.path, filepath);
-
-    // Return the public URL
-    const imageUrl = `/assets/images/events/${filename}`;
-    res.json({ url: imageUrl });
+    // Return the image ID and metadata
+    res.json({ 
+      imageId: eventImage._id.toString(),
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
 
   } catch (e) { next(e); }
 }

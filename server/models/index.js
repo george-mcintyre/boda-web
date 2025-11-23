@@ -2,6 +2,7 @@ module.exports = {
   Admin: require('./Admin'),
   Guest: require('./Guest'),
   Event: require('./Event'),
+  EventImage: require('./EventImage'),
   EventChoice: require('./EventChoice'),
   Message: require('./Message'),
   Comment: require('./Comment'),

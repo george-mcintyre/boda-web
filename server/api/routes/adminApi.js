@@ -42,6 +42,91 @@ router.put('/events/:id', auth('admin'), adminCtrl.updateEventsItem);
 router.delete('/events/:id', auth('admin'), adminCtrl.deleteEventsItem);
 router.post('/events/upload-image', auth('admin'), upload.single('image'), adminCtrl.uploadEventImage);
 
+// Event image serving endpoints
+router.get('/events/:eventId/image', auth('admin'), async (req, res, next) => {
+  try {
+    const { eventId } = req.params;
+    const { Event, EventImage } = require('../../models');
+    const event = await Event.findById(eventId).populate('image').lean();
+    
+    if (!event) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+    if (!event.image) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    // Handle both new format (EventImage reference) and legacy format (URL)
+    if (event.image.data && event.image.contentType) {
+      // New format - database-stored image
+      res.setHeader('Content-Type', event.image.contentType);
+      res.setHeader('Content-Length', event.image.data.length);
+      res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+      res.send(event.image.data);
+    } else if (typeof event.image === 'string' && event.image.startsWith('/')) {
+      // Legacy format - redirect to file system
+      res.redirect(event.image);
+    } else {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get('/events/:eventId/image/thumbnail', auth('admin'), async (req, res, next) => {
+  try {
+    const { eventId } = req.params;
+    const { Event, EventImage } = require('../../models');
+    const event = await Event.findById(eventId).populate('image').lean();
+    
+    if (!event) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+    if (!event.image) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    // Handle both formats
+    if (event.image.data && event.image.contentType) {
+      // New format - for now return full image (could implement thumbnail generation)
+      res.setHeader('Content-Type', event.image.contentType);
+      res.setHeader('Content-Length', event.image.data.length);
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.send(event.image.data);
+    } else if (typeof event.image === 'string' && event.image.startsWith('/')) {
+      // Legacy format - redirect to file system
+      res.redirect(event.image);
+    } else {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+  } catch (e) {
+    next(e);
+  }
+});
+
+// Direct image serving by image ID
+router.get('/images/:imageId', auth('admin'), async (req, res, next) => {
+  try {
+    const { imageId } = req.params;
+    const { EventImage } = require('../../models');
+    const image = await EventImage.findById(imageId).lean();
+    
+    if (!image) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    res.setHeader('Content-Type', image.contentType);
+    res.setHeader('Content-Length', image.data.length);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(image.data);
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Guests & Party Management (existing functionality)
 router.get('/guests', auth('admin'), guestCtrl.list);
 router.post('/guests', auth('admin'), guestCtrl.create);

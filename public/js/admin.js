@@ -1469,7 +1469,7 @@
           }
           
           // Handle image upload
-          let imageUrl = event.image || null;
+          let imageReference = null;
           const imageFile = document.getElementById('f_image')?.files[0];
           if (imageFile) {
             const formData = new FormData();
@@ -1481,8 +1481,17 @@
             });
             if (uploadRes.ok) {
               const uploadData = await uploadRes.json();
-              imageUrl = uploadData.url;
+              // Store the image ID for the event
+              imageReference = {
+                imageId: uploadData.imageId
+              };
             }
+          } else if (event.image && !event.image.startsWith('/')) {
+            // Keep existing database-stored image reference
+            imageReference = event.image;
+          } else if (event.image && event.image.startsWith('/')) {
+            // Legacy URL-based image - keep as is for now
+            imageReference = event.image;
           }
           
           const eventData = {
@@ -1492,7 +1501,7 @@
             location: locationValue,
             title: values.title,
             description: values.description,
-            image: imageUrl
+            image: imageReference
           };
           
           const url = isNew ? '/api/admin/events' : `/api/admin/events/${event.id}`;
