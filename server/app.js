@@ -49,9 +49,10 @@ app.use(helmet({
         "https://unpkg.com",
         "https://fonts.googleapis.com"
       ],
-      "img-src": ["'self'", "data:", "https:"],
+      "img-src": ["'self'", "data:", "https:", "http://staticmap.openstreetmap.de"],
       "font-src": ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
-      "connect-src": ["'self'", "*"]
+      "connect-src": ["'self'", "*"],
+      "frame-src": ["'self'", "https://*.tile.openstreetmap.org"],
     }
   },
   crossOriginEmbedderPolicy: false,

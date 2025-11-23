@@ -6,6 +6,9 @@
     <title data-i18n="admin:pageTitle">Panel de Administración - Boda de Iluminada & George</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
 </head>
 <body>
   <header>
@@ -130,13 +133,24 @@
         return;
       }
       
-      // If token exists, load full admin script
-      const script = document.createElement('script');
-      script.src = 'js/admin.js';
-      script.onload = () => {
-        console.log('Admin script loaded correctly');
+      // Load Leaflet.js first, then admin script
+      const leafletScript = document.createElement('script');
+      leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      leafletScript.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+      leafletScript.crossOrigin = '';
+      
+      leafletScript.onload = () => {
+        console.log('Leaflet script loaded correctly');
+        // Load admin script after Leaflet is loaded
+        const adminScript = document.createElement('script');
+        adminScript.src = 'js/admin.js';
+        adminScript.onload = () => {
+          console.log('Admin script loaded correctly');
+        };
+        document.body.appendChild(adminScript);
       };
-      document.body.appendChild(script);
+      
+      document.body.appendChild(leafletScript);
     });
   </script>
 </body>

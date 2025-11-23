@@ -212,20 +212,12 @@
     // Update map preview function
     function updateMapPreview(div, lat, lng) {
       if (lat && lng) {
-        // Use OpenStreetMap instead of Google Maps to avoid API key issues
-        const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${(lng-0.01).toFixed(6)},${(lat-0.01).toFixed(6)},${(lng+0.01).toFixed(6)},${(lat+0.01).toFixed(6)}&layer=mapnik&marker=${lat.toFixed(6)},${lng.toFixed(6)}`;
+        // Use Leaflet.js to create an interactive map - most reliable approach
         const osmUrl = `https://www.openstreetmap.org/?mlat=${lat.toFixed(6)}&mlon=${lng.toFixed(6)}#map=16/${lat.toFixed(6)}/${lng.toFixed(6)}`;
         
         div.innerHTML = `
           <div style="position:relative;width:100%;height:100%;border-radius:8px;overflow:hidden;">
-            <iframe 
-              src="${mapUrl}" 
-              width="100%" 
-              height="100%" 
-              frameborder="0" 
-              style="border:0;border-radius:8px;"
-              allowfullscreen>
-            </iframe>
+            <div id="map-${lat.toFixed(6)}-${lng.toFixed(6)}" style="width:100%;height:100%;border-radius:8px;"></div>
             <div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.7);color:white;padding:5px 10px;border-radius:4px;font-size:12px;z-index:1000;">
               ${lat.toFixed(4)}, ${lng.toFixed(4)}
             </div>
@@ -234,6 +226,60 @@
             </a>
           </div>
         `;
+        
+        // Initialize the map after DOM update
+        setTimeout(() => {
+          try {
+            // Check if Leaflet is available
+            if (typeof L !== 'undefined') {
+              const mapId = `map-${lat.toFixed(6)}-${lng.toFixed(6)}`;
+              const mapDiv = document.getElementById(mapId);
+              
+              if (mapDiv) {
+                const map = L.map(mapId).setView([parseFloat(lat), parseFloat(lng)], 16);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                  attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                
+                L.marker([parseFloat(lat), parseFloat(lng)]).addTo(map);
+              }
+            } else {
+              // Fallback: Show a simple coordinate display with map link
+              const mapId = `map-${lat.toFixed(6)}-${lng.toFixed(6)}`;
+              const mapDiv = document.getElementById(mapId);
+              
+              if (mapDiv) {
+                mapDiv.innerHTML = `
+                  <div style="width:100%;height:100%;background:linear-gradient(45deg,#f0f0f0,#e0e0e0);display:flex;align-items:center;justify-content:center;border-radius:8px;">
+                    <div style="text-align:center;color:#666;">
+                      <i class="fas fa-map-marker-alt" style="font-size:2em;color:#e74c3c;margin-bottom:10px;"></i>
+                      <div>Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
+                      <small>Interactive map requires Leaflet.js</small>
+                    </div>
+                  </div>
+                `;
+              }
+            }
+          } catch (error) {
+            console.error('Map initialization error:', error);
+            // Graceful fallback
+            const mapId = `map-${lat.toFixed(6)}-${lng.toFixed(6)}`;
+            const mapDiv = document.getElementById(mapId);
+            
+            if (mapDiv) {
+              mapDiv.innerHTML = `
+                <div style="width:100%;height:100%;background:linear-gradient(45deg,#f0f0f0,#e0e0e0);display:flex;align-items:center;justify-content:center;border-radius:8px;">
+                  <div style="text-align:center;color:#666;">
+                    <i class="fas fa-map-marker-alt" style="font-size:2em;color:#e74c3c;margin-bottom:10px;"></i>
+                    <div>Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
+                    <small>Open in Maps to view</small>
+                  </div>
+                </div>
+              `;
+            }
+          }
+        }, 100);
       }
     }
     
