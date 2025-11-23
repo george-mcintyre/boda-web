@@ -5,14 +5,29 @@ const { getAvailableGiftCardImages, isValidImageNumber } = require('../utils/ima
 
 // Format event for API response according to README specification
 function formatEventForApi(event) {
+  // Helper function to extract string value from either Map or plain object
+  const getStringValue = (value) => {
+    if (!value) return null;
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object') {
+      // Handle Map objects (newer format)
+      if (typeof value.get === 'function') {
+        return value.get('en') || value.get('es') || value.get('default') || '';
+      }
+      // Handle plain objects (legacy format)
+      return value.en || value.es || value.default || '';
+    }
+    return null;
+  };
+
   return {
     id: event._id.toString(),
     name: event.name,
     date: event.date ? event.date.toISOString() : null,
     end: event.end ? event.end.toISOString() : null,
     location: event.location,
-    title: event.title ? (typeof event.title === 'string' ? event.title : event.title.get('en') || event.title.get('es')) : null,
-    description: event.description ? (typeof event.description === 'string' ? event.description : event.description.get('en') || event.description.get('es')) : null,
+    title: getStringValue(event.title),
+    description: getStringValue(event.description),
     image: event.image || null,
     sub_events: (event.sub_events || []).map(sub => ({
       name: sub.name,
@@ -523,11 +538,53 @@ async function deleteCashGiftCard(req, res, next) {
   } catch (e) { next(e); }
 }
 
+// Image upload for events
+async function uploadEventImage(req, res, next) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(req.file.mimetype)) {
+      return res.status(400).json({ error: 'Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.' });
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (req.file.size > maxSize) {
+      return res.status(400).json({ error: 'File too large. Maximum size is 5MB.' });
+    }
+
+    // Generate unique filename
+    const fs = require('fs');
+    const path = require('path');
+    const ext = path.extname(req.file.originalname);
+    const filename = `event_${Date.now()}_${Math.random().toString(36).substring(2)}${ext}`;
+    const filepath = path.join(__dirname, '..', 'public', 'assets', 'images', 'events', filename);
+
+    // Ensure directory exists
+    const dir = path.dirname(filepath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    // Move file to public directory
+    fs.renameSync(req.file.path, filepath);
+
+    // Return the public URL
+    const imageUrl = `/assets/images/events/${filename}`;
+    res.json({ url: imageUrl });
+
+  } catch (e) { next(e); }
+}
+
 module.exports = {
   // gifts (DB-backed)
   listGifts, createGift, updateGift, deleteGift, getGiftChoices, getGiftCardImages,
   // agenda (DB-backed)
-  listEventsAdmin, createEventsItem, updateEventsItem, deleteEventsItem,
+  listEventsAdmin, createEventsItem, updateEventsItem, deleteEventsItem, uploadEventImage,
   // menu (DB-backed)
   listMenus, createMenu, updateMenu, deleteMenu,
   // settings (DB-backed)
