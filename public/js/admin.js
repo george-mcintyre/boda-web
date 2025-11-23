@@ -97,6 +97,141 @@
     return guests;
   }
 
+  // Image preloading and caching
+  let imageCache = {};
+  let imagesPreloaded = false;
+
+  function preloadGiftCardImages() {
+    if (imagesPreloaded) return;
+    
+    // Preload all 30 gift card images
+    for (let i = 1; i <= 30; i++) {
+      const paddedNumber = String(i).padStart(2, '0');
+      const imageUrl = `/assets/images/gift-cards/image_${paddedNumber}.jpg`;
+      
+      const img = new Image();
+      img.src = imageUrl;
+      
+      // Cache the image for instant access
+      imageCache[i] = {
+        id: i,
+        label: `Gift Card ${i}`,
+        imageUrl: imageUrl,
+        element: img
+      };
+    }
+    
+    imagesPreloaded = true;
+    console.log('Preloaded all 30 gift card images');
+  }
+
+  function getCachedImageOptions(selectedValue) {
+    const options = [];
+    for (let i = 1; i <= 30; i++) {
+      options.push({
+        value: i,
+        label: `Gift Card ${i}`,
+        imageUrl: imageCache[i].imageUrl,
+        cached: true
+      });
+    }
+    return options;
+  }
+
+  // Custom image dropdown component
+  function createImageDropdown(id, name, options, selectedValue) {
+    // Ensure styles are loaded
+    addImageDropdownStyles();
+    
+    const selectedOption = options.find(opt => String(opt.value) === String(selectedValue)) || options[0];
+    
+    const container = document.createElement('div');
+    container.className = 'image-dropdown-container';
+    
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.id = `${id}_btn`;
+    button.className = 'image-dropdown-button';
+    button.setAttribute('aria-expanded', 'false');
+    
+    button.innerHTML = `
+      <img src="${selectedOption.imageUrl}" alt="Selected image">
+      <span>${selectedOption.label}</span>
+      <i class="fas fa-chevron-down"></i>
+    `;
+    
+    const dropdown = document.createElement('div');
+    dropdown.id = `${id}_dropdown`;
+    dropdown.className = 'image-dropdown-menu';
+    
+    options.forEach(option => {
+      const optionDiv = document.createElement('div');
+      optionDiv.className = 'image-dropdown-option';
+      if (String(option.value) === String(selectedValue)) {
+        optionDiv.classList.add('selected');
+      }
+      
+      optionDiv.innerHTML = `
+        <img src="${option.imageUrl}" alt="${option.label}">
+        <span>${option.label}</span>
+      `;
+      
+      optionDiv.addEventListener('click', () => {
+        // Update button content
+        button.innerHTML = `
+          <img src="${option.imageUrl}" alt="Selected image">
+          <span>${option.label}</span>
+          <i class="fas fa-chevron-down"></i>
+        `;
+        
+        // Update selected state
+        dropdown.querySelectorAll('.image-dropdown-option').forEach(opt => {
+          opt.classList.remove('selected');
+        });
+        optionDiv.classList.add('selected');
+        
+        // Update hidden input value
+        const hiddenInput = document.getElementById(id);
+        hiddenInput.value = option.value;
+        
+        // Close dropdown
+        dropdown.style.display = 'none';
+        button.setAttribute('aria-expanded', 'false');
+      });
+      
+      dropdown.appendChild(optionDiv);
+    });
+    
+    // Toggle dropdown
+    button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isVisible = dropdown.style.display === 'block';
+      dropdown.style.display = isVisible ? 'none' : 'block';
+      button.setAttribute('aria-expanded', !isVisible);
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!container.contains(e.target)) {
+        dropdown.style.display = 'none';
+        button.setAttribute('aria-expanded', 'false');
+      }
+    });
+    
+    // Create hidden input for form submission
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.id = id;
+    hiddenInput.name = name;
+    hiddenInput.value = selectedOption.value;
+    
+    container.appendChild(button);
+    container.appendChild(dropdown);
+    container.appendChild(hiddenInput);
+    
+    return container;
+  }
+
   // Reusable modal form
   function openFormModal({ title = 'Form', submitText = 'Save', fields = [], initialValues = {}, onSubmit }){
     const overlay = document.createElement('div');
@@ -116,22 +251,45 @@
           const val = initialValues[f.name] ?? f.default ?? '';
           const baseStyle = 'width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;';
           let inputHtml = '';
+          
           if (f.type === 'textarea') {
             inputHtml = `<textarea id="${id}" name="${f.name}" rows="${f.rows||3}" style="${baseStyle}">${val!==undefined?String(val):''}</textarea>`;
           } else if (f.type === 'select') {
-            const opts = (f.options||[]).map(opt => {
-              const v = typeof opt === 'string' ? opt : opt.value;
-              const t = typeof opt === 'string' ? opt : opt.label;
-              const sel = String(val) === String(v) ? 'selected' : '';
-              return `<option value="${v}" ${sel}>${t}</option>`;
-            }).join('');
-            inputHtml = `<select id="${id}" name="${f.name}" style="${baseStyle}">${opts}</select>`;
+            // Check if this is an image dropdown
+            if (f.showImages && f.options && f.options.length > 0 && f.options[0].imageUrl) {
+              const imageOptions = f.options.map(opt => ({
+                value: opt.value,
+                label: opt.label,
+                imageUrl: opt.imageUrl
+              }));
+              
+              // Create a placeholder div that will be replaced after the form is created
+              inputHtml = `<div id="image-dropdown-placeholder-${f.name}" style="width:100%;"></div>`;
+              
+              // Store the image dropdown creation for after the form is rendered
+              setTimeout(() => {
+                const placeholder = document.getElementById(`image-dropdown-placeholder-${f.name}`);
+                if (placeholder) {
+                  const container = createImageDropdown(id, f.name, imageOptions, val);
+                  placeholder.parentNode.replaceChild(container, placeholder);
+                }
+              }, 0);
+            } else {
+              const opts = (f.options||[]).map(opt => {
+                const v = typeof opt === 'string' ? opt : opt.value;
+                const t = typeof opt === 'string' ? opt : opt.label;
+                const sel = String(val) === String(v) ? 'selected' : '';
+                return `<option value="${v}" ${sel}>${t}</option>`;
+              }).join('');
+              inputHtml = `<select id="${id}" name="${f.name}" style="${baseStyle}">${opts}</select>`;
+            }
           } else {
             const type = f.type || 'text';
             inputHtml = `<input id="${id}" name="${f.name}" type="${type}" value="${val!==undefined?String(val):''}" style="${baseStyle}">`;
           }
+          
           const help = f.help ? `<small style="display:block;color:#6c757d;margin-top:4px;">${f.help}</small>` : '';
-          return `<div style="margin-bottom:14px;">${label}${inputHtml}${help}</div>`;
+          return `<div style="margin-bottom:14px;" data-field="${f.name}">${label}${inputHtml}${help}</div>`;
         }).join('')}
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;">
           <button type="button" id="mfCancel" class="admin-action" style="background:#6c757d;color:#fff;border:none;padding:10px 16px;border-radius:8px;">Cancel</button>
@@ -168,6 +326,114 @@
       });
     });
     return { close };
+  }
+
+  // Add styles for custom image dropdown
+  function addImageDropdownStyles(){
+    if (document.getElementById('image-dropdown-styles')) return;
+    
+    const style = document.createElement('style');
+    style.id = 'image-dropdown-styles';
+    style.textContent = `
+      .image-dropdown-container {
+        position: relative;
+        width: 100%;
+      }
+      
+      .image-dropdown-button {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        text-align: left;
+        transition: all 0.3s ease;
+      }
+      
+      .image-dropdown-button:hover {
+        border-color: #007bff;
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+      }
+      
+      .image-dropdown-button img {
+        width: 40px;
+        height: 25px;
+        object-fit: cover;
+        border-radius: 4px;
+        flex-shrink: 0;
+      }
+      
+      .image-dropdown-button span {
+        flex: 1;
+        font-weight: 500;
+      }
+      
+      .image-dropdown-button i {
+        color: #666;
+        transition: transform 0.3s ease;
+      }
+      
+      .image-dropdown-button[aria-expanded="true"] i {
+        transform: rotate(180deg);
+      }
+      
+      .image-dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        display: none;
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 2px;
+      }
+      
+      .image-dropdown-option {
+        padding: 8px 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid #f0f0f0;
+        transition: background-color 0.2s ease;
+      }
+      
+      .image-dropdown-option:last-child {
+        border-bottom: none;
+      }
+      
+      .image-dropdown-option:hover {
+        background-color: #f8f9fa;
+      }
+      
+      .image-dropdown-option img {
+        width: 40px;
+        height: 25px;
+        object-fit: cover;
+        border-radius: 4px;
+        flex-shrink: 0;
+      }
+      
+      .image-dropdown-option span {
+        flex: 1;
+        font-weight: 500;
+      }
+      
+      .image-dropdown-option.selected {
+        background-color: #e7f3ff;
+        color: #0056b3;
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   // Generic table renderer
@@ -576,14 +842,15 @@
     activate('gifts');
     setLoading('Loading gift list...');
     
-    // Load gifts and available images
-    const [giftsRes, imagesRes] = await Promise.all([
-      api('/api/admin/gifts'),
-      api('/api/admin/gift-images')
-    ]);
+    // Preload gift card images for instant dropdown access
+    preloadGiftCardImages();
     
+    // Load gifts (we'll use cached images for the dropdown)
+    const giftsRes = await api('/api/admin/gifts');
     const gifts = giftsRes.ok ? await giftsRes.json() : [];
-    const availableImages = imagesRes.ok ? await imagesRes.json() : [];
+    
+    // Use cached image options for instant access
+    const imageOptions = getCachedImageOptions();
     
     const rows = (gifts||[]).map(it => `
       <tr>
@@ -625,7 +892,8 @@
             { name:'name', label:'Name', required:true },
             { name:'description', label:'Description', type:'textarea', required:true },
             { name:'image', label:'Image', type:'select', required:true, 
-              options: availableImages.map(img => ({ value: img.id, label: `Image ${img.id}` })),
+              options: imageOptions,
+              showImages: true,
               help: 'Select a gift card image' 
             },
             { name:'available', label:'Number Available', type:'number', min:'0', required:true },
@@ -671,7 +939,8 @@
           { name:'name', label:'Name', required:true },
           { name:'description', label:'Description', type:'textarea', required:true },
           { name:'image', label:'Image', type:'select', required:true,
-            options: availableImages.map(img => ({ value: img.id, label: `Image ${img.id}` })),
+            options: imageOptions,
+            showImages: true,
             help: 'Select a gift card image' 
           },
           { name:'available', label:'Number Available', type:'number', min:'0', required:true },
@@ -1081,6 +1350,9 @@
   function showTab(tab){
     // Add styles for party management
     addPartyStyles();
+    
+    // Preload gift card images when admin panel first loads
+    preloadGiftCardImages();
     
     switch(tab){
       case 'guests': return showGuests();
