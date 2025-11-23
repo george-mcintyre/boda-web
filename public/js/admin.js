@@ -2151,43 +2151,283 @@
   async function showSettings(){
     activate('configuration');
     setLoading('Loading settings...');
-    const res = await api('/api/config/event/blocked');
-    const cfg = res.ok ? await res.json() : {};
-    const isBlocked = !!(cfg.event && cfg.event.blocked);
-    const reason = (cfg.event && cfg.event.reason) || '';
+    
+    // Load both feature toggles and event blocking settings
+    const [settingsRes, blockedRes] = await Promise.all([
+      api('/api/admin/settings'),
+    ]);
+    
+    const settings = settingsRes.ok ? await settingsRes.json() : {
+      guestsEnabled: false,
+      eventsEnabled: false,
+      menuEnabled: false,
+      messagesEnabled: false,
+      giftsEnabled: false
+    };
+    
     content.innerHTML = `
       <div class="admin-content">
         <h3><i class="fas fa-cog"></i> Settings</h3>
-        <div class="config-grid">
-          <div class="config-card">
-            <h4>Event lock</h4>
-            <p>Current state: <strong>${isBlocked?'Locked':'Open'}</strong></p>
-            ${isBlocked?`<p>Reason: ${reason||'-'}</p>`:''}
-            <div style="display:flex; gap:8px; margin-top:8px;">
-              <button id="btnLock" class="admin-action ${isBlocked?'disabled':''}" ${isBlocked?'disabled':''}><i class="fas fa-lock"></i> Lock</button>
-              <button id="btnUnlock" class="admin-action ${!isBlocked?'disabled':''}" ${!isBlocked?'disabled':''}><i class="fas fa-lock-open"></i> Unlock</button>
-            </div>
+        
+        <!-- Feature Toggles -->
+        <div class="settings-section">
+          <h4><i class="fas fa-toggle-on"></i> Feature Toggles</h4>
+          <p style="color:#666;margin-bottom:20px;">Control which features are available to guests</p>
+          
+          <div class="feature-toggles-grid">
+            ${[
+              { key: 'guestsEnabled', label: 'Enable Guest Area', icon: 'fa-users', desc: 'Allow guests to login and manage guests in their party' },
+              { key: 'eventsEnabled', label: 'Show Wedding Events', icon: 'fa-calendar-alt', desc: 'Show the wedding event calendar and allow guests to confirm their attendance' },
+              { key: 'menuEnabled', label: 'Menu', icon: 'fa-utensils', desc: 'Show Guest Menu selection and Preferences' },
+              { key: 'messagesEnabled', label: 'Messages', icon: 'fa-comments', desc: 'Show Messages' },
+              { key: 'giftsEnabled', label: 'Gifts', icon: 'fa-gift', desc: 'Show Gift Registry' }
+            ].map(feature => `
+              <div class="feature-toggle-card ${settings[feature.key] ? 'enabled' : 'disabled'}">
+                <div class="feature-toggle-header">
+                  <i class="fas ${feature.icon}"></i>
+                  <h5>${feature.label}</h5>
+                  <div class="toggle-switch">
+                    <input type="checkbox" id="toggle-${feature.key}" ${settings[feature.key] ? 'checked' : ''} 
+                           onchange="updateFeatureToggle('${feature.key}', this.checked)">
+                    <label for="toggle-${feature.key}"></label>
+                  </div>
+                </div>
+                <p class="feature-desc">${feature.desc}</p>
+                <div class="feature-status">
+                  <span class="status-badge ${settings[feature.key] ? 'active' : 'inactive'}">
+                    ${settings[feature.key] ? 'Enabled' : 'Disabled'}
+                  </span>
+                </div>
+              </div>
+            `).join('')}
           </div>
         </div>
+        
+        </div>
       </div>`;
+    
+    // Add styles for the feature toggles
+    addSettingsStyles();
+    
     const btnLock = document.getElementById('btnLock');
     const btnUnlock = document.getElementById('btnUnlock');
-    if (btnLock) btnLock.addEventListener('click', async ()=>{
-      openFormModal({
-        title: 'Lock event', submitText: 'Lock',
-        fields: [ { name:'reason', label:'Reason', type:'textarea' } ],
-        onSubmit: async (values, close) => {
-          const r = await api('/api/config/event/blocked', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
-          if (!r.ok) throw new Error('Failed to lock');
-          close();
-          showSettings();
-        }
+  }
+  
+  // Update feature toggle function (global scope)
+  window.updateFeatureToggle = async function(featureKey, enabled) {
+    try {
+      const currentSettings = {
+        eventsEnabled: document.getElementById('toggle-eventsEnabled').checked,
+        guestsEnabled: document.getElementById('toggle-guestsEnabled').checked,
+        menuEnabled: document.getElementById('toggle-menuEnabled').checked,
+        messagesEnabled: document.getElementById('toggle-messagesEnabled').checked,
+        giftsEnabled: document.getElementById('toggle-giftsEnabled').checked
+      };
+      
+      const r = await api('/api/admin/settings', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(currentSettings)
       });
-    });
-    if (btnUnlock) btnUnlock.addEventListener('click', async ()=>{
-      const r = await api('/api/config/event/blocked', { method:'DELETE' });
-      if (r.ok) showSettings(); else notify('Error','error');
-    });
+      
+      if (!r.ok) throw new Error('Failed to update settings');
+      
+      // Update visual feedback
+      const card = document.querySelector(`#toggle-${featureKey}`).closest('.feature-toggle-card');
+      const badge = card.querySelector('.status-badge');
+      
+      if (enabled) {
+        card.classList.remove('disabled');
+        card.classList.add('enabled');
+        badge.textContent = 'Enabled';
+        badge.classList.remove('inactive');
+        badge.classList.add('active');
+      } else {
+        card.classList.remove('enabled');
+        card.classList.add('disabled');
+        badge.textContent = 'Disabled';
+        badge.classList.remove('active');
+        badge.classList.add('inactive');
+      }
+      
+      notify(`${featureKey} ${enabled ? 'enabled' : 'disabled'} successfully`);
+    } catch (error) {
+      // Revert the toggle on error
+      const toggle = document.getElementById(`toggle-${featureKey}`);
+      toggle.checked = !enabled;
+      notify('Error updating setting: ' + error.message, 'error');
+    }
+  };
+  
+  // Add styles for settings page
+  function addSettingsStyles(){
+    if (document.getElementById('settings-styles')) return;
+    
+    const style = document.createElement('style');
+    style.id = 'settings-styles';
+    style.textContent = `
+      .settings-section {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      }
+      
+      .settings-section h4 {
+        margin: 0 0 8px 0;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      
+      .settings-section h4 i {
+        color: #8B5A96;
+      }
+      
+      .feature-toggles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+        margin-top: 16px;
+      }
+      
+      .feature-toggle-card {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s ease;
+        background: #fff;
+      }
+      
+      .feature-toggle-card.enabled {
+        border-color: #28a745;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fff9 100%);
+      }
+      
+      .feature-toggle-card.disabled {
+        border-color: #dc3545;
+        background: linear-gradient(135deg, #ffffff 0%, #fff8f8 100%);
+      }
+      
+      .feature-toggle-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      
+      .feature-toggle-header i {
+        font-size: 1.5em;
+        color: #8B5A96;
+      }
+      
+      .feature-toggle-header h5 {
+        margin: 0;
+        flex: 1;
+        font-size: 1.1em;
+        color: #333;
+      }
+      
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+      }
+      
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      
+      .toggle-switch label {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+      }
+      
+      .toggle-switch label:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+      }
+      
+      .toggle-switch input:checked + label {
+        background-color: #28a745;
+      }
+      
+      .toggle-switch input:checked + label:before {
+        transform: translateX(26px);
+      }
+      
+      .toggle-switch input:disabled + label {
+        background-color: #e9ecef;
+        cursor: not-allowed;
+      }
+      
+      .feature-desc {
+        color: #666;
+        font-size: 0.9em;
+        margin: 0 0 12px 0;
+        line-height: 1.4;
+      }
+      
+      .feature-status {
+        text-align: right;
+      }
+      
+      .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+      
+      .status-badge.active {
+        background: #d4edda;
+        color: #155724;
+      }
+      
+      .status-badge.inactive {
+        background: #f8d7da;
+        color: #721c24;
+      }
+      
+      .config-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        border-left: 4px solid #007bff;
+      }
+      
+      .config-card h5 {
+        margin: 0 0 10px 0;
+        color: #333;
+      }
+      
+      @media (max-width: 768px) {
+        .feature-toggles-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   // Router for tabs

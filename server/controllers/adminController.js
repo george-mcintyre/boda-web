@@ -534,11 +534,11 @@ async function getSettings(req, res, next) {
   try {
     const cfg = await getConfigDoc();
     res.json({
-      eventsEnabled: cfg.eventsEnabled,
-      guestsEnabled: cfg.guestsEnabled,
-      menuEnabled: cfg.menuEnabled,
-      messagesEnabled: cfg.messagesEnabled,
-      giftsEnabled: cfg.giftsEnabled
+      guestsEnabled: cfg.guestsEnabled !== undefined ? cfg.guestsEnabled : true,
+      eventsEnabled: cfg.eventsEnabled !== undefined ? cfg.eventsEnabled : true,
+      menuEnabled: cfg.menuEnabled !== undefined ? cfg.menuEnabled : true,
+      messagesEnabled: cfg.messagesEnabled !== undefined ? cfg.messagesEnabled : true,
+      giftsEnabled: cfg.giftsEnabled !== undefined ? cfg.giftsEnabled : true
     });
   } catch (e) { next(e); }
 }
@@ -550,22 +550,22 @@ async function updateSettings(req, res, next) {
     const cfg = await getConfigDoc();
     await Config.updateOne({ _id: cfg._id }, {
       $set: {
-        ...(eventsEnabled !== undefined && { eventsEnabled }),
         ...(guestsEnabled !== undefined && { guestsEnabled }),
+        ...(eventsEnabled !== undefined && { eventsEnabled }),
         ...(menuEnabled !== undefined && { menuEnabled }),
         ...(messagesEnabled !== undefined && { messagesEnabled }),
         ...(giftsEnabled !== undefined && { giftsEnabled })
       }
     });
 
-    // Return updated settings
+    // Return updated settings with defaults for any missing values
     const updatedCfg = await Config.findById(cfg._id);
     res.json({
-      eventsEnabled: updatedCfg.eventsEnabled,
-      guestsEnabled: updatedCfg.guestsEnabled,
-      menuEnabled: updatedCfg.menuEnabled,
-      messagesEnabled: updatedCfg.messagesEnabled,
-      giftsEnabled: updatedCfg.giftsEnabled
+      guestsEnabled: updatedCfg.guestsEnabled !== undefined ? updatedCfg.guestsEnabled : true,
+      eventsEnabled: updatedCfg.eventsEnabled !== undefined ? updatedCfg.eventsEnabled : true,
+      menuEnabled: updatedCfg.menuEnabled !== undefined ? updatedCfg.menuEnabled : true,
+      messagesEnabled: updatedCfg.messagesEnabled !== undefined ? updatedCfg.messagesEnabled : true,
+      giftsEnabled: updatedCfg.giftsEnabled !== undefined ? updatedCfg.giftsEnabled : true
     });
   } catch (e) { next(e); }
 }

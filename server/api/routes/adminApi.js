@@ -165,11 +165,6 @@ router.get('/gift-images', auth('admin'), adminCtrl.getGiftCardImages);
 // Gift choices overview
 router.get('/gift-choices', auth('admin'), adminCtrl.getGiftChoices);
 
-// Legacy settings (to be migrated)
-router.get('/config/event/blocked', auth('admin'), adminCtrl.getBlockedEvent);
-router.put('/config/event/blocked', auth('admin'), adminCtrl.setBlockedEvent);
-router.delete('/config/event/blocked', auth('admin'), adminCtrl.clearBlockedEvent);
-
 // Settings / Feature Toggles
 router.get('/settings', auth('admin'), adminCtrl.getSettings);
 router.put('/settings', auth('admin'), adminCtrl.updateSettings);
