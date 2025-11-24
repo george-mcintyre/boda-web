@@ -7,6 +7,7 @@ module.exports = {
   Message: require('./Message'),
   Comment: require('./Comment'),
   Menu: require('./Menu'),
+  MenuPart: require('./Menu'),
   MenuChoice: require('./MenuChoice'),
   Gift: require('./Gift'),
   GiftChoice: require('./GiftChoice'),

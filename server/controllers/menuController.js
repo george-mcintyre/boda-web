@@ -1,25 +1,16 @@
-const { Menu, MenuChoice, Guest } = require('../models');
-
-// Helper to get localized string from Map or object
-function getLocalizedString(value) {
-  if (!value) return '';
-  if (typeof value === 'string') return value;
-  if (value instanceof Map) return value.get('en') || value.get('es') || '';
-  if (typeof value === 'object') return value.en || value.es || '';
-  return '';
-}
+const { MenuPart, MenuChoice, Guest } = require('../models');
 
 // Helper to format menu part for API response
 function formatMenuPartForApi(menuPart, index) {
   return {
-    id: `menu-part-${index}`,
+    id: menuPart._id.toString(),
     course: menuPart.course,
-    label: getLocalizedString(menuPart.label),
+    label: menuPart.label,
     options: (menuPart.options || []).map((option, optIndex) => ({
-      id: `option-${optIndex}`,
-      label: getLocalizedString(option.label),
+      id: option._id.toString(),
+      label: option.label,
       image: option.image || null,
-      description: getLocalizedString(option.description)
+      description: option.description
     }))
   };
 }
@@ -27,12 +18,8 @@ function formatMenuPartForApi(menuPart, index) {
 // Guest: list menu parts and options
 async function listMenu(req, res, next) {
   try {
-    const menu = await Menu.findOne();
-    if (!menu) {
-      return res.json([]);
-    }
-    
-    const formatted = menu.parts.map((part, index) => formatMenuPartForApi(part, index));
+    const menuParts = await MenuPart.find({}).sort({ course: 1, createdAt: 1 });
+    const formatted = menuParts.map(part => formatMenuPartForApi(part));
     res.json(formatted);
   } catch (e) {
     next(e);

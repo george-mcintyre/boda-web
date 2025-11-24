@@ -1,12 +1,10 @@
 const { Schema, model } = require('mongoose');
 
-const LocalizedString = { type: Map, of: String, default: undefined };
-
 const menuOptionSchema = new Schema({
-  label: LocalizedString,
+  label: { type: String, required: true },
   image: { type: String, default: null },
-  description: { type: Map, of: String, default: undefined }
-}, { _id: false });
+  description: { type: String, default: null }
+}, { _id: true });
 
 const menuPartSchema = new Schema({
   course: { 
@@ -14,12 +12,8 @@ const menuPartSchema = new Schema({
     enum: ['starter', 'main', 'dessert', 'drinks'], 
     required: true 
   },
-  label: LocalizedString,
+  label: { type: String, required: true },
   options: [menuOptionSchema]
-}, { _id: false });
-
-const menuSchema = new Schema({
-  parts: [menuPartSchema],
 }, { timestamps: true });
 
-module.exports = model('Menu', menuSchema);
+module.exports = model('MenuPart', menuPartSchema);

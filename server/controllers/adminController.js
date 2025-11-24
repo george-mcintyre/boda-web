@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { Message, Menu, Config, CashGiftCard, Event, Gift, GiftChoice } = require('../models');
+const { Message, Menu, MenuPart, Config, CashGiftCard, Event, Gift, GiftChoice } = require('../models');
 const { getAvailableGiftCardImages, isValidImageNumber } = require('../utils/imageUtils');
 
 // Format event for API response according to README specification
@@ -395,82 +395,112 @@ async function deleteEventsItem(req, res, next) {
 }
 
 // ========== Menu (MongoDB-backed CRUD) ==========
-function toOptionPayload(body) {
-  const nombre = body?.nombre ?? body?.name ?? '';
-  const descripcion = body?.descripcion ?? body?.description ?? '';
-  const mapOrUndef = (v) => {
-    if (v == null || v === '') return undefined;
-    if (typeof v === 'object') return v; // already localized
-    return { en: String(v) };
+
+// Helper function to format menu part for API response
+function formatMenuPartForApi(menuPart) {
+  return {
+    id: menuPart._id.toString(),
+    course: menuPart.course,
+    label: menuPart.label,
+    options: (menuPart.options || []).map((option, index) => ({
+      id: option._id.toString(),
+      label: option.label,
+      image: option.image,
+      description: option.description
+    }))
   };
-  return { name: mapOrUndef(nombre), description: mapOrUndef(descripcion) };
-}
-
-async function getMenuDoc() {
-  let doc = await Menu.findOne();
-  if (!doc) doc = await Menu.create({ options: [] });
-  return doc;
-}
-
-function presentOptions(options) {
-  const arr = Array.isArray(options) ? options : [];
-  return arr.map((opt, idx) => {
-    const asStr = (m) => {
-      if (!m) return '';
-      if (typeof m === 'string') return m;
-      if (m && typeof m.get === 'function') return m.get('es') || m.get('en') || '';
-      if (m && typeof m === 'object') return m.es || m.en || '';
-      return '';
-    };
-    return {
-      id: String(idx + 1),
-      nombre: asStr(opt.name),
-      descripcion: asStr(opt.description),
-    };
-  });
 }
 
 async function listMenus(req, res, next) {
   try {
-    const doc = await getMenuDoc();
-    res.json(presentOptions(doc.options));
-  } catch (e) { next(e); }
+    const menuParts = await MenuPart.find({}).sort({ course: 1, createdAt: 1 });
+    const formatted = menuParts.map(part => formatMenuPartForApi(part));
+    res.json(formatted);
+  } catch (e) { 
+    next(e); 
+  }
 }
 
 async function createMenu(req, res, next) {
   try {
-    const doc = await getMenuDoc();
-    const payload = toOptionPayload(req.body || {});
-    doc.options.push(payload);
-    await doc.save();
-    const items = presentOptions(doc.options);
-    res.status(201).json(items[items.length - 1]);
-  } catch (e) { next(e); }
+    const { course, label, options } = req.body;
+    
+    // Validate required fields
+    if (!course || !['starter', 'main', 'dessert', 'drinks'].includes(course)) {
+      return res.status(400).json({ error: 'Valid course (starter, main, dessert, drinks) is required' });
+    }
+    
+    if (!label) {
+      return res.status(400).json({ error: 'Label is required' });
+    }
+    
+    // Create individual menu part
+    const menuPart = await MenuPart.create({
+      course,
+      label,
+      options: (options || []).map(option => ({
+        label: option.label,
+        image: option.image || null,
+        description: option.description || null
+      }))
+    });
+    
+    // Format for API response
+    const response = formatMenuPartForApi(menuPart);
+    res.status(201).json(response);
+  } catch (e) { 
+    next(e); 
+  }
 }
 
 async function updateMenu(req, res, next) {
   try {
-    const id = String(req.params.id || '');
-    const doc = await getMenuDoc();
-    const idx = presentOptions(doc.options).findIndex(it => it.id === id);
-    if (idx === -1) return res.status(404).json({ error: 'Menu item not found' });
-    const payload = toOptionPayload(req.body || {});
-    doc.options[idx] = { ...doc.options[idx].toObject?.() ?? doc.options[idx], ...payload };
-    await doc.save();
-    res.json(presentOptions(doc.options)[idx]);
-  } catch (e) { next(e); }
+    const { id } = req.params;
+    const { course, label, options } = req.body;
+    
+    const menuPart = await MenuPart.findById(id);
+    if (!menuPart) {
+      return res.status(404).json({ error: 'Menu part not found' });
+    }
+    
+    // Update fields if provided
+    if (course && ['starter', 'main', 'dessert', 'drinks'].includes(course)) {
+      menuPart.course = course;
+    }
+    
+    if (label) {
+      menuPart.label = label;
+    }
+    
+    if (options !== undefined) {
+      // Replace all options
+      menuPart.options = options.map(option => ({
+        label: option.label,
+        image: option.image || null,
+        description: option.description || null
+      }));
+    }
+    
+    await menuPart.save();
+    res.json(formatMenuPartForApi(menuPart));
+  } catch (e) { 
+    next(e); 
+  }
 }
 
 async function deleteMenu(req, res, next) {
   try {
-    const id = String(req.params.id || '');
-    const doc = await getMenuDoc();
-    const idx = presentOptions(doc.options).findIndex(it => it.id === id);
-    if (idx === -1) return res.status(404).json({ error: 'Menu item not found' });
-    doc.options.splice(idx, 1);
-    await doc.save();
-    res.json({ ok: true });
-  } catch (e) { next(e); }
+    const { id } = req.params;
+    
+    const menuPart = await MenuPart.findByIdAndDelete(id);
+    if (!menuPart) {
+      return res.status(404).json({ error: 'Menu part not found' });
+    }
+    
+    res.json({ status: 'ok' });
+  } catch (e) { 
+    next(e); 
+  }
 }
 
 // ========== Settings: Agenda bloqueo (MongoDB) ==========

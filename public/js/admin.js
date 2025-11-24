@@ -1915,66 +1915,428 @@
   // ========== Menu management ==========
   async function showMenu(){
     activate('menu');
-    setLoading('Loading menus...');
-    const res = await api('/api/admin/menu');
-    const data = res.ok ? await res.json() : [];
-    const rows = (data||[]).map(m => `
-      <tr>
-        <td>${m.nombre||m.name||''}</td>
-        <td>${m.descripcion||''}</td>
-        <td>${m.tipo||''}</td>
-        <td>
-          <button class="admin-action" data-action="edit" data-id="${m.id}"><i class="fas fa-edit"></i></button>
-          <button class="admin-action danger" data-action="del" data-id="${m.id}"><i class="fas fa-trash"></i></button>
-        </td>
-      </tr>`).join('');
-    content.innerHTML = renderTable({title:'Menu Management', columns:['Name','Description','Type','Actions']}, rows,
-      `<button id=\"addMenu\" class=\"admin-action\"><i class=\"fas fa-plus\"></i> Add</button>`);
-    const tbody = content.querySelector('tbody');
-    tbody.addEventListener('click', async (e)=>{
-      const btn = e.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
-      const current = (data||[]).find(x => String(x.id) === String(id)) || {};
-      if (action==='del'){
-        if (!confirm('Delete this menu item?')) return;
-        const r = await api(`/api/admin/menu/${id}`, { method:'DELETE' }); if (r.ok) showMenu(); else notify('Error','error');
-      } else if (action==='edit'){
-        openFormModal({
-          title: 'Edit menu item', submitText: 'Save',
-          fields: [
-            { name:'nombre', label:'Name', required:true },
-            { name:'descripcion', label:'Description', type:'textarea' },
-            { name:'tipo', label:'Type' },
-          ],
-          initialValues: {
-            nombre: current.nombre || current.name || '',
-            descripcion: current.descripcion || '',
-            tipo: current.tipo || ''
-          },
-          onSubmit: async (values, close) => {
-            const r = await api(`/api/admin/menu/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
-            if (!r.ok) throw new Error('Failed to update');
-            close();
-            showMenu();
-          }
-        });
-      }
-    });
-    content.querySelector('#addMenu').addEventListener('click', async ()=>{
-      openFormModal({
-        title: 'Add menu item', submitText: 'Add',
-        fields: [
-          { name:'nombre', label:'Name', required:true },
-          { name:'descripcion', label:'Description', type:'textarea' },
-          { name:'tipo', label:'Type' },
-        ],
-        onSubmit: async (values, close) => {
-          const r = await api('/api/admin/menu', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(values)});
-          if (!r.ok) throw new Error('Failed to create');
-          close();
-          showMenu();
+    setLoading('Loading menu parts...');
+    
+    try {
+      const res = await api('/api/admin/menu');
+      const data = res.ok ? await res.json() : [];
+      
+      // Group menu parts by course type for better organization
+      const courseGroups = {
+        starter: [],
+        main: [],
+        dessert: [],
+        drinks: []
+      };
+      
+      (data || []).forEach(part => {
+        if (courseGroups[part.course]) {
+          courseGroups[part.course].push(part);
         }
       });
-    });
+      
+      const courseIcons = {
+        starter: 'fa-utensils',
+        main: 'fa-drumstick-bite',
+        dessert: 'fa-birthday-cake',
+        drinks: 'fa-wine-glass-alt'
+      };
+      
+      const courseNames = {
+        starter: 'Starters',
+        main: 'Main Courses',
+        dessert: 'Desserts',
+        drinks: 'Drinks'
+      };
+      
+      let menuContent = `
+        <div class="admin-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h3 style="margin:0;">Menu Management</h3>
+            <button id="addMenuPart" class="admin-action">
+              <i class="fas fa-plus"></i> Add Menu Part
+            </button>
+          </div>
+          
+          <div class="menu-overview">
+      `;
+      
+      // Render each course group
+      Object.keys(courseGroups).forEach(courseType => {
+        const parts = courseGroups[courseType];
+        menuContent += `
+          <div class="course-section">
+            <div class="course-header">
+              <i class="fas ${courseIcons[courseType]}"></i>
+              <h4>${courseNames[courseType]}</h4>
+              <span class="count-badge">${parts.length}</span>
+            </div>
+            <div class="course-parts">
+        `;
+        
+        if (parts.length === 0) {
+          menuContent += `
+            <div class="empty-course">
+              <p>No ${courseNames[courseType].toLowerCase()} defined yet.</p>
+              <button class="admin-action" onclick="openAddMenuForm('${courseType}')">
+                <i class="fas fa-plus"></i> Add ${courseNames[courseType].slice(0, -1)}
+              </button>
+            </div>
+          `;
+        } else {
+          parts.forEach(part => {
+            menuContent += `
+              <div class="menu-part-card" data-id="${part.id}">
+                <div class="menu-part-header">
+                  <h5>${part.label}</h5>
+                  <div class="menu-part-actions">
+                    <button class="admin-action" onclick="editMenuPart('${part.id}')" title="Edit">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="admin-action danger" onclick="deleteMenuPart('${part.id}')" title="Delete">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="menu-options">
+                  ${(part.options || []).map(option => `
+                    <div class="menu-option">
+                      <div class="option-info">
+                        <span class="option-label">${option.label}</span>
+                        ${option.description ? `<small class="option-description">${option.description}</small>` : ''}
+                      </div>
+                      ${option.image ? `<img src="${option.image}" alt="${option.label}" class="option-image" onerror="this.style.display='none'">` : ''}
+                    </div>
+                  `).join('')}
+                  ${(part.options || []).length === 0 ? '<p class="no-options">No options defined</p>' : ''}
+                </div>
+              </div>
+            `;
+          });
+        }
+        
+        menuContent += `
+            </div>
+          </div>
+        `;
+      });
+      
+      menuContent += `
+          </div>
+        </div>
+      `;
+      
+      content.innerHTML = menuContent;
+      
+      // Add global add button handler
+      content.querySelector('#addMenuPart')?.addEventListener('click', () => {
+        openAddMenuForm();
+      });
+      
+      // Add styles for menu management
+      addMenuStyles();
+      
+    } catch(e) { 
+      console.error('Error loading menu:', e); 
+      notify('Error loading menu: ' + e.message, 'error'); 
+      content.innerHTML = `
+        <div class="admin-content">
+          <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Menu</h3>
+            <p>Failed to load menu: ${e.message}</p>
+            <button onclick="showMenu()" class="btn-retry">
+              <i class="fas fa-redo"></i> Retry
+            </button>
+          </div>
+        </div>`;
+    }
+  }
+  
+  // Global functions for menu management
+  window.openAddMenuForm = function(courseType = '') {
+    openMenuPartForm(null, courseType);
+  };
+  
+  window.editMenuPart = function(id) {
+    openMenuPartForm(id, null);
+  };
+  
+  window.deleteMenuPart = async function(id) {
+    if (!confirm('Delete this menu part? This will remove all its options.')) return;
+    
+    try {
+      const r = await api(`/api/admin/menu/${id}`, { method: 'DELETE' });
+      if (r.ok) {
+        showMenu();
+      } else {
+        notify('Error deleting menu part', 'error');
+      }
+    } catch (error) {
+      notify('Error deleting menu part: ' + error.message, 'error');
+    }
+  };
+  
+  function openMenuPartForm(menuPartId = null, defaultCourse = '') {
+    // Load existing menu data for editing
+    let existingData = null;
+    
+    const loadExistingData = async () => {
+      if (menuPartId) {
+        try {
+          const res = await api('/api/admin/menu');
+          if (res.ok) {
+            const data = await res.json();
+            existingData = data.find(part => part.id === menuPartId) || null;
+          }
+        } catch (error) {
+          console.error('Error loading menu part data:', error);
+        }
+      }
+    };
+    
+    const showForm = () => {
+      const isEditing = !!existingData;
+      
+      openFormModal({
+        title: isEditing ? 'Edit Menu Part' : 'Add Menu Part',
+        submitText: isEditing ? 'Save' : 'Add',
+        fields: [
+          { 
+            name: 'course', 
+            label: 'Course Type', 
+            type: 'select', 
+            required: true,
+            options: [
+              { value: 'starter', label: 'Starter' },
+              { value: 'main', label: 'Main Course' },
+              { value: 'dessert', label: 'Dessert' },
+              { value: 'drinks', label: 'Drinks' }
+            ]
+          },
+          { name: 'label', label: 'Course Label', required: true, help: 'e.g. "Appetizers", "Main Dishes", "Desserts"' },
+          { 
+            name: 'options', 
+            label: 'Options', 
+            type: 'textarea', 
+            help: 'Add menu options, one per line. Format: "Option Name - Description" or just "Option Name"'
+          }
+        ],
+        initialValues: {
+          course: existingData?.course || defaultCourse || 'starter',
+          label: existingData?.label || '',
+          options: existingData?.options?.map(opt => `${opt.label}${opt.description ? ' - ' + opt.description : ''}`).join('\n') || ''
+        },
+        onSubmit: async (values, close) => {
+          try {
+            // Parse options from textarea
+            const optionLines = (values.options || '').split('\n').filter(line => line.trim());
+            const options = optionLines.map(line => {
+              const [namePart, ...descParts] = line.split(' - ');
+              return {
+                label: namePart.trim(),
+                description: descParts.join(' - ').trim() || null
+              };
+            }).filter(opt => opt.label.trim());
+            
+            const menuData = {
+              course: values.course,
+              label: values.label,
+              options: options
+            };
+            
+            const url = menuPartId ? `/api/admin/menu/${menuPartId}` : '/api/admin/menu';
+            const method = menuPartId ? 'PUT' : 'POST';
+            
+            const r = await api(url, { 
+              method, 
+              headers: {'Content-Type': 'application/json'}, 
+              body: JSON.stringify(menuData)
+            });
+            
+            if (!r.ok) {
+              const errorData = await r.json().catch(() => ({}));
+              throw new Error(errorData.error || `Failed to ${menuPartId ? 'update' : 'create'} menu part`);
+            }
+            
+            close();
+            showMenu();
+          } catch (error) {
+            throw error;
+          }
+        }
+      });
+    };
+    
+    if (menuPartId) {
+      loadExistingData().then(showForm);
+    } else {
+      showForm();
+    }
+  }
+  
+  // Add styles for menu management
+  function addMenuStyles(){
+    if (document.getElementById('menu-styles')) return;
+    
+    const style = document.createElement('style');
+    style.id = 'menu-styles';
+    style.textContent = `
+      .menu-overview {
+        display: grid;
+        gap: 24px;
+      }
+      
+      .course-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-left: 4px solid var(--primary-color, #8B5A96);
+      }
+      
+      .course-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+      
+      .course-header i {
+        font-size: 1.5em;
+        color: var(--primary-color, #8B5A96);
+      }
+      
+      .course-header h4 {
+        margin: 0;
+        flex: 1;
+        color: #333;
+        font-size: 1.3em;
+      }
+      
+      .count-badge {
+        background: var(--primary-color, #8B5A96);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: 600;
+      }
+      
+      .course-parts {
+        display: grid;
+        gap: 16px;
+      }
+      
+      .menu-part-card {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        transition: all 0.3s ease;
+      }
+      
+      .menu-part-card:hover {
+        border-color: var(--primary-color, #8B5A96);
+        box-shadow: 0 2px 8px rgba(139, 90, 150, 0.1);
+      }
+      
+      .menu-part-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      
+      .menu-part-header h5 {
+        margin: 0;
+        color: #333;
+        font-size: 1.1em;
+      }
+      
+      .menu-part-actions {
+        display: flex;
+        gap: 8px;
+      }
+      
+      .menu-options {
+        display: grid;
+        gap: 8px;
+      }
+      
+      .menu-option {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 12px;
+        background: #f8f9fa;
+        border-radius: 6px;
+      }
+      
+      .option-info {
+        flex: 1;
+      }
+      
+      .option-label {
+        font-weight: 500;
+        color: #333;
+        display: block;
+      }
+      
+      .option-description {
+        color: #666;
+        font-size: 0.9em;
+        margin-top: 2px;
+      }
+      
+      .option-image {
+        width: 40px;
+        height: 30px;
+        object-fit: cover;
+        border-radius: 4px;
+        flex-shrink: 0;
+      }
+      
+      .no-options {
+        color: #666;
+        font-style: italic;
+        text-align: center;
+        padding: 20px;
+        margin: 0;
+      }
+      
+      .empty-course {
+        text-align: center;
+        padding: 30px 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 2px dashed #dee2e6;
+      }
+      
+      .empty-course p {
+        color: #666;
+        margin: 0 0 15px 0;
+      }
+      
+      @media (max-width: 768px) {
+        .course-header {
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        
+        .course-header h4 {
+          width: 100%;
+        }
+        
+        .menu-option {
+          flex-direction: column;
+          align-items: flex-start;
+          text-align: left;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   // ========== Styles for Party Management ==========
