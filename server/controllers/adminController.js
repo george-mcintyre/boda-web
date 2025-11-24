@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { Message, Config, CashGiftCard, Event, Gift, GiftChoice, Course, CourseOption, MenuOptionImage } = require('../models');
 const { getAvailableGiftCardImages, isValidImageNumber } = require('../utils/imageUtils');
+const { generateDietaryIconsHTML, generateSelectionIconHTML } = require('../utils/menuIcons');
 
 // Format event for API response according to README specification
 function formatEventForApi(event) {
@@ -401,7 +402,9 @@ function formatCourseForApi(course) {
   return {
     id: course._id.toString(),
     course: course.course,
-    label: course.label
+    label: course.label,
+    selectionRequired: course.selectionRequired !== undefined ? course.selectionRequired : true,
+    selectionIcon: generateSelectionIconHTML(course)
   };
 }
 
@@ -429,7 +432,12 @@ function formatCourseOptionForApi(option) {
     courseId: option.courseId.toString(),
     label: option.label,
     image: imageData,
-    description: option.description || null
+    description: option.description || null,
+    // Special Dietary Indicators
+    isVegetarian: option.isVegetarian || false,
+    containsAllergens: option.containsAllergens || false,
+    containsLactose: option.containsLactose || false,
+    dietaryIcons: generateDietaryIconsHTML(option)
   };
 }
 
@@ -446,7 +454,7 @@ async function listCourses(req, res, next) {
 
 async function createCourse(req, res, next) {
   try {
-    const { course, label } = req.body;
+    const { course, label, selectionRequired } = req.body;
     
     // Validate required fields
     if (!course || !['starter', 'main', 'dessert', 'drinks'].includes(course)) {
@@ -457,7 +465,11 @@ async function createCourse(req, res, next) {
       return res.status(400).json({ error: 'Label is required' });
     }
     
-    const newCourse = await Course.create({ course, label });
+    const newCourse = await Course.create({ 
+      course, 
+      label, 
+      selectionRequired: selectionRequired !== undefined ? selectionRequired : true 
+    });
     res.status(201).json(formatCourseForApi(newCourse));
   } catch (e) { 
     next(e); 
@@ -479,7 +491,7 @@ async function getCourse(req, res, next) {
 async function updateCourse(req, res, next) {
   try {
     const { id } = req.params;
-    const { course, label } = req.body;
+    const { course, label, selectionRequired } = req.body;
     
     const updateData = {};
     if (course && ['starter', 'main', 'dessert', 'drinks'].includes(course)) {
@@ -487,6 +499,9 @@ async function updateCourse(req, res, next) {
     }
     if (label) {
       updateData.label = label;
+    }
+    if (selectionRequired !== undefined) {
+      updateData.selectionRequired = selectionRequired;
     }
     
     const updatedCourse = await Course.findByIdAndUpdate(id, updateData, { new: true });

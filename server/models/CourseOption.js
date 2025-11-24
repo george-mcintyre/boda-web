@@ -11,7 +11,11 @@ const courseOptionSchema = new Schema({
     type: Schema.Types.ObjectId,                      // Reference to MenuOptionImage model
     ref: 'MenuOptionImage'                            // Reference to MenuOptionImage collection
   },
-  description: { type: String, default: null }
+  description: { type: String, default: null },
+  // Special Dietary Indicators
+  isVegetarian: { type: Boolean, default: false },
+  containsAllergens: { type: Boolean, default: false },
+  containsLactose: { type: Boolean, default: false }
 }, { timestamps: true });
 
 module.exports = model('CourseOption', courseOptionSchema);

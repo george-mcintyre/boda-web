@@ -1985,7 +1985,10 @@
             menuContent += `
               <div class="menu-course-card" data-id="${part.id}">
                 <div class="menu-course-header">
-                  <h5>${part.label}</h5>
+                  <div class="course-title-section">
+                    <h5>${part.label}</h5>
+                    ${part.selectionIcon || ''}
+                  </div>
                   <div class="menu-course-actions">
                     <button class="admin-action" onclick="editMenuCourseOption('${part.id}')" title="Add Option">
                       <i class="fas fa-plus"></i>
@@ -2002,8 +2005,10 @@
                   ${(part.options || []).map(option => `
                     <div class="menu-option">
                       <div class="option-info">
-                        <span class="option-label">${option.label}</span>
-                        
+                        <div class="option-header">
+                          <span class="option-label">${option.label}</span>
+                          ${option.dietaryIcons || ''}
+                        </div>
                         ${option.description ? `<small class="option-description">${option.description}</small>` : ''}
                       </div>
                       ${option.image ? `<img src="${option.image}" alt="${option.label}" class="option-image" onerror="this.style.display='none'">` : ''}
@@ -2140,16 +2145,25 @@
             ]
           },
           { name: 'label', label: 'Course Label', required: true, help: 'e.g. "Appetizers", "Main Dish", "Desserts"' },
+          { name: 'selectionRequired', label: 'Selection Required', type: 'select', 
+            help: 'If enabled, guests must select one option. If disabled, all options will be provided.',
+            options: [
+              { value: 'true', label: 'Yes - Guests must choose one option' },
+              { value: 'false', label: 'No - All options will be provided' }
+            ]
+          },
         ],
         initialValues: {
           course: existingData?.course || defaultCourse || 'starter',
-          label: existingData?.label || ''
+          label: existingData?.label || '',
+          selectionRequired: existingData?.selectionRequired !== undefined ? String(existingData.selectionRequired) : 'true'
         },
         onSubmit: async (values, close) => {
           try {
             const courseData = {
               course: values.course,
               label: values.label,
+              selectionRequired: values.selectionRequired === 'true'
             };
             
             const url = courseId ? `/api/admin/courseData/${courseId}` : '/api/admin/courseData';
@@ -2215,11 +2229,18 @@ function openMenuCourseOptionsForm(courseId, optionId = null) {
           { name: 'label', label: 'Option', required: true, help: 'e.g. Cream of Mushroom Soup' },
           { name: 'image', label: 'Image', type: 'file', help: 'Upload menu option image (will be stored in database)' },
           { name: 'description', label: 'Option Description', required: false, help: 'e.g. A delicate blend of cream, mushrooms, and garlic' },
+          // Special Dietary Indicators
+          { name: 'isVegetarian', label: 'Vegetarian', type: 'checkbox', help: 'This option is suitable for vegetarians' },
+          { name: 'containsAllergens', label: 'Contains Allergens', type: 'checkbox', help: 'This option contains allergens - please check ingredient list' },
+          { name: 'containsLactose', label: 'Contains Lactose', type: 'checkbox', help: 'This option contains lactose/dairy products' },
         ],
         initialValues: {
           label: existingData?.label || '',
           image: existingData?.image || '',
-          description: existingData?.description || ''
+          description: existingData?.description || '',
+          isVegetarian: existingData?.isVegetarian || false,
+          containsAllergens: existingData?.containsAllergens || false,
+          containsLactose: existingData?.containsLactose || false
         },
         onSubmit: async (values, close, modal) => {
           try {
@@ -2273,6 +2294,9 @@ function openMenuCourseOptionsForm(courseId, optionId = null) {
               label: values.label,
               image: imageReference,
               description: values.description,
+              isVegetarian: values.isVegetarian || false,
+              containsAllergens: values.containsAllergens || false,
+              containsLactose: values.containsLactose || false
             };
             
             const url = optionId ? `/api/admin/courseData/${courseId}/options/${optionId}` : `/api/admin/courseData/${courseId}/options`;
@@ -2385,9 +2409,42 @@ function openMenuCourseOptionsForm(courseId, optionId = null) {
         font-size: 1.1em;
       }
       
+      .course-title-section {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+      }
+      
       .menu-course-actions {
         display: flex;
         gap: 8px;
+      }
+      
+      .selection-icon {
+        font-size: 0.9em;
+        margin-left: 4px;
+      }
+      
+      .dietary-flags {
+        display: flex;
+        gap: 4px;
+        margin-left: 8px;
+      }
+      
+      .dietary-icon {
+        font-size: 0.8em;
+        padding: 2px 4px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+      
+      .option-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
       }
       
       .menu-options {

@@ -1,5 +1,6 @@
 const { MenuCourse, MenuChoice, Guest, Course, CourseOption, MenuOptionImage } = require('../models');
 const { formatCourseForApi, formatCourseOptionForApi } = require('../controllers/adminController');
+const { generateSelectionIconHTML } = require('../utils/menuIcons');
 
 // Helper to format menu part for API response
 function formatMenuCourseForApi(menuPart, index) {
@@ -7,6 +8,8 @@ function formatMenuCourseForApi(menuPart, index) {
     id: menuPart._id.toString(),
     course: menuPart.course,
     label: menuPart.label,
+    selectionRequired: menuPart.selectionRequired !== undefined ? menuPart.selectionRequired : true,
+    selectionIcon: generateSelectionIconHTML(menuPart),
     options: (menuPart.options || []).map((option, optIndex) => formatCourseOptionForApi(option))
   };
 }
@@ -38,8 +41,12 @@ async function listCourses(req, res, next) {
 
 async function createCourse(req, res, next) {
   try {
-    const { course, label } = req.body;
-    const newCourse = await Course.create({ course, label });
+    const { course, label, selectionRequired } = req.body;
+    const newCourse = await Course.create({ 
+      course, 
+      label, 
+      selectionRequired: selectionRequired !== undefined ? selectionRequired : true 
+    });
     res.status(201).json(formatCourseForApi(newCourse));
   } catch (e) {
     next(e);
@@ -49,8 +56,14 @@ async function createCourse(req, res, next) {
 async function updateCourse(req, res, next) {
   try {
     const { id } = req.params;
-    const { course, label } = req.body;
-    const updatedCourse = await Course.findByIdAndUpdate(id, { course, label }, { new: true });
+    const { course, label, selectionRequired } = req.body;
+    
+    const updateData = {};
+    if (course) updateData.course = course;
+    if (label) updateData.label = label;
+    if (selectionRequired !== undefined) updateData.selectionRequired = selectionRequired;
+    
+    const updatedCourse = await Course.findByIdAndUpdate(id, updateData, { new: true });
     res.json(formatCourseForApi(updatedCourse));
   } catch (e) {
     next(e);
@@ -229,7 +242,7 @@ async function updateGuestCourseOption(req, res, next) {
 async function createCourseOption(req, res, next) {
   try {
     const { courseId } = req.params;
-    const { label, image, description } = req.body;
+    const { label, image, description, isVegetarian, containsAllergens, containsLactose } = req.body;
 
     // Verify course exists
     const course = await Course.findById(courseId);
@@ -255,7 +268,10 @@ async function createCourseOption(req, res, next) {
       courseId,
       label,
       image: imageRef || null,
-      description: description || null
+      description: description || null,
+      isVegetarian: isVegetarian || false,
+      containsAllergens: containsAllergens || false,
+      containsLactose: containsLactose || false
     });
     
     // Populate image for response
@@ -269,7 +285,7 @@ async function createCourseOption(req, res, next) {
 async function updateCourseOption(req, res, next) {
   try {
     const { optionId } = req.params;
-    const { label, image, description } = req.body;
+    const { label, image, description, isVegetarian, containsAllergens, containsLactose } = req.body;
     
     // Handle image reference
     let imageRef = undefined;
@@ -290,6 +306,9 @@ async function updateCourseOption(req, res, next) {
     if (label) updateData.label = label;
     if (imageRef !== undefined) updateData.image = imageRef;
     if (description !== undefined) updateData.description = description;
+    if (isVegetarian !== undefined) updateData.isVegetarian = isVegetarian;
+    if (containsAllergens !== undefined) updateData.containsAllergens = containsAllergens;
+    if (containsLactose !== undefined) updateData.containsLactose = containsLactose;
     
     const option = await CourseOption.findByIdAndUpdate(optionId, updateData, { new: true })
       .populate('image');
