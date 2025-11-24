@@ -877,6 +877,22 @@
     // Setup image preview for file inputs
     setupImagePreview(modal);
 
+    // Populate image preview with existing image if editing and image exists
+    if (additionalOptions.showCurrentImage && additionalOptions.currentImageUrl) {
+      const previewContainer = modal.querySelector('#image-preview-container');
+      if (previewContainer) {
+        console.log('Populating existing image preview:', additionalOptions.currentImageUrl);
+        previewContainer.innerHTML = `
+          <div style="text-align:center;">
+            <img src="${additionalOptions.currentImageUrl}" alt="Current gift card image" style="max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="margin-top:8px; color:#666; font-size:0.9em;">
+              <i class="fas fa-info-circle"></i> 
+              Current gift card image
+            </div>
+          </div>`;
+      }
+    }
+
     return { close, modal };
   }
 
@@ -3235,3 +3251,4 @@ function openMenuCourseOptionsForm(courseId, optionId = null) {
   // Default
   showTab('guests');
 })();
+
