@@ -50,6 +50,8 @@
     let completed = false;
 
     function animateNext(){
+      if (!isMobile && index == -1) index=0;
+
       if (busy) return;
       if (index >= cards.length - 1){
         completed = true;
@@ -83,7 +85,12 @@
 
     function animatePrev(){
       if (busy) return;
-      if (index < 0) return; // Can't go back if already at text-only state
+      
+      // On desktop (non-mobile), can't go back past first image
+      if (!isMobile && index <= 0) return;
+      // On mobile, can't go back if already at text-only state
+      if (isMobile && index < 0) return;
+      
       // If we had completed, re-lock because we are reversing within hero
       if (completed){
         completed = false;
@@ -103,7 +110,7 @@
         current.style.transform = 'translateY(100%)';
         index--;
         busy = false;
-        // If we've gone back to -1, all images are hidden and text is visible
+        // If we've gone back to -1 (mobile only), all images are hidden and text is visible
       }
       current.addEventListener('animationend', onEnd);
     }
