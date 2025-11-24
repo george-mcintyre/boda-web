@@ -440,10 +440,10 @@
           </div>
         </div>
         <div class="login-access-icon">
-          <a href="login.html" class="guests-access-btn" title="Acceso para invitados" aria-label="Acceso para invitados">
+          <a href="login.html" class="guests-access-btn" title="Acceso para invitados" aria-label="Acceso para invitados" data-action="guest-login">
             <i class="fas fa-user" aria-hidden="true"></i>
           </a>
-          <a href="/admin-login.html" class="guests-access-btn" title="Acceso de administrador" aria-label="Acceso de administrador">
+          <a href="/admin-login.html" class="guests-access-btn" title="Acceso de administrador" aria-label="Acceso de administrador" data-action="admin-login">
             <i class="fas fa-cog" aria-hidden="true"></i>
           </a>
         </div>
@@ -472,12 +472,12 @@
               be private chats between guests that the bride and groom can’t see — so you’re free to plot
                surprises in peace.</p>
           <div class="cta-row">
-            <a class="btn" href="login.html"><i class="fas fa-heart"></i> Guest zone</a>
+            <a class="btn" href="login.html" data-action="guest-login"><i class="fas fa-heart"></i> Guest zone</a>
           </div>
         </div>
         <div class="wix-right">
           <div class="stack-section">
-            <div class="stack-gallery wow-stack">
+            <div class="stack-gallery wow-stack mobile-overlay">
               <div class="stack-viewport">
                 <div class="stack-inner">
                   <div class="stack-card"><img src="assets/images/home.png" alt="Home" loading="eager"></div>
@@ -545,7 +545,7 @@
         </div>
         <p data-i18n="wedding:guestZone.description">Aquí puedes gestionar todos los detalles de tu participación en nuestra boda.</p>
         <div class="cta-buttons">
-          <a class="primary" href="/login.html" role="button">
+          <a class="primary" href="/login.html" role="button" data-action="guest-login">
             <i class="fas fa-sign-in-alt"></i>
             <span data-i18n="common:login">Iniciar sesión</span>
           </a>
@@ -1302,5 +1302,6 @@
 -->
 
   <script src="js/stack-gallery.js"></script>
+  <script src="js/auth-check.js"></script>
 </body>
 </html>

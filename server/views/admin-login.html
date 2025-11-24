@@ -99,6 +99,16 @@
             this.querySelector('i').classList.toggle('fa-eye-slash');
         });
     </script>
+    <script src="/js/auth-check.js"></script>
     <script src="js/admin-login.js"></script>
+    <script>
+        // Additional check for admin login page - redirect if already logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof isAdminLoggedIn === 'function' && isAdminLoggedIn()) {
+                console.log('Admin already logged in, redirecting to dashboard');
+                window.location.href = '/admin.html';
+            }
+        });
+    </script>
 </body>
 </html>

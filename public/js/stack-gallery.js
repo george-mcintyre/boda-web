@@ -13,6 +13,9 @@
     const cards = Array.from(gallery.querySelectorAll('.stack-card'));
     if (!viewport || cards.length === 0) return;
 
+    // Check if we're on mobile (narrow screen)
+    const isMobile = window.innerWidth <= 859;
+
     // Prepare cards: first visible, rest off-screen bottom
     cards.forEach((card, i) => {
       card.style.willChange = 'transform, opacity';
@@ -24,12 +27,15 @@
       } else {
         card.style.opacity = '0';
         card.style.transform = 'translateY(100%)';
-        // mark for wow/animate.css
-        card.classList.add('wow');
+        // mark for wow/animate.css (desktop only)
+        if (!isMobile) {
+          card.classList.add('wow');
+        }
       }
     });
-    // Ensure WOW watches any newly marked elements
-    if (window._wowInstance && typeof window._wowInstance.sync === 'function'){
+    
+    // Ensure WOW watches any newly marked elements (desktop only)
+    if (!isMobile && window._wowInstance && typeof window._wowInstance.sync === 'function'){
       window._wowInstance.sync();
     }
 
@@ -127,6 +133,28 @@
     function touchMove(e){
       const y = (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
       const dy = touchStartY - y; // swipe up => positive, swipe down => negative
+      
+      // On mobile, always allow the swipe interaction since images overlay text
+      if (isMobile) {
+        // Forward only if not completed and we have a next card
+        if (dy > 15 && !busy && !completed && index < cards.length - 1){
+          e.preventDefault();
+          animateNext();
+          return;
+        // Reverse allowed whenever not at first card
+        } else if (dy < -15 && !busy){
+          if (index > 0){
+            e.preventDefault();
+            animatePrev();
+            return;
+          }
+        }
+        // Always prevent page scrolling on mobile
+        e.preventDefault();
+        return;
+      }
+      
+      // Desktop behavior
       if (!sectionInView(section, dy < 0)) return;
 
       // Forward only if not completed and we have a next card
@@ -312,11 +340,23 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.stack-gallery').forEach(gallery => {
-      if (gallery.classList.contains('wow-stack')){
+      const isMobile = window.innerWidth <= 859;
+      
+      // On mobile (narrow screens), always use overlay behavior
+      if (isMobile || gallery.classList.contains('wow-stack')){
         initWowStack(gallery);
       } else {
         initParallaxStack(gallery);
       }
+    });
+    
+    // Handle window resize to switch between mobile and desktop modes
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        location.reload(); // Simple reload to reinitialize with correct mode
+      }, 250);
     });
   });
 })();

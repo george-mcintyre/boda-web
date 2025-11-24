@@ -242,6 +242,104 @@ body.wix-landing-active footer { display: none !important; }
   height: auto;
 }
 
+/* Mobile overlay layout - text visible first, images overlay on scroll */
+@media (max-width: 859px) {
+  .wix-landing .wix-hero {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    /* Override grid layout completely */
+    display: block !important;
+  }
+  
+  .wix-landing .wix-left {
+    position: relative;
+    z-index: 1;
+    background: var(--wix-bg);
+    padding: 20px;
+    margin-bottom: 50vh; /* Make room for images below */
+    max-width: none !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
+  
+  .wix-landing .wix-right {
+    /* Override grid layout completely */
+    width: 100% !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+  
+  .wix-landing .stack-section {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  .wix-landing .stack-gallery {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+  }
+  
+  .wix-landing .stack-viewport {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+  }
+  
+  .wix-landing .stack-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .wix-landing .stack-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    transform: translateZ(0);
+    will-change: transform, opacity;
+  }
+  
+  .wix-landing .stack-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  /* Initial state - all images hidden below viewport */
+  .wix-landing .stack-card:not(:first-child) {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  
+  /* First image visible */
+  .wix-landing .stack-card:first-child {
+    opacity: 1;
+    transform: translateY(0);
+    z-index: 10;
+  }
+}
+
 /* Desktop */
 @media (min-width: 860px) {
   .wix-landing .wix-hero {

@@ -58,6 +58,16 @@
     // Initialize i18n for this page; respects language stored from home page
     window.i18n = initI18n(window.currentTranslations);
   </script>
+  <script src="js/auth-check.js"></script>
   <script src="js/login.js"></script>
+  <script>
+      // Additional check for login page - redirect if already logged in as guest
+      document.addEventListener('DOMContentLoaded', function() {
+          if (typeof isGuestLoggedIn === 'function' && isGuestLoggedIn()) {
+              console.log('Guest already logged in, redirecting to dashboard');
+              window.location.href = 'guests.html';
+          }
+      });
+  </script>
 </body>
 </html>
