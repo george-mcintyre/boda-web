@@ -14,6 +14,28 @@ body.wix-landing-active header,
 body.wix-landing-active main,
 body.wix-landing-active footer { display: none !important; }
 
+/* Force no scrolling on the wix landing page */
+.wix-landing-active {
+  overflow: hidden !important;
+  height: 100vh !important;
+  position: fixed !important;
+  width: 100% !important;
+}
+
+.wix-landing-active body {
+  overflow: hidden !important;
+  height: 100vh !important;
+  position: fixed !important;
+  width: 100% !important;
+}
+
+.wix-landing-active html {
+  overflow: hidden !important;
+  height: 100vh !important;
+  position: fixed !important;
+  width: 100% !important;
+}
+
 /* Base */
 .wix-landing {
   color: var(--wix-fg);

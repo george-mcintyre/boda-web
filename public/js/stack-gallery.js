@@ -96,24 +96,9 @@
 
     // Scroll lock mechanics while in hero and sequence not completed
     let touchStartY = 0;
-    let releasedTop = false; // allow natural page scroll when at top and user keeps scrolling up
     function wheelHandler(e){
       if (!sectionInView(section, false)) return;
       const lastIndex = cards.length - 1;
-
-      // If we're released at the top, allow default scrolling until the user reverses (scrolls down)
-      if (releasedTop) {
-        if (e.deltaY > 6) { // user reversed direction (down)
-          releasedTop = false;
-          if (!completed && index < lastIndex) {
-            e.preventDefault();
-            animateNext();
-            return;
-          }
-        }
-        // Continue letting the page scroll naturally
-        return;
-      }
 
       // Reverse (scroll up) within the stack when not at the first card
       if (e.deltaY < -6) {
@@ -122,9 +107,9 @@
           animatePrev();
           return;
         } else {
-          // At the top with further up-scroll: release the page
-          releasedTop = true;
-          return; // do not preventDefault → allow normal page scroll
+          // At the top - completely prevent any page movement
+          e.preventDefault();
+          return;
         }
       }
 
@@ -134,30 +119,15 @@
         animateNext();
         return;
       }
-      // Otherwise, if the hero sequence isn't completed, keep page from scrolling
-      if (!completed) {
-        e.preventDefault();
-      }
+      
+      // Always prevent page scrolling - no exceptions
+      e.preventDefault();
     }
     function touchStart(e){ touchStartY = (e.touches && e.touches[0] ? e.touches[0].clientY : 0); }
     function touchMove(e){
       const y = (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
       const dy = touchStartY - y; // swipe up => positive, swipe down => negative
       if (!sectionInView(section, dy < 0)) return;
-
-      // If released at top: allow natural scroll while swiping down (dy < -10)
-      if (releasedTop) {
-        if (dy > 10) { // user reversed (swipe up → scroll down)
-          releasedTop = false;
-          if (!busy && !completed && index < cards.length - 1){
-            e.preventDefault();
-            animateNext();
-            return;
-          }
-        }
-        // keep allowing default while continuing to swipe down
-        return;
-      }
 
       // Forward only if not completed and we have a next card
       if (dy > 10 && !busy && !completed && index < cards.length - 1){
@@ -169,12 +139,11 @@
           e.preventDefault();
           animatePrev();
         } else {
-          // At top and swiping down: release to allow page to scroll
-          releasedTop = true;
-          // do not preventDefault
+          // At top - completely prevent any page movement
+          e.preventDefault();
         }
-      } else if (!completed) {
-        // Keep page from scrolling while the hero sequence is active
+      } else {
+        // Always prevent page scrolling - no exceptions
         e.preventDefault();
       }
     }
@@ -207,10 +176,31 @@
       window.removeEventListener('touchstart', touchStart);
       window.removeEventListener('touchmove', touchMove);
       window.removeEventListener('keydown', keyHandler);
+      
+      // Remove additional scroll prevention listeners
+      window.removeEventListener('scroll', preventAllScroll);
+      document.removeEventListener('scroll', preventAllScroll);
+      document.body.removeEventListener('scroll', preventAllScroll);
+      document.documentElement.removeEventListener('scroll', preventAllScroll);
     }
 
     // Lock scroll initially while hero is in view
     lockScroll();
+
+    // Additional global scroll prevention
+    function preventAllScroll(e) {
+      if (sectionInView(section)) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    }
+
+    // Add multiple event listeners to catch all scroll attempts
+    window.addEventListener('scroll', preventAllScroll, { passive: false });
+    document.addEventListener('scroll', preventAllScroll, { passive: false });
+    document.body.addEventListener('scroll', preventAllScroll, { passive: false });
+    document.documentElement.addEventListener('scroll', preventAllScroll, { passive: false });
 
     // Track scroll position to support scrollbar drags in addition to wheel/touch
     let lastScrollY = window.scrollY;
@@ -219,12 +209,16 @@
       let dy = currentY - lastScrollY; // positive → scrolling down, negative → up
       lastScrollY = currentY;
 
-      // If sequence completed, nothing special to do (allow natural scroll)
-      if (completed) return;
+      // If sequence completed, nothing special to do (but still prevent scrolling)
+      if (completed) {
+        // Force scroll position back to 0 to prevent any movement
+        window.scrollTo(0, 0);
+        return;
+      }
 
       const inView = sectionInView(section);
 
-      // Maintain lock/unlock behavior while the hero is in view
+      // Always maintain lock while the hero is in view
       if (inView) {
         lockScroll();
       } else {
@@ -237,25 +231,14 @@
 
       const lastIndex = cards.length - 1;
 
-      // If released at the very top: let natural scroll continue until user reverses direction
-      if (releasedTop) {
-        if (dy > 2) { // reversed (down)
-          releasedTop = false;
-          if (!busy && index < lastIndex) {
-            animateNext();
-          }
-        }
-        return;
-      }
-
       // When scrolling up via scrollbar
       if (dy < -2) {
         if (!busy) {
           if (index > 0) {
             animatePrev();
           } else {
-            // At the top and still going up: release to allow page scroll until reversed
-            releasedTop = true;
+            // At the top - force scroll position back to 0
+            window.scrollTo(0, 0);
           }
         }
         return;
@@ -266,9 +249,13 @@
         if (!busy && index < lastIndex) {
           animateNext();
         } else {
-          // At the end, allow natural scroll to proceed
+          // At the end - force scroll position back to 0
+          window.scrollTo(0, 0);
         }
       }
+
+      // Force scroll position back to 0 to prevent any page movement
+      window.scrollTo(0, 0);
     }
 
     // If the user scrolls away somehow, unlock; if they come back and not completed, re-lock
