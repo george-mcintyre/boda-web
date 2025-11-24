@@ -774,10 +774,35 @@ document.addEventListener('DOMContentLoaded', async () => {
            const available = regalo.available - regalo.purchased;
            const isAvailable = available > 0;
            
+           // Helper function to get image URL
+           function getGiftImageUrl(gift) {
+             if (!gift.image) return null;
+             
+             // Handle different image formats
+             if (typeof gift.image === 'string') {
+               // Base64 data or ObjectId
+               if (gift.image.startsWith('data:')) {
+                 return gift.image; // Already base64 encoded
+               } else if (gift.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(gift.image)) {
+                 // ObjectId - use the image endpoint
+                 return `/api/admin/gifts/${gift.id}/image/thumbnail`;
+               } else {
+                 return gift.image; // Legacy URL
+               }
+             } else if (gift.image && gift.image.data) {
+               // Database-stored image with base64 data
+               return gift.image;
+             }
+             
+             return null;
+           };
+           
+           const imageUrl = getGiftImageUrl(regalo);
+           
            regalosHTML += `
              <div class="gift-card">
                <div class="gift-card-image">
-                 <img src="${regalo.imageUrl}" alt="${regalo.name}" />
+                 <img src="${imageUrl || '/assets/images/placeholder-gift.jpg'}" alt="${regalo.name}" onerror="this.src='/assets/images/placeholder-gift.jpg';" />
                </div>
                <div class="gift-card-content">
                  <h4>${regalo.name}</h4>

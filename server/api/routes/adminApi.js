@@ -149,8 +149,96 @@ router.post('/gifts', auth('admin'), adminCtrl.createGift);
 router.put('/gifts/:id', auth('admin'), adminCtrl.updateGift);
 router.delete('/gifts/:id', auth('admin'), adminCtrl.deleteGift);
 
-// Gift card images
+// Gift image upload
+router.post('/gifts/upload-image', auth('admin'), upload.single('image'), adminCtrl.uploadGiftImage);
+
+// Gift card images (legacy - will be removed)
 router.get('/gift-images', auth('admin'), adminCtrl.getGiftCardImages);
+
+// Gift image serving endpoints
+router.get('/gifts/:giftId/image', auth('admin'), async (req, res, next) => {
+  try {
+    const { giftId } = req.params;
+    const { Gift, GiftImage } = require('../../models');
+    const gift = await Gift.findById(giftId).populate('image').lean();
+    
+    if (!gift) {
+      return res.status(404).json({ error: 'Gift not found' });
+    }
+
+    if (!gift.image) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    // Handle both new format (GiftImage reference) and legacy format (URL)
+    if (gift.image.data && gift.image.contentType) {
+      // New format - database-stored image
+      res.setHeader('Content-Type', gift.image.contentType);
+      res.setHeader('Content-Length', gift.image.data.length);
+      res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+      res.send(gift.image.data);
+    } else if (typeof gift.image === 'string' && gift.image.startsWith('/')) {
+      // Legacy format - redirect to file system
+      res.redirect(gift.image);
+    } else {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get('/gifts/:giftId/image/thumbnail', auth('admin'), async (req, res, next) => {
+  try {
+    const { giftId } = req.params;
+    const { Gift, GiftImage } = require('../../models');
+    const gift = await Gift.findById(giftId).populate('image').lean();
+    
+    if (!gift) {
+      return res.status(404).json({ error: 'Gift not found' });
+    }
+
+    if (!gift.image) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    // Handle both formats
+    if (gift.image.data && gift.image.contentType) {
+      // New format - for now return full image (could implement thumbnail generation)
+      res.setHeader('Content-Type', gift.image.contentType);
+      res.setHeader('Content-Length', gift.image.data.length);
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      res.send(gift.image.data);
+    } else if (typeof gift.image === 'string' && gift.image.startsWith('/')) {
+      // Legacy format - redirect to file system
+      res.redirect(gift.image);
+    } else {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+  } catch (e) {
+    next(e);
+  }
+});
+
+// Direct image serving by image ID
+router.get('/gift-images/:imageId', auth('admin'), async (req, res, next) => {
+  try {
+    const { imageId } = req.params;
+    const { GiftImage } = require('../../models');
+    const image = await GiftImage.findById(imageId).lean();
+    
+    if (!image) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    res.setHeader('Content-Type', image.contentType);
+    res.setHeader('Content-Length', image.data.length);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(image.data);
+  } catch (e) {
+    next(e);
+  }
+});
 
 // Gift choices overview
 router.get('/gift-choices', auth('admin'), adminCtrl.getGiftChoices);

@@ -106,7 +106,10 @@ function writeJson(file, payload) {
 // ========== Gifts (MongoDB-backed) ==========
 async function listGifts(req, res, next) {
   try {
-    const gifts = await Gift.find({ enabled: true }).sort({ createdAt: -1 }).lean();
+    const gifts = await Gift.find({ enabled: true })
+      .populate('image')
+      .sort({ createdAt: -1 })
+      .lean();
     
     // Get purchase counts for each gift
     const giftIds = gifts.map(gift => gift._id);
@@ -121,18 +124,36 @@ async function listGifts(req, res, next) {
       purchaseCountMap[item._id.toString()] = item.count;
     });
     
-    const items = gifts.map(gift => ({
-      id: gift._id.toString(),
-      name: gift.title, // Using 'name' as per requirements
-      title: gift.title,
-      description: gift.description,
-      amount: gift.amount,
-      available: gift.available,
-      purchased: purchaseCountMap[gift._id.toString()] || 0,
-      image: gift.image,
-      imageUrl: `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`,
-      priceDisplay: `€${gift.amount}`
-    }));
+    const items = gifts.map(gift => {
+      // Format image data for display
+      let imageData = null;
+      if (gift.image && gift.image.data) {
+        // Database-stored image with populated data
+        const base64Data = gift.image.data.toString('base64');
+        imageData = `data:${gift.image.contentType};base64,${base64Data}`;
+      } else if (gift.image && gift.image._id) {
+        // Image reference with populated data
+        if (gift.image.data) {
+          const base64Data = gift.image.data.toString('base64');
+          imageData = `data:${gift.image.contentType};base64,${base64Data}`;
+        }
+      } else if (gift.image && typeof gift.image === 'string' && gift.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(gift.image)) {
+        // ObjectId reference - return the ObjectId string for frontend to use API endpoint
+        imageData = gift.image;
+      }
+      
+      return {
+        id: gift._id.toString(),
+        name: gift.title, // Using 'name' as per requirements
+        title: gift.title,
+        description: gift.description,
+        amount: gift.amount,
+        available: gift.available,
+        purchased: purchaseCountMap[gift._id.toString()] || 0,
+        image: imageData,
+        priceDisplay: `€${gift.amount}`
+      };
+    });
     res.json(items);
   } catch (e) { next(e); }
 }
@@ -158,8 +179,16 @@ async function createGift(req, res, next) {
       return res.status(400).json({ error: 'Valid number available is required' });
     }
     
-    if (!image || !isValidImageNumber(parseInt(image))) {
-      return res.status(400).json({ error: 'Valid image number (1-30) is required' });
+    // Handle image reference
+    let imageRef = undefined;
+    if (image && image.imageId) {
+      // New format - reference to uploaded image
+      imageRef = image.imageId;
+    } else if (typeof image === 'string' && image.length === 24 && /^[0-9a-fA-F]{24}$/.test(image)) {
+      // ObjectId string
+      imageRef = image;
+    } else {
+      return res.status(400).json({ error: 'Valid image is required' });
     }
     
     const gift = await Gift.create({ 
@@ -167,8 +196,19 @@ async function createGift(req, res, next) {
       description, 
       amount: parseInt(amount), 
       available: parseInt(available), 
-      image: parseInt(image) 
+      image: imageRef
     });
+    
+    // Populate image for response
+    const populatedGift = await Gift.findById(gift._id).populate('image').lean();
+    
+    // Format image data for display
+    let imageData = null;
+    if (populatedGift.image && populatedGift.image.data) {
+      const base64Data = populatedGift.image.data.toString('base64');
+      imageData = `data:${populatedGift.image.contentType};base64,${base64Data}`;
+    }
+    
     res.status(201).json({
       id: gift._id.toString(),
       name: gift.title,
@@ -177,8 +217,7 @@ async function createGift(req, res, next) {
       amount: gift.amount,
       available: gift.available,
       purchased: 0,
-      image: gift.image,
-      imageUrl: `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`,
+      image: imageData,
       priceDisplay: `€${gift.amount}`
     });
   } catch (e) { next(e); }
@@ -189,28 +228,49 @@ async function updateGift(req, res, next) {
     const { id } = req.params;
     const { name, title, description, amount, available, image } = req.body;
     
-    // Validate image number if provided
-    if (image && !isValidImageNumber(parseInt(image))) {
-      return res.status(400).json({ error: 'Valid image number (1-30) is required' });
-    }
-    
     // Validate amount if provided
     if (amount && ![25, 50, 100, 200, 500].includes(parseInt(amount))) {
       return res.status(400).json({ error: 'Valid amount (€25, €50, €100, €200, or €500) is required' });
     }
     
-    const gift = await Gift.findByIdAndUpdate(id, {
-      ...(title || name) && { title: title || name },
-      ...(description && { description }),
-      ...(amount && { amount: parseInt(amount) }),
-      ...(available !== undefined && { available: parseInt(available) }),
-      ...(image && { image: parseInt(image) })
-    }, { new: true });
+    // Handle image reference
+    let imageRef = undefined;
+    if (image !== undefined) {
+      if (!image) {
+        // Image explicitly set to null/empty, remove it
+        imageRef = undefined;
+      } else if (image.imageId) {
+        // New format - reference to uploaded image
+        imageRef = image.imageId;
+      } else if (typeof image === 'string' && image.length === 24 && /^[0-9a-fA-F]{24}$/.test(image)) {
+        // ObjectId string
+        imageRef = image;
+      }
+    }
+    
+    const updateData = {};
+    if (title || name) updateData.title = title || name;
+    if (description !== undefined) updateData.description = description;
+    if (amount !== undefined) updateData.amount = parseInt(amount);
+    if (available !== undefined) updateData.available = parseInt(available);
+    if (imageRef !== undefined) updateData.image = imageRef;
+    
+    const gift = await Gift.findByIdAndUpdate(id, updateData, { new: true }).populate('image');
 
     if (!gift) return res.status(404).json({ error: 'Gift not found' });
     
     // Get updated purchase count
     const purchaseCount = await GiftChoice.countDocuments({ giftId: gift._id });
+
+    // Format image data for display
+    let imageData = null;
+    if (gift.image && gift.image.data) {
+      const base64Data = gift.image.data.toString('base64');
+      imageData = `data:${gift.image.contentType};base64,${base64Data}`;
+    } else if (gift.image && typeof gift.image === 'string' && gift.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(gift.image)) {
+      // ObjectId reference - return the ObjectId string for frontend to use API endpoint
+      imageData = gift.image;
+    }
 
     res.json({
       id: gift._id.toString(),
@@ -220,8 +280,7 @@ async function updateGift(req, res, next) {
       amount: gift.amount,
       available: gift.available,
       purchased: purchaseCount,
-      image: gift.image,
-      imageUrl: `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`,
+      image: imageData,
       priceDisplay: `€${gift.amount}`
     });
   } catch (e) { next(e); }
@@ -774,6 +833,52 @@ async function uploadMenuOptionImage(req, res, next) {
   } catch (e) { next(e); }
 }
 
+// Image upload for gifts
+async function uploadGiftImage(req, res, next) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(req.file.mimetype)) {
+      return res.status(400).json({ error: 'Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.' });
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (req.file.size > maxSize) {
+      return res.status(400).json({ error: 'File too large. Maximum size is 5MB.' });
+    }
+
+    // Read the file and store in database
+    const fs = require('fs');
+    const imageData = fs.readFileSync(req.file.path);
+    const { GiftImage } = require('../models');
+    
+    // Clean up temporary file
+    fs.unlinkSync(req.file.path);
+
+    // Store image in database
+    const giftImage = await GiftImage.create({
+      data: imageData,
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+
+    // Return the image ID and metadata
+    res.json({ 
+      imageId: giftImage._id.toString(),
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+
+  } catch (e) { next(e); }
+}
+
 module.exports = {
   // gifts (DB-backed)
   listGifts, createGift, updateGift, deleteGift, getGiftChoices, getGiftCardImages,
@@ -781,6 +886,8 @@ module.exports = {
   listEventsAdmin, createEventsItem, updateEventsItem, deleteEventsItem, uploadEventImage,
   // menu options (DB-backed)
   uploadMenuOptionImage,
+  // gifts (DB-backed)
+  uploadGiftImage,
   // courses (new schema)
   listCourses, createCourse, getCourse, updateCourse, deleteCourse,
   getCourseOptions,

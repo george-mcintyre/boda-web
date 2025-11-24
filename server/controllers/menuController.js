@@ -1,6 +1,6 @@
 const { MenuCourse, MenuChoice, Guest, Course, CourseOption, MenuOptionImage } = require('../models');
 const { formatCourseForApi, formatCourseOptionForApi } = require('../controllers/adminController');
-const { generateSelectionIconHTML } = require('../utils/menuIcons');
+const { generateSelectionIconHTML, generateDietaryIconsHTML } = require('../utils/menuIcons');
 
 // Helper to format menu part for API response
 function formatMenuCourseForApi(menuPart, index) {
@@ -10,7 +10,13 @@ function formatMenuCourseForApi(menuPart, index) {
     label: menuPart.label,
     selectionRequired: menuPart.selectionRequired !== undefined ? menuPart.selectionRequired : true,
     selectionIcon: generateSelectionIconHTML(menuPart),
-    options: (menuPart.options || []).map((option, optIndex) => formatCourseOptionForApi(option))
+    options: (menuPart.options || []).map((option, optIndex) => {
+      // Ensure each option includes dietary icons
+      const formattedOption = formatCourseOptionForApi(option);
+      // Override the dietaryIcons to ensure they're generated with the latest format
+      formattedOption.dietaryIcons = generateDietaryIconsHTML(option);
+      return formattedOption;
+    })
   };
 }
 

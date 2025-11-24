@@ -468,6 +468,86 @@
     return guests;
   }
 
+  // Image preview handler for file inputs
+  function setupImagePreview(modal) {
+    const fileInput = modal.querySelector('#f_image');
+    const previewContainer = modal.querySelector('#image-preview-container');
+    
+    console.log('setupImagePreview called:', {
+      hasFileInput: !!fileInput,
+      hasPreviewContainer: !!previewContainer,
+      fileInputId: fileInput?.id,
+      previewContainerId: previewContainer?.id
+    });
+    
+    if (!fileInput || !previewContainer) {
+      console.warn('Image preview setup failed: missing elements', {
+        fileInput: !!fileInput,
+        previewContainer: !!previewContainer
+      });
+      return;
+    }
+    
+    // Remove any existing listeners to prevent duplicates
+    const newFileInput = fileInput.cloneNode(true);
+    fileInput.parentNode.replaceChild(newFileInput, fileInput);
+    
+    newFileInput.addEventListener('change', function(e) {
+      console.log('File input changed:', e.target.files[0]);
+      const file = e.target.files[0];
+      
+      if (!file) {
+        console.log('No file selected, resetting preview');
+        // Reset preview if no file selected
+        previewContainer.innerHTML = `
+          <div style="text-align:center; color:#999;">
+            <i class="fas fa-image" style="font-size:2em; margin-bottom:10px; display:block;"></i>
+            <div>Image preview will appear here</div>
+          </div>`;
+        return;
+      }
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file');
+        newFileInput.value = '';
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size must be less than 5MB');
+        newFileInput.value = '';
+        return;
+      }
+      
+      console.log('Creating preview for file:', file.name, file.type, file.size);
+      
+      // Create and show preview
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        console.log('FileReader loaded, creating preview');
+        const imageUrl = e.target.result;
+        previewContainer.innerHTML = `
+          <div style="text-align:center;">
+            <img src="${imageUrl}" alt="Preview" style="max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="margin-top:8px; color:#666; font-size:0.9em;">
+              <i class="fas fa-info-circle"></i> 
+              ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)
+            </div>
+          </div>`;
+        console.log('Preview created successfully');
+      };
+      reader.onerror = function(error) {
+        console.error('FileReader error:', error);
+        alert('Error reading file');
+      };
+      reader.readAsDataURL(file);
+    });
+    
+    console.log('Image preview event listener attached successfully');
+  }
+
   // Custom image dropdown component
   function createImageDropdown(id, name, options, selectedValue) {
     // Ensure styles are loaded
@@ -611,76 +691,92 @@
         
         ${fields.map(f => {
           const id = `f_${f.name}`;
-          const label = `<label for="${id}" style="display:block;margin:6px 0 6px 0;font-weight:600;color:#333;">${f.label}${f.required?' *':''}</label>`;
           const val = initialValues[f.name] ?? f.default ?? '';
           const baseStyle = 'width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;';
           let inputHtml = '';
           
-          if (f.type === 'textarea') {
-            inputHtml = `<textarea id="${id}" name="${f.name}" rows="${f.rows||3}" style="${baseStyle}">${val!==undefined?String(val):''}</textarea>`;
-          } else if (f.type === 'location') {
-            // Location selector with map integration - pass separate coordinates if available
-            const locationAddress = val || '';
-            const locationLatitude = initialValues[`${f.name}Latitude`] || '';
-            const locationLongitude = initialValues[`${f.name}Longitude`] || '';
+          if (f.type === 'checkbox') {
+            const checked = val === true || val === 'true' || val === 'on' ? 'checked' : '';
+            inputHtml = `<input id="${id}" name="${f.name}" type="checkbox" ${checked} style="width:auto;margin-right:8px;"> <label for="${id}" style="font-weight:normal;margin:0;cursor:pointer;">${f.label}${f.required?' *':''}</label>`;
+            const help = f.help ? `<small style="display:block;color:#6c757d;margin-top:4px;margin-left:24px;">${f.help}</small>` : '';
+            return `<div style="margin-bottom:14px;" data-field="${f.name}">${inputHtml}${help}</div>`;
+          } else {
+            const label = `<label for="${id}" style="display:block;margin:6px 0 6px 0;font-weight:600;color:#333;">${f.label}${f.required?' *':''}</label>`;
             
-            const locationSelector = createLocationSelector(id, locationAddress, locationLatitude, locationLongitude);
-            inputHtml = '';
-            setTimeout(() => {
-              const placeholder = document.getElementById(`location-placeholder-${f.name}`);
-              if (placeholder) {
-                placeholder.parentNode.replaceChild(locationSelector.container, placeholder);
-                // Store reference to get value function
-                locationSelector._getValue = locationSelector.getValue;
-                locationSelector.getValue = () => locationSelector._getValue();
-              }
-            }, 0);
-            inputHtml = `<div id="location-placeholder-${f.name}" style="width:100%;"></div>`;
-          } else if (f.type === 'select') {
-            // Check if this is an image dropdown
-            if (f.showImages && f.options && f.options.length > 0 && f.options[0].imageUrl) {
-              const imageOptions = f.options.map(opt => ({
-                value: opt.value,
-                label: opt.label,
-                imageUrl: opt.imageUrl
-              }));
+            if (f.type === 'textarea') {
+              inputHtml = `<textarea id="${id}" name="${f.name}" rows="${f.rows||3}" style="${baseStyle}">${val!==undefined?String(val):''}</textarea>`;
+            } else if (f.type === 'location') {
+              // Location selector with map integration - pass separate coordinates if available
+              const locationAddress = val || '';
+              const locationLatitude = initialValues[`${f.name}Latitude`] || '';
+              const locationLongitude = initialValues[`${f.name}Longitude`] || '';
               
-              // Debug logging
-              console.log('openFormModal - image field:', {
-                fieldName: f.name,
-                originalOptionsCount: f.options.length,
-                mappedOptionsCount: imageOptions.length,
-                mappedOptions: imageOptions.slice(0, 3),
-                selectedValue: val
-              });
-              
-              // Create a placeholder div that will be replaced after the form is created
-              inputHtml = `<div id="image-dropdown-placeholder-${f.name}" style="width:100%;"></div>`;
-              
-              // Store the image dropdown creation for after the form is rendered
+              const locationSelector = createLocationSelector(id, locationAddress, locationLatitude, locationLongitude);
+              inputHtml = '';
               setTimeout(() => {
-                const placeholder = document.getElementById(`image-dropdown-placeholder-${f.name}`);
+                const placeholder = document.getElementById(`location-placeholder-${f.name}`);
                 if (placeholder) {
-                  const container = createImageDropdown(id, f.name, imageOptions, val);
-                  placeholder.parentNode.replaceChild(container, placeholder);
+                  placeholder.parentNode.replaceChild(locationSelector.container, placeholder);
+                  // Store reference to get value function
+                  locationSelector._getValue = locationSelector.getValue;
+                  locationSelector.getValue = () => locationSelector._getValue();
                 }
               }, 0);
+              inputHtml = `<div id="location-placeholder-${f.name}" style="width:100%;"></div>`;
+            } else if (f.type === 'imagePreview') {
+              // Image preview container - will be populated by file input change handler
+              inputHtml = `<div id="image-preview-container" style="margin-top:10px; padding:10px; border:1px dashed #ddd; border-radius:8px; background:#f8f9fa; min-height:120px; display:flex; align-items:center; justify-content:center;">
+                <div style="text-align:center; color:#999;">
+                  <i class="fas fa-image" style="font-size:2em; margin-bottom:10px; display:block;"></i>
+                  <div>Image preview will appear here</div>
+                </div>
+              </div>`;
+            } else if (f.type === 'select') {
+              // Check if this is an image dropdown
+              if (f.showImages && f.options && f.options.length > 0 && f.options[0].imageUrl) {
+                const imageOptions = f.options.map(opt => ({
+                  value: opt.value,
+                  label: opt.label,
+                  imageUrl: opt.imageUrl
+                }));
+                
+                // Debug logging
+                console.log('openFormModal - image field:', {
+                  fieldName: f.name,
+                  originalOptionsCount: f.options.length,
+                  mappedOptionsCount: imageOptions.length,
+                  mappedOptions: imageOptions.slice(0, 3),
+                  selectedValue: val
+                });
+                
+                // Create a placeholder div that will be replaced after the form is created
+                inputHtml = `<div id="image-dropdown-placeholder-${f.name}" style="width:100%;"></div>`;
+                
+                // Store the image dropdown creation for after the form is rendered
+                setTimeout(() => {
+                  const placeholder = document.getElementById(`image-dropdown-placeholder-${f.name}`);
+                  if (placeholder) {
+                    const container = createImageDropdown(id, f.name, imageOptions, val);
+                    placeholder.parentNode.replaceChild(container, placeholder);
+                  }
+                }, 0);
+              } else {
+                const opts = (f.options||[]).map(opt => {
+                  const v = typeof opt === 'string' ? opt : opt.value;
+                  const t = typeof opt === 'string' ? opt : opt.label;
+                  const sel = String(val) === String(v) ? 'selected' : '';
+                  return `<option value="${v}" ${sel}>${t}</option>`;
+                }).join('');
+                inputHtml = `<select id="${id}" name="${f.name}" style="${baseStyle}">${opts}</select>`;
+              }
             } else {
-              const opts = (f.options||[]).map(opt => {
-                const v = typeof opt === 'string' ? opt : opt.value;
-                const t = typeof opt === 'string' ? opt : opt.label;
-                const sel = String(val) === String(v) ? 'selected' : '';
-                return `<option value="${v}" ${sel}>${t}</option>`;
-              }).join('');
-              inputHtml = `<select id="${id}" name="${f.name}" style="${baseStyle}">${opts}</select>`;
+              const type = f.type || 'text';
+              inputHtml = `<input id="${id}" name="${f.name}" type="${type}" value="${val!==undefined?String(val):''}" style="${baseStyle}">`;
             }
-          } else {
-            const type = f.type || 'text';
-            inputHtml = `<input id="${id}" name="${f.name}" type="${type}" value="${val!==undefined?String(val):''}" style="${baseStyle}">`;
+            
+            const help = f.help ? `<small style="display:block;color:#6c757d;margin-top:4px;">${f.help}</small>` : '';
+            return `<div style="margin-bottom:14px;" data-field="${f.name}">${label}${inputHtml}${help}</div>`;
           }
-          
-          const help = f.help ? `<small style="display:block;color:#6c757d;margin-top:4px;">${f.help}</small>` : '';
-          return `<div style="margin-bottom:14px;" data-field="${f.name}">${label}${inputHtml}${help}</div>`;
         }).join('')}
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;">
           <button type="button" id="mfCancel" class="admin-action" style="background:#6c757d;color:#fff;border:none;padding:10px 16px;border-radius:8px;">Cancel</button>
@@ -726,9 +822,13 @@
         if (f.required && (v === '' || v === null || v === undefined || (f.type==='number' && Number.isNaN(v)))) valid = false;
         if (f.type === 'select' && f.required && (v === '' || v === null || v === undefined)) valid = false;
         if (f.type === 'location' && f.required && (v === '' || v === null || v === undefined)) valid = false;
+        if (f.type === 'checkbox' && f.required && !v) valid = false;
         
-        // For non-location fields, store the value in data
-        if (f.type !== 'location') {
+        // Handle checkbox values properly
+        if (f.type === 'checkbox') {
+          const checkboxEl = modal.querySelector(`#f_${f.name}`);
+          data[f.name] = checkboxEl ? checkboxEl.checked : false;
+        } else if (f.type !== 'location') {
           data[f.name] = v;
         }
       });
@@ -773,7 +873,11 @@
         ebox.style.display = 'block';
       });
     });
-    return { close };
+
+    // Setup image preview for file inputs
+    setupImagePreview(modal);
+
+    return { close, modal };
   }
 
   // Add styles for custom image dropdown
@@ -1290,39 +1394,42 @@
     activate('gifts');
     setLoading('Loading gift list...');
     
-    // Load gifts and available images
-    const [giftsRes, imagesRes] = await Promise.all([
-      api('/api/admin/gifts'),
-      api('/api/admin/gift-images')
-    ]);
-    
+    // Load gifts 
+    const giftsRes = await api('/api/admin/gifts');
     const gifts = giftsRes.ok ? await giftsRes.json() : [];
-    const availableImages = imagesRes.ok ? await imagesRes.json() : [];
     
-    // Debug logging
-    console.log('showGifts - availableImages:', {
-      count: availableImages.length,
-      images: availableImages.slice(0, 5) // First 5 images for debugging
-    });
-    
-    // Add image URLs to the available images for the dropdown
-    const imageOptions = availableImages.map(img => ({
-      value: img.id,
-      label: `Gift Card ${img.id}`,
-      imageUrl: img.url
-    }));
-    
-    console.log('showGifts - imageOptions:', {
-      count: imageOptions.length,
-      options: imageOptions.slice(0, 3) // First 3 options for debugging
-    });
-    
-    const rows = (gifts||[]).map(it => `
+    const rows = (gifts||[]).map(it => {
+      // Helper function to get image URL
+      function getGiftImageUrl(gift) {
+        if (!gift.image) return null;
+        
+        // Handle different image formats
+        if (typeof gift.image === 'string') {
+          // Base64 data or ObjectId
+          if (gift.image.startsWith('data:')) {
+            return gift.image; // Already base64 encoded
+          } else if (gift.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(gift.image)) {
+            // ObjectId - use the image endpoint
+            return `/api/admin/gifts/${gift.id}/image/thumbnail`;
+          } else {
+            return gift.image; // Legacy URL
+          }
+        } else if (gift.image && gift.image.data) {
+          // Database-stored image with base64 data
+          return gift.image;
+        }
+        
+        return null;
+      };
+      
+      const imageUrl = getGiftImageUrl(it);
+      
+      return `
       <tr>
         <td>${it.name || it.title || ''}</td>
         <td>${it.description || ''}</td>
         <td>
-          <img src="${it.imageUrl}" alt="Gift card" style="width: 40px; height: 25px; object-fit: cover; border-radius: 4px;">
+          ${imageUrl ? `<img src="${imageUrl}" alt="Gift card" style="width: 40px; height: 25px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;">No image</span>` : '<span style="color: #999;">No image</span>'}
         </td>
         <td>${it.available}</td>
         <td>€${it.amount}</td>
@@ -1331,7 +1438,8 @@
           <button class="admin-action" data-action="edit" data-id="${it.id}"><i class="fas fa-edit"></i></button>
           <button class="admin-action danger" data-action="del" data-id="${it.id}"><i class="fas fa-trash"></i></button>
         </td>
-      </tr>`).join('');
+      </tr>`;
+    }).join('');
       
     content.innerHTML = renderTable({
       title:'Gift List', 
@@ -1353,14 +1461,13 @@
         openFormModal({
           title: 'Edit gift', 
           submitText: 'Save',
+          showCurrentImage: current.image && !current.image.startsWith('data:'),
+          currentImageUrl: current.image && current.image.startsWith('data:') ? current.image : (current.image ? `/api/admin/gifts/${current.id}/image` : null),
           fields: [
             { name:'name', label:'Name', required:true },
             { name:'description', label:'Description', type:'textarea', required:true },
-            { name:'image', label:'Image', type:'select', required:true, 
-              options: imageOptions,
-              showImages: true,
-              help: 'Select a gift card image' 
-            },
+            { name:'image', label:'Image', type:'file', help: 'Upload gift card image (will be stored in database)' },
+            { name:'imagePreview', label:'Preview', type:'imagePreview' },
             { name:'available', label:'Number Available', type:'number', min:'0', required:true },
             { name:'amount', label:'Price', type:'select', required:true,
               options: [
@@ -1375,22 +1482,79 @@
           initialValues: {
             name: current.name || current.title || '',
             description: current.description || '',
-            image: current.image,
             available: current.available,
             amount: String(current.amount)
           },
-          onSubmit: async (values, close) => {
-            const r = await api(`/api/admin/gifts/${id}`, { 
-              method:'PUT', 
-              headers:{'Content-Type':'application/json'}, 
-              body: JSON.stringify(values)
-            });
-            if (!r.ok) {
-              const errorData = await r.json();
-              throw new Error(errorData.error || 'Failed to update gift');
+          onSubmit: async (values, close, modal) => {
+            try {
+              // Handle image upload
+              let imageReference = null;
+              const imageFile = document.getElementById('f_image')?.files[0];
+              if (imageFile) {
+                const formData = new FormData();
+                formData.append('image', imageFile);
+                const uploadRes = await fetch('/api/admin/gifts/upload-image', {
+                  method: 'POST',
+                  headers: { 'Authorization': `Bearer ${token}` },
+                  body: formData
+                });
+                if (uploadRes.ok) {
+                  const uploadData = await uploadRes.json();
+                  // Store the image ID for the gift
+                  imageReference = {
+                    imageId: uploadData.imageId
+                  };
+                }
+              } else if (current.image) {
+                // Keep existing image reference for edit mode
+                if (typeof current.image === 'string') {
+                  if (current.image.startsWith('data:')) {
+                    // Base64 data - keep as is
+                    imageReference = current.image;
+                  } else if (current.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(current.image)) {
+                    // ObjectId string - keep as is
+                    imageReference = current.image;
+                  } else {
+                    // Legacy URL-based image - keep as is
+                    imageReference = current.image;
+                  }
+                } else if (current.image && typeof current.image === 'object') {
+                  // Database-stored image object - keep the reference
+                  if (current.image.imageId) {
+                    // New format with imageId
+                    imageReference = { imageId: current.image.imageId };
+                  } else if (current.image._id) {
+                    // MongoDB ObjectId reference
+                    imageReference = current.image._id.toString();
+                  } else {
+                    // Other object format - keep as is
+                    imageReference = current.image;
+                  }
+                }
+              }
+              
+              const giftData = {
+                name: values.name,
+                description: values.description,
+                available: parseInt(values.available),
+                amount: parseInt(values.amount),
+                image: imageReference
+              };
+              
+              const r = await api(`/api/admin/gifts/${id}`, { 
+                method:'PUT', 
+                headers:{'Content-Type':'application/json'}, 
+                body: JSON.stringify(giftData)
+              });
+              if (!r.ok) {
+                const errorData = await r.json();
+                throw new Error(errorData.error || 'Failed to update gift');
+              }
+              close();
+              showGifts();
+            } catch (error) {
+              throw error;
             }
-            close();
-            showGifts();
           }
         });
       }
@@ -1403,11 +1567,8 @@
         fields: [
           { name:'name', label:'Name', required:true },
           { name:'description', label:'Description', type:'textarea', required:true },
-          { name:'image', label:'Image', type:'select', required:true,
-            options: imageOptions,
-            showImages: true,
-            help: 'Select a gift card image' 
-          },
+          { name:'image', label:'Image', type:'file', required:true, help: 'Upload gift card image (will be stored in database)' },
+          { name:'imagePreview', label:'Preview', type:'imagePreview' },
           { name:'available', label:'Number Available', type:'number', min:'0', required:true },
           { name:'amount', label:'Price', type:'select', required:true,
             options: [
@@ -1419,18 +1580,50 @@
             ]
           }
         ],
-        onSubmit: async (values, close) => {
-          const r = await api('/api/admin/gifts', { 
-            method:'POST', 
-            headers:{'Content-Type':'application/json'}, 
-            body: JSON.stringify(values)
-          });
-          if (!r.ok) {
-            const errorData = await r.json();
-            throw new Error(errorData.error || 'Failed to create gift');
+        onSubmit: async (values, close, modal) => {
+          try {
+            // Handle image upload
+            let imageReference = null;
+            const imageFile = document.getElementById('f_image')?.files[0];
+            if (imageFile) {
+              const formData = new FormData();
+              formData.append('image', imageFile);
+              const uploadRes = await fetch('/api/admin/gifts/upload-image', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+              });
+              if (uploadRes.ok) {
+                const uploadData = await uploadRes.json();
+                // Store the image ID for the gift
+                imageReference = {
+                  imageId: uploadData.imageId
+                };
+              }
+            }
+            
+            const giftData = {
+              name: values.name,
+              description: values.description,
+              available: parseInt(values.available),
+              amount: parseInt(values.amount),
+              image: imageReference
+            };
+            
+            const r = await api('/api/admin/gifts', { 
+              method:'POST', 
+              headers:{'Content-Type':'application/json'}, 
+              body: JSON.stringify(giftData)
+            });
+            if (!r.ok) {
+              const errorData = await r.json();
+              throw new Error(errorData.error || 'Failed to create gift');
+            }
+            close();
+            showGifts();
+          } catch (error) {
+            throw error;
           }
-          close();
-          showGifts();
         }
       });
     });
@@ -2430,14 +2623,31 @@ function openMenuCourseOptionsForm(courseId, optionId = null) {
         display: flex;
         gap: 4px;
         margin-left: 8px;
+        flex-wrap: wrap;
       }
       
       .dietary-icon {
-        font-size: 0.8em;
-        padding: 2px 4px;
-        border-radius: 3px;
-        background: rgba(255, 255, 255, 0.8);
+        font-size: 0.85em;
+        padding: 3px 6px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.95);
         border: 1px solid rgba(0, 0, 0, 0.1);
+        cursor: help;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        height: 20px;
+      }
+      
+      .dietary-icon:hover {
+        transform: scale(1.1);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      }
+      
+      .dietary-icon i {
+        margin: 0;
       }
       
       .option-header {

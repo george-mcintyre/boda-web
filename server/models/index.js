@@ -10,6 +10,7 @@ module.exports = {
   CourseOption: require('./CourseOption'),
   MenuOptionImage: require('./MenuOptionImage'),
   Gift: require('./Gift'),
+  GiftImage: require('./GiftImage'),
   GiftChoice: require('./GiftChoice'),
   CashGiftCard: require('./CashGiftCard'), // Legacy - will be removed in Phase 8
   Config: require('./Config'),
