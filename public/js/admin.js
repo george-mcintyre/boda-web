@@ -678,17 +678,6 @@
       <form id="mfForm" style="padding:18px 24px;">
         <div id="mfError" style="display:none;margin-bottom:10px;color:#dc3545;font-weight:600;"></div>
         
-        ${additionalOptions.showCurrentImage ? `
-          <div style="margin-bottom:14px;">
-            <label style="display:block;margin:6px 0 6px 0;font-weight:600;color:#333;">Current Image</label>
-            <div style="border:1px solid #ddd;border-radius:8px;padding:10px;background:#f8f9fa;">
-              <img src="${additionalOptions.currentImageUrl}" alt="Current event image" style="max-width:200px;max-height:120px;object-fit:cover;border-radius:4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';">
-              <div style="color:#999; display: none;">Image not available</div>
-              <small style="color:#666;margin-top:5px;display:block;">Upload a new image below to replace this one</small>
-            </div>
-          </div>
-        ` : ''}
-        
         ${fields.map(f => {
           const id = `f_${f.name}`;
           const val = initialValues[f.name] ?? f.default ?? '';
@@ -1425,8 +1414,8 @@
           if (gift.image.startsWith('data:')) {
             return gift.image; // Already base64 encoded
           } else if (gift.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(gift.image)) {
-            // ObjectId - use the image endpoint
-            return `/api/admin/gifts/${gift.id}/image/thumbnail`;
+            // ObjectId - use the image endpoint with image ID
+            return `/api/admin/gift-images/${gift.image}`;
           } else {
             return gift.image; // Legacy URL
           }
@@ -1474,11 +1463,41 @@
         const r = await api(`/api/admin/gifts/${id}`, { method:'DELETE' }); 
         if (r.ok) showGifts(); else notify('Error deleting gift','error');
       } else if (action === 'edit'){
+        // Helper function to determine if image is an ObjectId
+        function isObjectId(str) {
+          return str && typeof str === 'string' && str.length === 24 && /^[0-9a-fA-F]{24}$/.test(str);
+        }
+
+        // Helper function to get proper image URL for display
+        function getImageUrlForForm(gift) {
+          if (!gift.image) return null;
+          
+          // Handle base64 data URLs
+          if (typeof gift.image === 'string' && gift.image.startsWith('data:')) {
+            return gift.image;
+          }
+          
+          // Handle ObjectId references
+          if (isObjectId(gift.image)) {
+            return `/api/admin/gift-images/${gift.image}`;
+          }
+          
+          // Handle legacy URL-based images
+          if (typeof gift.image === 'string' && gift.image.startsWith('/')) {
+            return gift.image;
+          }
+          
+          return null;
+        }
+
+        const imageUrl = getImageUrlForForm(current);
+        const showCurrentImage = !!(current.image && imageUrl);
+
         openFormModal({
           title: 'Edit gift', 
           submitText: 'Save',
-          showCurrentImage: current.image && !current.image.startsWith('data:'),
-          currentImageUrl: current.image && current.image.startsWith('data:') ? current.image : (current.image ? `/api/admin/gifts/${current.id}/image` : null),
+          showCurrentImage: showCurrentImage,
+          currentImageUrl: imageUrl,
           fields: [
             { name:'name', label:'Name', required:true },
             { name:'description', label:'Description', type:'textarea', required:true },
