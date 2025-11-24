@@ -2628,7 +2628,7 @@
                   <h5>${feature.label}</h5>
                   <div class="toggle-switch">
                     <input type="checkbox" id="toggle-${feature.key}" ${settings[feature.key] ? 'checked' : ''}>
-                    <label for="toggle-${feature.key}" onclick="updateFeatureToggle('${feature.key}', document.getElementById('toggle-${feature.key}').checked)"></label>
+                    <label for="toggle-${feature.key}" onclick="updateFeatureToggle('${feature.key}', !document.getElementById('toggle-${feature.key}').checked)"></label>
                   </div>
                 </div>
                 <p class="feature-desc">${feature.desc}</p>
@@ -2655,11 +2655,11 @@
     try {
       // Get current state of all toggles
       const currentSettings = {
-        guestsEnabled: featureKey === 'guestsEnabled' ? !enabled : (document.getElementById('toggle-guestsEnabled')?.checked || false) ,
-        eventsEnabled: featureKey === 'eventsEnabled' ? !enabled : (document.getElementById('toggle-eventsEnabled')?.checked || false),
-        menuEnabled: featureKey === 'menuEnabled' ? !enabled : (document.getElementById('toggle-menuEnabled')?.checked || false),
-        messagesEnabled: featureKey === 'messagesEnabled' ? !enabled : (document.getElementById('toggle-messagesEnabled')?.checked || false),
-        giftsEnabled: featureKey === 'giftsEnabled' ? !enabled : (document.getElementById('toggle-giftsEnabled')?.checked || false)
+        guestsEnabled: featureKey === 'guestsEnabled' ? enabled : (document.getElementById('toggle-guestsEnabled')?.checked || false) ,
+        eventsEnabled: featureKey === 'eventsEnabled' ? enabled : (document.getElementById('toggle-eventsEnabled')?.checked || false),
+        menuEnabled: featureKey === 'menuEnabled' ? enabled : (document.getElementById('toggle-menuEnabled')?.checked || false),
+        messagesEnabled: featureKey === 'messagesEnabled' ? enabled : (document.getElementById('toggle-messagesEnabled')?.checked || false),
+        giftsEnabled: featureKey === 'giftsEnabled' ? enabled : (document.getElementById('toggle-giftsEnabled')?.checked || false)
       };
       
       console.log('Updating settings:', currentSettings);
@@ -2685,12 +2685,14 @@
       
       if (toggle && card && badge) {
         if (enabled) {
+          toggle.classList.remove('checked');
           card.classList.remove('disabled');
           card.classList.add('enabled');
           badge.textContent = 'Enabled';
           badge.classList.remove('inactive');
           badge.classList.add('active');
         } else {
+          toggle.classList.add('checked');
           card.classList.remove('enabled');
           card.classList.add('disabled');
           badge.textContent = 'Disabled';
