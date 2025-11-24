@@ -53,7 +53,8 @@ body.wix-landing-active footer { display: none !important; }
   grid-template-columns: 1fr;
   align-items: start;
   gap: 28px;
-  padding: 64px 0 24px;
+  padding: 0 0 24px;
+  /* Remove top padding to touch the navbar */
 }
 
 .wix-landing .eyebrow {
@@ -225,7 +226,8 @@ body.wix-landing-active footer { display: none !important; }
     grid-template-columns: 1.00fr 1.00fr;
     align-items: center;
     gap: 10px;
-    padding: 8vh 0 2vh;
+    padding: 0 0 2vh;
+    /* Remove top padding to touch the navbar */
   }
   .wix-landing .stack-gallery { height: 76vh; }
   .wix-landing .stack-viewport { height: 76vh; }
