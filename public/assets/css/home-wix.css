@@ -326,16 +326,10 @@ body.wix-landing-active footer { display: none !important; }
     display: block;
   }
   
-  /* Initial state - all images hidden below viewport */
-  .wix-landing .stack-card:not(:first-child) {
+  /* Initial state - ALL images hidden below viewport to show text first */
+  .wix-landing .stack-card {
     opacity: 0;
     transform: translateY(100%);
-  }
-  
-  /* First image visible */
-  .wix-landing .stack-card:first-child {
-    opacity: 1;
-    transform: translateY(0);
     z-index: 10;
   }
 }

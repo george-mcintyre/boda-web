@@ -16,19 +16,25 @@
     // Check if we're on mobile (narrow screen)
     const isMobile = window.innerWidth <= 859;
 
-    // Prepare cards: first visible, rest off-screen bottom
+    // Prepare cards: all hidden on mobile (text first), first visible on desktop
     cards.forEach((card, i) => {
       card.style.willChange = 'transform, opacity';
       card.style.transition = 'none';
       card.style.zIndex = String(10 + i);
-      if (i === 0){
-        card.style.opacity = '1';
-        card.style.transform = 'translateY(0)';
-      } else {
+      
+      if (isMobile) {
+        // On mobile, ALL images start hidden to show text first
         card.style.opacity = '0';
         card.style.transform = 'translateY(100%)';
-        // mark for wow/animate.css (desktop only)
-        if (!isMobile) {
+      } else {
+        // On desktop, first image visible, rest off-screen bottom
+        if (i === 0){
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        } else {
+          card.style.opacity = '0';
+          card.style.transform = 'translateY(100%)';
+          // mark for wow/animate.css (desktop only)
           card.classList.add('wow');
         }
       }
@@ -39,7 +45,7 @@
       window._wowInstance.sync();
     }
 
-    let index = 0; // currently visible top-most index
+    let index = -1; // currently visible top-most index (-1 means no images visible)
     let busy = false;
     let completed = false;
 
@@ -52,7 +58,8 @@
         return;
       }
       busy = true;
-      const next = cards[index + 1];
+      const nextIndex = index + 1;
+      const next = cards[nextIndex];
       // Ensure visibility and start animation
       next.style.opacity = '1';
       next.style.transform = 'translateY(0)';
@@ -65,7 +72,7 @@
         next.removeEventListener('animationend', onEnd);
         // Clean up animate classes to avoid re-triggering
         next.classList.remove('animate__slideInUp', 'animate__faster');
-        index++;
+        index = nextIndex;
         busy = false;
         if (index >= cards.length - 1){
           completed = true;
@@ -96,6 +103,7 @@
         current.style.transform = 'translateY(100%)';
         index--;
         busy = false;
+        // If we've gone back to -1, all images are hidden and text is visible
       }
       current.addEventListener('animationend', onEnd);
     }
@@ -106,14 +114,14 @@
       if (!sectionInView(section, false)) return;
       const lastIndex = cards.length - 1;
 
-      // Reverse (scroll up) within the stack when not at the first card
+      // Reverse (scroll up) within the stack when we have images showing
       if (e.deltaY < -6) {
-        if (index > 0) {
+        if (index >= 0) {
           e.preventDefault();
           animatePrev();
           return;
         } else {
-          // At the top - completely prevent any page movement
+          // At the top (text only) - completely prevent any page movement
           e.preventDefault();
           return;
         }
@@ -141,9 +149,9 @@
           e.preventDefault();
           animateNext();
           return;
-        // Reverse allowed whenever not at first card
+        // Reverse allowed whenever we have images showing (index >= 0)
         } else if (dy < -15 && !busy){
-          if (index > 0){
+          if (index >= 0){
             e.preventDefault();
             animatePrev();
             return;
@@ -161,9 +169,9 @@
       if (dy > 10 && !busy && !completed && index < cards.length - 1){
         e.preventDefault();
         animateNext();
-      // Reverse allowed whenever not at first card
+      // Reverse allowed whenever we have images showing (index >= 0)
       } else if (dy < -10 && !busy){
-        if (index > 0){
+        if (index >= 0){
           e.preventDefault();
           animatePrev();
         } else {
@@ -180,7 +188,7 @@
       const nextKeys = ['ArrowDown','PageDown','Space',' '];
       const prevKeys = ['ArrowUp','PageUp'];
       const lastIndex = cards.length - 1;
-      if (prevKeys.includes(e.key) && index > 0){
+      if (prevKeys.includes(e.key) && index >= 0){
         if (!sectionInView(section, false)) return;
         e.preventDefault();
         animatePrev();
@@ -262,7 +270,7 @@
       // When scrolling up via scrollbar
       if (dy < -2) {
         if (!busy) {
-          if (index > 0) {
+          if (index >= 0) {
             animatePrev();
           } else {
             // At the top - force scroll position back to 0
