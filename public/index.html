@@ -11,34 +11,128 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <style>
-    /* Estilos para el header con selector de idiomas */
-    .header-content {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-    }
-    
-    .header-left {
-      flex: 1;
-    }
-    
-    /* Estilos para el selector de idiomas */
-    .language-selector {
-      position: relative;
-      margin-left: 20px;
-      z-index: 1000;
+    /* Sticky navbar styles */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 1001;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
 
-    /* Acciones del encabezado (top-right) */
+    .navbar .container {
+      width: min(90%, 100%);
+      margin-inline: auto;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
     .header-actions {
       display: flex;
       align-items: center;
       gap: 12px;
-      z-index: 1000;
     }
 
-    /* Estilos para el icono de acceso al login */
+    /* Language selector styles */
+    .language-selector {
+      position: relative;
+    }
+
+    .language-selector-wrapper {
+      position: relative;
+    }
+
+    .language-selector-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .language-selector-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      height: 40px;
+      background: rgb(213, 213, 213);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      color: #605047;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      min-width: 120px;
+    }
+
+    .language-selector-toggle:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .language-selector-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+      background: white;
+      border: 1px solid #e1e5e9;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      backdrop-filter: blur(20px);
+      min-width: 160px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1001;
+      overflow: hidden;
+    }
+
+    .language-selector-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .language-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: #333;
+      font-size: 14px;
+      font-weight: 500;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .language-option:last-child {
+      border-bottom: none;
+    }
+
+    .language-option:hover {
+      background: #f8f9fa;
+      color: #007bff;
+    }
+
+    .language-option.active {
+      background: #e3f2fd;
+      color: #1976d2;
+      font-weight: 600;
+    }
+
+    /* Login icon styles */
     .login-access-icon {
       display: flex;
       align-items: center;
@@ -56,17 +150,11 @@
       background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 8px;
-      color: white;
+      color: #605047;
       font-size: 18px;
       text-decoration: none;
       transition: all 0.3s ease;
       backdrop-filter: blur(10px);
-    }
-
-    @media (max-width: 600px) {
-      .header-actions { gap: 8px; }
-      .language-selector-toggle { min-width: auto; padding: 8px; }
-      .login-access-icon a { width: 36px; height: 36px; font-size: 16px; }
     }
 
     .login-access-icon a:hover {
@@ -79,6 +167,79 @@
     .login-access-icon a:focus {
       outline: none;
       box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+    }
+
+    @media (max-width: 600px) {
+      .header-actions { gap: 8px; }
+      .language-selector-toggle { min-width: auto; padding: 8px; }
+      .login-access-icon a { width: 36px; height: 36px; font-size: 16px; }
+    }
+
+    /* Centered wedding content styles */
+    .wix-landing .wix-hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: 70vh;
+      padding: 60px 0;
+    }
+
+    .wix-landing .wix-left {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .wix-landing .eyebrow {
+      font-size: 13px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--wix-muted);
+      margin: 0 0 16px;
+    }
+
+    .wix-landing h1 {
+      font-size: clamp(32px, 9vw, 56px);
+      line-height: 1.02;
+      margin: 0 0 16px;
+      font-weight: 600;
+    }
+
+    .wix-landing .date {
+      font-size: 16px;
+      color: var(--wix-muted);
+      margin: 0 0 32px;
+    }
+
+    .wix-landing .cta-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    /* Hide the original site when landing is active */
+    body.wix-landing-active header:not(.navbar),
+    body.wix-landing-active main,
+    body.wix-landing-active footer { display: none !important; }
+
+    /* Responsive adjustments */
+    @media (min-width: 860px) {
+      .wix-landing .wix-hero {
+        flex-direction: row;
+        text-align: left;
+        align-items: center;
+      }
+      
+      .wix-landing .wix-left {
+        flex: 1;
+        margin-right: 40px;
+      }
+      
+      .wix-landing .wix-right {
+        flex: 1;
+      }
     }
 
     /* Estilos específicos para centrar eventos */
@@ -119,110 +280,6 @@
     .location-card {
       max-width: 400px !important;
     }
-    
-    .language-selector-wrapper {
-      position: relative;
-    }
-    
-    .language-selector-dropdown {
-      position: relative;
-      display: inline-block;
-    }
-    
-    .language-selector-toggle {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      height: 40px;
-      background: rgb(213, 213, 213);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      color: #605047;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(10px);
-      min-width: 120px;
-    }
-    
-    .language-selector-toggle:hover {
-      background: rgba(255, 255, 255, 0.2);
-      border-color: rgba(255, 255, 255, 0.3);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-    
-    .language-selector-menu {
-      position: absolute;
-      top: 100%;
-      right: 0;
-      margin-top: 8px;
-      background: white;
-      border: 1px solid #e1e5e9;
-      border-radius: 12px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-      backdrop-filter: blur(20px);
-      min-width: 160px;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-10px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1001;
-      overflow: hidden;
-    }
-    
-    .language-selector-menu.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-    
-    .language-option {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      border: none;
-      background: none;
-      width: 100%;
-      text-align: left;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      color: #333;
-      font-size: 14px;
-      font-weight: 500;
-      border-bottom: 1px solid #f5f5f5;
-    }
-    
-    .language-option:last-child {
-      border-bottom: none;
-    }
-    
-    .language-option:hover {
-      background: #f8f9fa;
-      color: #007bff;
-    }
-    
-    .language-option.active {
-      background: #e3f2fd;
-      color: #1976d2;
-      font-weight: 600;
-    }
-    
-    /* Asegurar que el header tenga el espacio correcto */
-    header {
-      position: relative;
-      padding: 20px;
-    }
-
-    /* Espaciado para el contenido principal */
-    main {
-      margin-top: 40px;
-    }
-
-
 
     /* Asegurar que la sección de guests esté centrada */
     .cta-section {
@@ -248,91 +305,6 @@
       margin-top: 30px;
     }
 
-    /* Estilos para la carga de eventos */
-    .loading-events {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      color: var(--text-light);
-      font-style: italic;
-      grid-column: 1 / -1;
-    }
-
-    .loading-events i {
-      font-size: 2em;
-      margin-bottom: 15px;
-      color: var(--primary-color);
-    }
-
-    .error-events {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px;
-      color: #dc3545;
-      font-style: italic;
-      grid-column: 1 / -1;
-    }
-
-    .error-events i {
-      font-size: 2em;
-      margin-bottom: 15px;
-    }
-
-
-
-    /* Estilos para los headers de sección (CTA y Admin) */
-    .section-header {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-
-    .section-header .info-icon {
-      width: 80px;
-      height: 80px;
-      background: var(--gradient-primary);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1.5rem;
-      color: var(--white);
-      font-size: 2rem;
-    }
-
-    .section-header h3 {
-      color: var(--primary-color);
-      margin-bottom: 0;
-      font-size: 2.5rem;
-      font-weight: 600;
-    }
-
-    /* Estilos para el layout de eventos y ubicación */
-    .events-container {
-      display: flex;
-      flex-direction: column;
-      gap: 40px;
-    }
-
-    .events-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 20px;
-    }
-
-    .location-section {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    .location-card {
-      max-width: 400px;
-    }
-    
     /* Botón rosa degradado para ver en mapa */
     a.btn-ver-mapa {
       display: inline-flex;
@@ -347,12 +319,12 @@
       margin-top: 0.8rem;
       transition: all 0.3s ease;
     }
-    
+
     a.btn-ver-mapa:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 25px var(--shadow-hover);
     }
-    
+
     a.btn-ver-mapa i {
       font-size: 1rem;
     }
@@ -410,125 +382,9 @@
 </head>
 <body class="wix-landing-active">
 
-  <!-- Temporary Wix-inspired mobile-first landing -->
-  <div class="wix-landing">
+  <!-- Sticky Navbar -->
+  <nav class="navbar">
     <div class="container">
-      <div class="wix-top-actions">
-        <div class="header-actions" aria-label="Top-right actions">
-          <div class="language-selector">
-            <div class="language-selector-wrapper">
-              <div class="language-selector-dropdown">
-                <button class="language-selector-toggle" id="language-toggle" aria-label="Select language">
-                  <span class="current-language">
-                    <span class="flag">🇪🇸</span>
-                    <span class="name">Español</span>
-                  </span>
-                  <i class="fas fa-chevron-down"></i>
-                </button>
-                <div class="language-selector-menu" id="language-menu">
-                  <button class="language-option active" data-lang="es">
-                    <span class="flag">🇪🇸</span>
-                    <span class="name">Español</span>
-                  </button>
-                  <button class="language-option" data-lang="en">
-                    <span class="flag">🇬🇧</span>
-                    <span class="name">English</span>
-                  </button>
-                  <button class="language-option" data-lang="fr">
-                    <span class="flag">🇫🇷</span>
-                    <span class="name">Français</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="login-access-icon">
-            <a href="login.html" class="guests-access-btn" title="Acceso para invitados" aria-label="Acceso para invitados">
-              <i class="fas fa-user" aria-hidden="true"></i>
-            </a>
-            <a href="/admin-login.html" class="guests-access-btn" title="Acceso de administrador" aria-label="Acceso de administrador">
-              <i class="fas fa-cog" aria-hidden="true"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-      <section class="wix-hero">
-        <div class="wix-left">
-          <p class="eyebrow">We’re getting married</p>
-          <h1>Iluminada & George</h1>
-          <p class="date">June 6, 2026 • Marbella, Spain</p>
-          <p class="lede">We can’t wait to celebrate with our favorite people. Here you’ll find the basics — we’ll add more details soon.</p>
-          <div class="cta-row">
-            <a class="btn" href="login.html"><i class="fas fa-heart"></i> Guest zone</a>
-            <a class="link" href="guests.html">Event details</a>
-          </div>
-        </div>
-        <div class="wix-right">
-          <div class="stack-section">
-            <div class="stack-gallery wow-stack">
-              <div class="stack-viewport">
-                <div class="stack-inner">
-                  <div class="stack-card"><img src="assets/images/home.png" alt="Home" loading="eager"></div>
-                  <div class="stack-card"><img src="assets/images/kiss.png" alt="Kiss" loading="lazy"></div>
-                  <div class="stack-card"><img src="assets/images/celebrate.png" alt="Celebrate" loading="lazy"></div>
-                  <div class="stack-card"><img src="assets/images/reception.png" alt="Reception" loading="lazy"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="wix-details">
-        <div class="detail-grid">
-          <div class="detail-item">
-            <img src="assets/images/event.png" alt="Ceremony">
-            <div>
-              <p class="title">Ceremony</p>
-              <p class="desc">We’ll say “I do” surrounded by friends and family.</p>
-            </div>
-          </div>
-          <div class="detail-item">
-            <img src="assets/images/dinner.png" alt="Dinner">
-            <div>
-              <p class="title">Dinner & Toasts</p>
-              <p class="desc">A warm, laid‑back celebration with great food and stories.</p>
-            </div>
-          </div>
-          <div class="detail-item">
-            <img src="assets/images/celebrate.png" alt="Party">
-            <div>
-              <p class="title">Let’s Celebrate</p>
-              <p class="desc">Dress to feel amazing; bring your best dance moves.</p>
-            </div>
-          </div>
-          <div class="detail-item">
-            <img src="assets/images/last.png" alt="More info">
-            <div>
-              <p class="title">More details soon</p>
-              <p class="desc">We’re polishing the full site. Check back for travel, schedule, and more.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div class="mini-footer">
-        Iluminada & George • <a class="link" href="/admin-login.html">Admin</a>
-      </div>
-    </div>
-  </div>
-  <header>
-    <div class="header-content">
-      <div class="header-left">
-        <h1 data-i18n="wedding:title">Iluminada & George</h1>
-        <p data-i18n="wedding:subtitle">Nos casamos</p>
-        <div class="wedding-date">
-          <i class="fas fa-calendar-alt"></i>
-          <span data-i18n="wedding:date">6 de Junio, 2026</span>
-        </div>
-      </div>
-
-      <!-- Actions pinned to the top-right: language, guest, admin -->
       <div class="header-actions" aria-label="Top-right actions">
         <div class="language-selector">
           <div class="language-selector-wrapper">
@@ -567,7 +423,50 @@
         </div>
       </div>
     </div>
-  </header>
+  </nav>
+
+  <!-- Temporary Wix-inspired mobile-first landing -->
+  <div class="wix-landing">
+    <div class="container">
+      <section class="wix-hero">
+        <div class="wix-left">
+          <h2 class="eyebrow">We’re getting married</h2>
+          <h1>Iluminada & George</h1>
+          <h2 class="date">June 6, 2026 • Marbella, Spain</h2>
+          <p class="lede">Iluminada and George are tying the knot on the beach in Marbella this June, and we feel 
+            incredibly lucky to be able to share this moment with the people we love most. Sun, sea, and a bit of 
+            sand in our shoes — we’re hoping for a day full of laughter, happy tears, questionable dancing, and memories 
+            we’ll always treasure. Thank you for being part of this chapter of our story; your presence means far 
+            more to us than any present ever could.</p>
+          <p class="lede">This website will be your hub for everything wedding-related. You’ll log
+             in using the same email address you use to RSVP. Once inside, you’ll be able to confirm
+              how many guests will be in your party and add their names, choose your menu and let us 
+              know about any dietary requirements, see the full schedule with times and locations, browse 
+              and purchase wedding gifts from our registry, and even message other guests. There will also 
+              be private chats between guests that the bride and groom can’t see — so you’re free to plot
+               surprises in peace.</p>
+          <div class="cta-row">
+            <a class="btn" href="login.html"><i class="fas fa-heart"></i> Guest zone</a>
+          </div>
+        </div>
+        <div class="wix-right">
+          <div class="stack-section">
+            <div class="stack-gallery wow-stack">
+              <div class="stack-viewport">
+                <div class="stack-inner">
+                  <div class="stack-card"><img src="assets/images/home.png" alt="Home" loading="eager"></div>
+                  <div class="stack-card"><img src="assets/images/kiss.png" alt="Kiss" loading="lazy"></div>
+                  <div class="stack-card"><img src="assets/images/celebrate.png" alt="Celebrate" loading="lazy"></div>
+                  <div class="stack-card"><img src="assets/images/reception.png" alt="Reception" loading="lazy"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
 
   <main>
     <section class="hero-section fade-in-up">
