@@ -1,4 +1,4 @@
-const { MenuCourse, MenuChoice, Guest, Course, CourseOption } = require('../models');
+const { MenuCourse, MenuChoice, Guest, Course, CourseOption, MenuOptionImage } = require('../models');
 const { formatCourseForApi, formatCourseOptionForApi } = require('../controllers/adminController');
 
 // Helper to format menu part for API response
@@ -7,12 +7,7 @@ function formatMenuCourseForApi(menuPart, index) {
     id: menuPart._id.toString(),
     course: menuPart.course,
     label: menuPart.label,
-    options: (menuPart.options || []).map((option, optIndex) => ({
-      id: option._id.toString(),
-      label: option.label,
-      image: option.image || null,
-      description: option.description
-    }))
+    options: (menuPart.options || []).map((option, optIndex) => formatCourseOptionForApi(option))
   };
 }
 
@@ -23,18 +18,15 @@ async function listCourses(req, res, next) {
     const menuData = [];
     
     for (const course of courses) {
-      const options = await CourseOption.find({ courseId: course._id }).sort({ createdAt: 1 });
+      const options = await CourseOption.find({ courseId: course._id })
+        .populate('image')
+        .sort({ createdAt: 1 });
       
       menuData.push({
         id: course._id.toString(),
         course: course.course,
         label: course.label,
-        options: options.map(option => ({
-          id: option._id.toString(),
-          label: option.label,
-          image: option.image || null,
-          description: option.description
-        }))
+        options: options.map(option => formatCourseOptionForApi(option))
       });
     }
     
@@ -86,7 +78,9 @@ async function listCourseOptions(req, res, next) {
       return res.status(404).json({ error: 'Course not found' });
     }
     
-    const options = await CourseOption.find({ courseId }).sort({ createdAt: 1 });
+    const options = await CourseOption.find({ courseId })
+      .populate('image')
+      .sort({ createdAt: 1 });
     const formatted = options.map(option => formatCourseOptionForApi(option));
     res.json(formatted);
   } catch (e) { 
@@ -105,7 +99,8 @@ async function getCourseOptionById(req, res, next) {
       return res.status(404).json({ error: 'Course not found' });
     }
     
-    const option = await CourseOption.findOne({ _id: optionId, courseId });
+    const option = await CourseOption.findOne({ _id: optionId, courseId })
+      .populate('image');
     if (!option) {
       return res.status(404).json({ error: 'Course option not found' });
     }
@@ -246,14 +241,26 @@ async function createCourseOption(req, res, next) {
       return res.status(400).json({ error: 'Label is required' });
     }
     
+    // Handle image reference
+    let imageRef = undefined;
+    if (image && image.imageId) {
+      // New format - reference to uploaded image
+      imageRef = image.imageId;
+    } else if (typeof image === 'string' && image.length === 24 && /^[0-9a-fA-F]{24}$/.test(image)) {
+      // ObjectId string
+      imageRef = image;
+    }
+    
     const option = await CourseOption.create({
       courseId,
       label,
-      image: image || null,
+      image: imageRef || null,
       description: description || null
     });
     
-    res.status(201).json(formatCourseOptionForApi(option));
+    // Populate image for response
+    const populatedOption = await CourseOption.findById(option._id).populate('image');
+    res.status(201).json(formatCourseOptionForApi(populatedOption));
   } catch (e) { 
     next(e); 
   }
@@ -264,12 +271,28 @@ async function updateCourseOption(req, res, next) {
     const { optionId } = req.params;
     const { label, image, description } = req.body;
     
+    // Handle image reference
+    let imageRef = undefined;
+    if (image !== undefined) {
+      if (!image) {
+        // Image explicitly set to null/empty, remove it
+        imageRef = undefined;
+      } else if (image.imageId) {
+        // New format - reference to uploaded image
+        imageRef = image.imageId;
+      } else if (typeof image === 'string' && image.length === 24 && /^[0-9a-fA-F]{24}$/.test(image)) {
+        // ObjectId string
+        imageRef = image;
+      }
+    }
+    
     const updateData = {};
     if (label) updateData.label = label;
-    if (image !== undefined) updateData.image = image;
+    if (imageRef !== undefined) updateData.image = imageRef;
     if (description !== undefined) updateData.description = description;
     
-    const option = await CourseOption.findByIdAndUpdate(optionId, updateData, { new: true });
+    const option = await CourseOption.findByIdAndUpdate(optionId, updateData, { new: true })
+      .populate('image');
     if (!option) {
       return res.status(404).json({ error: 'Course option not found' });
     }

@@ -2181,7 +2181,7 @@
       showForm();
     }
   }
- function openMenuCourseOptionsForm(courseId, optionId = null) {
+function openMenuCourseOptionsForm(courseId, optionId = null) {
     // Load existing menu data for editing
     let existingData = null;
     
@@ -2202,12 +2202,18 @@
     const showForm = () => {
       const isEditing = !!existingData;
       
+      // Get current image URL for display
+      const currentImageUrl = existingData?.image || null;
+      const showCurrentImage = isEditing && currentImageUrl;
+      
       openFormModal({
         title: isEditing ? 'Edit Course Option' : 'Add Course Option',
         submitText: isEditing ? 'Save' : 'Add',
+        showCurrentImage: showCurrentImage,
+        currentImageUrl: currentImageUrl,
         fields: [
           { name: 'label', label: 'Option', required: true, help: 'e.g. Cream of Mushroom Soup' },
-          { name: 'image', label: 'Image', required: false, help: 'upload an image"' },
+          { name: 'image', label: 'Image', type: 'file', help: 'Upload menu option image (will be stored in database)' },
           { name: 'description', label: 'Option Description', required: false, help: 'e.g. A delicate blend of cream, mushrooms, and garlic' },
         ],
         initialValues: {
@@ -2215,11 +2221,57 @@
           image: existingData?.image || '',
           description: existingData?.description || ''
         },
-        onSubmit: async (values, close) => {
+        onSubmit: async (values, close, modal) => {
           try {
+            // Handle image upload
+            let imageReference = null;
+            const imageFile = document.getElementById('f_image')?.files[0];
+            if (imageFile) {
+              const formData = new FormData();
+              formData.append('image', imageFile);
+              const uploadRes = await fetch('/api/admin/menu-options/upload-image', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+              });
+              if (uploadRes.ok) {
+                const uploadData = await uploadRes.json();
+                // Store the image ID for the menu option
+                imageReference = {
+                  imageId: uploadData.imageId
+                };
+              }
+            } else if (existingData?.image) {
+              // Keep existing image reference for edit mode
+              if (typeof existingData.image === 'string') {
+                if (existingData.image.startsWith('data:')) {
+                  // Base64 data - keep as is
+                  imageReference = existingData.image;
+                } else if (existingData.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(existingData.image)) {
+                  // ObjectId string - keep as is
+                  imageReference = existingData.image;
+                } else {
+                  // Legacy URL-based image - keep as is
+                  imageReference = existingData.image;
+                }
+              } else if (existingData.image && typeof existingData.image === 'object') {
+                // Database-stored image object - keep the reference
+                if (existingData.image.imageId) {
+                  // New format with imageId
+                  imageReference = { imageId: existingData.image.imageId };
+                } else if (existingData.image._id) {
+                  // MongoDB ObjectId reference
+                  imageReference = existingData.image._id.toString();
+                } else {
+                  // Other object format - keep as is
+                  imageReference = existingData.image;
+                }
+              }
+            }
+            
             const courseData = {
               label: values.label,
-              image: values.image,
+              image: imageReference,
               description: values.description,
             };
             

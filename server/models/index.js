@@ -8,6 +8,7 @@ module.exports = {
   Comment: require('./Comment'),
   Course: require('./Course'),
   CourseOption: require('./CourseOption'),
+  MenuOptionImage: require('./MenuOptionImage'),
   Gift: require('./Gift'),
   GiftChoice: require('./GiftChoice'),
   CashGiftCard: require('./CashGiftCard'), // Legacy - will be removed in Phase 8

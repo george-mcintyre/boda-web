@@ -7,7 +7,10 @@ const courseOptionSchema = new Schema({
     required: true 
   },
   label: { type: String, required: true },
-  image: { type: String, default: null },
+  image: { 
+    type: Schema.Types.ObjectId,                      // Reference to MenuOptionImage model
+    ref: 'MenuOptionImage'                            // Reference to MenuOptionImage collection
+  },
   description: { type: String, default: null }
 }, { timestamps: true });
 

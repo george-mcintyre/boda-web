@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { Message, Config, CashGiftCard, Event, Gift, GiftChoice, Course, CourseOption } = require('../models');
+const { Message, Config, CashGiftCard, Event, Gift, GiftChoice, Course, CourseOption, MenuOptionImage } = require('../models');
 const { getAvailableGiftCardImages, isValidImageNumber } = require('../utils/imageUtils');
 
 // Format event for API response according to README specification
@@ -407,11 +407,28 @@ function formatCourseForApi(course) {
 
 // Format course option for API response
 function formatCourseOptionForApi(option) {
+  // Format image data for display
+  let imageData = null;
+  if (option.image && option.image.data) {
+    // Database-stored image with populated data
+    const base64Data = option.image.data.toString('base64');
+    imageData = `data:${option.image.contentType};base64,${base64Data}`;
+  } else if (option.image && option.image._id) {
+    // Image reference with populated data
+    if (option.image.data) {
+      const base64Data = option.image.data.toString('base64');
+      imageData = `data:${option.image.contentType};base64,${base64Data}`;
+    }
+  } else if (option.image && typeof option.image === 'string' && option.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(option.image)) {
+    // ObjectId reference - return the ObjectId string for frontend to use API endpoint
+    imageData = option.image;
+  }
+
   return {
     id: option._id.toString(),
     courseId: option.courseId.toString(),
     label: option.label,
-    image: option.image || null,
+    image: imageData,
     description: option.description || null
   };
 }
@@ -697,11 +714,58 @@ async function uploadEventImage(req, res, next) {
   } catch (e) { next(e); }
 }
 
+// Image upload for menu options
+async function uploadMenuOptionImage(req, res, next) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(req.file.mimetype)) {
+      return res.status(400).json({ error: 'Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.' });
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 50 * 1024 * 1024; // 5MB
+    if (req.file.size > maxSize) {
+      return res.status(400).json({ error: 'File too large. Maximum size is 5MB.' });
+    }
+
+    // Read the file and store in database
+    const fs = require('fs');
+    const imageData = fs.readFileSync(req.file.path);
+    
+    // Clean up temporary file
+    fs.unlinkSync(req.file.path);
+
+    // Store image in database
+    const menuOptionImage = await MenuOptionImage.create({
+      data: imageData,
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+
+    // Return the image ID and metadata
+    res.json({ 
+      imageId: menuOptionImage._id.toString(),
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+
+  } catch (e) { next(e); }
+}
+
 module.exports = {
   // gifts (DB-backed)
   listGifts, createGift, updateGift, deleteGift, getGiftChoices, getGiftCardImages,
   // agenda (DB-backed)
   listEventsAdmin, createEventsItem, updateEventsItem, deleteEventsItem, uploadEventImage,
+  // menu options (DB-backed)
+  uploadMenuOptionImage,
   // courses (new schema)
   listCourses, createCourse, getCourse, updateCourse, deleteCourse,
   getCourseOptions,
@@ -712,3 +776,4 @@ module.exports = {
   listCashGiftCards, createCashGiftCard, updateCashGiftCard, deleteCashGiftCard,
   formatCourseForApi, formatCourseOptionForApi
 };
+
