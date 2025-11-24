@@ -710,5 +710,5 @@ module.exports = {
   getSettings, updateSettings,
   // cash gift cards (DB-backed) - Legacy, to be removed in Phase 8
   listCashGiftCards, createCashGiftCard, updateCashGiftCard, deleteCashGiftCard,
-  formatCourseForApi,
+  formatCourseForApi, formatCourseOptionForApi
 };

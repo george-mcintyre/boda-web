@@ -97,7 +97,6 @@
     }
   }
   
-
   function extractTimeFromISO(isoString) {
     if (!isoString) return '';
     try {
@@ -129,17 +128,6 @@
       dancing: '/assets/icons/dancing.svg'
     };
     return icons[iconType] || icons.ceremony;
-  }
-
-  // Course Type icon utilities
-  function getCourseTypeIcon(iconType) {
-    const icons = {
-      starter: '/assets/icons/starter.svg',
-      main: '/assets/icons/main.svg',
-      desert: '/assets/icons/desert.svg',
-      drinks: '/assets/icons/drinks.svg'
-    };
-    return icons[iconType] || icons.main;
   }
 
   // Location selection component
@@ -2019,8 +2007,11 @@
                         ${option.description ? `<small class="option-description">${option.description}</small>` : ''}
                       </div>
                       ${option.image ? `<img src="${option.image}" alt="${option.label}" class="option-image" onerror="this.style.display='none'">` : ''}
-                      <button class="admin-action" onclick="editMenuCourseOption('${part.id}', '${option._id}')" title="Edit Option">
+                      <button class="admin-action" onclick="editMenuCourseOption('${part.id}', '${option.id}')" title="Edit Option">
                         <i class="fas fa-edit"></i>
+                      </button>
+                      <button class="admin-action danger" onclick="deleteMenuCourseOption('${part.id}', '${option.id}')" title="Delete">
+                        <i class="fas fa-trash"></i>
                       </button>
                     </div>
                   `).join('')}
@@ -2086,7 +2077,7 @@
     if (!confirm('Delete this menu part? This will remove all its options.')) return;
     
     try {
-      const r = await api(`/api/admin/courseData/${id}`, { method: 'DELETE' });
+      const r = await api(`/api/admin/courseData/${courseId}`, { method: 'DELETE' });
       if (r.ok) {
         showMenu();
       } else {
@@ -2096,7 +2087,21 @@
       notify('Error deleting menu part: ' + error.message, 'error');
     }
   };
-  
+  window.deleteMenuCourseOption = async function(courseId, optionId) {
+    if (!confirm('Delete this menu option?')) return;
+    
+    try {
+      const r = await api(`/api/admin/courseData/${courseId}/options/${optionId}`, { method: 'DELETE' });
+      if (r.ok) {
+        showMenu();
+      } else {
+        notify('Error deleting menu option', 'error');
+      }
+    } catch (error) {
+      notify('Error deleting menu option: ' + error.message, 'error');
+    }
+  };
+
   function openMenuCourseForm(courseId = null, defaultCourse = '') {
     // Load existing menu data for editing
     let existingData = null;
@@ -2186,7 +2191,7 @@
           const res = await api(`/api/admin/courseData/${courseId}/options/${optionId}`);
           if (res.ok) {
             const data = await res.json();
-            existingData = data.find(part => part.id === optionId) || null;
+            existingData = data;
           }
         } catch (error) {
           console.error('Error loading course option data:', error);
@@ -2201,9 +2206,9 @@
         title: isEditing ? 'Edit Course Option' : 'Add Course Option',
         submitText: isEditing ? 'Save' : 'Add',
         fields: [
-          { name: 'label', label: 'Option', required: true, help: 'e.g. "Cream of Mushroom Soup", "Baked Crab", "Chocolate Cake"' },
+          { name: 'label', label: 'Option', required: true, help: 'e.g. Cream of Mushroom Soup' },
           { name: 'image', label: 'Image', required: false, help: 'upload an image"' },
-          { name: 'description', label: 'Option Description', required: false, help: 'e.g. "A delicate blend of cream, mushrooms, and garlic", "Alaskan Crabs marinated in lemon and herbs", "Chocolate Cake with a layer of chocolate gan ache"' },
+          { name: 'description', label: 'Option Description', required: false, help: 'e.g. A delicate blend of cream, mushrooms, and garlic' },
         ],
         initialValues: {
           label: existingData?.label || '',

@@ -16,7 +16,7 @@ function formatMenuCourseForApi(menuPart, index) {
   };
 }
 
-// Guest: list courses and options
+// Admin: list courses with options (for admin interface)
 async function listCourses(req, res, next) {
   try {
     const courses = await Course.find({}).sort({ course: 1, createdAt: 1 });
@@ -75,8 +75,49 @@ async function deleteCourse(req, res, next) {
   }
 }
 
-// Guest: get menu selections per party member
+// Admin: get course options (for admin interface)
 async function listCourseOptions(req, res, next) {
+  try {
+    const { courseId } = req.params;
+    
+    // Verify course exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    
+    const options = await CourseOption.find({ courseId }).sort({ createdAt: 1 });
+    const formatted = options.map(option => formatCourseOptionForApi(option));
+    res.json(formatted);
+  } catch (e) { 
+    next(e); 
+  }
+}
+
+// Admin: get specific course option by ID (for editing)
+async function getCourseOptionById(req, res, next) {
+  try {
+    const { courseId, optionId } = req.params;
+    
+    // Verify course exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    
+    const option = await CourseOption.findOne({ _id: optionId, courseId });
+    if (!option) {
+      return res.status(404).json({ error: 'Course option not found' });
+    }
+    
+    res.json(formatCourseOptionForApi(option));
+  } catch (e) { 
+    next(e); 
+  }
+}
+
+// Guest: get menu selections per party member (legacy function)
+async function listGuestCourseOption(req, res, next) {
   try {
     const guestId = req.user.id;
     const guest = await Guest.findById(guestId);
@@ -240,8 +281,8 @@ async function updateCourseOption(req, res, next) {
 
 async function deleteCourseOption(req, res, next) {
   try {
-    const { id } = req.params;
-    await CourseOption.findByIdAndDelete(id);
+    const { optionId } = req.params;
+    await CourseOption.findByIdAndDelete(optionId);
     res.json({ status: 'ok' });
   } catch (e) {
     next(e);
@@ -302,8 +343,10 @@ module.exports = {
   updateCourse,
   deleteCourse,
   listCourseOptions,
-  deleteCourseOption,
   createCourseOption,
+  getCourseOptionById,
   updateCourseOption,
+  deleteCourseOption,
+  listGuestCourseOption,
   updateGuestCourseOption
 };

@@ -22,7 +22,8 @@ router.delete('/api/admin/courseData/:id', auth('admin'), menuCtrl.deleteCourse)
 
 // Course Options
 router.get('/api/admin/courseData/:courseId/options', auth('admin'), menuCtrl.listCourseOptions);
+router.get('/api/admin/courseData/:courseId/options/:optionId', auth('admin'), menuCtrl.getCourseOptionById);
 router.post('/api/admin/courseData/:courseId/options', auth('admin'), menuCtrl.createCourseOption);
-router.put('/api/admin/courseData/:courseId/options/:id', auth('admin'), menuCtrl.updateCourseOption);
-router.delete('/api/admin/courseData/:courseId/options/:id', auth('admin'), menuCtrl.deleteCourseOption);
+router.put('/api/admin/courseData/:courseId/options/:optionId', auth('admin'), menuCtrl.updateCourseOption);
+router.delete('/api/admin/courseData/:courseId/options/:optionId', auth('admin'), menuCtrl.deleteCourseOption);
 module.exports = router;
