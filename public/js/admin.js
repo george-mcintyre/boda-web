@@ -1999,7 +1999,7 @@
                 <div class="menu-course-header">
                   <h5>${part.label}</h5>
                   <div class="menu-course-actions">
-                    <button class="admin-action" onclick="editMenuCourseOption()" title="Add Option">
+                    <button class="admin-action" onclick="editMenuCourseOption('${part.id}')" title="Add Option">
                       <i class="fas fa-plus"></i>
                     </button>
                     <button class="admin-action" onclick="editMenuCourse('${part.id}')" title="Edit">
@@ -2019,7 +2019,7 @@
                         ${option.description ? `<small class="option-description">${option.description}</small>` : ''}
                       </div>
                       ${option.image ? `<img src="${option.image}" alt="${option.label}" class="option-image" onerror="this.style.display='none'">` : ''}
-                      <button class="admin-action" onclick="editMenuCourseOption('${option._id}')" title="Edit Option">
+                      <button class="admin-action" onclick="editMenuCourseOption('${part.id}', '${option._id}')" title="Edit Option">
                         <i class="fas fa-edit"></i>
                       </button>
                     </div>
@@ -2078,11 +2078,11 @@
     openMenuCourseForm(id, null);
   };
   
-  window.editMenuCourseOption = function(id) {
-    openMenuCourseOptionsForm(id);
+  window.editMenuCourseOption = function (courseId, optionId = null) {
+    openMenuCourseOptionsForm(courseId, optionId);
   };
   
-  window.deleteMenuCourse = async function(id) {
+  window.deleteMenuCourse = async function(courseId) {
     if (!confirm('Delete this menu part? This will remove all its options.')) return;
     
     try {
@@ -2176,17 +2176,17 @@
       showForm();
     }
   }
- function openMenuCourseOptionsForm(courseOptionId = null) {
+ function openMenuCourseOptionsForm(courseId, optionId = null) {
     // Load existing menu data for editing
     let existingData = null;
     
     const loadExistingData = async () => {
-      if (courseOptionId) {
+      if (optionId) {
         try {
-          const res = await api('/api/admin/courseOptions');
+          const res = await api(`/api/admin/courseData/${courseId}/options/${optionId}`);
           if (res.ok) {
             const data = await res.json();
-            existingData = data.find(part => part.id === courseOptionId) || null;
+            existingData = data.find(part => part.id === optionId) || null;
           }
         } catch (error) {
           console.error('Error loading course option data:', error);
@@ -2218,8 +2218,8 @@
               description: values.description,
             };
             
-            const url = courseOptionId ? `/api/admin/updateCourseOption/${courseOptionId}` : '/api/admin/createCourseOption';
-            const method = courseOptionId ? 'PUT' : 'POST';
+            const url = optionId ? `/api/admin/courseData/${courseId}/options/${optionId}` : `/api/admin/courseData/${courseId}/options`;
+            const method = optionId ? 'PUT' : 'POST';
             
             const r = await api(url, { 
               method, 
@@ -2229,7 +2229,7 @@
             
             if (!r.ok) {
               const errorData = await r.json().catch(() => ({}));
-              throw new Error(errorData.error || `Failed to ${courseOptionId ? 'update' : 'create'} course option`);
+              throw new Error(errorData.error || `Failed to ${optionId ? 'update' : 'create'} course option`);
             }
             
             close();
@@ -2241,7 +2241,7 @@
       });
     };
     
-    if (courseOptionId) {
+    if (optionId) {
       loadExistingData().then(showForm);
     } else {
       showForm();

@@ -139,19 +139,8 @@ async function listCourseOptions(req, res, next) {
     next(e);
   }
 }
-
-async function createCourseOption(req, res, next) {
-  try {
-    const { courseId, label, image, description } = req.body;
-    const newCourseOption = await CourseOption.create({ courseId, label, image, description });
-    res.status(201).json(formatCourseOptionForApi(newCourseOption));
-  } catch (e) {
-    next(e);
-  }
-}
-
 // Guest: update menu selections
-async function updateCourseOption(req, res, next) {
+async function updateGuestCourseOption(req, res, next) {
   try {
     const guestId = req.user.id;
     const { choices } = req.body;
@@ -198,6 +187,54 @@ async function updateCourseOption(req, res, next) {
     res.json(menuChoice.partyChoices);
   } catch (e) {
     next(e);
+  }
+}
+
+async function createCourseOption(req, res, next) {
+  try {
+    const { courseId } = req.params;
+    const { label, image, description } = req.body;
+
+    // Verify course exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    
+    if (!label) {
+      return res.status(400).json({ error: 'Label is required' });
+    }
+    
+    const option = await CourseOption.create({
+      courseId,
+      label,
+      image: image || null,
+      description: description || null
+    });
+    
+    res.status(201).json(formatCourseOptionForApi(option));
+  } catch (e) { 
+    next(e); 
+  }
+}
+
+async function updateCourseOption(req, res, next) {
+  try {
+    const { optionId } = req.params;
+    const { label, image, description } = req.body;
+    
+    const updateData = {};
+    if (label) updateData.label = label;
+    if (image !== undefined) updateData.image = image;
+    if (description !== undefined) updateData.description = description;
+    
+    const option = await CourseOption.findByIdAndUpdate(optionId, updateData, { new: true });
+    if (!option) {
+      return res.status(404).json({ error: 'Course option not found' });
+    }
+    res.json(formatCourseOptionForApi(option));
+  } catch (e) { 
+    next(e); 
   }
 }
 
@@ -265,7 +302,8 @@ module.exports = {
   updateCourse,
   deleteCourse,
   listCourseOptions,
+  deleteCourseOption,
   createCourseOption,
   updateCourseOption,
-  deleteCourseOption
+  updateGuestCourseOption
 };

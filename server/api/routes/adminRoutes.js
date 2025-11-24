@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const { auth } = require('../../auth/middleware');
 const guestCtrl = require('../../controllers/guestController');
-const adminCtrl = require('../../controllers/adminController');
 const messageCtrl = require('../../controllers/messageController');
 const menuCtrl = require('../../controllers/menuController');
 
@@ -22,8 +21,8 @@ router.put('/api/admin/courseData/:id', auth('admin'), menuCtrl.updateCourse);
 router.delete('/api/admin/courseData/:id', auth('admin'), menuCtrl.deleteCourse);
 
 // Course Options
-router.get('/api/admin/courseOptions', auth('admin'), menuCtrl.listCourseOptions);
-router.post('/api/admin/courseOptions', auth('admin'), menuCtrl.createCourseOption);
-router.put('/api/admin/courseOptions/:id', auth('admin'), menuCtrl.updateCourseOption);
-router.delete('/api/admin/courseOptions/:id', auth('admin'), menuCtrl.deleteCourseOption);
+router.get('/api/admin/courseData/:courseId/options', auth('admin'), menuCtrl.listCourseOptions);
+router.post('/api/admin/courseData/:courseId/options', auth('admin'), menuCtrl.createCourseOption);
+router.put('/api/admin/courseData/:courseId/options/:id', auth('admin'), menuCtrl.updateCourseOption);
+router.delete('/api/admin/courseData/:courseId/options/:id', auth('admin'), menuCtrl.deleteCourseOption);
 module.exports = router;

@@ -521,68 +521,6 @@ async function getCourseOptions(req, res, next) {
   }
 }
 
-async function createCourseOption(req, res, next) {
-  try {
-    const { courseId } = req.params;
-    const { label, image, description } = req.body;
-    
-    // Verify course exists
-    const course = await Course.findById(courseId);
-    if (!course) {
-      return res.status(404).json({ error: 'Course not found' });
-    }
-    
-    if (!label) {
-      return res.status(400).json({ error: 'Label is required' });
-    }
-    
-    const option = await CourseOption.create({
-      courseId,
-      label,
-      image: image || null,
-      description: description || null
-    });
-    
-    res.status(201).json(formatCourseOptionForApi(option));
-  } catch (e) { 
-    next(e); 
-  }
-}
-
-async function updateCourseOption(req, res, next) {
-  try {
-    const { optionId } = req.params;
-    const { label, image, description } = req.body;
-    
-    const updateData = {};
-    if (label) updateData.label = label;
-    if (image !== undefined) updateData.image = image;
-    if (description !== undefined) updateData.description = description;
-    
-    const option = await CourseOption.findByIdAndUpdate(optionId, updateData, { new: true });
-    if (!option) {
-      return res.status(404).json({ error: 'Course option not found' });
-    }
-    res.json(formatCourseOptionForApi(option));
-  } catch (e) { 
-    next(e); 
-  }
-}
-
-async function deleteCourseOption(req, res, next) {
-  try {
-    const { optionId } = req.params;
-    
-    const option = await CourseOption.findByIdAndDelete(optionId);
-    if (!option) {
-      return res.status(404).json({ error: 'Course option not found' });
-    }
-    res.json({ status: 'ok' });
-  } catch (e) { 
-    next(e); 
-  }
-}
-
 // ========== Settings: Agenda bloqueo (MongoDB) ==========
 async function getConfigDoc() {
   let cfg = await Config.findOne();
@@ -766,7 +704,7 @@ module.exports = {
   listEventsAdmin, createEventsItem, updateEventsItem, deleteEventsItem, uploadEventImage,
   // courses (new schema)
   listCourses, createCourse, getCourse, updateCourse, deleteCourse,
-  getCourseOptions, createCourseOption, updateCourseOption, deleteCourseOption,
+  getCourseOptions,
   // settings (DB-backed)
   getBlockedEvent, setBlockedEvent, clearBlockedEvent,
   getSettings, updateSettings,
