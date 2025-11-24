@@ -83,7 +83,7 @@
 
     function animatePrev(){
       if (busy) return;
-      if (index <= 0) return;
+      if (index < 0) return; // Can't go back if already at text-only state
       // If we had completed, re-lock because we are reversing within hero
       if (completed){
         completed = false;
