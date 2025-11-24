@@ -478,7 +478,7 @@ Confirmation:
 
 #### `GET /api/guest/menu`
 
-List menu parts and options (starters, mains, desserts, etc.).
+List menu courses (starters, mains, desserts, etc.) and options (onion soup, salad, steak tartar).
 
 **Response**
 ```json
@@ -510,7 +510,7 @@ Get menu selections per party member.
         "partyGuestId": "string",
         "choices": [
           {
-            "menuPartId": "string",
+            "courseId": "string",
             "optionId": "string | null"
           }
         ],
@@ -807,7 +807,7 @@ Same as the guest-side `PUT /api/guest/party`, but targeting the specified guest
 
 ### 3.3 Menu Definition & Overview
 
-#### `GET /api/admin/menu`
+#### `GET /api/admin/courseData`
 
 Get the list of all menu parts.
 
@@ -832,9 +832,9 @@ Same schema as `GET /api/guest/menu`:
     ]
 ```
 
-#### `POST /api/admin/menu`
+#### `POST /api/admin/courseData`
 
-Create a new menu part.
+Create a new menu course.
 
 **Request body**
 ```json
@@ -852,12 +852,12 @@ Create a new menu part.
 ```
 **Response**
 
-- Created menu part (with `id` and option `id`s).
+- Created menu course (with generated `id` and option `id`s).
 
 
-#### `PUT /api/admin/menu/:id`
+#### `PUT /api/admin/courseData/:id`
 
-Update an existing menu part.
+Update an existing menu course.
 
 **Request body**
 ```json
@@ -875,9 +875,9 @@ Update an existing menu part.
     }
 ```
 
-#### `DELETE /api/admin/menu/:id`
+#### `DELETE /api/admin/courseData/:id`
 
-Delete a menu part.
+Delete a menu course.
 
 **Response**
 ```json
@@ -886,7 +886,7 @@ Delete a menu part.
     }
 ```
 
-#### `GET /api/admin/menu-choices`
+#### `GET /api/admin/course-choices`
 
 Overview of menu selections per guest.
 
@@ -900,7 +900,7 @@ Overview of menu selections per guest.
         "partyGuestName": "string",
         "choices": [
           {
-            "menuPartId": "string",
+            "courseId": "string",
             "optionId": "string | null"
           }
         ],
@@ -1093,8 +1093,8 @@ Returns frontend feature toggles.
 **Response**
 ```json
     {
-      "eventsEnabled": true,
       "guestsEnabled": true,
+      "eventsEnabled": true,
       "menuEnabled": true,
       "messagesEnabled": true,
       "giftsEnabled": true
@@ -1109,8 +1109,8 @@ Update feature toggles.
 
 ```json
     {
-      "eventsEnabled": true,
       "guestsEnabled": true,
+      "eventsEnabled": true,
       "menuEnabled": false,
       "messagesEnabled": false,
       "giftsEnabled": false
@@ -1121,8 +1121,8 @@ Update feature toggles.
 - Updated settings:
 ```json
     {
-      "eventsEnabled": true,
       "guestsEnabled": true,
+      "eventsEnabled": true,
       "menuEnabled": false,
       "messagesEnabled": false,
       "giftsEnabled": false

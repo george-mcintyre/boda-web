@@ -1,7 +1,8 @@
-const { MenuPart, MenuChoice, Guest } = require('../models');
+const { MenuCourse, MenuChoice, Guest, Course, CourseOption } = require('../models');
+const { formatCourseForApi, formatCourseOptionForApi } = require('../controllers/adminController');
 
 // Helper to format menu part for API response
-function formatMenuPartForApi(menuPart, index) {
+function formatMenuCourseForApi(menuPart, index) {
   return {
     id: menuPart._id.toString(),
     course: menuPart.course,
@@ -15,19 +16,67 @@ function formatMenuPartForApi(menuPart, index) {
   };
 }
 
-// Guest: list menu parts and options
-async function listMenu(req, res, next) {
+// Guest: list courses and options
+async function listCourses(req, res, next) {
   try {
-    const menuParts = await MenuPart.find({}).sort({ course: 1, createdAt: 1 });
-    const formatted = menuParts.map(part => formatMenuPartForApi(part));
-    res.json(formatted);
+    const courses = await Course.find({}).sort({ course: 1, createdAt: 1 });
+    const menuData = [];
+    
+    for (const course of courses) {
+      const options = await CourseOption.find({ courseId: course._id }).sort({ createdAt: 1 });
+      
+      menuData.push({
+        id: course._id.toString(),
+        course: course.course,
+        label: course.label,
+        options: options.map(option => ({
+          id: option._id.toString(),
+          label: option.label,
+          image: option.image || null,
+          description: option.description
+        }))
+      });
+    }
+    
+    res.json(menuData);
+  } catch (e) {
+    next(e);
+  }
+}
+
+async function createCourse(req, res, next) {
+  try {
+    const { course, label } = req.body;
+    const newCourse = await Course.create({ course, label });
+    res.status(201).json(formatCourseForApi(newCourse));
+  } catch (e) {
+    next(e);
+  }
+}
+
+async function updateCourse(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { course, label } = req.body;
+    const updatedCourse = await Course.findByIdAndUpdate(id, { course, label }, { new: true });
+    res.json(formatCourseForApi(updatedCourse));
+  } catch (e) {
+    next(e);
+  }
+}
+
+async function deleteCourse(req, res, next) {
+  try {
+    const { id } = req.params;
+    await Course.findByIdAndDelete(id);
+    res.json({ status: 'ok' });
   } catch (e) {
     next(e);
   }
 }
 
 // Guest: get menu selections per party member
-async function getMenuChoices(req, res, next) {
+async function listCourseOptions(req, res, next) {
   try {
     const guestId = req.user.id;
     const guest = await Guest.findById(guestId);
@@ -91,8 +140,18 @@ async function getMenuChoices(req, res, next) {
   }
 }
 
+async function createCourseOption(req, res, next) {
+  try {
+    const { courseId, label, image, description } = req.body;
+    const newCourseOption = await CourseOption.create({ courseId, label, image, description });
+    res.status(201).json(formatCourseOptionForApi(newCourseOption));
+  } catch (e) {
+    next(e);
+  }
+}
+
 // Guest: update menu selections
-async function updateMenuChoices(req, res, next) {
+async function updateCourseOption(req, res, next) {
   try {
     const guestId = req.user.id;
     const { choices } = req.body;
@@ -101,15 +160,19 @@ async function updateMenuChoices(req, res, next) {
       return res.status(400).json({ error: 'Choices must be an array' });
     }
     
-    // Validate choices structure
+    // Validate choices structure (supports both new and legacy format)
     for (const choice of choices) {
       if (!choice.partyGuestId || !Array.isArray(choice.choices)) {
         return res.status(400).json({ error: 'Invalid choice structure' });
       }
       
       for (const item of choice.choices) {
-        if (!item.menuPartId) {
-          return res.status(400).json({ error: 'menuPartId is required for each choice' });
+        if (!item.courseId) {
+          return res.status(400).json({ error: 'courseId is required for each choice' });
+        }
+        
+        if (!item.optionId) {
+          return res.status(400).json({ error: 'optionId is required' });
         }
       }
       
@@ -138,7 +201,17 @@ async function updateMenuChoices(req, res, next) {
   }
 }
 
-// Admin: get menu overview per guest
+async function deleteCourseOption(req, res, next) {
+  try {
+    const { id } = req.params;
+    await CourseOption.findByIdAndDelete(id);
+    res.json({ status: 'ok' });
+  } catch (e) {
+    next(e);
+  }
+}
+
+// Admin: get menu overview per guest (supports both new and legacy format)
 async function getMenuChoicesOverview(req, res, next) {
   try {
     const menuChoices = await MenuChoice.find({}).populate('guestId', 'name email').lean();
@@ -150,12 +223,30 @@ async function getMenuChoicesOverview(req, res, next) {
       if (!guest) continue;
       
       for (const partyChoice of menuChoice.partyChoices) {
+        const choices = (partyChoice.choices || []).map(choice => {
+          // Handle new format (courseId + optionId)
+          if (choice.courseId && choice.optionId) {
+            return {
+              courseId: choice.courseId.toString(),
+              optionId: choice.optionId.toString()
+            };
+          }
+          // Handle legacy format (menuPartId + legacyOptionId)
+          if (choice.menuPartId && choice.legacyOptionId) {
+            return {
+              courseId: choice.menuPartId,
+              optionId: choice.legacyOptionId
+            };
+          }
+          return choice;
+        });
+        
         overview.push({
           guestId: guest._id.toString(),
           guestName: guest.name || 'Unknown Guest',
           partyGuestId: partyChoice.partyGuestId,
           partyGuestName: partyChoice.partyGuestId.startsWith('primary-') ? guest.name : 'Party Member',
-          choices: partyChoice.choices || [],
+          choices: choices,
           specialRequest: partyChoice.specialRequest,
           specialRequestDetail: partyChoice.specialRequestDetail
         });
@@ -169,8 +260,12 @@ async function getMenuChoicesOverview(req, res, next) {
 }
 
 module.exports = {
-  listMenu,
-  getMenuChoices,
-  updateMenuChoices,
-  getMenuChoicesOverview
+  listCourses,
+  createCourse,
+  updateCourse,
+  deleteCourse,
+  listCourseOptions,
+  createCourseOption,
+  updateCourseOption,
+  deleteCourseOption
 };

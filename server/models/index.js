@@ -6,9 +6,8 @@ module.exports = {
   EventChoice: require('./EventChoice'),
   Message: require('./Message'),
   Comment: require('./Comment'),
-  Menu: require('./Menu'),
-  MenuPart: require('./Menu'),
-  MenuChoice: require('./MenuChoice'),
+  Course: require('./Course'),
+  CourseOption: require('./CourseOption'),
   Gift: require('./Gift'),
   GiftChoice: require('./GiftChoice'),
   CashGiftCard: require('./CashGiftCard'), // Legacy - will be removed in Phase 8

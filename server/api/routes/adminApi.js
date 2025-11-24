@@ -137,14 +137,18 @@ router.delete('/guests/:id', auth('admin'), guestCtrl.remove);
 router.get('/guests/:id/party', auth('admin'), guestCtrl.getPartyByGuestId);
 router.put('/guests/:id/party', auth('admin'), guestCtrl.updatePartyByGuestId);
 
-// Menu Definition & Overview (existing functionality)
-router.get('/menu', auth('admin'), adminCtrl.listMenus);
-router.post('/menu', auth('admin'), adminCtrl.createMenu);
-router.put('/menu/:id', auth('admin'), adminCtrl.updateMenu);
-router.delete('/menu/:id', auth('admin'), adminCtrl.deleteMenu);
+// Course Management (new schema - mimicking guest management)
+router.get('/courses', auth('admin'), adminCtrl.listCourses);
+router.post('/courses', auth('admin'), adminCtrl.createCourse);
+router.get('/courses/:id', auth('admin'), adminCtrl.getCourse);
+router.put('/courses/:id', auth('admin'), adminCtrl.updateCourse);
+router.delete('/courses/:id', auth('admin'), adminCtrl.deleteCourse);
 
-// Menu choices overview
-router.get('/menu-choices', auth('admin'), require('../../controllers/menuController').getMenuChoicesOverview);
+// Course Options Management (mimicking party management)
+router.get('/courses/:courseId/options', auth('admin'), adminCtrl.getCourseOptions);
+router.post('/courses/:courseId/options', auth('admin'), adminCtrl.createCourseOption);
+router.put('/courses/options/:optionId', auth('admin'), adminCtrl.updateCourseOption);
+router.delete('/courses/options/:optionId', auth('admin'), adminCtrl.deleteCourseOption);
 
 // Messages (Admin Console)
 router.get('/messages', auth('admin'), messageCtrl.listAdminMessages);

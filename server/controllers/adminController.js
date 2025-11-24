@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { Message, Menu, MenuPart, Config, CashGiftCard, Event, Gift, GiftChoice } = require('../models');
+const { Message, Config, CashGiftCard, Event, Gift, GiftChoice, Course, CourseOption } = require('../models');
 const { getAvailableGiftCardImages, isValidImageNumber } = require('../utils/imageUtils');
 
 // Format event for API response according to README specification
@@ -394,36 +394,42 @@ async function deleteEventsItem(req, res, next) {
   } catch (e) { next(e); }
 }
 
-// ========== Menu (MongoDB-backed CRUD) ==========
+// ========== Course Management ==========
 
-// Helper function to format menu part for API response
-function formatMenuPartForApi(menuPart) {
+// Format course for API response
+function formatCourseForApi(course) {
   return {
-    id: menuPart._id.toString(),
-    course: menuPart.course,
-    label: menuPart.label,
-    options: (menuPart.options || []).map((option, index) => ({
-      id: option._id.toString(),
-      label: option.label,
-      image: option.image,
-      description: option.description
-    }))
+    id: course._id.toString(),
+    course: course.course,
+    label: course.label
   };
 }
 
-async function listMenus(req, res, next) {
+// Format course option for API response
+function formatCourseOptionForApi(option) {
+  return {
+    id: option._id.toString(),
+    courseId: option.courseId.toString(),
+    label: option.label,
+    image: option.image || null,
+    description: option.description || null
+  };
+}
+
+// Course CRUD operations (mimicking guest management)
+async function listCourses(req, res, next) {
   try {
-    const menuParts = await MenuPart.find({}).sort({ course: 1, createdAt: 1 });
-    const formatted = menuParts.map(part => formatMenuPartForApi(part));
+    const courses = await Course.find({}).sort({ course: 1, createdAt: 1 });
+    const formatted = courses.map(course => formatCourseForApi(course));
     res.json(formatted);
   } catch (e) { 
     next(e); 
   }
 }
 
-async function createMenu(req, res, next) {
+async function createCourse(req, res, next) {
   try {
-    const { course, label, options } = req.body;
+    const { course, label } = req.body;
     
     // Validate required fields
     if (!course || !['starter', 'main', 'dessert', 'drinks'].includes(course)) {
@@ -434,69 +440,143 @@ async function createMenu(req, res, next) {
       return res.status(400).json({ error: 'Label is required' });
     }
     
-    // Create individual menu part
-    const menuPart = await MenuPart.create({
-      course,
+    const newCourse = await Course.create({ course, label });
+    res.status(201).json(formatCourseForApi(newCourse));
+  } catch (e) { 
+    next(e); 
+  }
+}
+
+async function getCourse(req, res, next) {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    res.json(formatCourseForApi(course));
+  } catch (e) { 
+    next(e); 
+  }
+}
+
+async function updateCourse(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { course, label } = req.body;
+    
+    const updateData = {};
+    if (course && ['starter', 'main', 'dessert', 'drinks'].includes(course)) {
+      updateData.course = course;
+    }
+    if (label) {
+      updateData.label = label;
+    }
+    
+    const updatedCourse = await Course.findByIdAndUpdate(id, updateData, { new: true });
+    if (!updatedCourse) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    res.json(formatCourseForApi(updatedCourse));
+  } catch (e) { 
+    next(e); 
+  }
+}
+
+async function deleteCourse(req, res, next) {
+  try {
+    const { id } = req.params;
+    
+    // Check if course has options
+    const optionCount = await CourseOption.countDocuments({ courseId: id });
+    if (optionCount > 0) {
+      return res.status(400).json({ error: 'Cannot delete course with existing options. Delete options first.' });
+    }
+    
+    const course = await Course.findByIdAndDelete(id);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    res.json({ status: 'ok' });
+  } catch (e) { 
+    next(e); 
+  }
+}
+
+// Course Options management (mimicking party management)
+async function getCourseOptions(req, res, next) {
+  try {
+    const { courseId } = req.params;
+    
+    // Verify course exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    
+    const options = await CourseOption.find({ courseId }).sort({ createdAt: 1 });
+    const formatted = options.map(option => formatCourseOptionForApi(option));
+    res.json(formatted);
+  } catch (e) { 
+    next(e); 
+  }
+}
+
+async function createCourseOption(req, res, next) {
+  try {
+    const { courseId } = req.params;
+    const { label, image, description } = req.body;
+    
+    // Verify course exists
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+    
+    if (!label) {
+      return res.status(400).json({ error: 'Label is required' });
+    }
+    
+    const option = await CourseOption.create({
+      courseId,
       label,
-      options: (options || []).map(option => ({
-        label: option.label,
-        image: option.image || null,
-        description: option.description || null
-      }))
+      image: image || null,
+      description: description || null
     });
     
-    // Format for API response
-    const response = formatMenuPartForApi(menuPart);
-    res.status(201).json(response);
+    res.status(201).json(formatCourseOptionForApi(option));
   } catch (e) { 
     next(e); 
   }
 }
 
-async function updateMenu(req, res, next) {
+async function updateCourseOption(req, res, next) {
   try {
-    const { id } = req.params;
-    const { course, label, options } = req.body;
+    const { optionId } = req.params;
+    const { label, image, description } = req.body;
     
-    const menuPart = await MenuPart.findById(id);
-    if (!menuPart) {
-      return res.status(404).json({ error: 'Menu part not found' });
+    const updateData = {};
+    if (label) updateData.label = label;
+    if (image !== undefined) updateData.image = image;
+    if (description !== undefined) updateData.description = description;
+    
+    const option = await CourseOption.findByIdAndUpdate(optionId, updateData, { new: true });
+    if (!option) {
+      return res.status(404).json({ error: 'Course option not found' });
     }
-    
-    // Update fields if provided
-    if (course && ['starter', 'main', 'dessert', 'drinks'].includes(course)) {
-      menuPart.course = course;
-    }
-    
-    if (label) {
-      menuPart.label = label;
-    }
-    
-    if (options !== undefined) {
-      // Replace all options
-      menuPart.options = options.map(option => ({
-        label: option.label,
-        image: option.image || null,
-        description: option.description || null
-      }));
-    }
-    
-    await menuPart.save();
-    res.json(formatMenuPartForApi(menuPart));
+    res.json(formatCourseOptionForApi(option));
   } catch (e) { 
     next(e); 
   }
 }
 
-async function deleteMenu(req, res, next) {
+async function deleteCourseOption(req, res, next) {
   try {
-    const { id } = req.params;
+    const { optionId } = req.params;
     
-    const menuPart = await MenuPart.findByIdAndDelete(id);
-    if (!menuPart) {
-      return res.status(404).json({ error: 'Menu part not found' });
+    const option = await CourseOption.findByIdAndDelete(optionId);
+    if (!option) {
+      return res.status(404).json({ error: 'Course option not found' });
     }
-    
     res.json({ status: 'ok' });
   } catch (e) { 
     next(e); 
@@ -684,11 +764,13 @@ module.exports = {
   listGifts, createGift, updateGift, deleteGift, getGiftChoices, getGiftCardImages,
   // agenda (DB-backed)
   listEventsAdmin, createEventsItem, updateEventsItem, deleteEventsItem, uploadEventImage,
-  // menu (DB-backed)
-  listMenus, createMenu, updateMenu, deleteMenu,
+  // courses (new schema)
+  listCourses, createCourse, getCourse, updateCourse, deleteCourse,
+  getCourseOptions, createCourseOption, updateCourseOption, deleteCourseOption,
   // settings (DB-backed)
   getBlockedEvent, setBlockedEvent, clearBlockedEvent,
   getSettings, updateSettings,
   // cash gift cards (DB-backed) - Legacy, to be removed in Phase 8
   listCashGiftCards, createCashGiftCard, updateCashGiftCard, deleteCashGiftCard,
+  formatCourseForApi,
 };

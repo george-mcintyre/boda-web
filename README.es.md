@@ -848,7 +848,7 @@ Igual que el `PUT /api/guest/party` del lado del invitado, pero apuntando al inv
 
 ### 3.3 Definición y Resumen del Menú
 
-#### `GET /api/admin/menu`
+#### `GET /api/admin/courseData`
 
 Obtener la lista de todas las partes del menú.
 
@@ -874,7 +874,7 @@ Mismo esquema que `GET /api/guest/menu`:
     ]
 ```
 
-#### `POST /api/admin/menu`
+#### `POST /api/admin/courseData`
 
 Crear una nueva parte del menú.
 
@@ -898,7 +898,7 @@ Crear una nueva parte del menú.
 
   - Parte del menú creada (con `id` e `id`s de opciones).
 
-#### `PUT /api/admin/menu/:id`
+#### `PUT /api/admin/courseData/:id`
 
 Actualizar una parte del menú existente.
 
@@ -919,7 +919,7 @@ Actualizar una parte del menú existente.
     }
 ```
 
-#### `DELETE /api/admin/menu/:id`
+#### `DELETE /api/admin/courseData/:id`
 
 Eliminar una parte del menú.
 
@@ -931,7 +931,7 @@ Eliminar una parte del menú.
     }
 ```
 
-#### `GET /api/admin/menu-choices`
+#### `GET /api/admin/course-choices`
 
 Resumen de selecciones de menú por invitado.
 

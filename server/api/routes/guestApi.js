@@ -22,15 +22,9 @@ router.post('/messages', auth('guest'), messageCtrl.createGuestMessage);
 router.post('/messages/:id/reaction', auth('guest'), messageCtrl.reactGuest);
 
 // Menu
-router.get('/menu', auth('guest'), require('../../controllers/menuController').listMenu);
-router.get('/menu-choices', auth('guest'), require('../../controllers/menuController').getMenuChoices);
-router.put('/menu-choices', auth('guest'), require('../../controllers/menuController').updateMenuChoices);
-
-// TODO: Add these in Phase 5
-// Menu
-// router.get('/menu', auth('guest'), adminCtrl.listMenus);
-// router.get('/menu-choices', auth('guest'), guestCtrl.getMenuChoices);
-// router.put('/menu-choices', auth('guest'), guestCtrl.updateMenuChoices);
+router.get('/menu', auth('guest'), require('../../controllers/menuController').listCourses);
+router.get('/menu-choices', auth('guest'), require('../../controllers/menuController').listCourseOptions);
+router.put('/menu-choices', auth('guest'), require('../../controllers/menuController').updateCourseOption);
 
 // Gifts
 router.get('/gifts', auth('guest'), guestCtrl.getGifts);
