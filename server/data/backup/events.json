@@ -1,0 +1,130 @@
+[
+  {
+    "_id": {"$oid": "69237e6b76402958d7ee1956"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-11-23T21:36:43.136Z"},
+    "date": {"$date": "2026-06-06T11:00:00.000Z"},
+    "description": {
+      "en": "Come and join us as we celebrate our love.  The beach wedding!"
+    },
+    "end": {"$date": "2026-06-06T23:00:00.000Z"},
+    "image": {"$oid": "69237f3876402958d7ee195d"},
+    "location": "Urbanización las Chapas, s/n, 29604 Marbella, Málaga",
+    "locationAddress": "Urbanización las Chapas, s/n, 29604 Marbella, Málaga",
+    "locationLatitude": 36.49992141718805,
+    "locationLongitude": -4.81805492057585,
+    "name": "Wedding Ceremony",
+    "sub_events": [
+      {
+        "name": "Welcome Cocktails",
+        "date": {"$date": "2026-06-06T11:00:00.000Z"},
+        "end": {"$date": "2026-06-06T12:00:00.000Z"},
+        "description": "Enjoy a glass of champagne while we wait for the bride to appear.  Entertainment will start promptly so don't be late.",
+        "icon": "cocktails"
+      },
+      {
+        "name": "Wedding Ceremony",
+        "date": {"$date": "2026-06-06T12:00:00.000Z"},
+        "end": {"$date": "2026-06-06T13:00:00.000Z"},
+        "description": "The Wedding Ceremony",
+        "icon": "ceremony"
+      },
+      {
+        "name": "Photographs",
+        "date": {"$date": "2026-06-06T13:00:00.000Z"},
+        "end": {"$date": "2026-06-06T14:00:00.000Z"},
+        "description": "The bride and groom will go to take photographs, while guests wait to take places at reception",
+        "icon": "cocktails"
+      },
+      {
+        "name": "Reception Dinner",
+        "date": {"$date": "2026-06-06T14:00:00.000Z"},
+        "end": {"$date": "2026-06-06T17:00:00.000Z"},
+        "description": "The dinner",
+        "icon": "reception"
+      },
+      {
+        "name": "Cake, Fireworks, First Dance, and Games",
+        "date": {"$date": "2026-06-06T17:00:00.000Z"},
+        "end": {"$date": "2026-06-06T19:00:00.000Z"},
+        "description": null,
+        "icon": "reception"
+      },
+      {
+        "name": "Party",
+        "date": {"$date": "2026-06-06T19:00:00.000Z"},
+        "end": {"$date": "2026-06-05T23:00:00.000Z"},
+        "description": null,
+        "icon": "dancing"
+      }
+    ],
+    "title": {
+      "en": "Oyana Beach Restaurant"
+    },
+    "updatedAt": {"$date": "2025-11-23T22:08:13.348Z"}
+  },
+  {
+    "_id": {"$oid": "692381ef76402958d7ee1977"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-11-23T21:51:43.758Z"},
+    "date": {"$date": "2026-06-05T19:00:00.000Z"},
+    "description": {
+      "en": "Join us to meet the others in the wedding party and get in the mood for love!"
+    },
+    "end": {"$date": "2026-06-05T22:00:00.000Z"},
+    "image": {"$oid": "6923828776402958d7ee197e"},
+    "location": "Playa Padron, Carr. de Cadiz, Km 159, 29680 Estepona, Málaga",
+    "locationAddress": "Playa Padron, Carr. de Cadiz, Km 159, 29680 Estepona, Málaga",
+    "locationLatitude": 36.438354134601,
+    "locationLongitude": -5.104264180418514,
+    "name": "Welcome Cocktails",
+    "sub_events": [
+      {
+        "name": "Welcome",
+        "date": {"$date": "2026-06-05T19:00:00.000Z"},
+        "end": {"$date": "2026-06-05T19:30:00.000Z"},
+        "description": null,
+        "icon": "cocktails"
+      },
+      {
+        "name": "Dinner",
+        "date": {"$date": "2026-06-05T19:30:00.000Z"},
+        "end": {"$date": "2026-06-05T21:00:00.000Z"},
+        "description": null,
+        "icon": "reception"
+      },
+      {
+        "name": "Dancing",
+        "date": {"$date": "2026-06-05T21:00:00.000Z"},
+        "end": {"$date": "2026-06-04T22:00:00.000Z"},
+        "description": "",
+        "icon": "dancing"
+      }
+    ],
+    "title": {
+      "en": "Sublim Beach Club"
+    },
+    "updatedAt": {"$date": "2025-11-23T22:05:59.829Z"}
+  },
+  {
+    "_id": {"$oid": "6923849276402958d7ee1a73"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-11-23T22:02:58.267Z"},
+    "date": {"$date": "2026-06-07T12:30:00.000Z"},
+    "description": {
+      "en": "Wedding Brunch"
+    },
+    "end": {"$date": "2026-06-07T16:00:00.000Z"},
+    "image": {"$oid": "6923849276402958d7ee1a71"},
+    "location": "P.º Marítimo, num 2, 29600 Marbella, Málaga",
+    "locationAddress": "P.º Marítimo, num 2, 29600 Marbella, Málaga",
+    "locationLatitude": 36.50704566918498,
+    "locationLongitude": -4.892851492688078,
+    "name": "Wedding Brunch",
+    "sub_events": [],
+    "title": {
+      "en": "Bocana Beach"
+    },
+    "updatedAt": {"$date": "2025-11-23T22:08:55.652Z"}
+  }
+]

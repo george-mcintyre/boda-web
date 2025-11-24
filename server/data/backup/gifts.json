@@ -1,0 +1,14 @@
+[
+  {
+    "_id": {"$oid": "69245854a347858e19002942"},
+    "__v": 0,
+    "amount": 25,
+    "available": 12,
+    "createdAt": {"$date": "2025-11-24T13:06:28.897Z"},
+    "description": "Bar",
+    "enabled": true,
+    "image": {"$oid": "69245fdf3d2dd38bc5a3df69"},
+    "title": "Foo",
+    "updatedAt": {"$date": "2025-11-24T13:38:39.629Z"}
+  }
+]

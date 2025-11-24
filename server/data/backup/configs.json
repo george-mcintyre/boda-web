@@ -1,0 +1,30 @@
+[
+  {
+    "_id": {"$oid": "692359f38de762c4d68a40c7"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-11-23T19:01:07.085Z"},
+    "defaultLanguage": "en",
+    "eventsEnabled": false,
+    "giftsEnabled": false,
+    "guestsEnabled": true,
+    "menuEnabled": false,
+    "messagesEnabled": false,
+    "otherOptions": {
+      "agenda": {
+        "locked": false,
+        "lockDate": null,
+        "lockReason": null
+      },
+      "system": {
+        "lastUpdate": "2025-09-04T22:52:51.863Z",
+        "version": "1.0.0"
+      },
+      "event": {
+        "blocked": false,
+        "reason": "",
+        "blockedAt": null
+      }
+    },
+    "updatedAt": {"$date": "2025-11-24T11:06:11.281Z"}
+  }
+]
