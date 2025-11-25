@@ -136,27 +136,8 @@ function handleAdminLoginClick() {
 // Initialize authentication check handlers on DOM load
 function initializeAuthHandlers() {
     console.log('initializing auth handlers');
-    // Handle guest login links by href
-    const guestLoginLinks = document.querySelectorAll('a[href="login.html"], a[href="/login.html"]');
-    guestLoginLinks.forEach((link, index) => {
-        link.addEventListener('click', async function(e) {
-            e.preventDefault(); // stop navigation right away
-            const allowAccess = await handleGuestLoginClick();
-            if (allowAccess) window.location.href = link.href;
-        });
-    });
-
-    // Handle admin login links by href
-    const adminLoginLinks = document.querySelectorAll('a[href="/admin-login.html"]');
-    adminLoginLinks.forEach((link) => {
-        link.addEventListener('click', function(e) {
-            if (!handleAdminLoginClick()) {
-                e.preventDefault();
-            }
-        });
-    });
-
-    // Handle buttons with data-action attributes
+    
+    // Handle buttons with data-action attributes (handles both guest and admin login)
     const loginButtons = document.querySelectorAll('[data-action="guest-login"], [data-action="admin-login"]');
     loginButtons.forEach((button) => {
         button.addEventListener('click', async (e) => {
