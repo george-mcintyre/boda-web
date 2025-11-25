@@ -2364,10 +2364,10 @@
       }
     }
 
-    // Función para cargar tarjetas de pago del servidor
+    // Function to load payment cards from the server
     async function loadCashGiftCards() {
       try {
-        // Llenar automáticamente los datos del invitado autenticado
+        // Automatically fill the authenticated guest data
         const guestName = localStorage.getItem('nombre');
         const guestEmail = localStorage.getItem('email');
         
@@ -2379,18 +2379,16 @@
           if (donorEmailInput) donorEmailInput.value = guestEmail;
         }
         
-        // Agregar timestamp para evitar cache
+        // Add timestamp to avoid cache
         const response = await fetch(`/api/cash-gift-cards?_t=${Date.now()}`);
         const cards = await response.json();
-        
-        console.log('💳 Tarjetas cargadas:', cards);
         
         const amountOptionsContainer = document.querySelector('.amount-options');
         if (amountOptionsContainer) {
           // Limpiar opciones existentes
           amountOptionsContainer.innerHTML = '';
           
-          // Agregar todas las tarjetas del servidor (incluyendo las por defecto)
+          // Add all cards from the server (including the default ones)
           cards.forEach(card => {
             const cardElement = document.createElement('div');
             cardElement.className = 'amount-option';
@@ -2400,7 +2398,6 @@
             const backgroundStyle = card.imageUrl ? 
               `background-image: url('${card.imageUrl}'); background-size: cover; background-position: center; background-blend-mode: overlay;` : '';
             
-            console.log(`🎨 Aplicando estilo a tarjeta ${card.label}:`, backgroundStyle);
             cardElement.style.cssText = backgroundStyle;
             
             cardElement.innerHTML = `

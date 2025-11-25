@@ -26,15 +26,12 @@ function getCurrentAuthStatus() {
 // Redirect to appropriate dashboard based on login status
 function redirectToAppropriateDashboard() {
     if (isAdminLoggedIn()) {
-        console.log('Admin user detected, redirecting to admin dashboard');
         window.location.href = '/admin.html';
         return true;
     } else if (isGuestLoggedIn()) {
-        console.log('Guest user detected, redirecting to guest dashboard');
         window.location.href = 'guests.html';
         return true;
     }
-    console.log('No authenticated user detected, allowing login page access');
     return false;
 }
 
@@ -56,7 +53,6 @@ function handleGuestLoginClick() {
 function handleAdminLoginClick() {
     try {
         if (isAdminLoggedIn()) {
-            console.log('Admin user detected, redirecting to admin dashboard');
             window.location.href = '/admin.html';
             return false; // Prevent default link behavior
         } else if (isGuestLoggedIn()) {
@@ -69,10 +65,8 @@ function handleAdminLoginClick() {
             };
             
             alert(messages[currentLang] || messages.es);
-            console.log('Guest user tried to access admin section, access denied');
             return false; // Prevent default link behavior
         }
-        console.log('No authenticated user detected, allowing admin login page access');
         return true; // Allow default link behavior (go to admin login page)
     } catch (error) {
         console.error('Error handling admin login click:', error);
@@ -83,13 +77,10 @@ function handleAdminLoginClick() {
 
 // Initialize authentication check handlers on DOM load
 function initializeAuthHandlers() {
-    console.log('Initializing authentication handlers...');
-    
     // Handle guest login links by href
     const guestLoginLinks = document.querySelectorAll('a[href="login.html"], a[href="/login.html"]');
     guestLoginLinks.forEach((link, index) => {
         link.addEventListener('click', function(e) {
-            console.log(`Guest login link ${index + 1} clicked:`, this.href);
             if (!handleGuestLoginClick()) {
                 e.preventDefault();
             }
@@ -100,7 +91,6 @@ function initializeAuthHandlers() {
     const adminLoginLinks = document.querySelectorAll('a[href="/admin-login.html"]');
     adminLoginLinks.forEach((link, index) => {
         link.addEventListener('click', function(e) {
-            console.log(`Admin login link ${index + 1} clicked:`, this.href);
             if (!handleAdminLoginClick()) {
                 e.preventDefault();
             }
@@ -111,7 +101,6 @@ function initializeAuthHandlers() {
     const loginButtons = document.querySelectorAll('[data-action="guest-login"], [data-action="admin-login"]');
     loginButtons.forEach((button, index) => {
         button.addEventListener('click', function(e) {
-            console.log(`Login button ${index + 1} clicked:`, this.getAttribute('data-action'));
             e.preventDefault();
             const action = this.getAttribute('data-action');
             if (action === 'admin-login') {
@@ -121,11 +110,6 @@ function initializeAuthHandlers() {
             }
         });
     });
-
-    // Log current authentication status for debugging
-    console.log('Current authentication status:', getCurrentAuthStatus());
-    
-    console.log(`Authentication handlers initialized: ${guestLoginLinks.length} guest links, ${adminLoginLinks.length} admin links, ${loginButtons.length} buttons`);
 }
 
 // Initialize when DOM is ready

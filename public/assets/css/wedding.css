@@ -1,0 +1,394 @@
+
+/* Prevent all scrolling on the home page */
+body {
+    overflow: hidden !important;
+    height: 100vh !important;
+    position: fixed !important;
+    width: 100% !important;
+    }
+
+    html {
+    overflow: hidden !important;
+    height: 100vh !important;
+    position: fixed !important;
+    width: 100% !important;
+    }
+
+    /* Ensure the wedding-landing section takes full height and can handle animations */
+    .wedding-landing {
+    height: 100vh !important;
+    overflow: visible !important;
+    position: relative !important;
+    }
+
+    /* Sticky navbar styles */
+    .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar .container {
+    width: min(90%, 100%);
+    margin-inline: auto;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    }
+
+    .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    }
+
+    /* Language selector styles */
+    .language-selector {
+    position: relative;
+    }
+
+    .language-selector-wrapper {
+    position: relative;
+    }
+
+    .language-selector-dropdown {
+    position: relative;
+    display: inline-block;
+    }
+
+    .language-selector-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    height: 40px;
+    background: rgb(213, 213, 213);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #605047;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    min-width: 120px;
+    }
+
+    .language-selector-toggle:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .language-selector-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: white;
+    border: 1px solid #e1e5e9;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(20px);
+    min-width: 160px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1001;
+    overflow: hidden;
+    }
+
+    .language-selector-menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    }
+
+    .language-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 1px solid #f5f5f5;
+    }
+
+    .language-option:last-child {
+    border-bottom: none;
+    }
+
+    .language-option:hover {
+    background: #f8f9fa;
+    color: #007bff;
+    }
+
+    .language-option.active {
+    background: #e3f2fd;
+    color: #1976d2;
+    font-weight: 600;
+    }
+
+    /* Login icon styles */
+    .login-access-icon {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 15px;
+    z-index: 1000;
+    }
+
+    .login-access-icon a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #605047;
+    font-size: 18px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    }
+
+    .login-access-icon a:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .login-access-icon a:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+    }
+
+    @media (max-width: 600px) {
+    .header-actions { gap: 8px; }
+    .language-selector-toggle { min-width: auto; padding: 8px; }
+    .login-access-icon a { width: 36px; height: 36px; font-size: 16px; }
+    }
+
+    /* Centered wedding content styles */
+    .wedding-landing .wix-hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;
+    padding: 80px 0 0 0; /* Add top padding for fixed navbar */
+    margin-top: 0;
+    }
+
+    .wedding-landing .wix-left {
+    max-width: 600px;
+    margin: 0 auto;
+    }
+
+    .wedding-landing .eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--wix-muted);
+    margin: 0 0 16px;
+    }
+
+    .wedding-landing h1 {
+    font-size: clamp(32px, 9vw, 56px);
+    line-height: 1.2;
+    margin: 0 0 16px;
+    font-weight: 600;
+    }
+
+    .wedding-landing .date {
+    font-size: 16px;
+    color: var(--wix-muted);
+    margin: 0 0 32px;
+    }
+
+    .wedding-landing .cta-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    }
+
+    /* Hide the original site when landing is active */
+    body.wedding-landing-active header:not(.navbar),
+    body.wedding-landing-active main,
+    body.wedding-landing-active footer { display: none !important; }
+
+    /* Responsive adjustments */
+    @media (min-width: 860px) {
+    .wedding-landing .wix-hero {
+        flex-direction: row;
+        text-align: left;
+        align-items: center;
+        padding: 0 0;
+    }
+    
+    .wedding-landing .wix-left {
+        flex: 1;
+        margin-right: 40px;
+    }
+    
+    .wedding-landing .wix-right {
+        flex: 1;
+    }
+    }
+
+    /* Estilos específicos para centrar eventos */
+    .info-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 2rem !important;
+    margin: 2rem 0 !important;
+    }
+
+    /* Contenedor de eventos */
+    .events-container {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 2rem !important;
+    }
+
+    /* Fila de eventos */
+    .events-row {
+    display: flex !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 2rem !important;
+    max-width: 1200px !important;
+    width: 100% !important;
+    }
+
+    /* Sección de ubicación */
+    .location-section {
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
+    }
+
+    .location-card {
+    max-width: 400px !important;
+    }
+
+    /* Asegurar que la sección de guests esté centrada */
+    .cta-section {
+    text-align: center;
+    }
+
+    .cta-content {
+    max-width: 600px;
+    margin: 0 auto;
+    }
+
+    .cta-content > h3 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-weight: 600;
+    }
+
+    .cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+    }
+
+    /* Botón rosa degradado para ver en mapa */
+    a.btn-ver-mapa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--gradient-primary);
+    color: #ffffff;
+    padding: 0.8rem 1.4rem;
+    border-radius: 50px;
+    text-decoration: none;
+    box-shadow: 0 4px 15px var(--shadow);
+    margin-top: 0.8rem;
+    transition: all 0.3s ease;
+    }
+
+    a.btn-ver-mapa:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px var(--shadow-hover);
+    }
+
+    a.btn-ver-mapa i {
+    font-size: 1rem;
+    }
+
+    /* Overlay y contenedor de mapa */
+    .map-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    }
+
+    .map-container {
+    position: relative;
+    width: min(1000px, 92%);
+    height: min(700px, 85%);
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    }
+
+    #events-map {
+    width: 100%;
+    height: 100%;
+    }
+
+    .map-close-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 100000;
+    background: var(--gradient-primary);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    border: 2px solid #ffffff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
