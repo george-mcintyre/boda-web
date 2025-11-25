@@ -1,5 +1,4 @@
-/* Mobile-first landing styles inspired by the Wix placeholder
-   Scope everything under .wedding-landing to avoid conflicts */
+/* Mobile-first landing styles */
 :root {
   --pepe-bg: #fcfcfc;
   --pepe-fg: #1c1b1a;
@@ -14,7 +13,7 @@ body.wedding-landing-active header,
 body.wedding-landing-active main,
 body.wedding-landing-active footer { display: none !important; }
 
-/* Force no scrolling on the wix landing page */
+/* Force no scrolling on the landing page */
 .wedding-landing-active {
   overflow: hidden !important;
   height: 100vh !important;
@@ -49,7 +48,7 @@ body.wedding-landing-active footer { display: none !important; }
   margin-inline: auto;
 }
 
-/* Top-right actions inside Wix landing */
+/* Top-right actions inside landing */
 .wedding-landing .pepe-top-actions {
   position: sticky;
   top: 0;
