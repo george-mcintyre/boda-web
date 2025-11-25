@@ -49,23 +49,24 @@
     gap: 8px;
     padding: 8px 12px;
     height: 40px;
-    background: rgb(213, 213, 213);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: linear-gradient(180deg, #c7a27a, #b78d61);
+    border: 1px solid rgba(199, 162, 122, 0.3);
     border-radius: 8px;
-    color: #605047;
+    color: white;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
     min-width: 120px;
+    box-shadow: 0 6px 16px rgba(199,162,122,0.35);
     }
 
     .language-selector-toggle:hover {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: rgba(255, 255, 255, 0.3);
+    filter: brightness(1.05);
+    border-color: rgba(199, 162, 122, 0.5);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 20px rgba(199,162,122,0.45);
     }
 
     .language-selector-menu {
