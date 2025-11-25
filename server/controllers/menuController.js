@@ -140,8 +140,6 @@ async function listGuestCourseOption(req, res, next) {
     }
     
     // Get existing menu choices
-    let menuChoice = await MenuChoice.findOne({ guestId });
-    
     // Build party member list including primary guest
     const partyMembers = [
       { 
@@ -164,6 +162,11 @@ async function listGuestCourseOption(req, res, next) {
       });
     }
     
+    let menuChoice = null; 
+    try {
+      menuChoice = await MenuChoice.findOne({ guestId });
+    } catch (e) {}
+
     // If no menu choices exist, create default structure
     if (!menuChoice) {
       menuChoice = await MenuChoice.create({

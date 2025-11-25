@@ -8,6 +8,7 @@ module.exports = {
   Comment: require('./Comment'),
   Course: require('./Course'),
   CourseOption: require('./CourseOption'),
+  MenuChoice: require('./MenuChoice'),
   MenuOptionImage: require('./MenuOptionImage'),
   Gift: require('./Gift'),
   GiftImage: require('./GiftImage'),

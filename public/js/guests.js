@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadMenuSelections() {
     try {
       // Get party members and menu data in parallel
-      const [partyResponse, menuResponse] = await Promise.all([
+      const [partyResponse, menuResponse, menuChoicesResponse] = await Promise.all([
         fetch('/api/guest/party', {
           method: 'GET',
           headers: { 'Authorization': token }
@@ -113,11 +113,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         fetch('/api/guest/menu', {
           method: 'GET',
           headers: { 'Authorization': token }
+        }),
+        fetch('/api/guest/menu-choices', {
+          method: 'GET',
+          headers: { 'Authorization': token }
         })
       ]);
 
       const partyData = await partyResponse.json();
       const menuData = await menuResponse.json();
+      const menuChoicesData = menuChoicesResponse.ok ? await menuChoicesResponse.json() : [];
 
       const menuStatusContent = document.getElementById('menuStatusContent');
       if (!menuStatusContent) return;
@@ -130,40 +135,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // Get menu choices for each course using courseId from menu response
-      const menuChoicesPromises = menuData.map(course => 
-        fetch(`/api/guest/${course.id}/menu-choices`, {
-          method: 'GET',
-          headers: { 'Authorization': token }
-        }).then(res => res.json()).catch(() => [])
-      );
-
-      const menuChoicesResults = await Promise.all(menuChoicesPromises);
-      
-      // Also get existing guest menu selections
-      const menuChoicesResponse = await fetch('/api/guest/menu-choices', {
-        method: 'GET',
-        headers: { 'Authorization': token }
-      });
-      const guestMenuChoicesData = await menuChoicesResponse.json();
-      
-      // Combine course options with guest selections
-      const menuChoicesData = guestMenuChoicesData;
-
-      // Group courses by type and merge with course-specific options
+      // Group courses by type using the menu data (which already contains all options)
       const coursesByType = {};
-      menuData.forEach((course, index) => {
+      menuData.forEach(course => {
         if (!coursesByType[course.course]) {
           coursesByType[course.course] = [];
         }
-        
-        // Merge course data with options from the course-specific API call
-        const courseWithOptions = {
-          ...course,
-          options: menuChoicesResults[index] || course.options || []
-        };
-        
-        coursesByType[course.course].push(courseWithOptions);
+        coursesByType[course.course].push(course);
       });
 
       // Create menu cards for each party member
@@ -205,7 +183,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
           courses.forEach(course => {
             const courseOptions = course.options || [];
-            const selectedOption = memberChoices.choices.find(choice => choice.courseId === course.id);
+            
+            // Find existing choice for this course, or select first option if no choice made
+            const selectedChoice = memberChoices.choices.find(choice => choice.courseId === course.id);
+            let selectedOptionId = null;
+            
+            if (selectedChoice) {
+              // Choice exists, use the selected option
+              selectedOptionId = selectedChoice.optionId;
+            } else if (course.selectionRequired && courseOptions.length > 0) {
+              // No choice made (404 case), select first option by default
+              selectedOptionId = courseOptions[0].id;
+            }
             
             menuHTML += `
               <div class="course-card">
@@ -214,7 +203,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             `;
 
             courseOptions.forEach((option, optionIndex) => {
-              const isSelected = selectedOption && selectedOption.optionId === option.id;
+              const isSelected = selectedOptionId === option.id;
               const radioName = `menu-${member.id}-${course.id}`;
               const hasImage = option.image && (option.image.startsWith('data:') || option.image.length === 24);
               
