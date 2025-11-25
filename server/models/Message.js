@@ -6,7 +6,7 @@ const userReactionSchema = new Schema({
 }, { _id: false });
 
 const messageSchema = new Schema({
-  name: { type: String, alias: 'name' },
+  name: { type: String, required: true },
   email: String,
   content: { type: String, alias: 'contenido' },
   // Legacy: Map of emoji -> array of emails who reacted (kept for backward compatibility). Keys are emoji (safe).
