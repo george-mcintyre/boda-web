@@ -104,54 +104,336 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load and menu selections
   async function loadMenuSelections() {
     try {
-      const response = await fetch('/api/guest/menu-choices', {
-        method: 'GET',
-        headers: { 'Authorization': token }
-      });
-      const data = await response.json();
-      
+      // Get party members and menu data in parallel
+      const [partyResponse, menuResponse, menuChoicesResponse] = await Promise.all([
+        fetch('/api/guest/party', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        }),
+        fetch('/api/guest/menu', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        }),
+        fetch('/api/guest/menu-choices', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        })
+      ]);
+
+      const partyData = await partyResponse.json();
+      const menuData = await menuResponse.json();
+      const menuChoicesData = await menuChoicesResponse.json();
+
       const menuStatusContent = document.getElementById('menuStatusContent');
       if (!menuStatusContent) return;
-      
-      if (response.ok && data.seleccionMenu) {
-        const seleccion = data.seleccionMenu;
-        menuStatusContent.innerHTML = `
-          <h4><i class="fas fa-check-circle"></i> Tu selección actual</h4>
-          <div class="menu-status-item">
-            <span class="menu-status-label">Entrante:</span>
-            <span class="menu-status-value">${seleccion.entrante || '<span class="no-selection">No seleccionado</span>'}</span>
-          </div>
-          <div class="menu-status-item">
-            <span class="menu-status-label">Plato principal:</span>
-            <span class="menu-status-value">${seleccion.principal || '<span class="no-selection">No seleccionado</span>'}</span>
-          </div>
-          <div class="menu-status-item">
-            <span class="menu-status-label">Postre:</span>
-            <span class="menu-status-value">${seleccion.postre || '<span class="no-selection">No seleccionado</span>'}</span>
-          </div>
-          ${seleccion.opcion ? `
-          <div class="menu-status-item">
-            <span class="menu-status-label">Opción especial:</span>
-            <span class="menu-status-value">${seleccion.opcion}</span>
-          </div>
-          ` : ''}
-          ${seleccion.alergias ? `
-          <div class="menu-status-item">
-            <span class="menu-status-label">Alergias:</span>
-            <span class="menu-status-value">${seleccion.alergias}</span>
-          </div>
-          ` : ''}
-        `;
-      } else {
+
+      if (!partyResponse.ok || !menuResponse.ok) {
         menuStatusContent.innerHTML = `
           <h4><i class="fas fa-info-circle"></i> Menu selections</h4>
-          <p class="no-selection">Something went wrong with the menu selections. Please try again later.</p>
+          <p class="no-selection">Error loading menu data. Please try again later.</p>
+        `;
+        return;
+      }
+
+      // Group courses by type
+      const coursesByType = {};
+      menuData.forEach(course => {
+        if (!coursesByType[course.course]) {
+          coursesByType[course.course] = [];
+        }
+        coursesByType[course.course].push(course);
+      });
+
+      // Create menu cards for each party member
+      let menuHTML = '';
+      
+      partyData.forEach(member => {
+        const memberChoices = menuChoicesData.find(choice => 
+          choice.partyGuestId === member.id || choice.partyGuestId === `primary-${member.id}`
+        ) || { choices: [], specialRequest: null };
+
+        menuHTML += `
+          <div class="menu-card">
+            <h4 class="menu-card-title">
+              <i class="fas fa-utensils"></i>
+              Menu for ${member.name}
+            </h4>
+            <div class="menu-sections">
+        `;
+
+        // Define the order of course types
+        const courseTypes = ['starter', 'main', 'dessert', 'drinks'];
+        const courseLabels = {
+          starter: 'Starters',
+          main: 'Main Course',
+          dessert: 'Desserts',
+          drinks: 'Drinks'
+        };
+
+        courseTypes.forEach(courseType => {
+          const courses = coursesByType[courseType] || [];
+          
+          menuHTML += `
+            <div class="menu-section">
+              <h5 class="section-title">
+                <i class="fas fa-${courseType === 'starter' ? ' appetizers' : courseType === 'main' ? 'drumstick-bite' : courseType === 'dessert' ? 'ice-cream' : 'cocktail'}"></i>
+                ${courseLabels[courseType]}
+              </h5>
+          `;
+
+          courses.forEach(course => {
+            const courseOptions = course.options || [];
+            const selectedOption = memberChoices.choices.find(choice => choice.courseId === course.id);
+            
+            menuHTML += `
+              <div class="course-card">
+                <h6 class="course-title">${course.label}</h6>
+                <div class="options-container">
+            `;
+
+            courseOptions.forEach((option, optionIndex) => {
+              const isSelected = selectedOption && selectedOption.optionId === option.id;
+              const radioName = `menu-${member.id}-${course.id}`;
+              const hasImage = option.image && (option.image.startsWith('data:') || option.image.length === 24);
+              
+              menuHTML += `
+                <div class="option-card ${isSelected ? 'selected' : ''}">
+                  ${hasImage ? `
+                    <div class="option-image">
+                      <img src="${option.image}" alt="${option.label}" onerror="this.parentElement.style.display='none';" />
+                    </div>
+                  ` : ''}
+                  <div class="option-content">
+                    <div class="option-header">
+                      <label for="${radioName}-${optionIndex}" class="option-label">
+                        ${option.label}
+                        ${option.dietaryIcons ? `<span class="dietary-icons">${option.dietaryIcons}</span>` : ''}
+                      </label>
+                      ${course.selectionRequired ? `
+                        <input 
+                          type="radio" 
+                          id="${radioName}-${optionIndex}" 
+                          name="${radioName}" 
+                          value="${option.id}"
+                          ${isSelected ? 'checked' : ''}
+                          onchange="saveMenuSelection('${member.id}', '${course.id}', '${option.id}')"
+                        />
+                      ` : ''}
+                    </div>
+                    ${option.description ? `
+                      <p class="option-description">${option.description}</p>
+                    ` : ''}
+                  </div>
+                </div>
+              `;
+            });
+
+            menuHTML += `
+                </div>
+              </div>
+            `;
+          });
+
+          menuHTML += `</div>`;
+        });
+
+        // Add special requests section
+        menuHTML += `
+          <div class="special-requests">
+            <h5 class="section-title">
+              <i class="fas fa-exclamation-triangle"></i>
+              Special Requests
+            </h5>
+            <div class="special-request-options">
+              <select name="special-request-${member.id}" onchange="saveSpecialRequest('${member.id}', this.value)">
+                <option value="">None</option>
+                <option value="vegan" ${memberChoices.specialRequest === 'vegan' ? 'selected' : ''}>Vegan</option>
+                <option value="vegetarian" ${memberChoices.specialRequest === 'vegetarian' ? 'selected' : ''}>Vegetarian</option>
+                <option value="nut allergy" ${memberChoices.specialRequest === 'nut allergy' ? 'selected' : ''}>Nut Allergy</option>
+                <option value="other" ${memberChoices.specialRequest === 'other' ? 'selected' : ''}>Other</option>
+              </select>
+              ${memberChoices.specialRequestDetail ? `
+                <textarea 
+                  placeholder="Please specify..." 
+                  name="special-request-detail-${member.id}"
+                  onchange="saveSpecialRequestDetail('${member.id}', this.value)"
+                >${memberChoices.specialRequestDetail}</textarea>
+              ` : `
+                <textarea 
+                  placeholder="Please specify..." 
+                  name="special-request-detail-${member.id}"
+                  style="display: none;"
+                  onchange="saveSpecialRequestDetail('${member.id}', this.value)"
+                ></textarea>
+              `}
+            </div>
+          </div>
+        `;
+
+        menuHTML += `
+            </div>
+          </div>
+        `;
+      });
+
+      menuStatusContent.innerHTML = menuHTML || `
+        <p class="no-selection">No party members found.</p>
+      `;
+
+    } catch (err) {
+      console.error('Error loading menu selections:', err);
+      const menuStatusContent = document.getElementById('menuStatusContent');
+      if (menuStatusContent) {
+        menuStatusContent.innerHTML = `
+          <h4><i class="fas fa-info-circle"></i> Menu selections</h4>
+          <p class="no-selection">Error loading menu data. Please try again later.</p>
         `;
       }
-    } catch (err) {
-      console.error('Error al cargar el status del menú:', err);
     }
   }
+
+  // Save menu selection function
+  window.saveMenuSelection = async (partyGuestId, courseId, optionId) => {
+    try {
+      const currentChoices = await fetch('/api/guest/menu-choices', {
+        method: 'GET',
+        headers: { 'Authorization': token }
+      }).then(res => res.json());
+
+      // Find or create choice for this party member
+      let memberChoices = currentChoices.find(choice => 
+        choice.partyGuestId === partyGuestId
+      );
+
+      if (!memberChoices) {
+        memberChoices = {
+          partyGuestId: partyGuestId,
+          choices: []
+        };
+        currentChoices.push(memberChoices);
+      }
+
+      // Remove existing choice for this course and add new one
+      memberChoices.choices = memberChoices.choices.filter(choice => choice.courseId !== courseId);
+      memberChoices.choices.push({ courseId, optionId });
+
+      // Update on server
+      const response = await fetch('/api/guest/menu-choices', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ choices: currentChoices })
+      });
+
+      if (response.ok) {
+        showToast('Menu selection saved successfully!', 'success');
+      } else {
+        showToast('Error saving menu selection', 'error');
+      }
+    } catch (err) {
+      console.error('Error saving menu selection:', err);
+      showToast('Error saving menu selection', 'error');
+    }
+  };
+
+  // Save special request function
+  window.saveSpecialRequest = async (partyGuestId, specialRequest) => {
+    try {
+      const currentChoices = await fetch('/api/guest/menu-choices', {
+        method: 'GET',
+        headers: { 'Authorization': token }
+      }).then(res => res.json());
+
+      // Find or create choice for this party member
+      let memberChoices = currentChoices.find(choice => 
+        choice.partyGuestId === partyGuestId
+      );
+
+      if (!memberChoices) {
+        memberChoices = {
+          partyGuestId: partyGuestId,
+          choices: []
+        };
+        currentChoices.push(memberChoices);
+      }
+
+      memberChoices.specialRequest = specialRequest || null;
+      if (specialRequest !== 'other') {
+        memberChoices.specialRequestDetail = null;
+      }
+
+      // Update on server
+      const response = await fetch('/api/guest/menu-choices', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ choices: currentChoices })
+      });
+
+      if (response.ok) {
+        showToast('Special request saved successfully!', 'success');
+        
+        // Show/hide detail textarea based on selection
+        const detailTextarea = document.querySelector(`textarea[name="special-request-detail-${partyGuestId}"]`);
+        if (detailTextarea) {
+          detailTextarea.style.display = specialRequest === 'other' ? 'block' : 'none';
+        }
+      } else {
+        showToast('Error saving special request', 'error');
+      }
+    } catch (err) {
+      console.error('Error saving special request:', err);
+      showToast('Error saving special request', 'error');
+    }
+  };
+
+  // Save special request detail function
+  window.saveSpecialRequestDetail = async (partyGuestId, specialRequestDetail) => {
+    try {
+      const currentChoices = await fetch('/api/guest/menu-choices', {
+        method: 'GET',
+        headers: { 'Authorization': token }
+      }).then(res => res.json());
+
+      // Find or create choice for this party member
+      let memberChoices = currentChoices.find(choice => 
+        choice.partyGuestId === partyGuestId
+      );
+
+      if (!memberChoices) {
+        memberChoices = {
+          partyGuestId: partyGuestId,
+          choices: []
+        };
+        currentChoices.push(memberChoices);
+      }
+
+      memberChoices.specialRequestDetail = specialRequestDetail || null;
+
+      // Update on server
+      const response = await fetch('/api/guest/menu-choices', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ choices: currentChoices })
+      });
+
+      if (response.ok) {
+        showToast('Special request details saved successfully!', 'success');
+      } else {
+        showToast('Error saving special request details', 'error');
+      }
+    } catch (err) {
+      console.error('Error saving special request details:', err);
+      showToast('Error saving special request details', 'error');
+    }
+  };
   
     // Cargar y mostrar el status del RSVP
   async function cargarStatusRSVP() {
@@ -195,10 +477,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadMessages() {
   }
 
-  // Load menu content
-  async function loadMenuContent() {
-  }
-
   // Load events content
   async function loadEventsContent() {
   }
@@ -210,182 +488,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Load messages content
   async function loadMessagesContent() {
   }
-
-  // Load menu content
-  async function loadMenuContent() {
-    const menuContent = document.getElementById('menuContent');
-    
-    try {
-      // Obtener el menú disponible
-      const menuResponse = await fetch('/api/menu');
-      const menu = await menuResponse.json();
-      
-      // Obtener la selección actual del usuario
-      const userResponse = await fetch('/api/invitado', {
-        method: 'GET',
-        headers: { 'Authorization': token }
-      });
-      const userData = await userResponse.json();
-      
-      let menuHTML = `
-        <div class="menu-form">
-          <form id="menuForm">
-            <div class="form-group">
-              <label for="entrante">
-                <i class="fas fa-appetizers"></i>
-                Entrante
-              </label>
-              <select id="entrante" name="entrante" required>
-                <option value="">Selecciona un entrante</option>
-                ${menu.entrantes.map(entrante => `<option value="${entrante}">${entrante}</option>`).join('')}
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label for="principal">
-                <i class="fas fa-drumstick-bite"></i>
-                Plato principal
-              </label>
-              <select id="principal" name="principal" required>
-                <option value="">Selecciona un plato principal</option>
-                ${menu.principales.map(principal => `<option value="${principal}">${principal}</option>`).join('')}
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label for="postre">
-                <i class="fas fa-ice-cream"></i>
-                Postre
-              </label>
-              <select id="postre" name="postre" required>
-                <option value="">Selecciona un postre</option>
-                ${menu.postres.map(postre => `<option value="${postre}">${postre}</option>`).join('')}
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label for="opcion">
-                <i class="fas fa-leaf"></i>
-                Opción especial (si aplica)
-              </label>
-              <select id="opcion" name="opcion">
-                <option value="">Ninguna</option>
-                <option value="Vegano">Vegano</option>
-                <option value="Sin gluten">Sin gluten</option>
-                <option value="Sin lactosa">Sin lactosa</option>
-                <option value="Sin frutos secos">Sin frutos secos</option>
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label for="alergias">
-                <i class="fas fa-exclamation-triangle"></i>
-                Alergias o patologías alimentarias
-              </label>
-              <input type="text" id="alergias" name="alergias" placeholder="Ej: Sin frutos secos, celiaquía, intolerancia a la lactosa...">
-            </div>
-            
-            <button type="submit" class="submit-btn">
-              <i class="fas fa-save"></i>
-              Guardar selección
-            </button>
-          </form>
-          
-          <div id="menuMessage" class="message"></div>
-        </div>
-      `;
-      
-      // Si el usuario ya tiene una selección, mostrarla
-      if (userResponse.ok && userData.seleccionMenu) {
-        const seleccion = userData.seleccionMenu;
-        menuHTML = `
-          <div class="current-selection">
-            <h3><i class="fas fa-check-circle"></i> Tu selección actual</h3>
-            <div class="selection-item">
-              <span class="selection-label">Entrante:</span>
-              <span class="selection-value">${seleccion.entrante || 'No seleccionado'}</span>
-            </div>
-            <div class="selection-item">
-              <span class="selection-label">Plato principal:</span>
-              <span class="selection-value">${seleccion.principal || 'No seleccionado'}</span>
-            </div>
-            <div class="selection-item">
-              <span class="selection-label">Postre:</span>
-              <span class="selection-value">${seleccion.postre || 'No seleccionado'}</span>
-            </div>
-            ${seleccion.opcion ? `
-            <div class="selection-item">
-              <span class="selection-label">Opción especial:</span>
-              <span class="selection-value">${seleccion.opcion}</span>
-            </div>
-            ` : ''}
-            ${seleccion.alergias ? `
-            <div class="selection-item">
-              <span class="selection-label">Alergias:</span>
-              <span class="selection-value">${seleccion.alergias}</span>
-            </div>
-            ` : ''}
-          </div>
-        ` + menuHTML;
-      }
-      
-      menuContent.innerHTML = menuHTML;
-      
-      // Configurar el formulario del menú
-      const menuForm = document.getElementById('menuForm');
-      if (menuForm) {
-        menuForm.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          
-          const formData = new FormData(menuForm);
-          const seleccion = {
-            entrante: formData.get('entrante'),
-            principal: formData.get('principal'),
-            postre: formData.get('postre'),
-            opcion: formData.get('opcion'),
-            alergias: formData.get('alergias')
-          };
-          
-                     try {
-             const res = await fetch('/api/menu/seleccion', {
-               method: 'POST',
-               headers: {
-                 'Content-Type': 'application/json',
-                 'Authorization': token
-               },
-               body: JSON.stringify(seleccion)
-             });
-            
-            const data = await res.json();
-            if (res.ok) {
-              showMessage('menuMessage', data.mensaje, 'success');
-              setTimeout(() => {
-                cargarContenidoMenu(); // Recargar para mostrar la selección actual
-                loadMenuSelections(); // Actualizar el status en la pestaña resumen
-              }, 1000);
-            } else {
-              showMessage('menuMessage', data.error || 'Error al guardar la selección.', 'error');
-            }
-          } catch (err) {
-            showMessage('menuMessage', 'Error de conexión al guardar la selección.', 'error');
-          }
-        });
-      }
-      
-      // Si el usuario ya tiene una selección, preseleccionar los valores
-      if (userResponse.ok && userData.seleccionMenu) {
-        const seleccion = userData.seleccionMenu;
-        if (seleccion.entrante) document.getElementById('entrante').value = seleccion.entrante;
-        if (seleccion.principal) document.getElementById('principal').value = seleccion.principal;
-        if (seleccion.postre) document.getElementById('postre').value = seleccion.postre;
-        if (seleccion.opcion) document.getElementById('opcion').value = seleccion.opcion;
-        if (seleccion.alergias) document.getElementById('alergias').value = seleccion.alergias;
-      }
-      
-         } catch (err) {
-       menuContent.innerHTML = '<p class="error">Error al cargar el menú.</p>';
-     }
-   }
 
    // Función para cargar el contenido de la agenda en la pestaña
    async function loadEventsContent() {
@@ -813,7 +915,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // If the tab is menu, load the menu content
       if (targetTab === 'menu') {
-        loadMenuContent();
+        loadMenuSelections();
       }
       
       // If the tab is events, load the events content

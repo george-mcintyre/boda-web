@@ -23,8 +23,8 @@ router.post('/messages/:id/reaction', auth('guest'), messageCtrl.reactGuest);
 
 // Menu
 router.get('/menu', auth('guest'), require('../../controllers/menuController').listCourses);
-router.get('/menu-choices', auth('guest'), require('../../controllers/menuController').listCourseOptions);
-router.put('/menu-choices', auth('guest'), require('../../controllers/menuController').updateCourseOption);
+router.get('/menu/:courseId/menu-choices', auth('guest'), require('../../controllers/menuController').listCourseOptions);
+router.put('/menu/:courseId/menu-choices/:optionId', auth('guest'), require('../../controllers/menuController').updateCourseOption);
 
 // Gifts
 router.get('/gifts', auth('guest'), guestCtrl.getGifts);
