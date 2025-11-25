@@ -1,12 +1,12 @@
 /* Mobile-first landing styles inspired by the Wix placeholder
    Scope everything under .wedding-landing to avoid conflicts */
 :root {
-  --wix-bg: #fcfcfc;
-  --wix-fg: #1c1b1a;
-  --wix-muted: #6d6863;
-  --wix-accent: #c7a27a; /* warm sand */
-  --wix-accent-2: #9fb7aa; /* soft sage */
-  --wix-radius: 16px;
+  --pepe-bg: #fcfcfc;
+  --pepe-fg: #1c1b1a;
+  --pepe-muted: #6d6863;
+  --pepe-accent: #c7a27a; /* warm sand */
+  --pepe-accent-2: #9fb7aa; /* soft sage */
+  --pepe-radius: 16px;
 }
 
 /* Hide the original site when landing is active */
@@ -38,8 +38,8 @@ body.wedding-landing-active footer { display: none !important; }
 
 /* Base */
 .wedding-landing {
-  color: var(--wix-fg);
-  background: var(--wix-bg);
+  color: var(--pepe-fg);
+  background: var(--pepe-bg);
   min-height: 100vh;
   font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 }
@@ -50,7 +50,7 @@ body.wedding-landing-active footer { display: none !important; }
 }
 
 /* Top-right actions inside Wix landing */
-.wedding-landing .wix-top-actions {
+.wedding-landing .pepe-top-actions {
   position: sticky;
   top: 0;
   z-index: 1001;
@@ -59,18 +59,18 @@ body.wedding-landing-active footer { display: none !important; }
   padding: 12px 0 0;
 }
 
-.wedding-landing .wix-top-actions .header-actions {
+.wedding-landing .pepe-top-actions .header-actions {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
 @media (max-width: 600px) {
-  .wedding-landing .wix-top-actions { padding-top: 8px; }
+  .wedding-landing .pepe-top-actions { padding-top: 8px; }
 }
 
 /* Hero */
-.wedding-landing .wix-hero {
+.wedding-landing .pepe-hero {
   display: grid;
   grid-template-columns: 1fr;
   align-items: start;
@@ -83,7 +83,7 @@ body.wedding-landing-active footer { display: none !important; }
   font-size: 13px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--wix-muted);
+  color: var(--pepe-muted);
   margin: 0 0 8px;
 }
 
@@ -96,7 +96,7 @@ body.wedding-landing-active footer { display: none !important; }
 
 .wedding-landing .date {
   font-size: 16px;
-  color: var(--wix-muted);
+  color: var(--pepe-muted);
   margin: 0 0 16px;
 }
 
@@ -116,7 +116,7 @@ body.wedding-landing-active footer { display: none !important; }
 .wedding-landing .btn {
   appearance: none;
   border: none;
-  background: linear-gradient(180deg, var(--wix-accent), #b78d61);
+  background: linear-gradient(180deg, var(--pepe-accent), #b78d61);
   color: #fff;
   padding: 12px 18px;
   border-radius: 999px;
@@ -131,12 +131,12 @@ body.wedding-landing-active footer { display: none !important; }
 .wedding-landing .btn:hover { filter: brightness(1.05); }
 
 .wedding-landing .link {
-  color: var(--wix-fg);
+  color: var(--pepe-fg);
   text-underline-offset: 3px;
 }
 
 /* Right-side stacked gallery */
-.wedding-landing .wix-right { position: relative }
+.wedding-landing .pepe-right { position: relative }
 
 .wedding-landing .stack-section { position: relative; }
 
@@ -158,7 +158,7 @@ body.wedding-landing-active footer { display: none !important; }
 .wedding-landing .stack-card {
   position: absolute;
   inset: 0;
-  border-radius: var(--wix-radius);
+  border-radius: var(--pepe-radius);
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,0.18);
   transform: translateZ(0);
@@ -188,7 +188,7 @@ body.wedding-landing-active footer { display: none !important; }
 .wedding-landing .wow-stack .stack-card:nth-child(n) { z-index: auto; }
 
 /* Details section */
-.wedding-landing .wix-details {
+.wedding-landing .pepe-details {
   padding: 44px 0 80px;
 }
 
@@ -211,13 +211,13 @@ body.wedding-landing-active footer { display: none !important; }
 .wedding-landing .detail-item img { width: 56px; height: 56px; object-fit: contain; }
 
 .wedding-landing .detail-item .title { font-weight: 600; margin: 0 0 4px; }
-.wedding-landing .detail-item .desc { margin: 0; color: var(--wix-muted); font-size: 14px; }
+.wedding-landing .detail-item .desc { margin: 0; color: var(--pepe-muted); font-size: 14px; }
 
 /* Footer strip */
 .wedding-landing .mini-footer {
   border-top: 1px solid rgba(0,0,0,0.06);
   padding: 20px 0 40px;
-  color: var(--wix-muted);
+  color: var(--pepe-muted);
   font-size: 13px;
 }
 
@@ -230,8 +230,8 @@ body.wedding-landing-active footer { display: none !important; }
   transform: translateY(30%); /* overshoot the bottom by 30% of its own height */
   background: #000;
   box-shadow: 0 10px 30px rgba(0,0,0,0.18); /* same soft shadow as stack cards */
-  border-top-left-radius: var(--wix-radius);
-  border-top-right-radius: var(--wix-radius);
+  border-top-left-radius: var(--pepe-radius);
+  border-top-right-radius: var(--pepe-radius);
   overflow: hidden;
   z-index: 9999; /* above everything else */
   pointer-events: none; /* don't block clicks or scroll */
@@ -244,7 +244,7 @@ body.wedding-landing-active footer { display: none !important; }
 
 /* Mobile overlay layout - text visible first, images overlay on scroll */
 @media (max-width: 859px) {
-  .wedding-landing .wix-hero {
+  .wedding-landing .pepe-hero {
     position: relative;
     min-height: 100vh;
     overflow: hidden;
@@ -252,10 +252,10 @@ body.wedding-landing-active footer { display: none !important; }
     display: block !important;
   }
   
-  .wedding-landing .wix-left {
+  .wedding-landing .pepe-left {
     position: relative;
     z-index: 1;
-    background: var(--wix-bg);
+    background: var(--pepe-bg);
     padding: 20px;
     margin-bottom: 50vh; /* Make room for images below */
     max-width: none !important;
@@ -263,7 +263,7 @@ body.wedding-landing-active footer { display: none !important; }
     width: 100% !important;
   }
   
-  .wedding-landing .wix-right {
+  .wedding-landing .pepe-right {
     /* Override grid layout completely */
     width: 100% !important;
     position: absolute !important;
@@ -336,7 +336,7 @@ body.wedding-landing-active footer { display: none !important; }
 
 /* Desktop */
 @media (min-width: 860px) {
-  .wedding-landing .wix-hero {
+  .wedding-landing .pepe-hero {
     grid-template-columns: 1.00fr 1.00fr;
     align-items: center;
     gap: 10px;
@@ -345,7 +345,7 @@ body.wedding-landing-active footer { display: none !important; }
   }
   .wedding-landing .stack-gallery { height: 76vh; }
   .wedding-landing .stack-viewport { height: 76vh; }
-  .wedding-landing .wix-details .detail-grid { grid-template-columns: 1fr 1fr; }
+  .wedding-landing .pepe-details .detail-grid { grid-template-columns: 1fr 1fr; }
 }
 
 

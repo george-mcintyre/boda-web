@@ -188,7 +188,7 @@ body {
     }
 
     /* Centered wedding content styles */
-    .wedding-landing .wix-hero {
+    .wedding-landing .pepe-hero {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -199,7 +199,7 @@ body {
     margin-top: 0;
     }
 
-    .wedding-landing .wix-left {
+    .wedding-landing .pepe-left {
     max-width: 600px;
     margin: 0 auto;
     }
@@ -208,7 +208,7 @@ body {
     font-size: 13px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--wix-muted);
+    color: var(--pepe-muted);
     margin: 0 0 16px;
     }
 
@@ -221,7 +221,7 @@ body {
 
     .wedding-landing .date {
     font-size: 16px;
-    color: var(--wix-muted);
+    color: var(--pepe-muted);
     margin: 0 0 32px;
     }
 
@@ -239,19 +239,19 @@ body {
 
     /* Responsive adjustments */
     @media (min-width: 860px) {
-    .wedding-landing .wix-hero {
+    .wedding-landing .pepe-hero {
         flex-direction: row;
         text-align: left;
         align-items: center;
         padding: 0 0;
     }
     
-    .wedding-landing .wix-left {
+    .wedding-landing .pepe-left {
         flex: 1;
         margin-right: 40px;
     }
     
-    .wedding-landing .wix-right {
+    .wedding-landing .pepe-right {
         flex: 1;
     }
     }
