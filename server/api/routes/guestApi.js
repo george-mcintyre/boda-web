@@ -26,6 +26,10 @@ router.get('/menu', auth('guest'), require('../../controllers/menuController').l
 router.get('/menu/:courseId/menu-choices', auth('guest'), require('../../controllers/menuController').listCourseOptions);
 router.put('/menu/:courseId/menu-choices/:optionId', auth('guest'), require('../../controllers/menuController').updateCourseOption);
 
+// Guest menu choices (legacy support)
+router.get('/menu-choices', auth('guest'), require('../../controllers/menuController').listGuestCourseOption);
+router.put('/menu-choices', auth('guest'), require('../../controllers/menuController').updateGuestCourseOption);
+
 // Gifts
 router.get('/gifts', auth('guest'), guestCtrl.getGifts);
 router.get('/gift-choices', auth('guest'), guestCtrl.getGiftChoices);

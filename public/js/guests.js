@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadMenuSelections() {
     try {
       // Get party members and menu data in parallel
-      const [partyResponse, menuResponse, menuChoicesResponse] = await Promise.all([
+      const [partyResponse, menuResponse] = await Promise.all([
         fetch('/api/guest/party', {
           method: 'GET',
           headers: { 'Authorization': token }
@@ -113,16 +113,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         fetch('/api/guest/menu', {
           method: 'GET',
           headers: { 'Authorization': token }
-        }),
-        fetch('/api/guest/menu-choices', {
-          method: 'GET',
-          headers: { 'Authorization': token }
         })
       ]);
 
       const partyData = await partyResponse.json();
       const menuData = await menuResponse.json();
-      const menuChoicesData = await menuChoicesResponse.json();
 
       const menuStatusContent = document.getElementById('menuStatusContent');
       if (!menuStatusContent) return;
@@ -135,13 +130,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      // Group courses by type
+      // Get menu choices for each course using courseId from menu response
+      const menuChoicesPromises = menuData.map(course => 
+        fetch(`/api/guest/${course.id}/menu-choices`, {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        }).then(res => res.json()).catch(() => [])
+      );
+
+      const menuChoicesResults = await Promise.all(menuChoicesPromises);
+      
+      // Also get existing guest menu selections
+      const menuChoicesResponse = await fetch('/api/guest/menu-choices', {
+        method: 'GET',
+        headers: { 'Authorization': token }
+      });
+      const guestMenuChoicesData = await menuChoicesResponse.json();
+      
+      // Combine course options with guest selections
+      const menuChoicesData = guestMenuChoicesData;
+
+      // Group courses by type and merge with course-specific options
       const coursesByType = {};
-      menuData.forEach(course => {
+      menuData.forEach((course, index) => {
         if (!coursesByType[course.course]) {
           coursesByType[course.course] = [];
         }
-        coursesByType[course.course].push(course);
+        
+        // Merge course data with options from the course-specific API call
+        const courseWithOptions = {
+          ...course,
+          options: menuChoicesResults[index] || course.options || []
+        };
+        
+        coursesByType[course.course].push(courseWithOptions);
       });
 
       // Create menu cards for each party member
