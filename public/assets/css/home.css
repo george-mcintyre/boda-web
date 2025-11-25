@@ -264,6 +264,56 @@ body.wedding-landing-active footer { display: none !important; }
   height: auto;
 }
 
+/* Countdown mobile optimization for home page */
+@media (max-width: 859px) {
+  .wedding-landing .countdown-container {
+    gap: 0.3rem !important;
+    padding: 0 0.5rem;
+    justify-content: space-between;
+  }
+  
+  .wedding-landing .countdown-item {
+    min-width: 60px !important;
+    max-width: 70px !important;
+    padding: 0.6rem 0.4rem !important;
+    flex: 1;
+    margin: 0;
+  }
+  
+  .wedding-landing .countdown-number {
+    font-size: 1.2rem !important;
+    line-height: 1.2;
+  }
+  
+  .wedding-landing .countdown-label {
+    font-size: 0.7rem !important;
+    line-height: 1.2;
+    margin-top: 0.3rem;
+  }
+}
+
+/* Extra small screens for home page countdown */
+@media (max-width: 360px) {
+  .wedding-landing .countdown-container {
+    gap: 0.2rem !important;
+    padding: 0 0.3rem;
+  }
+  
+  .wedding-landing .countdown-item {
+    min-width: 50px !important;
+    max-width: 60px !important;
+    padding: 0.5rem 0.3rem !important;
+  }
+  
+  .wedding-landing .countdown-number {
+    font-size: 1rem !important;
+  }
+  
+  .wedding-landing .countdown-label {
+    font-size: 0.65rem !important;
+  }
+}
+
 /* Mobile overlay layout - text visible first, images overlay on scroll */
 @media (max-width: 859px) {
   .wedding-landing .pepe-hero {
