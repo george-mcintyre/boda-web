@@ -1,25 +1,6 @@
 
-/* Prevent all scrolling on the home page */
-body {
-    overflow: hidden !important;
-    height: 100vh !important;
-    position: fixed !important;
-    width: 100% !important;
-    }
-
-    html {
-    overflow: hidden !important;
-    height: 100vh !important;
-    position: fixed !important;
-    width: 100% !important;
-    }
-
-    /* Ensure the wedding-landing section takes full height and can handle animations */
-    .wedding-landing {
-    height: 100vh !important;
-    overflow: visible !important;
-    position: relative !important;
-    }
+/* Wedding Site Styles */
+/* This file contains all styles for the entire wedding site except home page specific styles (which are in home.css) */
 
     /* Sticky navbar styles */
     .navbar {
@@ -187,106 +168,12 @@ body {
     .login-access-icon a { width: 36px; height: 36px; font-size: 16px; }
     }
 
-    /* Centered wedding content styles */
-    .wedding-landing .pepe-hero {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    min-height: 100vh;
-    padding: 80px 0 0 0; /* Add top padding for fixed navbar */
-    margin-top: 0;
-    }
-
-    .wedding-landing .pepe-left {
-    max-width: 600px;
-    margin: 0 auto;
-    background-image: url('../images/black-and-red.png');
-    background-size: 100% auto;
-    background-position: center;
-    background-repeat: no-repeat;
-    position: relative;
-    }
-
-    .wedding-landing .pepe-left::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.3);
-    z-index: -1;
-    }
-
-    .wedding-landing .eyebrow {
-    font-size: 13px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--pepe-muted);
-    margin: 0 0 16px;
-    }
-
-    .wedding-landing h1 {
-    font-size: clamp(32px, 9vw, 56px);
-    line-height: 1.2;
-    margin: 0 0 16px;
-    font-weight: 600;
-    }
-
-    .wedding-landing .date {
-    font-size: 16px;
-    color: var(--pepe-muted);
-    margin: 0 0 32px;
-    }
-
-    .wedding-landing .cta-row {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    }
-
-    /* Hide the original site when landing is active */
+    /* General body and html styles for wedding site */
+    
+    /* General styles for wedding-landing active state (home page specific) */
     body.wedding-landing-active header:not(.navbar),
     body.wedding-landing-active main,
     body.wedding-landing-active footer { display: none !important; }
-
-    /* Responsive adjustments */
-    @media (min-width: 860px) {
-    .wedding-landing .pepe-hero {
-        flex-direction: row;
-        text-align: left;
-        align-items: center;
-        padding: 0 0;
-    }
-    
-    .wedding-landing .pepe-left {
-        flex: 1;
-        margin-right: 40px;
-        background-image: url('../images/black-and-red.png');
-        background-size: 100% auto;
-        background-position: center;
-        background-repeat: no-repeat;
-        position: relative;
-        }
-
-    .wedding-landing .pepe-left::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.3);
-        z-index: -1;
-        }
-    
-    .wedding-landing .pepe-right {
-        flex: 1;
-    }
-    }
 
     /* Specific style to center events */
     .info-grid {
