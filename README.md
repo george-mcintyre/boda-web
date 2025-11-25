@@ -104,7 +104,7 @@ There are several ways to create this initial data:
    - `server/data/guests.json`
    ```json
    [
-     { "nombre": "Juan Pérez", "email": "juan@example.com" }
+     { "name": "Juan Pérez", "email": "juan@example.com" }
    ]
    ```
 3. Run the migration:
@@ -116,7 +116,7 @@ This will list the existing collections in your MongoDB database.
 ### Option B) Seed data with a Node one-liner (no JSON files)
 With your `.env` configured and MongoDB running, execute:
 ```
-node -e "require('dotenv').config(); const mongoose=require('mongoose'); const {Admin,Guest}=require('./server/models'); (async()=>{ await mongoose.connect(process.env.MONGODB_URI||'mongodb://127.0.0.1:27017',{dbName:process.env.MONGODB_DB||'boda-web'}); await Admin.updateOne({email:'admin@example.com'},{email:'admin@example.com',password:'admin123'},{upsert:true}); await Guest.updateOne({email:'juan@example.com'},{nombre:'Juan Pérez',email:'juan@example.com'},{upsert:true}); console.log('Seed OK'); await mongoose.connection.close(); process.exit(0); })().catch(e=>{console.error(e);process.exit(1);});"
+node -e "require('dotenv').config(); const mongoose=require('mongoose'); const {Admin,Guest}=require('./server/models'); (async()=>{ await mongoose.connect(process.env.MONGODB_URI||'mongodb://127.0.0.1:27017',{dbName:process.env.MONGODB_DB||'boda-web'}); await Admin.updateOne({email:'admin@example.com'},{email:'admin@example.com',password:'admin123'},{upsert:true}); await Guest.updateOne({email:'juan@example.com'},{name:'Juan Pérez',email:'juan@example.com'},{upsert:true}); console.log('Seed OK'); await mongoose.connection.close(); process.exit(0); })().catch(e=>{console.error(e);process.exit(1);});"
 ```
 
 ### Option C) Use the MongoDB shell
@@ -132,7 +132,7 @@ db.admins.updateOne(
 
 db.guests.updateOne(
   { email: 'juan@example.com' },
-  { $set: { nombre: 'Juan Pérez', email: 'juan@example.com' } },
+  { $set: { name: 'Juan Pérez', email: 'juan@example.com' } },
   { upsert: true }
 )
 ```
@@ -171,7 +171,7 @@ Seeding behavior:
   - Config: `config.json`.
 
 Schema compatibility notes:
-- Guests: Spanish fields like `nombre`, `estado`/`asistencia`, `acompañantes`, `menuEspecial` and `notas` are mapped to the new schema fields (`name`, `status`, `companions`, `specialMenu`, `message`).
+- Guests: Spanish fields like `name`, `estado`/`asistencia`, `acompañantes`, `menuEspecial` and `notas` are mapped to the new schema fields (`name`, `status`, `companions`, `specialMenu`, `message`).
 - Events: Localized strings are mapped; dates from `fecha` are parsed; `hora` goes into `time`.
 - Messages: `mensaje` → `content`; reactions map preserved; `fecha` mapped to timestamps.
 

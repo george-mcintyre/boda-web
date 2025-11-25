@@ -25,39 +25,7 @@
     </form>
     <div id="loginMessage" style="margin-top:1em;"></div>
   </main>
-  <script src="js/i18n-common.js"></script>
-  <script>
-    // Translations for the login page
-    window.currentTranslations = {
-      es: {
-        'login:pageTitle': 'Acceso guests - Boda',
-        'login:header': 'Acceso para guests',
-        'login:home': 'Inicio',
-        'login:emailLabel': 'Email:',
-        'login:emailPlaceholder': 'Introduce tu email',
-        'login:submit': 'Acceder',
-        'login:enterEmail': 'Por favor, introduce tu email.',
-        'login:successRedirect': 'Acceso exitoso. Redirigiendo...',
-        'login:emailNotFound': 'Email no encontrado en la lista de guests',
-        'login:serverError': 'Error de conexión con el servidor'
-      },
-      en: {
-        'login:pageTitle': 'Guest access - Wedding',
-        'login:header': 'Guest access',
-        'login:home': 'Home',
-        'login:emailLabel': 'Email:',
-        'login:emailPlaceholder': 'Enter your email',
-        'login:submit': 'Continue',
-        'login:enterEmail': 'Please enter your email.',
-        'login:successRedirect': 'Login successful. Redirecting...',
-        'login:emailNotFound': 'Email not found in the guest list',
-        'login:serverError': 'Server connection error'
-      }
-    };
-
-    // Initialize i18n for this page; respects language stored from home page
-    window.i18n = initI18n(window.currentTranslations);
-  </script>
+  <script src="js/i18n.js"></script>
   <script src="js/auth-check.js"></script>
   <script src="js/login.js"></script>
   <script>

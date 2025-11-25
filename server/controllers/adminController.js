@@ -300,13 +300,13 @@ async function getGiftChoices(req, res, next) {
   try {
     const giftChoices = await GiftChoice.find({})
       .populate('giftId', 'title amount')
-      .populate('guestId', 'nombre name email')
+      .populate('guestId', 'name name email')
       .sort({ date: -1 })
       .lean();
 
     const items = giftChoices.map(choice => ({
       guestId: choice.guestId._id.toString(),
-      guestName: choice.guestId.nombre || choice.guestId.name || choice.guestId.email,
+      guestName: choice.guestId.name || choice.guestId.name || choice.guestId.email,
       giftId: choice.giftId._id.toString(),
       amount: choice.giftId.amount,
       date: choice.date.toISOString(),

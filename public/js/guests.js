@@ -1,3 +1,5 @@
+
+// Configurar event listeners
 document.addEventListener('DOMContentLoaded', async () => {
   const token = localStorage.getItem('token');
   if (!token) {
@@ -5,6 +7,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
+  console.log('DOM loaded, initializing i18n system...');
+
+  // Show welcome message
   function showMessage(elementId, msg, type = 'error') {
     const element = document.getElementById(elementId);
     element.textContent = msg;
@@ -15,9 +20,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 5000);
   }
 
-  // Función para mostrar toast de confirmación
+  // Function to show toast of confirmation
   function showToast(message, type = 'success') {
-    // Crear elemento toast
+    // Create a toast element
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
     toast.innerHTML = `
@@ -27,42 +32,42 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `;
     
-    // Añadir al body
+    //Add to the body
     document.body.appendChild(toast);
     
-    // Mostrar con animación
+    // Show with animation
     setTimeout(() => toast.classList.add('show'), 100);
     
-    // Ocultar después de 3 segundos
+    // Hide after 3 seconds
     setTimeout(() => {
       toast.classList.remove('show');
       setTimeout(() => document.body.removeChild(toast), 300);
     }, 3000);
   }
 
-  // Función para mostrar confirmación personalizada
+  // Function to show custom confirmation
   function showConfirmDialog(message, onConfirm, onCancel) {
-    // Crear overlay de confirmación
+    // Create a confirmation overlay
     const overlay = document.createElement('div');
     overlay.className = 'confirm-overlay';
     overlay.innerHTML = `
       <div class="confirm-dialog">
         <div class="confirm-content">
           <i class="fas fa-question-circle"></i>
-          <h3>Confirmar acción</h3>
+          <h3>Confirm action</h3>
           <p>${message}</p>
           <div class="confirm-buttons">
-            <button class="btn-cancel-confirm">Cancelar</button>
-            <button class="btn-confirm-action">Confirmar</button>
+            <button class="btn-cancel-confirm">cancel</button>
+            <button class="btn-confirm-action">confirm</button>
           </div>
         </div>
       </div>
     `;
     
-    // Añadir al body
+    // Add to the body
     document.body.appendChild(overlay);
     
-    // Mostrar con animación
+    // Show with animation
     setTimeout(() => overlay.classList.add('show'), 100);
     
     // Event listeners
@@ -82,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }, 300);
     });
     
-    // Cerrar con Escape
+    // Close with Escape
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
         overlay.classList.remove('show');
@@ -96,10 +101,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener('keydown', handleEscape);
   }
 
-  // Cargar y mostrar el status del menú
-  async function cargarStatusMenu() {
+  // Load and menu selections
+  async function loadMenuSelections() {
     try {
-      const response = await fetch('/api/invitado', {
+      const response = await fetch('/api/guest/menu-choices', {
         method: 'GET',
         headers: { 'Authorization': token }
       });
@@ -139,8 +144,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
       } else {
         menuStatusContent.innerHTML = `
-          <h4><i class="fas fa-info-circle"></i> Estado de selección</h4>
-          <p class="no-selection">Aún no has realizado tu selección de menú. Haz clic en el botón de arriba para comenzar.</p>
+          <h4><i class="fas fa-info-circle"></i> Menu selections</h4>
+          <p class="no-selection">Something went wrong with the menu selections. Please try again later.</p>
         `;
       }
     } catch (err) {
@@ -148,265 +153,66 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
   
-  // Cargar el status del menú
-  cargarStatusMenu();
-
-  // Mostrar mensaje de bienvenida
-  try {
-    const response = await fetch('/api/invitado', {
-      method: 'GET',
-      headers: { 'Authorization': token }
-    });
-    const data = await response.json().catch(() => ({}));
-    if (response.ok) {
-      const nombre = data.name || data.nombre || 'invitado';
-      console.log(`Bienvenido, ${nombre}!`);
-    } else {
-      localStorage.removeItem('token');
-      window.location.href = 'login.html';
-    }
-  } catch (err) {
-    console.error('Error de conexión con el servidor.');
-  }
-
-    // Cargar y mostrar el status de la agenda
-  async function cargarStatusAgenda() {
+    // Cargar y mostrar el status del RSVP
+  async function cargarStatusRSVP() {
     try {
-      // Obtener tanto la agenda como las confirmaciones
-      const [agendaRes, guestRes] = await Promise.all([
+      // Obtener eventos y selecciones de RSVP
+      const [eventsRes, guestRes] = await Promise.all([
         fetch('/api/event'),
         fetch('/api/invitado', {
           headers: { 'Authorization': token }
         })
       ]);
       
-      const agenda = await agendaRes.json().catch(() => []);
+      const events = await eventsRes.json().catch(() => []);
       const guestData = await guestRes.json().catch(() => ({}));
       
       const agendaStatusContent = document.getElementById('agendaStatusContent');
       if (!agendaStatusContent) return;
       
-      const data = guestRes.ok ? guestData : {};
-      const confirmaciones = data.confirmaciones || data.confirmacionesAgenda || {};
-      
-      if (Object.keys(confirmaciones).length > 0) {
-        // Crear un mapa de eventos por ID para obtener los nombres
-        const eventosMap = {};
-        agenda.forEach(evento => {
-          eventosMap[evento.id] = evento;
-        });
-        
+      if (eventsRes.ok && events.length > 0) {
+        // Mostrar eventos disponibles para RSVP
         agendaStatusContent.innerHTML = `
           <h4><i class="fas fa-check-circle"></i> Tus confirmaciones de eventos</h4>
-          ${Object.keys(confirmaciones).map(eventoId => {
-            const confirmado = confirmaciones[eventoId];
-            const evento = eventosMap[eventoId];
-            const statusText = confirmado ? 'Confirmado' : 'No confirmado';
-            const statusClass = confirmado ? 'status-confirmado' : 'status-no-confirmado';
-            
-            return `
-              <div class="agenda-status-item">
-                <span class="agenda-status-label">${evento ? evento.titulo : `Evento ${eventoId}`}:</span>
-                <span class="agenda-status-value">
-                  <span class="status-badge ${statusClass}">${statusText}</span>
-                </span>
-              </div>
-            `;
-          }).join('')}
+          <p class="no-selection">Visita la pestaña RSVP para confirmar tu asistencia a cada evento.</p>
         `;
       } else {
         agendaStatusContent.innerHTML = `
-          <h4><i class="fas fa-info-circle"></i> Estado de agenda</h4>
-          <p class="no-selection">Aún no has confirmado ningún evento. Haz clic en el botón de arriba para ver la agenda.</p>
+          <h4><i class="fas fa-info-circle"></i> Estado de RSVP</h4>
+          <p class="no-selection">Aún no hay eventos disponibles para confirmar asistencia.</p>
         `;
       }
     } catch (err) {
-      console.error('Error loading the Event Status:', err);
+      console.error('Error loading the RSVP Status:', err);
     }
   }
   
-  // Cargar el status de la agenda
-  cargarStatusAgenda();
-
-  // Cargar el status de regalos
-  cargarStatusRegalos();
-
-  // Función global para confirmar eventos (ya no se usa en esta página)
-  // window.confirmarEvento = async (eventoId, confirmado) => { ... };
-
-  // Cargar agenda inicial (ya no se usa en esta página)
-  // cargarAgenda();
-
-  // Cargar y mostrar el status de regalos
-  async function cargarStatusRegalos() {
-    // Gifts (non-cash) have been removed from the site; skip loading status
-    return;
-  //
-    try {
-      const response = await fetch('/api/regalos');
-      const regalos = await response.json();
-      
-      const regalosStatusContent = document.getElementById('regalosStatusContent');
-      
-      if (response.ok && regalos.length > 0) {
-        const userEmail = localStorage.getItem('email');
-        let totalRegalos = regalos.length;
-        let regalosReservados = 0;
-        
-        // Filtrar los regalos reservados por el usuario actual
-        const misRegalos = regalos.filter(regalo => regalo.reservadoPor === userEmail);
-        
-        regalos.forEach(regalo => {
-          if (regalo.reservadoPor) {
-            regalosReservados++;
-          }
-        });
-        
-        if (misRegalos.length > 0) {
-          regalosStatusContent.innerHTML = `
-            <h4><i class="fas fa-gift"></i> Mis regalos reservados</h4>
-            <div class="regalos-lista">
-              ${misRegalos.map(regalo => `
-                <div class="regalo-item">
-                  <i class="fas fa-gift"></i>
-                  <span class="regalo-nombre">${regalo.nombre}</span>
-                  ${regalo.descripcion ? `<span class="regalo-descripcion">${regalo.descripcion}</span>` : ''}
-                </div>
-              `).join('')}
-            </div>
-            <div class="regalos-stats">
-              <div class="regalos-status-item">
-                <span class="regalos-status-label">Regalos disponibles:</span>
-                <span class="regalos-status-value">${totalRegalos - regalosReservados}</span>
-              </div>
-              <div class="regalos-status-item">
-                <span class="regalos-status-label">Total de regalos:</span>
-                <span class="regalos-status-value">${totalRegalos}</span>
-              </div>
-            </div>
-          `;
-        } else {
-          regalosStatusContent.innerHTML = `
-            <h4><i class="fas fa-info-circle"></i> Estado de regalos</h4>
-            <p class="no-selection">Aún no has reservado ningún regalo. Haz clic en el botón de arriba para ver la lista de regalos disponibles.</p>
-            <div class="regalos-stats">
-              <div class="regalos-status-item">
-                <span class="regalos-status-label">Regalos disponibles:</span>
-                <span class="regalos-status-value">${totalRegalos - regalosReservados}</span>
-              </div>
-              <div class="regalos-status-item">
-                <span class="regalos-status-label">Total de regalos:</span>
-                <span class="regalos-status-value">${totalRegalos}</span>
-              </div>
-            </div>
-          `;
-        }
-      } else {
-        regalosStatusContent.innerHTML = `
-          <h4><i class="fas fa-info-circle"></i> Estado de regalos</h4>
-          <p class="no-selection">No hay regalos disponibles en este momento.</p>
-        `;
-      }
-    } catch (err) {
-      console.error('Error al cargar el status de regalos:', err);
-    }
+  // Load and show the gift status
+  async function loadStatusGifts() {
   }
 
-
-
-  async function cargarMensajes() {
-    // If the mensajes container isn't present on this page, skip
-    const mensajesDiv = document.getElementById('mensajesContent') || document.getElementById('commentsList');
-    if (!mensajesDiv) return;
-    try {
-      const res = await fetch('/api/messages');
-      const mensajes = await res.json().catch(() => []);
-      
-      if (res.ok && Array.isArray(mensajes) && mensajes.length > 0) {
-        // Obtener el email del usuario actual
-        const userEmail = localStorage.getItem('email');
-        
-        // Filtrar solo los mensajes del usuario actual
-        const misMensajes = (Array.isArray(mensajes) ? mensajes : []).filter(m => m.email === userEmail);
-        
-        if (misMensajes.length > 0) {
-          mensajesDiv.innerHTML = `
-            <h4><i class=\"fas fa-comments\"></i> Mis mensajes enviados</h4>
-            <div class=\"messages-grid\">
-              ${misMensajes.map(m => `
-                <div class=\"message-block\">
-                  <div class=\"message-header\">
-                    <span class=\"message-author\">${m.name || m.nombre || 'Guest'}</span>
-                    <span class=\"message-date\">${new Date(m.createdAt || m.fecha).toLocaleDateString('es-ES')}</span>
-                  </div>
-                  <div class=\"message-content\">${m.content || m.contenido || ''}</div>
-                </div>
-              `).join('')}
-            </div>
-          `;
-        } else {
-          mensajesDiv.innerHTML = '<p class="no-messages">Aún no has enviado ningún mensaje. Haz clic en el botón de arriba para enviar tu primer mensaje.</p>';
-        }
-      } else {
-        mensajesDiv.innerHTML = '<p class="no-messages">Aún no hay mensajes. ¡Sé el primero en dejar uno!</p>';
-      }
-    } catch (err) {
-      if (mensajesDiv) mensajesDiv.innerHTML = '<p class="error">Error loading the Messages.</p>';
-    }
+// Load messages
+  async function loadMessages() {
   }
 
-  // Cargar mensajes iniciales
-  cargarMensajes();
+  // Load menu content
+  async function loadMenuContent() {
+  }
 
-  // Funcionalidad de pestañas
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  const tabContents = document.querySelectorAll('.tab-content');
+  // Load events content
+  async function loadEventsContent() {
+  }
 
-  tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const targetTab = button.getAttribute('data-tab');
-      
-      // Remover clase active de todos los botones y contenidos
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      tabContents.forEach(content => content.classList.remove('active'));
-      
-      // Añadir clase active al botón clickeado y su contenido
-      button.classList.add('active');
-      document.getElementById(`${targetTab}-tab`).classList.add('active');
-      
-      // Si se activa la pestaña de menú, cargar el contenido del menú
-      if (targetTab === 'menu') {
-        cargarContenidoMenu();
-      }
-      
-      // Si se activa la pestaña de agenda, cargar el contenido de la agenda
-      if (targetTab === 'agenda') {
-        cargarContenidoAgenda();
-      }
-      
-      // Si se activa la pestaña de regalos, cargar el contenido de regalos
-      if (targetTab === 'regalos') {
-        cargarContenidoRegalos();
-      }
-      
-      // Si se activa la pestaña de mensajes, cargar el contenido de mensajes
-      if (targetTab === 'mensajes') {
-        cargarContenidoMensajes();
-      }
-      
-      // Si se activa la pestaña de resumen, recargar todos los datos del status
-      if (targetTab === 'resumen') {
-        cargarStatusMenu();
-        cargarStatusAgenda();
-        cargarStatusRegalos();
-        cargarMensajes();
-      }
+  // Load gifts content
+  async function loadGiftsContent() {
+  }
 
-    });
-  });
+  // Load messages content
+  async function loadMessagesContent() {
+  }
 
-  // Función para cargar el contenido del menú en la pestaña
-  async function cargarContenidoMenu() {
+  // Load menu content
+  async function loadMenuContent() {
     const menuContent = document.getElementById('menuContent');
     
     try {
@@ -555,7 +361,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               showMessage('menuMessage', data.mensaje, 'success');
               setTimeout(() => {
                 cargarContenidoMenu(); // Recargar para mostrar la selección actual
-                cargarStatusMenu(); // Actualizar el status en la pestaña resumen
+                loadMenuSelections(); // Actualizar el status en la pestaña resumen
               }, 1000);
             } else {
               showMessage('menuMessage', data.error || 'Error al guardar la selección.', 'error');
@@ -582,7 +388,7 @@ document.addEventListener('DOMContentLoaded', async () => {
    }
 
    // Función para cargar el contenido de la agenda en la pestaña
-   async function cargarContenidoAgenda() {
+   async function loadEventsContent() {
      const agendaContent = document.getElementById('agendaContent');
      
      try {
@@ -722,7 +528,7 @@ document.addEventListener('DOMContentLoaded', async () => {
    }
 
    // Función global para confirmar eventos
-   window.confirmarEvento = async (eventoId, confirmar) => {
+   window.confirmEventAttendance = async (eventoId, confirmar) => {
      try {
        const res = await fetch('/api/event/confirm', {
          method: 'POST',
@@ -758,7 +564,7 @@ document.addEventListener('DOMContentLoaded', async () => {
    };
 
    // Función para cargar el contenido de regalos en la pestaña
-   async function cargarContenidoRegalos() {
+   async function loadGiftsContent() {
      const regalosContent = document.getElementById('regalosContent');
      
      try {
@@ -843,19 +649,17 @@ document.addEventListener('DOMContentLoaded', async () => {
      }
    }
 
-   // Función para cargar el contenido de mensajes en la pestaña
-   async function cargarContenidoMensajes() {
-     // La funcionalidad de mensajes ya está implementada en el HTML
-     // No necesitamos cargar contenido adicional
+   // Load messages content
+   async function loadMessagesContent() {
    }
 
-   // Configurar el formulario de mensajes
-   const mensajeForm = document.getElementById('mensajeForm');
-   if (mensajeForm) {
-     mensajeForm.addEventListener('submit', async (e) => {
+   // Configure the messages form
+   const messagesForm = document.getElementById('messagesForm');
+   if (messagesForm) {
+     messagesForm.addEventListener('submit', async (e) => {
        e.preventDefault();
-       const mensaje = mensajeForm.mensaje.value.trim();
-       if (!mensaje) return;
+       const message = messagesForm.message.value.trim();
+       if (!message) return;
        
        try {
          const res = await fetch('/api/messages', {
@@ -881,8 +685,8 @@ document.addEventListener('DOMContentLoaded', async () => {
      });
    }
 
-   // Función global para reservar regalos
-   window.reservarRegalo = async (regaloId) => {
+   // Global function to reserve gifts
+   window.reserveGift = async (giftId) => {
      try {
        const res = await fetch('/api/regalos/reservar', {
          method: 'POST',
@@ -908,8 +712,8 @@ document.addEventListener('DOMContentLoaded', async () => {
      }
    };
 
-   // Función global para cancelar regalos
-   window.cancelarRegalo = async (regaloId) => {
+   // Global function to cancel gifts
+   window.cancelGift = async (giftId) => {
      try {
        const res = await fetch('/api/regalos/cancelar', {
          method: 'POST',
@@ -935,8 +739,8 @@ document.addEventListener('DOMContentLoaded', async () => {
      }
    };
 
-   // Función global para comprar regalos
-   window.comprarRegalo = async (giftId) => {
+   // Global function to buy gifts
+   window.buyGift = async (giftId) => {
      try {
        const message = prompt('Leave a message with your gift (optional):');
        
@@ -965,11 +769,88 @@ document.addEventListener('DOMContentLoaded', async () => {
      }
    };
 
-   // Función de logout
-  window.logoutInvitado = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('nombre');
-  localStorage.removeItem('email');
-  window.location.href = 'login.html';
+   // Global logout function
+  window.logoutGuest = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('name');
+    localStorage.removeItem('email');
+    window.location.href = 'login.html';
   };
-}); 
+  
+  // Main function
+  try {
+    const response = await fetch('/api/guest/profile', {
+      method: 'GET',
+      headers: { 'Authorization': token }
+    });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok) {
+      const name = data.name || data.name || 'guest';
+      console.log(`Welcome, ${name}!`);
+    } else {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+  } catch (err) {
+    console.error('Error connecting to the server.');
+  }
+
+  // Tabs functionality
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.getAttribute('data-tab');
+      
+      //Remove active class from all buttons and contents
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      // Add active class to the clicked button and its content
+      button.classList.add('active');
+      document.getElementById(`${targetTab}-tab`).classList.add('active');
+      
+      // If the tab is menu, load the menu content
+      if (targetTab === 'menu') {
+        loadMenuContent();
+      }
+      
+      // If the tab is events, load the events content
+      if (targetTab === 'events') {
+        loadEventsContent();
+      }
+      
+      // If the tab is gifts, load the gifts content
+      if (targetTab === 'gifts') {
+        loadGiftsContent();
+      }
+      
+      // If the tab is messages, load the messages content
+      if (targetTab === 'messages') {
+        loadMessagesContent();
+      }
+      
+      // If the tab is summary, reload all the status data
+      if (targetTab === 'summary') {
+        loadSummaryContent();
+      }
+
+    });
+  });
+
+  // Load preferred language
+  const savedLang = localStorage.getItem('i18nextLng');
+  if (savedLang && languages[savedLang]) {
+    currentLanguage = savedLang;
+  }
+  
+  // Initialize
+  updateDocumentDirection();
+  updatePageContent();
+  updateLanguageSelector();
+  updateFormatting();
+  
+  console.log(`i18n system initialized, language: ${currentLanguage}`);
+});
+

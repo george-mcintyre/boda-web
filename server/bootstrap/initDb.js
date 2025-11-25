@@ -77,14 +77,14 @@ async function seedExampleDataIfEmpty() {
 
   const toMenuOptions = (src) => {
     if (Array.isArray(src?.options)) return src.options.map(o => ({ name: localize(o.name), description: localize(o.description) }));
-    if (Array.isArray(src?.opciones)) return src.opciones.map(o => ({ name: localize(o.nombre), description: localize(o.descripcion) }));
+    if (Array.isArray(src?.opciones)) return src.opciones.map(o => ({ name: localize(o.name), description: localize(o.descripcion) }));
     const catsEs = ['entrantes', 'principales', 'postres', 'bebidas'];
     const catsEn = ['starters', 'mains', 'desserts', 'drinks'];
     const collected = [];
     for (const c of [...catsEn, ...catsEs]) {
       if (Array.isArray(src?.[c])) {
         for (const item of src[c]) {
-          const name = item.name ?? item.nombre;
+          const name = item.name ?? item.name;
           const description = item.description ?? item.descripcion;
           collected.push({ name: localize(name), description: localize(description) });
         }

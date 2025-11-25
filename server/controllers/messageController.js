@@ -106,7 +106,7 @@ async function createGuestMessage(req, res, next) {
       return res.status(400).json({ error: 'Content is required' });
     }
     
-    const name = req.user?.name || req.user?.nombre || 'Guest';
+    const name = req.user?.name || req.user?.name || 'Guest';
     const email = req.user?.email || '';
     
     const message = await Message.create({ 

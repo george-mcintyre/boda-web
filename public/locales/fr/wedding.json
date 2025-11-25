@@ -217,7 +217,7 @@
       "rsvp": {
         "title": "Confirmation de présence",
         "status": "Statut",
-        "guests": "Nombre d'invités",
+        "guests": "Name d'invités",
         "dietary": "Restrictions alimentaires",
         "notes": "Notes spéciales"
       },
@@ -234,12 +234,12 @@
       },
       "gifts": {
         "title": "Cadeaux réservés",
-        "count": "Nombre de cadeaux réservés",
+        "count": "Name de cadeaux réservés",
         "total": "Valeur totale"
       },
       "messages": {
         "title": "Messages envoyés",
-        "count": "Nombre de messages",
+        "count": "Name de messages",
         "lastMessage": "Dernier message"
       }
     },
@@ -316,7 +316,7 @@
       "fullName": "Nom complet",
       "phone": "Téléphone",
       "attendanceStatus": "Statut de présence",
-      "companions": "Nombre d'accompagnateurs",
+      "companions": "Name d'accompagnateurs",
       "notes": "Notes supplémentaires",
       "notesPlaceholder": "Allergies, préférences spéciales, etc.",
       "cancel": "Annuler",

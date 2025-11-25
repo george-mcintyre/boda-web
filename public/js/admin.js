@@ -1099,7 +1099,7 @@
             }
           });
         } else if (action==='manage-party'){
-          showPartyManager(id, current.name || current.nombre || '');
+          showPartyManager(id, current.name || current.name || '');
         }
       });
       

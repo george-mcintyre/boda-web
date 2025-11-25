@@ -17,15 +17,15 @@ class CommentsSystem {
 
     // Obtener usuario actual desde localStorage
     getCurrentUser() {
-        // Obtener el nombre y email del invitado logueado desde localStorage
-        const nombre = localStorage.getItem('nombre');
+        // Obtener el name y email del invitado logueado desde localStorage
+        const name = localStorage.getItem('name');
         const email = localStorage.getItem('email');
         const token = localStorage.getItem('token');
         
-        if (nombre && email && token) {
+        if (name && email && token) {
             return {
                 id: 'guest_' + Date.now(),
-                name: nombre,
+                name: name,
                 email: email
             };
         }
@@ -91,7 +91,7 @@ class CommentsSystem {
                 // Normalize server fields (Message) to comments UI format
                 this.comments = (Array.isArray(items) ? items : []).map(it => ({
                     id: it._id || it.id,
-                    nombre: it.name || it.nombre || 'Guest',
+                    name: it.name || it.name || 'Guest',
                     comentario: it.content || it.contenido || '',
                     fecha: it.createdAt || it.fecha || Date.now(),
                     reacciones: it.reacciones || {}
@@ -342,7 +342,7 @@ class CommentsSystem {
             return `
                 <div class="comment-item" data-comment-id="${comment.id}">
                     <div class="comment-header">
-                        <span class="comment-author">${this.escapeHtml(comment.nombre)}</span>
+                        <span class="comment-author">${this.escapeHtml(comment.name)}</span>
                         <span class="comment-date">${new Date(comment.fecha).toLocaleDateString('es-ES', {
                             year: 'numeric',
                             month: 'short',

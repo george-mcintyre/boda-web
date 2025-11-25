@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (response.ok) {
         // Save token and data in localStorage
         localStorage.setItem('token', data.token);
-        localStorage.setItem('nombre', data.nombre);
+        localStorage.setItem('name', data.name);
         localStorage.setItem('email', data.email);
         showMessage(window.translate('login:successRedirect'), 'success');
         setTimeout(() => {

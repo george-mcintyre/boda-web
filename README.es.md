@@ -105,7 +105,7 @@ Hay varias formas de crear estos datos iniciales:
       - `server/data/guests.json`
     ```json
     [
-      { "nombre": "Juan Pérez", "email": "juan@example.com" }
+      { "name": "Juan Pérez", "email": "juan@example.com" }
     ]
     ```
 3.  Ejecuta la migración:
@@ -119,7 +119,7 @@ Esto listará las colecciones existentes en tu base de datos MongoDB.
 Con tu `.env` configurado y MongoDB corriendo, ejecuta:
 
 ```
-node -e "require('dotenv').config(); const mongoose=require('mongoose'); const {Admin,Guest}=require('./server/models'); (async()=>{ await mongoose.connect(process.env.MONGODB_URI||'mongodb://127.0.0.1:27017',{dbName:process.env.MONGODB_DB||'boda-web'}); await Admin.updateOne({email:'admin@example.com'},{email:'admin@example.com',password:'admin123'},{upsert:true}); await Guest.updateOne({email:'juan@example.com'},{nombre:'Juan Pérez',email:'juan@example.com'},{upsert:true}); console.log('Seed OK'); await mongoose.connection.close(); process.exit(0); })().catch(e=>{console.error(e);process.exit(1);});"
+node -e "require('dotenv').config(); const mongoose=require('mongoose'); const {Admin,Guest}=require('./server/models'); (async()=>{ await mongoose.connect(process.env.MONGODB_URI||'mongodb://127.0.0.1:27017',{dbName:process.env.MONGODB_DB||'boda-web'}); await Admin.updateOne({email:'admin@example.com'},{email:'admin@example.com',password:'admin123'},{upsert:true}); await Guest.updateOne({email:'juan@example.com'},{name:'Juan Pérez',email:'juan@example.com'},{upsert:true}); console.log('Seed OK'); await mongoose.connection.close(); process.exit(0); })().catch(e=>{console.error(e);process.exit(1);});"
 ```
 
 ### Opción C) Usar la shell de MongoDB
@@ -136,7 +136,7 @@ db.admins.updateOne(
 
 db.guests.updateOne(
   { email: 'juan@example.com' },
-  { $set: { nombre: 'Juan Pérez', email: 'juan@example.com' } },
+  { $set: { name: 'Juan Pérez', email: 'juan@example.com' } },
   { upsert: true }
 )
 ```
@@ -180,7 +180,7 @@ Comportamiento de siembra (seeding):
       - Config: `config.json`.
 
 Notas de compatibilidad de esquema:
-  - Invitados: Campos en español como `nombre`, `estado`/`asistencia`, `acompañantes`, `menuEspecial` y `notas` se mapean a los nuevos campos del esquema (`name`, `status`, `companions`, `specialMenu`, `message`).
+  - Invitados: Campos en español como `name`, `estado`/`asistencia`, `acompañantes`, `menuEspecial` y `notas` se mapean a los nuevos campos del esquema (`name`, `status`, `companions`, `specialMenu`, `message`).
   - Eventos: Se mapean cadenas localizadas; las fechas de `fecha` se analizan; `hora` va a `time`.
   - Mensajes: `mensaje` → `content`; se preserva el mapa de reacciones; `fecha` mapeada a timestamps.
 
@@ -222,7 +222,7 @@ API para los portales de invitados y administración de la boda.
   - **URL Base**: `/api`
   - **Auth**: JWT en `Authorization: Bearer <token>`
   - **Roles**: `guest` (invitado), `admin` (administrador)
-  - **Espacios de nombres**:
+  - **Espacios de names**:
       - Portal de invitados: `/api/guest/...`
       - Portal de administración: `/api/admin/...`
 
@@ -314,7 +314,7 @@ Notas:
 
   - `primary: true` para el invitado principal.
   - Los adultos son invitados mayores de 18 años (`adult: true`).
-  - Los miembros del grupo pueden ser emparejados en el servidor usando nombres insensibles a mayúsculas/minúsculas y espacios.
+  - Los miembros del grupo pueden ser emparejados en el servidor usando names insensibles a mayúsculas/minúsculas y espacios.
   - El invitado principal se añade automáticamente a la lista de miembros del grupo por el servidor.
 
 #### `PUT /api/guest/party`
@@ -1200,7 +1200,7 @@ Actualizar interruptores de funcionalidad.
     Codificados en JWT (`guest` vs `admin`); el backend fuerza el acceso a `/api/guest/*` y `/api/admin/*`.
 
   - **Pluralización**:  
-    Las colecciones usan nombres de recursos en plural (ej: `/guests`, `/gifts`, `/events`, `/messages`).
+    Las colecciones usan names de recursos en plural (ej: `/guests`, `/gifts`, `/events`, `/messages`).
 
   - **Fechas**:  
     Cadenas ISO 8601, ej: `"2026-06-06T17:00:00Z"`.
