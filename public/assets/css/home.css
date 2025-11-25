@@ -265,6 +265,17 @@ body.wedding-landing-active footer { display: none !important; }
     margin-right: 0 !important;
     width: 100% !important;
   }
+
+  .wedding-landing .pepe-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.5);
+    z-index: -1;
+  }
   
   .wedding-landing .pepe-right {
     /* Override grid layout completely */
@@ -351,6 +362,17 @@ body.wedding-landing-active footer { display: none !important; }
     background-size: 100% auto;
     background-position: center;
     background-repeat: no-repeat;
+  }
+
+  .wedding-landing .pepe-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.5);
+    z-index: -1;
   }
   .wedding-landing .stack-gallery { height: 76vh; }
   .wedding-landing .stack-viewport { height: 76vh; }
