@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load and menu selections
   async function loadMenuSelections() {
+    console.log('Loading menu selections...');
     try {
       // Get party members and menu data in parallel
       const [partyResponse, menuResponse, menuChoicesResponse] = await Promise.all([
@@ -124,11 +125,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       const menuData = await menuResponse.json();
       const menuChoicesData = menuChoicesResponse.ok ? await menuChoicesResponse.json() : [];
 
-      const menuStatusContent = document.getElementById('menuStatusContent');
-      if (!menuStatusContent) return;
+      const menuContent = document.getElementById('menuContent');
+      if (!menuContent) return;
 
       if (!partyResponse.ok || !menuResponse.ok) {
-        menuStatusContent.innerHTML = `
+        menuContent.innerHTML = `
           <h4><i class="fas fa-info-circle"></i> Menu selections</h4>
           <p class="no-selection">Error loading menu data. Please try again later.</p>
         `;
@@ -287,15 +288,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         `;
       });
 
-      menuStatusContent.innerHTML = menuHTML || `
+      menuContent.innerHTML = menuHTML || `
         <p class="no-selection">No party members found.</p>
       `;
 
+      console.log('Menu selections loaded successfully');
+
     } catch (err) {
       console.error('Error loading menu selections:', err);
-      const menuStatusContent = document.getElementById('menuStatusContent');
-      if (menuStatusContent) {
-        menuStatusContent.innerHTML = `
+      const menuContent = document.getElementById('menuContent');
+      if (menuContent) {
+        menuContent.innerHTML = `
           <h4><i class="fas fa-info-circle"></i> Menu selections</h4>
           <p class="no-selection">Error loading menu data. Please try again later.</p>
         `;
