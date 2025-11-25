@@ -381,11 +381,13 @@ body.wedding-landing-active footer { display: none !important; }
     /* Remove top padding to touch the navbar */
   }
   .wedding-landing .pepe-left {
+    position: relative;
+    z-index: 1;
+    background: var(--pepe-bg);
     background-image: url('../images/black-and-red.png');
     background-size: 100% auto;
     background-position: center;
     background-repeat: no-repeat;
-    position: relative;
   }
 
   .wedding-landing .pepe-left::before {
