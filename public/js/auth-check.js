@@ -14,15 +14,6 @@ function isAdminLoggedIn() {
     return !!token && token.trim() !== '';
 }
 
-// Get current authentication status for debugging
-function getCurrentAuthStatus() {
-    return {
-        isGuestLoggedIn: isGuestLoggedIn(),
-        isAdminLoggedIn: isAdminLoggedIn(),
-        hasAnyAuth: isGuestLoggedIn() || isAdminLoggedIn()
-    };
-}
-
 // Redirect to appropriate dashboard based on login status
 function redirectToAppropriateDashboard() {
     if (isAdminLoggedIn()) {
@@ -59,8 +50,8 @@ function handleAdminLoginClick() {
             // Guest is logged in but trying to access admin - show message and stay
             const currentLang = localStorage.getItem('i18nextLng') || 'es';
             const messages = {
-                es: 'Esta sección es solo para administradores. Si necesitas acceso de administrador, contacta con los organizadores.',
                 en: 'This section is for administrators only. If you need administrator access, contact the organizers.',
+                es: 'Esta sección es solo para administradores. Si necesitas acceso de administrador, contacta con los organizadores.',
                 fr: 'Cette section est réservée aux administrateurs. Si vous avez besoin d\'un accès administrateur, contactez les organisateurs.'
             };
             
@@ -89,7 +80,7 @@ function initializeAuthHandlers() {
 
     // Handle admin login links by href
     const adminLoginLinks = document.querySelectorAll('a[href="/admin-login.html"]');
-    adminLoginLinks.forEach((link, index) => {
+    adminLoginLinks.forEach((link) => {
         link.addEventListener('click', function(e) {
             if (!handleAdminLoginClick()) {
                 e.preventDefault();
@@ -99,9 +90,8 @@ function initializeAuthHandlers() {
 
     // Handle buttons with data-action attributes
     const loginButtons = document.querySelectorAll('[data-action="guest-login"], [data-action="admin-login"]');
-    loginButtons.forEach((button, index) => {
+    loginButtons.forEach((button) => {
         button.addEventListener('click', function(e) {
-            e.preventDefault();
             const action = this.getAttribute('data-action');
             if (action === 'admin-login') {
                 handleAdminLoginClick();
