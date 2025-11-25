@@ -243,8 +243,8 @@ router.get('/gift-images/:imageId', auth('admin'), async (req, res, next) => {
 // Gift choices overview
 router.get('/gift-choices', auth('admin'), adminCtrl.getGiftChoices);
 
-// Settings / Feature Toggles
-router.get('/settings', auth('admin'), adminCtrl.getSettings);
+// Settings / Feature Toggles - GET is public, PUT requires admin
+router.get('/settings', adminCtrl.getSettings);
 router.put('/settings', auth('admin'), adminCtrl.updateSettings);
 
 module.exports = router;

@@ -2,6 +2,67 @@
  * Authentication utilities for checking login status and redirecting appropriately
  */
 
+// Settings management for guest access control
+let settingsCache = null;
+let settingsCacheTimestamp = 0;
+const SETTINGS_CACHE_DURATION = 300000; // 5 minutes
+
+// Fetch application settings
+async function fetchSettings() {
+    try {
+        // Check if we have cached settings that are still valid
+        const now = Date.now();
+        if (settingsCache && (now - settingsCacheTimestamp) < SETTINGS_CACHE_DURATION) {
+            return settingsCache;
+        }
+
+        const response = await fetch('/api/admin/settings');
+        if (!response.ok) {
+            throw new Error(`Failed to fetch settings: ${response.status}`);
+        }
+        
+        const settings = await response.json();
+        settingsCache = settings;
+        settingsCacheTimestamp = now;
+        return settings;
+    } catch (error) {
+        console.error('Error fetching settings:', error);
+        // Return default settings if fetch fails
+        return {
+            guestsEnabled: false,
+            eventsEnabled: false,
+            menuEnabled: false,
+            messagesEnabled: false,
+            giftsEnabled: false
+        };
+    }
+}
+
+// Check if guests are enabled and show popup if not
+async function checkGuestAccess() {
+    try {
+        const settings = await fetchSettings();
+        
+        if (!settings.guestsEnabled) {
+            // Get current language for popup message
+            const currentLang = localStorage.getItem('i18nextLng') || 'es';
+            const messages = {
+                en: 'Guest entry not yet enabled. Please check back later or contact the organizers for more information.',
+                es: 'La entrada de invitados aún no está habilitada. Vuelve a consultar más tarde o contacta con los organizadores para más información.',
+                fr: 'L\'accès invités n\'est pas encore activé. Veuillez vérifier plus tard ou contacter les organisateurs pour plus d\'informations.'
+            };
+            
+            alert(messages[currentLang] || messages.es);
+            return false; // Prevent access
+        }
+        
+        return true; // Allow access
+    } catch (error) {
+        console.error('Error checking guest access:', error);
+        return false;
+    }
+}
+
 // Check if a guest is logged in
 function isGuestLoggedIn() {
     const token = localStorage.getItem('token');
@@ -27,16 +88,22 @@ function redirectToAppropriateDashboard() {
 }
 
 // Handle guest login link click
-function handleGuestLoginClick() {
+async function handleGuestLoginClick() {
     try {
         if (redirectToAppropriateDashboard()) {
             return false; // Prevent default link behavior
         }
+        
+        // Check if guest access is enabled before allowing login
+        const guestAccessAllowed = await checkGuestAccess();
+        if (!guestAccessAllowed) {
+            return false;
+        }
+        
         return true; // Allow default link behavior (go to login page)
     } catch (error) {
         console.error('Error handling guest login click:', error);
-        // On error, allow the default behavior (go to login page)
-        return true;
+        return false;
     }
 }
 
@@ -68,13 +135,14 @@ function handleAdminLoginClick() {
 
 // Initialize authentication check handlers on DOM load
 function initializeAuthHandlers() {
+    console.log('initializing auth handlers');
     // Handle guest login links by href
     const guestLoginLinks = document.querySelectorAll('a[href="login.html"], a[href="/login.html"]');
     guestLoginLinks.forEach((link, index) => {
-        link.addEventListener('click', function(e) {
-            if (!handleGuestLoginClick()) {
-                e.preventDefault();
-            }
+        link.addEventListener('click', async function(e) {
+            e.preventDefault(); // stop navigation right away
+            const allowAccess = await handleGuestLoginClick();
+            if (allowAccess) window.location.href = link.href;
         });
     });
 
@@ -91,15 +159,20 @@ function initializeAuthHandlers() {
     // Handle buttons with data-action attributes
     const loginButtons = document.querySelectorAll('[data-action="guest-login"], [data-action="admin-login"]');
     loginButtons.forEach((button) => {
-        button.addEventListener('click', function(e) {
-            const action = this.getAttribute('data-action');
-            if (action === 'admin-login') {
-                handleAdminLoginClick();
-            } else {
-                handleGuestLoginClick();
-            }
+        button.addEventListener('click', async (e) => {
+          const action = button.getAttribute('data-action');
+          const href = button.getAttribute('href'); // if it's an <a>
+      
+          if (action === 'admin-login') {
+            const allow = handleAdminLoginClick();
+            if (allow && href) window.location.href = href;
+          } else {
+            e.preventDefault(); // stop navigation right away
+            const allow = await handleGuestLoginClick();
+            if (allow && href) window.location.href = href;
+          }
         });
-    });
+      });      
 }
 
 // Initialize when DOM is ready
@@ -117,6 +190,8 @@ if (typeof module !== 'undefined' && module.exports) {
         isAdminLoggedIn,
         redirectToAppropriateDashboard,
         handleGuestLoginClick,
-        handleAdminLoginClick
+        handleAdminLoginClick,
+        fetchSettings,
+        checkGuestAccess
     };
 }

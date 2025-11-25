@@ -211,9 +211,6 @@ async function changeLanguage(lang) {
     // Update formatting
     updateFormatting();
     
-    // Reload events with the new language
-    await loadEvents();
-    
     console.log(`Language changed to: ${lang}`);
     return true;
   } catch (error) {
