@@ -255,7 +255,11 @@ body.wedding-landing-active footer { display: none !important; }
     position: relative;
     z-index: 1;
     background: var(--pepe-bg);
-    padding: 20px;
+    background-image: url('../images/black-and-red.png');
+    background-size: 100% auto;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 10px;
     margin-bottom: 50vh; /* Make room for images below */
     max-width: none !important;
     margin-right: 0 !important;
@@ -341,6 +345,12 @@ body.wedding-landing-active footer { display: none !important; }
     gap: 10px;
     padding: 0 0 2vh;
     /* Remove top padding to touch the navbar */
+  }
+  .wedding-landing .pepe-left {
+    background-image: url('../images/black-and-red.png');
+    background-size: 100% auto;
+    background-position: center;
+    background-repeat: no-repeat;
   }
   .wedding-landing .stack-gallery { height: 76vh; }
   .wedding-landing .stack-viewport { height: 76vh; }

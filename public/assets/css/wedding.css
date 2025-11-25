@@ -256,7 +256,7 @@ body {
     }
     }
 
-    /* Estilos específicos para centrar eventos */
+    /* Specific style to center events */
     .info-grid {
     display: flex !important;
     flex-direction: column !important;
@@ -265,7 +265,7 @@ body {
     margin: 2rem 0 !important;
     }
 
-    /* Contenedor de eventos */
+    /* Events container */
     .events-container {
     width: 100% !important;
     display: flex !important;
@@ -274,7 +274,7 @@ body {
     gap: 2rem !important;
     }
 
-    /* Fila de eventos */
+    /* Events row */
     .events-row {
     display: flex !important;
     justify-content: center !important;
@@ -284,7 +284,7 @@ body {
     width: 100% !important;
     }
 
-    /* Sección de ubicación */
+    /* Location section */
     .location-section {
     display: flex !important;
     justify-content: center !important;
@@ -295,7 +295,7 @@ body {
     max-width: 400px !important;
     }
 
-    /* Asegurar que la sección de guests esté centrada */
+    /* Ensure the guests section is centered */
     .cta-section {
     text-align: center;
     }
@@ -319,7 +319,7 @@ body {
     margin-top: 30px;
     }
 
-    /* Botón rosa degradado para ver en mapa */
+    /* Pink gradient button to view on map */
     a.btn-ver-mapa {
     display: inline-flex;
     align-items: center;
@@ -343,7 +343,7 @@ body {
     font-size: 1rem;
     }
 
-    /* Overlay y contenedor de mapa */
+    /* Overlay and map container */
     .map-overlay {
     position: fixed;
     top: 0;

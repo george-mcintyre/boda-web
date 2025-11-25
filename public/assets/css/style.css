@@ -183,7 +183,7 @@ main {
   z-index: 10;
 }
 
-/* Secciones específicas */
+/* Specific sections */
 .hero-section {
   text-align: center;
   padding: 2rem 0;
@@ -197,7 +197,7 @@ main {
   line-height: 1.8;
 }
 
-/* Contador regresivo */
+/* Countdown */
 .countdown-container {
   display: flex;
   justify-content: center;
@@ -237,7 +237,7 @@ main {
   margin-top: 0.5rem;
 }
 
-/* Grid de información */
+/* Info grid */
 .info-grid {
   display: flex;
   flex-direction: column;
@@ -246,7 +246,7 @@ main {
   margin: 2rem 0;
 }
 
-/* Contenedor de events */
+/* Events container */
 .events-container {
   width: 100%;
   display: flex;
@@ -255,7 +255,7 @@ main {
   gap: 2rem;
 }
 
-/* Fila de events */
+/* Events row */
 .events-row {
   display: flex;
   justify-content: center;
@@ -265,7 +265,7 @@ main {
   width: 100%;
 }
 
-/* Sección de ubicación */
+/* Location section */
 .location-section {
   display: flex;
   justify-content: center;
@@ -371,7 +371,7 @@ main {
   font-size: 1.1rem;
 }
 
-/* Botones específicos */
+/* Specific buttons */
 .primary-action {
   background: var(--gradient-primary);
   color: var(--white);
@@ -443,7 +443,7 @@ main {
   font-size: 1.2rem;
 }
 
-/* RSVP Section específica */
+/* RSVP Section specific */
 .rsvp-section {
   text-align: center;
   padding: 2rem 0;
@@ -592,7 +592,7 @@ main {
   font-size: 1.5rem;
 }
 
-/* Botones elegantes */
+/* Elegant buttons */
 button {
   background: var(--gradient-primary);
   color: var(--white);
@@ -645,7 +645,7 @@ button.secondary:hover {
   color: var(--white);
 }
 
-/* Formularios profesionales */
+/* Professional forms */
 form {
   background: var(--light-bg);
   padding: 2.5rem;
@@ -689,7 +689,7 @@ input::placeholder, textarea::placeholder {
   color: #A0A0A0;
 }
 
-/* Mensajes de estado */
+/* Status messages */
 .message {
   padding: 1rem 1.5rem;
   border-radius: 12px;
@@ -711,7 +711,7 @@ input::placeholder, textarea::placeholder {
   border-left: 4px solid #DC3545;
 }
 
-/* Secciones */
+/* Sections */
 section {
   margin: 3rem 0;
   padding: 2rem 0;
@@ -722,7 +722,7 @@ section:last-child {
   border-bottom: none;
 }
 
-/* Grid de botones */
+/* Button grid */
 .button-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -730,7 +730,7 @@ section:last-child {
   margin: 2rem 0;
 }
 
-/* Footer elegante */
+/* Elegant footer */
 footer {
   background: var(--gradient-secondary);
   color: var(--text-light);
@@ -744,7 +744,7 @@ footer {
   margin-bottom: 0.5rem;
 }
 
-/* Animaciones */
+/* Animations */
 @keyframes fadeInUp {
   from {
     opacity: 0;
