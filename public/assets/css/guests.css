@@ -3583,3 +3583,591 @@ header {
         font-size: 1.2em;
     }
 }
+
+/* ========================================
+   Summary Page - New Left Panel Styles
+   ======================================== */
+
+/* Summary Two Column Layout */
+.summary-two-column {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    padding: 10px 0;
+}
+
+.summary-left-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.summary-right-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Summary Section Card */
+.summary-section {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+}
+
+.summary-section h3 {
+    margin: 0 0 15px 0;
+    color: var(--primary-color);
+    font-size: 1.15em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.summary-section h3 i {
+    color: var(--secondary-color);
+}
+
+/* Party Members Section */
+.party-count {
+    font-size: 0.9em;
+    color: var(--text-light);
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.party-members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.party-member-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 15px;
+    background: #fafbfc;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+}
+
+.party-member-item:hover {
+    border-color: var(--primary-color);
+    background: #f5f0f8;
+}
+
+.party-member-name {
+    font-weight: 500;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.party-member-name i {
+    color: var(--primary-color);
+    font-size: 0.9em;
+}
+
+.member-badges {
+    display: flex;
+    gap: 6px;
+}
+
+.badge-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    font-size: 0.7em;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-child {
+    background: #17a2b8;
+    color: white;
+    font-size: 0.7em;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* RSVP Summary Section */
+.rsvp-events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.rsvp-event-item {
+    background: #fafbfc;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+}
+
+.rsvp-event-header {
+    background: linear-gradient(135deg, rgba(139, 90, 150, 0.1), rgba(212, 165, 165, 0.1));
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.rsvp-event-header h4 {
+    margin: 0 0 5px 0;
+    color: var(--primary-color);
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.event-datetime {
+    font-size: 0.85em;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.event-datetime i {
+    color: var(--secondary-color);
+}
+
+.rsvp-attendees {
+    padding: 12px 15px;
+}
+
+.rsvp-attendees-label {
+    font-size: 0.8em;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.attendees-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.attendee-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+.attendee-chip i {
+    font-size: 0.85em;
+}
+
+.no-attendees {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.9em;
+    padding: 8px 0;
+}
+
+/* Menu Summary Section */
+.menu-members-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.menu-member-card {
+    background: #fafbfc;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+}
+
+.menu-member-header {
+    background: linear-gradient(135deg, rgba(139, 90, 150, 0.15), rgba(212, 165, 165, 0.1));
+    padding: 10px 15px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.menu-member-header i {
+    color: var(--primary-color);
+}
+
+.menu-member-header h4 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 0.95em;
+    font-weight: 600;
+}
+
+.menu-choices-list {
+    padding: 12px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-choice-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.menu-choice-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.course-label {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 0.9em;
+    flex: 0 0 40%;
+}
+
+.option-label {
+    color: var(--primary-color);
+    font-size: 0.9em;
+    text-align: right;
+    flex: 1;
+}
+
+.option-label.not-selected {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.options-list {
+    color: var(--text-light);
+    font-size: 0.85em;
+    text-align: right;
+    flex: 1;
+}
+
+.no-choices-message {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.9em;
+    padding: 8px 0;
+    text-align: center;
+}
+
+/* Gifts Summary Section */
+.gifts-summary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.gift-summary-item {
+    background: linear-gradient(135deg, #fff5f5, #ffeef8);
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid #ffd6e7;
+    transition: all 0.2s ease;
+}
+
+.gift-summary-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(233, 30, 99, 0.1);
+}
+
+.gift-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.gift-summary-title {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 1em;
+    flex: 1;
+}
+
+.gift-summary-amount {
+    font-weight: 700;
+    color: #4caf50;
+    font-size: 1.1em;
+}
+
+.gift-summary-date {
+    font-size: 0.85em;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.gift-summary-date i {
+    color: var(--secondary-color);
+    font-size: 0.9em;
+}
+
+.gift-summary-message {
+    font-size: 0.9em;
+    font-style: italic;
+    color: var(--text-color);
+    background: rgba(255, 255, 255, 0.6);
+    padding: 10px 12px;
+    border-radius: 6px;
+    border-left: 3px solid var(--primary-color);
+}
+
+.gift-summary-message i {
+    margin-right: 5px;
+    color: var(--primary-color);
+}
+
+/* Summary Loading State */
+.summary-loading {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-light);
+}
+
+.summary-loading i {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    display: block;
+}
+
+/* Responsive Styles for Summary */
+@media (max-width: 900px) {
+    .summary-two-column {
+        grid-template-columns: 1fr;
+    }
+    
+    .summary-left-panel {
+        order: 1;
+    }
+    
+    .summary-right-panel {
+        order: 2;
+    }
+}
+
+@media (max-width: 768px) {
+    .summary-section {
+        padding: 15px;
+    }
+    
+    .party-member-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .member-badges {
+        align-self: flex-end;
+    }
+    
+    .menu-choice-item {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .option-label,
+    .options-list {
+        text-align: left;
+    }
+    
+    .gift-summary-header {
+        flex-direction: column;
+        gap: 5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .summary-section h3 {
+        font-size: 1em;
+    }
+    
+    .attendee-chip {
+        padding: 4px 10px;
+        font-size: 0.8em;
+    }
+    
+    .rsvp-event-header,
+    .rsvp-attendees {
+        padding: 10px 12px;
+    }
+    
+    .menu-member-header,
+    .menu-choices-list {
+        padding: 10px 12px;
+    }
+}
+
+/* ========================================
+   Additional Summary Classes - JS Compatibility
+   ======================================== */
+
+/* Member name alignment with party-member-name */
+.member-name {
+    font-weight: 500;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.member-name i {
+    color: var(--primary-color);
+    font-size: 0.9em;
+}
+
+/* RSVP Event Info Styles */
+.rsvp-event-info {
+    flex: 1;
+}
+
+.rsvp-event-name {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.rsvp-event-datetime {
+    font-size: 0.85em;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 4px;
+}
+
+.rsvp-event-datetime i {
+    color: var(--secondary-color);
+}
+
+/* RSVP Attendee Count Styles */
+.rsvp-attendee-count {
+    font-size: 0.85em;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.rsvp-attendee-count.has-attendees {
+    background: #d4edda;
+    color: #155724;
+}
+
+.rsvp-attendee-count.no-attendees {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* RSVP Attendees List */
+.rsvp-attendees-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px 15px;
+}
+
+.no-attendees-message {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.9em;
+    padding: 12px 15px;
+}
+
+/* Menu Course and Option Labels */
+.menu-course-label {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 0.9em;
+    flex: 0 0 40%;
+}
+
+.menu-option-label {
+    color: var(--primary-color);
+    font-size: 0.9em;
+    text-align: right;
+    flex: 1;
+}
+
+.menu-option-label.not-selected {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.menu-option-label.info-only {
+    color: var(--text-light);
+    font-size: 0.85em;
+}
+
+/* Menu Member Name */
+.menu-member-name {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 0.95em;
+    font-weight: 600;
+}
+
+/* Gift Summary List and Items */
+.gifts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.gift-title {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 1em;
+    flex: 1;
+}
+
+.gift-amount {
+    font-weight: 700;
+    color: #4caf50;
+    font-size: 1.1em;
+}
+
+/* Summary Section Title for h3 with class */
+.summary-section-title {
+    margin: 0 0 15px 0;
+    color: var(--primary-color);
+    font-size: 1.15em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.summary-section-title i {
+    color: var(--secondary-color);
+}
+
+/* Primary member highlight */
+.party-member-item.primary-member {
+    background: linear-gradient(135deg, rgba(139, 90, 150, 0.08), rgba(212, 165, 165, 0.05));
+    border-color: var(--primary-color);
+}

@@ -1884,11 +1884,355 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Define loadSummaryContent function if not already defined
-  function loadSummaryContent() {
-    // Reload RSVP status
-    cargarStatusRSVP();
+  // Define loadSummaryContent function to load all summary data
+  async function loadSummaryContent() {
+    const summaryContent = document.getElementById('summaryContent');
+    
+    if (!summaryContent) {
+      console.error('Summary content container not found');
+      return;
+    }
+    
+    // Show loading state
+    summaryContent.innerHTML = `
+      <div class="loading-summary">
+        <i class="fas fa-spinner fa-spin fa-2x"></i>
+        <p>Loading summary...</p>
+      </div>
+    `;
+    
+    try {
+      // Fetch all required data in parallel
+      const [partyResponse, eventsResponse, eventChoicesResponse, menuResponse, menuChoicesResponse, giftChoicesResponse] = await Promise.all([
+        fetch('/api/guest/party', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        }),
+        fetch('/api/guest/events', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        }),
+        fetch('/api/guest/event-choices', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        }),
+        fetch('/api/guest/menu', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        }),
+        fetch('/api/guest/menu-choices', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        }),
+        fetch('/api/guest/gift-choices', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        })
+      ]);
+      
+      // Parse responses
+      let partyMembers = [];
+      let events = [];
+      let eventChoices = [];
+      let menu = [];
+      let menuChoices = [];
+      let giftChoices = [];
+      
+      if (partyResponse.ok) partyMembers = await partyResponse.json();
+      if (eventsResponse.ok) events = await eventsResponse.json();
+      if (eventChoicesResponse.ok) eventChoices = await eventChoicesResponse.json();
+      if (menuResponse.ok) menu = await menuResponse.json();
+      if (menuChoicesResponse.ok) menuChoices = await menuChoicesResponse.json();
+      if (giftChoicesResponse.ok) giftChoices = await giftChoicesResponse.json();
+      
+      // Helper to escape HTML
+      const escapeHtml = (str) => {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      };
+      
+      // Date/time formatting helpers
+      const formatEventDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB', {
+          weekday: 'short',
+          day: 'numeric',
+          month: 'short'
+        });
+      };
+      
+      const formatEventTime = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleTimeString('en-GB', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      };
+      
+      const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        });
+      };
+      
+      // Build attendance lookup: { partyGuestId: { eventId: boolean } }
+      const attendanceLookup = {};
+      if (Array.isArray(eventChoices)) {
+        eventChoices.forEach(memberChoice => {
+          const memberId = memberChoice.partyGuestId;
+          if (!attendanceLookup[memberId]) {
+            attendanceLookup[memberId] = {};
+          }
+          if (Array.isArray(memberChoice.choices)) {
+            memberChoice.choices.forEach(choice => {
+              attendanceLookup[memberId][choice.eventId] = choice.attending === true;
+            });
+          }
+        });
+      }
+      
+      // Build menu choices lookup: { partyGuestId: { courseId: optionId } }
+      const menuChoicesLookup = {};
+      menuChoices.forEach(memberChoice => {
+        const memberId = memberChoice.partyGuestId;
+        menuChoicesLookup[memberId] = {};
+        if (memberChoice.choices) {
+          memberChoice.choices.forEach(choice => {
+            menuChoicesLookup[memberId][choice.courseId] = choice.optionId;
+          });
+        }
+      });
+      
+      // Build options lookup from menu: { optionId: optionLabel }
+      const optionsLookup = {};
+      const coursesLookup = {};
+      menu.forEach(course => {
+        coursesLookup[course.id] = {
+          label: course.label,
+          selectionRequired: course.selectionRequired !== false,
+          options: course.options
+        };
+        (course.options || []).forEach(option => {
+          optionsLookup[option.id] = option.label;
+        });
+      });
+      
+      // Start building HTML
+      let html = '';
+      
+      // ========== 1. Party Members Card ==========
+      html += `
+        <div class="summary-section party-members-section">
+          <h3 class="summary-section-title">
+            <i class="fas fa-users"></i>
+            Your Party (${partyMembers.length} ${partyMembers.length === 1 ? 'person' : 'people'})
+          </h3>
+          <div class="party-members-list">
+      `;
+      
+      if (partyMembers.length > 0) {
+        partyMembers.forEach(member => {
+          html += `
+            <div class="party-member-item ${member.primary ? 'primary-member' : ''}">
+              <span class="member-name">
+                <i class="fas fa-user"></i>
+                ${escapeHtml(member.name)}
+              </span>
+              ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
+              ${member.adult === false ? '<span class="badge badge-child">Child</span>' : ''}
+            </div>
+          `;
+        });
+      } else {
+        html += '<p class="no-data">No party members found.</p>';
+      }
+      
+      html += `
+          </div>
+        </div>
+      `;
+      
+      // ========== 2. RSVP Summary Card ==========
+      html += `
+        <div class="summary-section rsvp-summary-section">
+          <h3 class="summary-section-title">
+            <i class="fas fa-calendar-check"></i>
+            RSVP Summary
+          </h3>
+      `;
+      
+      if (events.length > 0) {
+        events.forEach(event => {
+          // Get attendees for this event
+          const attendees = partyMembers.filter(member => {
+            const memberAttendance = attendanceLookup[member.id];
+            return memberAttendance && memberAttendance[event.id] === true;
+          });
+          
+          html += `
+            <div class="rsvp-event-item">
+              <div class="rsvp-event-header">
+                <div class="rsvp-event-info">
+                  <span class="rsvp-event-name">${escapeHtml(event.name)}</span>
+                  <span class="rsvp-event-datetime">${formatEventDate(event.date)} at ${formatEventTime(event.date)}</span>
+                </div>
+                <span class="rsvp-attendee-count ${attendees.length > 0 ? 'has-attendees' : 'no-attendees'}">
+                  ${attendees.length} attending
+                </span>
+              </div>
+              ${attendees.length > 0 ? `
+                <div class="rsvp-attendees-list">
+                  ${attendees.map(a => `<span class="attendee-chip"><i class="fas fa-check"></i> ${escapeHtml(a.name)}</span>`).join('')}
+                </div>
+              ` : `
+                <div class="no-attendees-message">
+                  <i class="fas fa-info-circle"></i> No attendees confirmed yet
+                </div>
+              `}
+            </div>
+          `;
+        });
+      } else {
+        html += '<p class="no-data">No events available.</p>';
+      }
+      
+      html += '</div>';
+      
+      // ========== 3. Menu Choices Summary Card ==========
+      html += `
+        <div class="summary-section menu-summary-section">
+          <h3 class="summary-section-title">
+            <i class="fas fa-utensils"></i>
+            Menu Selections
+          </h3>
+      `;
+      
+      if (partyMembers.length > 0 && menu.length > 0) {
+        partyMembers.forEach(member => {
+          const memberChoices = menuChoicesLookup[member.id] || {};
+          
+          html += `
+            <div class="menu-member-card">
+              <div class="menu-member-header">
+                <i class="fas fa-user"></i>
+                <span class="menu-member-name">${escapeHtml(member.name)}</span>
+                ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
+              </div>
+              <div class="menu-choices-list">
+          `;
+          
+          menu.forEach(course => {
+            const selectedOptionId = memberChoices[course.id];
+            const isSelectable = course.selectionRequired !== false && course.options && course.options.length > 1;
+            
+            if (isSelectable) {
+              // Selectable course - show selected option
+              const selectedLabel = selectedOptionId ? optionsLookup[selectedOptionId] : null;
+              
+              html += `
+                <div class="menu-choice-item">
+                  <span class="menu-course-label">${escapeHtml(course.label)}:</span>
+                  <span class="menu-option-label ${selectedLabel ? '' : 'not-selected'}">
+                    ${selectedLabel ? escapeHtml(selectedLabel) : 'Not selected'}
+                  </span>
+                </div>
+              `;
+            } else {
+              // Non-selectable course - show all options or single option
+              const optionLabels = (course.options || []).map(o => o.label);
+              
+              html += `
+                <div class="menu-choice-item info-only">
+                  <span class="menu-course-label">${escapeHtml(course.label)}:</span>
+                  <span class="menu-option-label">
+                    ${optionLabels.length > 0 ? optionLabels.map(l => escapeHtml(l)).join(', ') : 'N/A'}
+                  </span>
+                </div>
+              `;
+            }
+          });
+          
+          html += `
+              </div>
+            </div>
+          `;
+        });
+      } else {
+        html += '<p class="no-data">No menu selections available.</p>';
+      }
+      
+      html += '</div>';
+      
+      // ========== 4. Gifts Offered Card (only if gifts exist) ==========
+      if (giftChoices.length > 0) {
+        html += `
+          <div class="summary-section gifts-summary-section">
+            <h3 class="summary-section-title">
+              <i class="fas fa-gift"></i>
+              Your Gifts
+            </h3>
+            <div class="gifts-list">
+        `;
+        
+        giftChoices.forEach(gift => {
+          html += `
+            <div class="gift-summary-item">
+              <div class="gift-summary-header">
+                <span class="gift-title">${escapeHtml(gift.giftTitle)}</span>
+                <span class="gift-amount">€${gift.giftAmount}</span>
+              </div>
+              <div class="gift-summary-date">
+                <i class="fas fa-calendar"></i>
+                ${formatDate(gift.date)}
+              </div>
+              ${gift.message ? `
+                <div class="gift-summary-message">
+                  <i class="fas fa-quote-left"></i>
+                  ${escapeHtml(gift.message)}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        });
+        
+        html += `
+            </div>
+          </div>
+        `;
+      }
+      
+      // Update the DOM
+      summaryContent.innerHTML = html;
+      
+    } catch (error) {
+      console.error('Error loading summary:', error);
+      summaryContent.innerHTML = `
+        <div class="error-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Error Loading Summary</h3>
+          <p>There was a problem loading your summary. Please try again.</p>
+          <button class="btn-retry" onclick="loadSummaryContent()">
+            <i class="fas fa-redo"></i>
+            Retry
+          </button>
+        </div>
+      `;
+    }
   }
+  
+  // Make loadSummaryContent globally accessible
+  window.loadSummaryContent = loadSummaryContent;
 
   // Load preferred language
   const savedLang = localStorage.getItem('i18nextLng');

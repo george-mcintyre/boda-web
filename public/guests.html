@@ -1789,18 +1789,16 @@
       <!-- Content of the Summary tab -->
       <div id="summaryContent-tab" class="tab-content active">
         <div class="summary-grid">
-          <!-- RSVP Summary Section -->
-          <section id="summaryContent" class="summary-card">
-            <h2><i class="fas fa-calendar-alt"></i> <span data-i18n="guests:eventRSVP">RSVP</span></h2>
-            <p class="section-description" data-i18n="guests:eventRSVPSummary">
-              Your attendance confirmations for our wedding events.
-            </p>
-            <div id="eventsStatus" class="events-status">
-              <div id="eventsStatusContent"></div>
+          <!-- Summary Section (Left) - dynamically loaded -->
+          <section id="summaryContent" class="summary-card summary-left-panel">
+            <h2><i class="fas fa-clipboard-list"></i> <span data-i18n="guests:yourSummary">Your Summary</span></h2>
+            <div class="loading-summary">
+              <i class="fas fa-spinner fa-spin fa-2x"></i>
+              <p data-i18n="guests:loadingSummary">Loading summary...</p>
             </div>
           </section>
           
-          <!-- Comments Card Section -->
+          <!-- Comments Card Section (Right) -->
           <section class="summary-card comments-card">
             <div class="comments-header">
               <h2><i class="fas fa-comments"></i> <span data-i18n="guests:commentsTitle">Comments</span></h2>
