@@ -463,17 +463,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       const events = await eventsRes.json().catch(() => []);
       const guestData = await guestRes.json().catch(() => ({}));
       
-      const agendaStatusContent = document.getElementById('agendaStatusContent');
-      if (!agendaStatusContent) return;
+      const eventStatusContent = document.getElementById('eventStatusContent');
+      if (!eventStatusContent) return;
       
       if (eventsRes.ok && events.length > 0) {
         // Mostrar eventos disponibles para RSVP
-        agendaStatusContent.innerHTML = `
+        eventStatusContent.innerHTML = `
           <h4><i class="fas fa-check-circle"></i> Tus confirmaciones de eventos</h4>
           <p class="no-selection">Visita la pestaña RSVP para confirmar tu asistencia a cada evento.</p>
         `;
       } else {
-        agendaStatusContent.innerHTML = `
+        eventStatusContent.innerHTML = `
           <h4><i class="fas fa-info-circle"></i> Estado de RSVP</h4>
           <p class="no-selection">Aún no hay eventos disponibles para confirmar asistencia.</p>
         `;
@@ -491,10 +491,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadMessages() {
   }
 
-  // Load events content
-  async function loadEventsContent() {
-  }
-
   // Load gifts content
   async function loadGiftsContent() {
   }
@@ -503,55 +499,46 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadMessagesContent() {
   }
 
-   // Función para cargar el contenido de la agenda en la pestaña
+   // Function to load the events content in the events tab
    async function loadEventsContent() {
-     const agendaContent = document.getElementById('agendaContent');
+     const eventsContent = document.getElementById('eventsContent');
      
      try {
-       const [agendaRes, guestRes] = await Promise.all([
-         fetch('/api/event'),
-         fetch('/api/invitado', {
+       const [eventsRes, eventChoicesRes] = await Promise.all([
+         fetch('/api/guest/events',{
+          method: 'GET',
+          headers: { 'Authorization': token }
+         }),
+         fetch('/api/guest/event-choices', {
+           method: 'GET',
            headers: { 'Authorization': token }
          })
        ]);
       
-       const agenda = await agendaRes.json().catch(() => []);
-       const guestData = await guestRes.json().catch(() => ({}));
-       const confirmaciones = (guestRes.ok ? (guestData.confirmaciones || guestData.confirmacionesAgenda) : {}) || {};
-       const agendaBloqueada = false;
+       const events = await eventsRes.json().catch(() => []);
+       const eventChoices = await eventChoicesRes.json().catch(() => ({}));
        
-       if (agendaRes.ok) {
-         let agendaHTML = '';
+       if (events) {
+         events.forEach(event => {
+           console.out(event);
+         });
          
-         // Mostrar aviso de bloqueo si la agenda está bloqueada
-         if (agendaBloqueada) {
-           agendaHTML += `
-             <div class="agenda-blocked-warning">
-               <div class="warning-content">
-                 <i class="fas fa-lock"></i>
-                 <h3>Agenda Bloqueada</h3>
-                 <p>La agenda de eventos está actualmente bloqueada y no se pueden realizar cambios en las confirmaciones.</p>
-                 ${configBloqueo.agenda.motivoBloqueo ? `<p><strong>Motivo:</strong> ${configBloqueo.agenda.motivoBloqueo}</p>` : ''}
-                 ${configBloqueo.agenda.fechaBloqueo ? `<p><strong>Bloqueada desde:</strong> ${new Date(configBloqueo.agenda.fechaBloqueo).toLocaleString('es-ES')}</p>` : ''}
-               </div>
-             </div>
-           `;
-         }
+         let eventHTML = '';
          
          // Mostrar confirmaciones actuales si existen
-         if (confirmaciones && Object.keys(confirmaciones).length > 0) {
-           agendaHTML += `
+         if (confirmations && Object.keys(confirmations).length > 0) {
+           eventHTML += `
              <div class="current-confirmations">
                <h3><i class="fas fa-check-circle"></i> Tus confirmaciones actuales</h3>
                <div class="confirmation-summary">
            `;
            
-           Object.keys(confirmaciones).forEach(eventoId => {
-             const confirmado = confirmaciones[eventoId];
+           Object.keys(confirmations).forEach(eventoId => {
+             const confirmado = confirmations[eventoId];
              const statusText = confirmado ? 'Confirmado' : 'No confirmado';
              const statusClass = confirmado ? 'status-confirmado' : 'status-no-confirmado';
              
-             agendaHTML += `
+             eventHTML += `
                <div class="confirmation-item">
                  <span class="confirmation-label">Evento ${eventoId}:</span>
                  <span class="confirmation-value">
@@ -561,15 +548,15 @@ document.addEventListener('DOMContentLoaded', async () => {
              `;
            });
            
-           agendaHTML += '</div></div>';
+           eventHTML += '</div></div>';
          }
          
-         // Mostrar la agenda de eventos
-         agendaHTML += '<div class="agenda-content">';
+         // Mostrar la event de eventos
+         eventHTML += '<div class="event-content">';
          
          // Agrupar eventos por día
          const eventosPorDia = {};
-         agenda.forEach(evento => {
+         events.forEach(evento => {
            const fecha = new Date(evento.fecha);
            const dia = fecha.toLocaleDateString('es-ES', { 
              weekday: 'long', 
@@ -585,8 +572,8 @@ document.addEventListener('DOMContentLoaded', async () => {
          });
          
          Object.keys(eventosPorDia).forEach(dia => {
-           agendaHTML += `
-             <div class="agenda-day">
+           eventHTML += `
+             <div class="event-day">
                <h3 class="day-title">
                  <i class="fas fa-calendar-day"></i>
                  ${dia}
@@ -595,16 +582,16 @@ document.addEventListener('DOMContentLoaded', async () => {
            `;
            
            eventosPorDia[dia].forEach(evento => {
-             const confirmado = confirmaciones && confirmaciones[evento.id];
+             const confirmado = confirmations && confirmations[evento.id];
              const statusText = confirmado ? 'Confirmado' : 'No confirmado';
              const statusClass = confirmado ? 'status-confirmado' : 'status-no-confirmado';
              
-             agendaHTML += `
+             eventHTML += `
                <div class="event-item">
-                 <div class="agenda-event-info">
-                   <h4 class="agenda-event-title">${evento.titulo}</h4>
-                   <p class="agenda-event-description">${evento.descripcion}</p>
-                   <p class="agenda-event-time">
+                 <div class="event-event-info">
+                   <h4 class="event-event-title">${evento.titulo}</h4>
+                   <p class="event-event-description">${evento.descripcion}</p>
+                   <p class="event-event-time">
                      <i class="fas fa-clock"></i>
                      ${new Date(evento.fecha).toLocaleTimeString('es-ES', { 
                        hour: '2-digit', 
@@ -614,7 +601,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                  </div>
                  <div class="evento-acciones">
                    <span class="status-badge ${statusClass}">${statusText}</span>
-                   ${agendaBloqueada ? `
+                   ${eventBloqueada ? `
                      <button disabled class="btn-disabled" title="Agenda bloqueada">
                        <i class="fas fa-lock"></i>
                        Bloqueado
@@ -629,21 +616,21 @@ document.addEventListener('DOMContentLoaded', async () => {
              `;
            });
            
-           agendaHTML += '</div></div>';
+           eventHTML += '</div></div>';
          });
          
-         agendaHTML += '</div>';
-         agendaContent.innerHTML = agendaHTML;
+         eventHTML += '</div>';
+         eventsContent.innerHTML = eventHTML;
          
        } else {
-         agendaContent.innerHTML = '<p class="error">Error al cargar la agenda.</p>';
+         eventsContent.innerHTML = '<p class="error">Error al cargar la event.</p>';
        }
      } catch (err) {
-       agendaContent.innerHTML = '<p class="error">Error de conexión al cargar la agenda.</p>';
+       eventsContent.innerHTML = '<p class="error">Error de conexión al cargar la event.</p>';
      }
    }
 
-   // Función global para confirmar eventos
+   // Global function to confirm events
    window.confirmEventAttendance = async (eventoId, confirmar) => {
      try {
        const res = await fetch('/api/event/confirm', {
@@ -659,14 +646,14 @@ document.addEventListener('DOMContentLoaded', async () => {
        if (res.ok) {
          showToast(data.mensaje, 'success');
          setTimeout(() => {
-           cargarContenidoAgenda(); // Recargar la agenda
+           cargarContenidoAgenda(); // Recargar la event
            cargarStatusAgenda(); // Actualizar el status en la pestaña resumen
          }, 1000);
        } else {
          // Verificar si es un error de bloqueo
          if (res.status === 403) {
-           showToast(`La agenda está bloqueada: ${data.error}`, 'error');
-           // Recargar la agenda para mostrar el estado de bloqueo
+           showToast(`La event está bloqueada: ${data.error}`, 'error');
+           // Recargar la event para mostrar el estado de bloqueo
            setTimeout(() => {
              cargarContenidoAgenda();
            }, 1000);
@@ -679,7 +666,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      }
    };
 
-   // Función para cargar el contenido de regalos en la pestaña
+   // Function to load the gifts content in the gifts tab
    async function loadGiftsContent() {
      const regalosContent = document.getElementById('regalosContent');
      
@@ -933,7 +920,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       
       // If the tab is events, load the events content
-      if (targetTab === 'events') {
+      if (targetTab === 'agenda') {
         loadEventsContent();
       }
       
