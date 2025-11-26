@@ -1,7 +1,6 @@
 [
   {
     "_id": {"$oid": "6923d62beac56d718dbca656"},
-    "__v": 0,
     "course": "dessert",
     "createdAt": {"$date": "2025-11-24T03:51:07.230Z"},
     "label": "Sweet Plates",
@@ -9,7 +8,6 @@
   },
   {
     "_id": {"$oid": "6923e2b5eac56d718dbca6ae"},
-    "__v": 0,
     "course": "drinks",
     "createdAt": {"$date": "2025-11-24T04:44:37.190Z"},
     "label": "Champagne",
@@ -17,7 +15,6 @@
   },
   {
     "_id": {"$oid": "69241bec417a12722a56b96d"},
-    "__v": 0,
     "course": "starter",
     "createdAt": {"$date": "2025-11-24T08:48:44.051Z"},
     "label": "Salad",
@@ -26,7 +23,6 @@
   },
   {
     "_id": {"$oid": "69241c73417a12722a56b983"},
-    "__v": 0,
     "course": "starter",
     "createdAt": {"$date": "2025-11-24T08:50:59.352Z"},
     "label": "Appetizers",
@@ -35,7 +31,6 @@
   },
   {
     "_id": {"$oid": "69241cf2417a12722a56b99a"},
-    "__v": 0,
     "course": "starter",
     "createdAt": {"$date": "2025-11-24T08:53:06.680Z"},
     "label": "Amuse Bouche",
@@ -43,7 +38,6 @@
   },
   {
     "_id": {"$oid": "69241d37417a12722a56b9ab"},
-    "__v": 0,
     "course": "main",
     "createdAt": {"$date": "2025-11-24T08:54:15.663Z"},
     "label": "Main",
@@ -51,7 +45,6 @@
   },
   {
     "_id": {"$oid": "69241e5a417a12722a56ba3b"},
-    "__v": 0,
     "course": "drinks",
     "createdAt": {"$date": "2025-11-24T08:59:06.222Z"},
     "label": "Wines",
@@ -59,7 +52,6 @@
   },
   {
     "_id": {"$oid": "69241eb8417a12722a56ba5b"},
-    "__v": 0,
     "course": "drinks",
     "createdAt": {"$date": "2025-11-24T09:00:40.293Z"},
     "label": "After Dinner",
@@ -67,7 +59,6 @@
   },
   {
     "_id": {"$oid": "69241ee7417a12722a56ba72"},
-    "__v": 0,
     "course": "main",
     "createdAt": {"$date": "2025-11-24T09:01:27.869Z"},
     "label": "Late Night Snacks",
@@ -75,7 +66,6 @@
   },
   {
     "_id": {"$oid": "69241f60417a12722a56ba98"},
-    "__v": 0,
     "course": "dessert",
     "createdAt": {"$date": "2025-11-24T09:03:28.157Z"},
     "label": "Coffee & Petite Sweets",

@@ -16,7 +16,7 @@ async function ensureCollectionsAndIndexes() {
     Event: models.Event,
     Message: models.Message,
     Menu: models.Menu,
-    CashGiftCard: models.CashGiftCard,
+    Gift: models.Gift,
     Config: models.Config,
   };
 
@@ -119,7 +119,7 @@ async function seedExampleDataIfEmpty() {
     models.Event.countDocuments(),
     models.Message.countDocuments(),
     models.Menu.countDocuments(),
-    models.CashGiftCard.countDocuments(),
+    models.Gift.countDocuments(),
     models.Config.countDocuments(),
   ]);
 
@@ -183,8 +183,8 @@ async function seedExampleDataIfEmpty() {
     await models.Menu.create(mapped);
     actions.push('Menu');
   }
-  if (cCard === 0 && exists('cash-gift-cards.json')) {
-    const raw = read('cash-gift-cards.json');
+  if (cCard === 0 && exists('gifts.json')) {
+    const raw = read('gifts.json');
     const seen = new Set();
     const items = (Array.isArray(raw) ? raw : [])
       .filter(x => x && x.code)
@@ -194,8 +194,8 @@ async function seedExampleDataIfEmpty() {
         seen.add(k); return true;
       });
     if (items.length) {
-      await models.CashGiftCard.insertMany(items);
-      actions.push('CashGiftCard');
+      await models.Gift.insertMany(items);
+      actions.push('Gifts');
     }
   }
   if (cCfg === 0 && exists('config.json')) {

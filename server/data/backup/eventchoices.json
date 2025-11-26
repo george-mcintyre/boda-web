@@ -1,7 +1,6 @@
 [
   {
     "_id": {"$oid": "6926806949d24766fbcee8e1"},
-    "__v": 0,
     "createdAt": {"$date": "2025-11-26T04:22:01.463Z"},
     "guestId": {"$oid": "692382fa76402958d7ee199f"},
     "partyChoices": [

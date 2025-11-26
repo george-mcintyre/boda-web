@@ -1,19 +1,12 @@
-{
-  "defaultLanguage": "en",
-  "guestsEnabled": true,
-  "eventsEnabled": true,
-  "menuEnabled": true,
-  "messagesEnabled": true,
-  "giftsEnabled": true,
-  "otherOptions": {
-    "agenda": {
-      "locked": false,
-      "lockDate": null,
-      "lockReason": null
-    },
-    "system": {
-      "lastUpdate": "2025-11-23T22:19:15.779Z",
-      "version": "1.0.0"
-    }
+[
+  {
+    "createdAt": {"$date": "2025-11-23T19:01:07.085Z"},
+    "defaultLanguage": "en",
+    "eventsEnabled": false,
+    "giftsEnabled": false,
+    "guestsEnabled": true,
+    "menuEnabled": false,
+    "messagesEnabled": false,
+    "updatedAt": {"$date": "2025-11-25T17:17:19.432Z"}
   }
-}
+]

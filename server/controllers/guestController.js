@@ -174,7 +174,7 @@ async function bulkUpload(req, res, next) {
 async function getGifts(req, res, next) {
   try {
     // Sort by amount (price) ascending as per requirements
-    const gifts = await Gift.find({ enabled: true }).sort({ amount: 1 }).lean();
+    const gifts = await Gift.find().sort({ amount: 1 }).lean();
     
     // Get purchase counts for each gift
     const giftIds = gifts.map(gift => gift._id);

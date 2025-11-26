@@ -1,0 +1,44 @@
+[
+  {
+    "_id": {"$oid": "6926806949d24766fbcee8e1"},
+    "createdAt": {"$date": "2025-11-26T04:22:01.463Z"},
+    "guestId": {"$oid": "692382fa76402958d7ee199f"},
+    "partyChoices": [
+      {
+        "partyGuestId": "692382fa76402958d7ee199f",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-11-26T13:15:55.865Z"}
+  }
+]

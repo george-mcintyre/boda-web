@@ -1,8 +1,6 @@
 [
   {
-    "_id": {"$oid": "69270c323e8bb28c24c0e41c"},
-    "__v": 0,
-    "content": "tewt",
+    "content": "test comment",
     "createdAt": {"$date": "2025-11-26T14:18:26.253Z"},
     "email": "benoit.heinrich@gmail.com",
     "name": "Benoit Heinrich",
@@ -12,8 +10,6 @@
     "userReactions": []
   },
   {
-    "_id": {"$oid": "69270c3b3e8bb28c24c0e41f"},
-    "__v": 1,
     "content": "seems to be working",
     "createdAt": {"$date": "2025-11-26T14:18:35.652Z"},
     "email": "benoit.heinrich@gmail.com",
@@ -29,8 +25,6 @@
     ]
   },
   {
-    "_id": {"$oid": "69270c3d3e8bb28c24c0e422"},
-    "__v": 2,
     "content": "Test comment to verify functionality!",
     "createdAt": {"$date": "2025-11-26T14:18:37.573Z"},
     "email": "jd@me.com",

@@ -143,6 +143,17 @@
         </section>
       </div>
       
+      <!-- Content of the Gifts tab -->
+      <div id="giftsContent-tab" class="tab-content">
+        <section id="giftsContent">
+          <h2><i class="fas fa-money-bill-wave"></i> <span data-i18n="guests:giftsSelection">Gifts Selection</span></h2>
+          <p class="section-description" data-i18n="guests:giftsSelectionDesc">
+            Choose your favorite gifts for our wedding celebrations.
+          </p>
+          <div id="giftsContent"></div>
+        </section>
+      </div>
+      
       <!-- Content of the RSVP tab -->
       <div id="eventsContent-tab" class="tab-content">
         <section id="eventsContent">
@@ -151,50 +162,6 @@
             The celebrations will take place over three days: Friday, Saturday and Sunday. They kick off on Friday with a welcome dinner.   Saturday is a full day of activities including the wedding ceremony, the reception banquet, and dancing.   Sunday's activities include a farewell brunch.  Please confirm your attendance for which ever of these events you will be attending.
           </p>
           <div id="eventsContent"></div>
-        </section>
-      </div>
-      
-      
-      <!-- Content of the Gifts tab -->
-      <div id="giftsContent-tab" class="tab-content">
-        <section id="giftsContent">
-          <h2><i class="fas fa-money-bill-wave"></i> <span data-i18n="guests:cashGifts">Regalos en Efectivo</span></h2>
-          <p class="section-description" data-i18n="guests:cashGiftsDesc">
-            Si prefieres hacer un regalo en efectivo, puedes elegir una cantidad fija o personalizada. Tu generosidad nos ayudará a comenzar nuestra nueva vida juntos.
-          </p>
-          <div class="cash-gifts-container">
-            <div class="amount-options">
-              <!-- Las tarjetas se cargarán dinámicamente desde el servidor -->
-            </div>
-            
-            <div class="payment-section">
-              <div class="payment-summary" id="paymentSummary" style="display: none;">
-                <h3 data-i18n="guests:paymentSummary">Resumen del Regalo</h3>
-                <p class="amount" id="selectedAmount">€0</p>
-              </div>
-              <button class="stripe-button" id="payButton" disabled>
-                <i class="fas fa-credit-card"></i>
-                <span data-i18n="guests:proceedPayment">Proceder al Pago</span>
-              </button>
-            </div>
-
-            <div class="donor-info">
-              <h3><i class="fas fa-user"></i> <span data-i18n="guests:donorInfo">Tu Información</span></h3>
-              <div class="form-group">
-                <label for="donorName" data-i18n="guests:donorName">Name completo</label>
-                <input type="text" id="donorName" readonly>
-              </div>
-              <div class="form-group">
-                <label for="donorEmail" data-i18n="guests:donorEmail">Email</label>
-                <input type="email" id="donorEmail" readonly>
-              </div>
-              <div class="form-group">
-                <label for="donorMessage" data-i18n="guests:donorMessage">Mensaje para los novios (opcional)</label>
-                <textarea id="donorMessage" data-i18n-placeholder="guests:messagePlaceholder" placeholder="Escribe un mensaje especial para Iluminada y George..."></textarea>
-              </div>
-            </div>
-          </div>
-          <div id="cashGiftsMessage" class="message"></div>
         </section>
       </div>
     </div>
