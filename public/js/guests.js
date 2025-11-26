@@ -101,9 +101,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener('keydown', handleEscape);
   }
 
-  // Load and menu selections
+  // Load and menu selections - New unified menu layout with drag-drop support
   async function loadMenuSelections() {
     console.log('Loading menu selections...');
+    const menuContent = document.getElementById('menuContent');
+    
+    if (!menuContent) return;
+    
+    // Show loading state
+    menuContent.innerHTML = `
+      <div class="loading-menu">
+        <i class="fas fa-spinner fa-spin fa-3x"></i>
+        <p>Loading menu...</p>
+      </div>
+    `;
+    
     try {
       // Get party members and menu data in parallel
       const [partyResponse, menuResponse, menuChoicesResponse] = await Promise.all([
@@ -121,190 +133,406 @@ document.addEventListener('DOMContentLoaded', async () => {
         })
       ]);
 
-      const partyData = await partyResponse.json();
-      const menuData = await menuResponse.json();
-      const menuChoicesData = menuChoicesResponse.ok ? await menuChoicesResponse.json() : [];
-
-      const menuContent = document.getElementById('menuContent');
-      if (!menuContent) return;
-
       if (!partyResponse.ok || !menuResponse.ok) {
         menuContent.innerHTML = `
-          <h4><i class="fas fa-info-circle"></i> Menu selections</h4>
-          <p class="no-selection">Error loading menu data. Please try again later.</p>
+          <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Menu</h3>
+            <p>Unable to load menu data. Please try again later.</p>
+            <button class="btn-retry" onclick="loadMenuSelections()">
+              <i class="fas fa-redo"></i> Retry
+            </button>
+          </div>
         `;
         return;
       }
 
-      // Group courses by type using the menu data (which already contains all options)
-      const coursesByType = {};
+      const partyData = await partyResponse.json();
+      const menuData = await menuResponse.json();
+      const menuChoicesData = menuChoicesResponse.ok ? await menuChoicesResponse.json() : [];
+
+      // Group courses by type (starter, main, dessert, drinks)
+      const courseGroups = {
+        starter: { label: 'Starters', icon: 'fa-seedling', courses: [] },
+        main: { label: 'Main Courses', icon: 'fa-drumstick-bite', courses: [] },
+        dessert: { label: 'Desserts', icon: 'fa-ice-cream', courses: [] },
+        drinks: { label: 'Drinks', icon: 'fa-cocktail', courses: [] }
+      };
+
       menuData.forEach(course => {
-        if (!coursesByType[course.course]) {
-          coursesByType[course.course] = [];
+        if (courseGroups[course.course]) {
+          courseGroups[course.course].courses.push(course);
         }
-        coursesByType[course.course].push(course);
       });
 
-      // Create menu cards for each party member
-      let menuHTML = '';
-      
-      partyData.forEach(member => {
-        const memberChoices = menuChoicesData.find(choice => 
-          choice.partyGuestId === member.id || choice.partyGuestId === `primary-${member.id}`
-        ) || { choices: [], specialRequest: null };
+      // Build a lookup for party member choices: { partyGuestId: { courseId: optionId } }
+      const choicesLookup = {};
+      menuChoicesData.forEach(memberChoice => {
+        const memberId = memberChoice.partyGuestId;
+        choicesLookup[memberId] = {};
+        if (memberChoice.choices) {
+          memberChoice.choices.forEach(choice => {
+            choicesLookup[memberId][choice.courseId] = choice.optionId;
+          });
+        }
+      });
 
-        menuHTML += `
-          <div class="menu-card">
-            <h4 class="menu-card-title">
-              <i class="fas fa-utensils"></i>
-              Menu for ${member.name}
-            </h4>
-            <div class="menu-sections">
+      // Helper to escape HTML
+      const escapeHtml = (str) => {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      };
+
+      // Helper to get image URL for option
+      const getOptionImageUrl = (option) => {
+        if (!option.image) return null;
+        if (typeof option.image === 'string') {
+          if (option.image.startsWith('data:')) {
+            return option.image;
+          } else if (option.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(option.image)) {
+            return `/api/admin/menu-options/${option.id}/image/thumbnail`;
+          }
+          return option.image;
+        }
+        return null;
+      };
+
+      // Build HTML for the unified menu
+      let html = '<div class="unified-menu-container">';
+
+      // Iterate through course groups
+      const groupOrder = ['starter', 'main', 'dessert', 'drinks'];
+      
+      groupOrder.forEach(groupKey => {
+        const group = courseGroups[groupKey];
+        if (!group.courses.length) return;
+
+        html += `
+          <div class="menu-course-group" data-group="${groupKey}">
+            <div class="course-group-header">
+              <i class="fas ${group.icon}"></i>
+              <h3>${escapeHtml(group.label)}</h3>
+            </div>
+            <div class="course-group-content">
         `;
 
-        // Define the order of course types
-        const courseTypes = ['starter', 'main', 'dessert', 'drinks'];
-        const courseLabels = {
-          starter: 'Starters',
-          main: 'Main Course',
-          dessert: 'Desserts',
-          drinks: 'Drinks'
-        };
-
-        courseTypes.forEach(courseType => {
-          const courses = coursesByType[courseType] || [];
+        // Iterate through courses in this group
+        group.courses.forEach(course => {
+          const isSelectable = course.selectionRequired !== false;
           
-          menuHTML += `
-            <div class="menu-section">
-              <h5 class="section-title">
-                <i class="fas fa-${courseType === 'starter' ? ' appetizers' : courseType === 'main' ? 'drumstick-bite' : courseType === 'dessert' ? 'ice-cream' : 'cocktail'}"></i>
-                ${courseLabels[courseType]}
-              </h5>
+          html += `
+            <div class="menu-course-section" data-course-id="${course.id}" data-selectable="${isSelectable}">
+              <h4 class="course-section-title">${escapeHtml(course.label)}</h4>
+              <div class="course-options-list">
           `;
 
-          courses.forEach(course => {
-            const courseOptions = course.options || [];
+          // Iterate through options in this course
+          const options = course.options || [];
+          options.forEach((option, optionIndex) => {
+            const imageUrl = getOptionImageUrl(option);
             
-            // Find existing choice for this course, or select first option if no choice made
-            const selectedChoice = memberChoices.choices.find(choice => choice.courseId === course.id);
-            let selectedOptionId = null;
-            
-            if (selectedChoice) {
-              // Choice exists, use the selected option
-              selectedOptionId = selectedChoice.optionId;
-            } else if (course.selectionRequired && courseOptions.length > 0) {
-              // No choice made (404 case), select first option by default
-              selectedOptionId = courseOptions[0].id;
+            // Determine which party members have selected this option
+            let membersForOption = [];
+            if (isSelectable) {
+              partyData.forEach(member => {
+                const memberChoices = choicesLookup[member.id] || {};
+                const selectedOptionId = memberChoices[course.id];
+                
+                if (selectedOptionId === option.id) {
+                  membersForOption.push(member);
+                } else if (!selectedOptionId && optionIndex === 0) {
+                  // Default: first option gets unassigned members
+                  membersForOption.push(member);
+                }
+              });
             }
-            
-            menuHTML += `
-              <div class="course-card">
-                <h6 class="course-title">${course.label}</h6>
-                <div class="options-container">
-            `;
 
-            courseOptions.forEach((option, optionIndex) => {
-              const isSelected = selectedOptionId === option.id;
-              const radioName = `menu-${member.id}-${course.id}`;
-              const hasImage = option.image && (option.image.startsWith('data:') || option.image.length === 24);
-              
-              menuHTML += `
-                <div class="option-card ${isSelected ? 'selected' : ''}">
-                  ${hasImage ? `
-                    <div class="option-image">
-                      <img src="${option.image}" alt="${option.label}" onerror="this.parentElement.style.display='none';" />
-                    </div>
-                  ` : ''}
-                  <div class="option-content">
-                    <div class="option-header">
-                      <label for="${radioName}-${optionIndex}" class="option-label">
-                        ${option.label}
-                        ${option.dietaryIcons ? `<span class="dietary-icons">${option.dietaryIcons}</span>` : ''}
-                      </label>
-                      ${course.selectionRequired ? `
-                        <input 
-                          type="radio" 
-                          id="${radioName}-${optionIndex}" 
-                          name="${radioName}" 
-                          value="${option.id}"
-                          ${isSelected ? 'checked' : ''}
-                          onchange="saveMenuSelection('${member.id}', '${course.id}', '${option.id}')"
-                        />
-                      ` : ''}
+            html += `
+              <div class="menu-option-card" data-option-id="${option.id}" data-course-id="${course.id}">
+                <div class="option-card-main">
+                  <div class="option-image-container">
+                    ${imageUrl ? `
+                      <img src="${imageUrl}" alt="${escapeHtml(option.label)}" class="option-thumbnail" onerror="this.style.display='none'; this.parentElement.classList.add('no-image');">
+                    ` : `
+                      <div class="option-image-placeholder">
+                        <i class="fas fa-utensils"></i>
+                      </div>
+                    `}
+                  </div>
+                  <div class="option-details">
+                    <div class="option-header-row">
+                      <h5 class="option-name">${escapeHtml(option.label)}</h5>
+                      ${option.dietaryIcons ? `<span class="dietary-icons">${option.dietaryIcons}</span>` : ''}
                     </div>
                     ${option.description ? `
-                      <p class="option-description">${option.description}</p>
+                      <p class="option-description-text">${escapeHtml(option.description)}</p>
                     ` : ''}
+                    <div class="dietary-badges">
+                      ${option.isVegetarian ? '<span class="dietary-badge vegetarian"><i class="fas fa-leaf"></i> Vegetarian</span>' : ''}
+                      ${option.containsAllergens ? '<span class="dietary-badge allergens"><i class="fas fa-exclamation-triangle"></i> Allergens</span>' : ''}
+                      ${option.containsLactose ? '<span class="dietary-badge lactose"><i class="fas fa-cheese"></i> Lactose</span>' : ''}
+                    </div>
                   </div>
                 </div>
-              `;
-            });
-
-            menuHTML += `
-                </div>
+                ${isSelectable ? `
+                  <div class="option-selection-panel" data-option-id="${option.id}" data-course-id="${course.id}">
+                    <div class="selection-panel-header">
+                      <span class="panel-label"><i class="fas fa-users"></i> Who's having this?</span>
+                      <span class="member-count">${membersForOption.length} selected</span>
+                    </div>
+                    <div class="member-drop-zone" data-option-id="${option.id}" data-course-id="${course.id}">
+                      ${membersForOption.map(member => `
+                        <div class="member-chip" draggable="true" data-member-id="${member.id}" data-member-name="${escapeHtml(member.name)}">
+                          <i class="fas fa-user"></i>
+                          <span>${escapeHtml(member.name)}</span>
+                          ${member.primary ? '<span class="chip-badge primary">Primary</span>' : ''}
+                        </div>
+                      `).join('')}
+                    </div>
+                  </div>
+                ` : ''}
               </div>
             `;
           });
 
-          menuHTML += `</div>`;
+          html += `
+              </div>
+            </div>
+          `;
         });
 
-        // Add special requests section
-        menuHTML += `
-          <div class="special-requests">
-            <h5 class="section-title">
-              <i class="fas fa-exclamation-triangle"></i>
-              Special Requests
-            </h5>
-            <div class="special-request-options">
-              <select name="special-request-${member.id}" onchange="saveSpecialRequest('${member.id}', this.value)">
-                <option value="">None</option>
-                <option value="vegan" ${memberChoices.specialRequest === 'vegan' ? 'selected' : ''}>Vegan</option>
-                <option value="vegetarian" ${memberChoices.specialRequest === 'vegetarian' ? 'selected' : ''}>Vegetarian</option>
-                <option value="nut allergy" ${memberChoices.specialRequest === 'nut allergy' ? 'selected' : ''}>Nut Allergy</option>
-                <option value="other" ${memberChoices.specialRequest === 'other' ? 'selected' : ''}>Other</option>
-              </select>
-              ${memberChoices.specialRequestDetail ? `
-                <textarea 
-                  placeholder="Please specify..." 
-                  name="special-request-detail-${member.id}"
-                  onchange="saveSpecialRequestDetail('${member.id}', this.value)"
-                >${memberChoices.specialRequestDetail}</textarea>
-              ` : `
-                <textarea 
-                  placeholder="Please specify..." 
-                  name="special-request-detail-${member.id}"
-                  style="display: none;"
-                  onchange="saveSpecialRequestDetail('${member.id}', this.value)"
-                ></textarea>
-              `}
-            </div>
-          </div>
-        `;
-
-        menuHTML += `
+        html += `
             </div>
           </div>
         `;
       });
 
-      menuContent.innerHTML = menuHTML || `
-        <p class="no-selection">No party members found.</p>
+      // Add save button
+      html += `
+        <div class="menu-actions">
+          <button type="button" id="saveMenuChoicesBtn" class="btn-save-menu">
+            <i class="fas fa-save"></i>
+            Save Menu Selections
+          </button>
+        </div>
       `;
+
+      html += '</div>'; // Close unified-menu-container
+
+      menuContent.innerHTML = html;
+
+      // Initialize drag and drop functionality
+      initMenuDragDrop();
+
+      // Attach save button handler
+      const saveBtn = document.getElementById('saveMenuChoicesBtn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', saveAllMenuChoices);
+      }
 
       console.log('Menu selections loaded successfully');
 
     } catch (err) {
       console.error('Error loading menu selections:', err);
-      const menuContent = document.getElementById('menuContent');
-      if (menuContent) {
-        menuContent.innerHTML = `
-          <h4><i class="fas fa-info-circle"></i> Menu selections</h4>
-          <p class="no-selection">Error loading menu data. Please try again later.</p>
-        `;
+      menuContent.innerHTML = `
+        <div class="error-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Error Loading Menu</h3>
+          <p>There was a problem loading the menu. Please try again.</p>
+          <button class="btn-retry" onclick="loadMenuSelections()">
+            <i class="fas fa-redo"></i> Retry
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  // Initialize drag and drop for menu selections
+  function initMenuDragDrop() {
+    const memberChips = document.querySelectorAll('.member-chip');
+    const dropZones = document.querySelectorAll('.member-drop-zone');
+
+    memberChips.forEach(chip => {
+      chip.addEventListener('dragstart', handleDragStart);
+      chip.addEventListener('dragend', handleDragEnd);
+    });
+
+    dropZones.forEach(zone => {
+      zone.addEventListener('dragover', handleDragOver);
+      zone.addEventListener('dragenter', handleDragEnter);
+      zone.addEventListener('dragleave', handleDragLeave);
+      zone.addEventListener('drop', handleDrop);
+    });
+  }
+
+  let draggedChip = null;
+
+  function handleDragStart(e) {
+    draggedChip = this;
+    this.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', this.dataset.memberId);
+    
+    // Highlight valid drop zones (same course)
+    const courseId = this.closest('.member-drop-zone').dataset.courseId;
+    document.querySelectorAll(`.member-drop-zone[data-course-id="${courseId}"]`).forEach(zone => {
+      zone.classList.add('drop-target-highlight');
+    });
+  }
+
+  function handleDragEnd(e) {
+    this.classList.remove('dragging');
+    document.querySelectorAll('.member-drop-zone').forEach(zone => {
+      zone.classList.remove('drop-target-highlight', 'drag-over');
+    });
+    draggedChip = null;
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  }
+
+  function handleDragEnter(e) {
+    e.preventDefault();
+    if (draggedChip) {
+      const draggedCourseId = draggedChip.closest('.member-drop-zone').dataset.courseId;
+      if (this.dataset.courseId === draggedCourseId) {
+        this.classList.add('drag-over');
       }
     }
   }
+
+  function handleDragLeave(e) {
+    this.classList.remove('drag-over');
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    this.classList.remove('drag-over');
+    
+    if (!draggedChip) return;
+    
+    const draggedCourseId = draggedChip.closest('.member-drop-zone').dataset.courseId;
+    const targetCourseId = this.dataset.courseId;
+    
+    // Only allow drops within the same course
+    if (draggedCourseId !== targetCourseId) return;
+    
+    // Move the chip to the new zone
+    this.appendChild(draggedChip);
+    
+    // Update the member counts
+    updateMemberCounts(targetCourseId);
+    
+    // Show unsaved changes indicator
+    markMenuAsUnsaved();
+  }
+
+  function updateMemberCounts(courseId) {
+    const dropZones = document.querySelectorAll(`.member-drop-zone[data-course-id="${courseId}"]`);
+    dropZones.forEach(zone => {
+      const count = zone.querySelectorAll('.member-chip').length;
+      const panel = zone.closest('.option-selection-panel');
+      if (panel) {
+        const countSpan = panel.querySelector('.member-count');
+        if (countSpan) {
+          countSpan.textContent = `${count} selected`;
+        }
+      }
+    });
+  }
+
+  function markMenuAsUnsaved() {
+    const saveBtn = document.getElementById('saveMenuChoicesBtn');
+    if (saveBtn && !saveBtn.classList.contains('unsaved')) {
+      saveBtn.classList.add('unsaved');
+      saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Menu Selections *';
+    }
+  }
+
+  // Save all menu choices
+  async function saveAllMenuChoices() {
+    const saveBtn = document.getElementById('saveMenuChoicesBtn');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    }
+
+    try {
+      // Build choices from current DOM state
+      const partyChoices = {};
+      
+      // Find all member chips and their current positions
+      document.querySelectorAll('.member-chip').forEach(chip => {
+        const memberId = chip.dataset.memberId;
+        const dropZone = chip.closest('.member-drop-zone');
+        
+        if (!dropZone) return;
+        
+        const optionId = dropZone.dataset.optionId;
+        const courseId = dropZone.dataset.courseId;
+        
+        if (!partyChoices[memberId]) {
+          partyChoices[memberId] = {
+            partyGuestId: memberId,
+            choices: []
+          };
+        }
+        
+        // Check if we already have a choice for this course
+        const existingChoice = partyChoices[memberId].choices.find(c => c.courseId === courseId);
+        if (!existingChoice) {
+          partyChoices[memberId].choices.push({
+            courseId: courseId,
+            optionId: optionId
+          });
+        }
+      });
+
+      // Convert to array format expected by API
+      const choicesArray = Object.values(partyChoices);
+
+      // Send to server
+      const response = await fetch('/api/guest/menu-choices', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ choices: choicesArray })
+      });
+
+      if (response.ok) {
+        showToast('Menu selections saved successfully!', 'success');
+        if (saveBtn) {
+          saveBtn.classList.remove('unsaved');
+          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Menu Selections';
+        }
+      } else {
+        const data = await response.json();
+        showToast(data.error || 'Error saving menu selections', 'error');
+      }
+    } catch (err) {
+      console.error('Error saving menu choices:', err);
+      showToast('Error saving menu selections', 'error');
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        if (!saveBtn.classList.contains('unsaved')) {
+          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Menu Selections';
+        }
+      }
+    }
+  }
+
+  // Make loadMenuSelections globally accessible for retry button
+  window.loadMenuSelections = loadMenuSelections;
 
   // Save menu selection function
   window.saveMenuSelection = async (partyGuestId, courseId, optionId) => {

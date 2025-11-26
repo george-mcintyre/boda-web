@@ -20,7 +20,7 @@ function formatMenuCourseForApi(menuPart, index) {
   };
 }
 
-// Admin: list courses with options (for admin interface)
+// List courses with options (for both admin and guest interfaces)
 async function listCourses(req, res, next) {
   try {
     const courses = await Course.find({}).sort({ course: 1, createdAt: 1 });
@@ -35,7 +35,13 @@ async function listCourses(req, res, next) {
         id: course._id.toString(),
         course: course.course,
         label: course.label,
-        options: options.map(option => formatCourseOptionForApi(option))
+        selectionRequired: course.selectionRequired !== undefined ? course.selectionRequired : true,
+        options: options.map(option => {
+          const formattedOption = formatCourseOptionForApi(option);
+          // Ensure dietary icons are generated
+          formattedOption.dietaryIcons = generateDietaryIconsHTML(option);
+          return formattedOption;
+        })
       });
     }
     
