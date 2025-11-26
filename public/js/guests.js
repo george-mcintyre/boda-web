@@ -644,6 +644,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
       
+      // Helper to escape HTML to prevent injection
+      const escapeHtml = (str) => {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      };
+      
       // Date/time formatting helpers
       const formatEventDate = (dateString) => {
         if (!dateString) return '';
@@ -692,10 +703,168 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Track events with coordinates for map initialization
       const mapsToInitialize = [];
       
-      // Build HTML output
+      // Build HTML for a single event card
+      const buildEventCard = (event) => {
+        const eventId = event.id;
+        const mapContainerId = `event-map-${eventId}`;
+        const hasLocation = event.locationLatitude && event.locationLongitude;
+        
+        // Track for map initialization
+        if (hasLocation) {
+          mapsToInitialize.push({
+            containerId: mapContainerId,
+            lat: event.locationLatitude,
+            lng: event.locationLongitude
+          });
+        }
+        
+        // Build sub-events HTML
+        let subEventsHtml = '';
+        if (Array.isArray(event.sub_events) && event.sub_events.length > 0) {
+          const subEventItems = event.sub_events.map(subEvent => `
+            <div class="sub-event-item">
+              <div class="sub-event-icon">
+                <i class="fas ${getIconClass(subEvent.icon)}"></i>
+              </div>
+              <div class="sub-event-info">
+                <span class="sub-event-name">${escapeHtml(subEvent.name)}</span>
+                <span class="sub-event-time">${formatEventTime(subEvent.date)}${subEvent.end ? ' - ' + formatEventTime(subEvent.end) : ''}</span>
+                ${subEvent.description ? `<p class="sub-event-description">${escapeHtml(subEvent.description)}</p>` : ''}
+              </div>
+            </div>
+          `).join('');
+          
+          subEventsHtml = `
+            <div class="sub-events">
+              <h5 class="sub-events-title">
+                <i class="fas fa-list-ul"></i>
+                Schedule
+              </h5>
+              <div class="sub-events-list">
+                ${subEventItems}
+              </div>
+            </div>
+          `;
+        }
+        
+        // Build attendance HTML
+        let attendanceItemsHtml = '';
+        if (Array.isArray(partyMembers) && partyMembers.length > 0) {
+          attendanceItemsHtml = partyMembers.map(member => {
+            const isAttending = attendanceLookup[member.id] ? attendanceLookup[member.id][eventId] === true : false;
+            return `
+              <div class="attendance-item">
+                <label class="attendance-label">
+                  <input type="checkbox" class="attendance-checkbox" data-event-id="${eventId}" data-member-id="${member.id}" ${isAttending ? 'checked' : ''}>
+                  <span class="member-name">${escapeHtml(member.name)}</span>
+                  ${member.primary ? '<span class="primary-badge">Primary</span>' : ''}
+                  ${member.adult === false ? '<span class="child-badge">Child</span>' : ''}
+                </label>
+              </div>
+            `;
+          }).join('');
+        } else {
+          attendanceItemsHtml = '<p class="no-members">No party members found.</p>';
+        }
+        
+        // Build location HTML
+        let locationHtml = '';
+        if (event.locationAddress || event.location) {
+          const mapLinkHtml = hasLocation ? `
+            <a href="https://www.google.com/maps?q=${event.locationLatitude},${event.locationLongitude}" target="_blank" class="map-link" title="Open in Google Maps">
+              <i class="fas fa-external-link-alt"></i>
+            </a>
+          ` : '';
+          
+          locationHtml = `
+            <div class="event-location">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>${escapeHtml(event.locationAddress || event.location)}</span>
+              ${mapLinkHtml}
+            </div>
+          `;
+        }
+        
+        // Build map HTML
+        let mapHtml = '';
+        if (hasLocation) {
+          mapHtml = `
+            <div class="event-map-container">
+              <div id="${mapContainerId}" class="event-map"></div>
+              <div class="map-coordinates">
+                <span>${parseFloat(event.locationLatitude).toFixed(4)}, ${parseFloat(event.locationLongitude).toFixed(4)}</span>
+                <a href="https://www.openstreetmap.org/?mlat=${event.locationLatitude}&mlon=${event.locationLongitude}#map=16/${event.locationLatitude}/${event.locationLongitude}" target="_blank" class="osm-link">View Larger Map</a>
+              </div>
+            </div>
+          `;
+        }
+        
+        // Build description HTML
+        let descriptionHtml = '';
+        if (event.description) {
+          descriptionHtml = `
+            <div class="event-description">
+              <p>${escapeHtml(event.description)}</p>
+            </div>
+          `;
+        }
+        
+        // Build image HTML
+        let imageHtml = '';
+        if (event.image) {
+          imageHtml = `
+            <div class="event-image">
+              <img src="${event.image}" alt="${escapeHtml(event.name)}" onerror="this.parentElement.style.display='none';">
+            </div>
+          `;
+        }
+        
+        // Build event name subtitle HTML
+        let eventNameHtml = '';
+        if (event.title && event.name !== event.title) {
+          eventNameHtml = `<p class="event-name">${escapeHtml(event.name)}</p>`;
+        }
+        
+        // Assemble the complete event card
+        return `
+          <div class="event-card" data-event-id="${eventId}">
+            <div class="event-card-header">
+              ${imageHtml}
+              <div class="event-header-content">
+                <h4 class="event-title">${escapeHtml(event.title || event.name)}</h4>
+                ${eventNameHtml}
+              </div>
+            </div>
+            <div class="event-details">
+              <div class="event-time">
+                <i class="fas fa-clock"></i>
+                <span>${formatEventTime(event.date)}${event.end ? ' - ' + formatEventTime(event.end) : ''}</span>
+              </div>
+              ${locationHtml}
+              ${mapHtml}
+              ${descriptionHtml}
+            </div>
+            ${subEventsHtml}
+            <div class="event-attendance">
+              <h5 class="attendance-title">
+                <i class="fas fa-users"></i>
+                Who's Attending?
+              </h5>
+              <div class="attendance-list">
+                ${attendanceItemsHtml}
+              </div>
+            </div>
+          </div>
+        `;
+      };
+      
+      // Build complete HTML output
       let html = '<div class="events-container">';
       
       Object.entries(eventsByDate).forEach(([dateKey, dateEvents]) => {
+        // Build all event cards for this date
+        const eventCardsHtml = dateEvents.map(event => buildEventCard(event)).join('');
+        
         html += `
           <div class="event-day">
             <h3 class="day-title">
@@ -703,146 +872,10 @@ document.addEventListener('DOMContentLoaded', async () => {
               ${dateKey}
             </h3>
             <div class="day-events">
-        `;
-        
-        dateEvents.forEach(event => {
-          const eventId = event.id;
-          const mapContainerId = `event-map-${eventId}`;
-          const hasLocation = event.locationLatitude && event.locationLongitude;
-          
-          // Track for map initialization
-          if (hasLocation) {
-            mapsToInitialize.push({
-              containerId: mapContainerId,
-              lat: event.locationLatitude,
-              lng: event.locationLongitude
-            });
-          }
-          
-          // Build event card
-          html += `
-            <div class="event-card" data-event-id="${eventId}">
-              <!-- Event Header -->
-              <div class="event-card-header">
-                ${event.image ? `
-                  <div class="event-image">
-                    <img src="${event.image}" alt="${event.name}" onerror="this.parentElement.style.display='none';">
-                  </div>
-                ` : ''}
-                <div class="event-header-content">
-                  <h4 class="event-title">${event.title || event.name}</h4>
-                  ${event.title && event.name !== event.title ? `<p class="event-name">${event.name}</p>` : ''}
-                </div>
-              </div>
-              
-              <!-- Event Details -->
-              <div class="event-details">
-                <div class="event-time">
-                  <i class="fas fa-clock"></i>
-                  <span>${formatEventTime(event.date)}${event.end ? ' - ' + formatEventTime(event.end) : ''}</span>
-                </div>
-                
-                ${event.locationAddress || event.location ? `
-                  <div class="event-location">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <span>${event.locationAddress || event.location}</span>
-                    ${hasLocation ? `
-                      <a href="https://www.google.com/maps?q=${event.locationLatitude},${event.locationLongitude}"
-                         target="_blank"
-                         class="map-link"
-                         title="Open in Google Maps">
-                        <i class="fas fa-external-link-alt"></i>
-                      </a>
-                    ` : ''}
-                  </div>
-                ` : ''}
-                
-                ${hasLocation ? `
-                  <div class="event-map-container">
-                    <div id="${mapContainerId}" class="event-map"></div>
-                    <div class="map-coordinates">
-                      <span>${parseFloat(event.locationLatitude).toFixed(4)}, ${parseFloat(event.locationLongitude).toFixed(4)}</span>
-                      <a href="https://www.openstreetmap.org/?mlat=${event.locationLatitude}&mlon=${event.locationLongitude}#map=16/${event.locationLatitude}/${event.locationLongitude}"
-                         target="_blank"
-                         class="osm-link">
-                        View Larger Map
-                      </a>
-                    </div>
-                  </div>
-                ` : ''}
-                
-                ${event.description ? `
-                  <div class="event-description">
-                    <p>${event.description}</p>
-                  </div>
-                ` : ''}
-              </div>
-              
-              <!-- Sub-Events Schedule -->
-              ${Array.isArray(event.sub_events) && event.sub_events.length > 0 ? `
-                <div class="sub-events">
-                  <h5 class="sub-events-title">
-                    <i class="fas fa-list-ul"></i>
-                    Schedule
-                  </h5>
-                  <div class="sub-events-list">
-                    ${event.sub_events.map(subEvent => `
-                      <div class="sub-event-item">
-                        <div class="sub-event-icon">
-                          <i class="fas ${getIconClass(subEvent.icon)}"></i>
-                        </div>
-                        <div class="sub-event-info">
-                          <span class="sub-event-name">${subEvent.name}</span>
-                          <span class="sub-event-time">
-                            ${formatEventTime(subEvent.date)}${subEvent.end ? ' - ' + formatEventTime(subEvent.end) : ''}
-                          </span>
-                          ${subEvent.description ? `<p class="sub-event-description">${subEvent.description}</p>` : ''}
-                        </div>
-                      </div>
-                    `).join('')}
-                  </div>
-                </div>
-              ` : ''}
-              
-              <!-- Party Member Attendance -->
-              <div class="event-attendance">
-                <h5 class="attendance-title">
-                  <i class="fas fa-users"></i>
-                  Who's Attending?
-                </h5>
-                <div class="attendance-list">
-                  ${Array.isArray(partyMembers) && partyMembers.length > 0 ?
-                    partyMembers.map(member => {
-                      // Check if this member is attending this event
-                      const isAttending = attendanceLookup[member.id]
-                        ? attendanceLookup[member.id][eventId] === true
-                        : false;
-                      
-                      return `
-                        <div class="attendance-item">
-                          <label class="attendance-label">
-                            <input
-                              type="checkbox"
-                              class="attendance-checkbox"
-                              data-event-id="${eventId}"
-                              data-member-id="${member.id}"
-                              ${isAttending ? 'checked' : ''}
-                            >
-                            <span class="member-name">${member.name}</span>
-                            ${member.primary ? '<span class="primary-badge">Primary</span>' : ''}
-                            ${member.adult === false ? '<span class="child-badge">Child</span>' : ''}
-                          </label>
-                        </div>
-                      `;
-                    }).join('')
-                  : '<p class="no-members">No party members found.</p>'}
-                </div>
-              </div>
+              ${eventCardsHtml}
             </div>
-          `;
-        });
-        
-        html += '</div></div>'; // Close day-events and event-day
+          </div>
+        `;
       });
       
       // Save button
