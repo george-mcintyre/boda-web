@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "server/server.js",
+      "src": "server/vercel-handler.js",
       "use": "@vercel/node",
       "config": {
         "maxDuration": 30
@@ -16,7 +16,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "server/server.js"
+      "dest": "server/vercel-handler.js"
     },
     {
       "src": "/assets/(.*)",
@@ -28,7 +28,7 @@
     },
     {
       "src": "/",
-      "dest": "server/server.js"
+      "dest": "server/vercel-handler.js"
     },
     {
       "src": "/(.*\\.html)",
