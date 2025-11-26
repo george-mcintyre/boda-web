@@ -1,5 +1,7 @@
 const guestService = require('../services/guestService');
 const { Guest, Gift, GiftChoice } = require('../models');
+const stripe = require('../config/stripe');
+const { APP_URL } = require('../config/env');
 
 async function getMe(req, res, next) {
   try {
@@ -171,7 +173,8 @@ async function bulkUpload(req, res, next) {
 // ========== Guest Gift Functions ==========
 async function getGifts(req, res, next) {
   try {
-    const gifts = await Gift.find({ enabled: true }).sort({ createdAt: -1 }).lean();
+    // Sort by amount (price) ascending as per requirements
+    const gifts = await Gift.find({ enabled: true }).sort({ amount: 1 }).lean();
     
     // Get purchase counts for each gift
     const giftIds = gifts.map(gift => gift._id);
@@ -186,18 +189,36 @@ async function getGifts(req, res, next) {
       purchaseCountMap[item._id.toString()] = item.count;
     });
     
-    const items = gifts.map(gift => ({
-      id: gift._id.toString(),
-      name: gift.title, // Using 'name' as per requirements, but keeping 'title' for compatibility
-      title: gift.title,
-      description: gift.description,
-      amount: gift.amount,
-      available: gift.available,
-      purchased: purchaseCountMap[gift._id.toString()] || 0,
-      image: gift.image,
-      imageUrl: `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`,
-      priceDisplay: `€${gift.amount}`
-    }));
+    const items = gifts.map(gift => {
+      const purchased = purchaseCountMap[gift._id.toString()] || 0;
+      const stock = gift.available - purchased;
+      
+      // Generate image URL - gift.image could be an ObjectId reference or a number
+      let imageUrl;
+      if (typeof gift.image === 'number') {
+        imageUrl = `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`;
+      } else if (gift.image) {
+        // ObjectId reference - use the gift image endpoint
+        imageUrl = `/api/admin/gifts/${gift._id}/image`;
+      } else {
+        // Default fallback image
+        imageUrl = `/assets/images/gift-cards/image_01.jpg`;
+      }
+      
+      return {
+        id: gift._id.toString(),
+        name: gift.title,
+        title: gift.title,
+        description: gift.description,
+        amount: gift.amount,
+        available: gift.available,
+        purchased: purchased,
+        stock: stock,
+        image: gift.image,
+        imageUrl: imageUrl,
+        priceDisplay: `€${gift.amount}`
+      };
+    });
     res.json(items);
   } catch (e) { next(e); }
 }
@@ -208,15 +229,34 @@ async function getGiftChoices(req, res, next) {
     if (!me) return res.status(404).json({ error: 'Guest not found' });
 
     const giftChoices = await GiftChoice.find({ guestId: me._id })
-      .populate('giftId', 'title amount')
+      .populate('giftId', 'title amount description image')
       .sort({ date: -1 })
       .lean();
 
-    const items = giftChoices.map(choice => ({
-      giftId: choice.giftId._id.toString(),
-      date: choice.date.toISOString(),
-      message: choice.message
-    }));
+    const items = giftChoices.map(choice => {
+      const gift = choice.giftId;
+      
+      // Generate image URL for the gift
+      let imageUrl;
+      if (gift && typeof gift.image === 'number') {
+        imageUrl = `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`;
+      } else if (gift && gift.image) {
+        imageUrl = `/api/admin/gifts/${gift._id}/image`;
+      } else {
+        imageUrl = `/assets/images/gift-cards/image_01.jpg`;
+      }
+      
+      return {
+        id: choice._id.toString(),
+        giftId: gift ? gift._id.toString() : null,
+        giftTitle: gift ? gift.title : 'Unknown Gift',
+        giftAmount: gift ? gift.amount : 0,
+        giftDescription: gift ? gift.description : '',
+        giftImageUrl: imageUrl,
+        date: choice.date.toISOString(),
+        message: choice.message
+      };
+    });
 
     res.json(items);
   } catch (e) { next(e); }
@@ -229,38 +269,113 @@ async function createPaymentSession(req, res, next) {
     if (!me) return res.status(404).json({ error: 'Guest not found' });
 
     const gift = await Gift.findById(giftId);
-    if (!gift || !gift.enabled || gift.available <= 0) {
+    if (!gift || !gift.enabled) {
       return res.status(404).json({ error: 'Gift not found or not available' });
     }
+    
+    // Check stock availability
+    const purchaseCount = await GiftChoice.countDocuments({ giftId: gift._id });
+    const stock = gift.available - purchaseCount;
+    if (stock <= 0) {
+      return res.status(400).json({ error: 'Gift is out of stock' });
+    }
 
-    // Create a record of the gift choice (pending payment)
-    const giftChoice = await GiftChoice.create({
-      giftId: gift._id,
-      guestId: me._id,
-      message: message || null
+    // Determine base URL for redirects
+    const baseUrl = APP_URL || `${req.protocol}://${req.get('host')}`;
+    
+    // Create Stripe checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: gift.title,
+              description: gift.description || `Wedding gift: ${gift.title}`,
+            },
+            unit_amount: gift.amount * 100, // Stripe uses cents
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${baseUrl}/guests.html?tab=gifts&payment=success&giftId=${giftId}`,
+      cancel_url: `${baseUrl}/guests.html?tab=gifts&payment=cancelled`,
+      metadata: {
+        giftId: giftId,
+        guestId: me._id.toString(),
+        guestEmail: me.email,
+        guestName: me.name,
+        message: message || ''
+      },
+      customer_email: me.email,
     });
 
-    // TODO: Implement Stripe integration
-    // For now, return a mock checkout URL
-    const checkoutUrl = `https://checkout.stripe.com/pay/mock_session_${giftChoice._id}`;
-    
-    res.json({ checkoutUrl });
-  } catch (e) { next(e); }
+    res.json({ checkoutUrl: session.url, sessionId: session.id });
+  } catch (e) {
+    console.error('Stripe session creation error:', e);
+    next(e);
+  }
 }
 
-module.exports = { 
-  getMe, 
-  getParty, 
-  updateParty, 
-  getPartyByGuestId, 
+// Stripe webhook handler for payment confirmation
+async function handleStripeWebhook(req, res) {
+  const sig = req.headers['stripe-signature'];
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  let event;
+
+  try {
+    if (endpointSecret) {
+      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    } else {
+      // For development without webhook secret
+      event = req.body;
+    }
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle the checkout.session.completed event
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    
+    try {
+      const { giftId, guestId, message } = session.metadata;
+      
+      // Create the gift choice record
+      await GiftChoice.create({
+        giftId: giftId,
+        guestId: guestId,
+        message: message || null,
+        date: new Date()
+      });
+      
+      console.log(`Gift choice created for guest ${guestId}, gift ${giftId}`);
+    } catch (err) {
+      console.error('Error creating gift choice after payment:', err);
+    }
+  }
+
+  res.json({ received: true });
+}
+
+module.exports = {
+  getMe,
+  getParty,
+  updateParty,
+  getPartyByGuestId,
   updatePartyByGuestId,
   getById,
-  list, 
-  create, 
-  update, 
+  list,
+  create,
+  update,
   remove,
   bulkUpload,
   getGifts,
   getGiftChoices,
-  createPaymentSession
+  createPaymentSession,
+  handleStripeWebhook
 };

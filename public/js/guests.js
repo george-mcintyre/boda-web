@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadMenuSelections() {
     console.log('Loading menu selections...');
     const menuContent = document.getElementById('menuContent');
-    
+
     if (!menuContent) return;
     
     // Show loading state
@@ -871,14 +871,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadMessages() {
   }
 
-  // Load gifts content
-  async function loadGiftsContent() {
-  }
-
-  // Load messages content
-  async function loadMessagesContent() {
-  }
-
    // Helper function to initialize a map for an event
    function initEventMap(mapContainerId, lat, lng) {
      try {
@@ -940,7 +932,7 @@ document.addEventListener('DOMContentLoaded', async () => {
    * Creates event cards with attendance checkboxes for each party member
    */
   async function loadEventsContent() {
-    const eventsContent = document.getElementById('agendaContent');
+    const eventsContent = document.getElementById('eventsContent');
     
     if (!eventsContent) {
       console.error('Events content container not found');
@@ -1407,71 +1399,161 @@ document.addEventListener('DOMContentLoaded', async () => {
    };
 
    // Function to load the gifts content in the gifts tab
-   async function loadGiftsContent() {
-     const regalosContent = document.getElementById('regalosContent');
+  async function loadGiftsContent() {
+     console.log("loading gifts content");
+     const giftsContent = document.getElementById('giftsContent');
+     
+     if (!giftsContent) {
+       console.error('Gifts content container not found');
+       return;
+     }
+     
+     // Show loading state
+     giftsContent.innerHTML = `
+       <div class="loading-gifts">
+         <i class="fas fa-spinner fa-spin fa-3x"></i>
+         <p>Loading gifts...</p>
+       </div>
+     `;
      
      try {
-       const regalosRes = await fetch('/api/invitado/regalos', {
-         headers: { 'Authorization': token }
-       });
-       const regalos = await regalosRes.json();
+       // Fetch gift choices (donations) and available gifts in parallel
+       const [giftChoicesRes, giftsRes] = await Promise.all([
+         fetch('/api/guest/gift-choices', {
+           method: 'GET',
+           headers: { 'Authorization': token }
+         }),
+         fetch('/api/guest/gifts', {
+           method: 'GET',
+           headers: { 'Authorization': token }
+         })
+       ]);
        
-       if (regalosRes.ok && Array.isArray(regalos)) {
-         let regalosHTML = '<div class="gift-grid">';
+       let giftChoices = [];
+       let gifts = [];
+       
+       if (giftChoicesRes.ok) {
+         giftChoices = await giftChoicesRes.json();
+       }
+       
+       if (!giftsRes.ok) {
+         throw new Error('Failed to load gifts');
+       }
+       gifts = await giftsRes.json();
+       
+       // Helper to escape HTML
+       const escapeHtml = (str) => {
+         if (!str) return '';
+         return String(str)
+           .replace(/&/g, '&amp;')
+           .replace(/</g, '&lt;')
+           .replace(/>/g, '&gt;')
+           .replace(/"/g, '&quot;')
+           .replace(/'/g, '&#039;');
+       };
+       
+       // Format date helper
+       const formatDate = (dateString) => {
+         if (!dateString) return '';
+         const date = new Date(dateString);
+         return date.toLocaleDateString('en-GB', {
+           day: 'numeric',
+           month: 'long',
+           year: 'numeric'
+         });
+       };
+       
+       let html = '<div class="gifts-container">';
+       
+       // ========== Section 1: Thank You Section (if there are donated gifts) ==========
+       if (giftChoices.length > 0) {
+         html += `
+           <div class="gifts-thank-you-section">
+             <div class="thank-you-header">
+               <i class="fas fa-heart"></i>
+               <h3>Thank You for Your Generosity!</h3>
+               <p>We are so grateful for your wonderful gifts</p>
+             </div>
+             <div class="donated-gifts-grid">
+         `;
          
-         regalos.forEach(regalo => {
-           const available = regalo.available - regalo.purchased;
-           const isAvailable = available > 0;
-           
-           // Helper function to get image URL
-           function getGiftImageUrl(gift) {
-             if (!gift.image) return null;
-             
-             // Handle different image formats
-             if (typeof gift.image === 'string') {
-               // Base64 data or ObjectId
-               if (gift.image.startsWith('data:')) {
-                 return gift.image; // Already base64 encoded
-               } else if (gift.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(gift.image)) {
-                 // ObjectId - use the image endpoint
-                 return `/api/admin/gifts/${gift.id}/image/thumbnail`;
-               } else {
-                 return gift.image; // Legacy URL
-               }
-             } else if (gift.image && gift.image.data) {
-               // Database-stored image with base64 data
-               return gift.image;
-             }
-             
-             return null;
-           };
-           
-           const imageUrl = getGiftImageUrl(regalo);
-           
-           regalosHTML += `
-             <div class="gift-card">
-               <div class="gift-card-image">
-                 <img src="${imageUrl || '/assets/images/placeholder-gift.jpg'}" alt="${regalo.name}" onerror="this.src='/assets/images/placeholder-gift.jpg';" />
-               </div>
-               <div class="gift-card-content">
-                 <h4>${regalo.name}</h4>
-                 <p class="gift-description">${regalo.description}</p>
-                 <div class="gift-details">
-                   <div class="gift-price">${regalo.priceDisplay}</div>
-                   <div class="gift-availability">
-                     <span class="available-count">${available} available</span>
-                     <span class="purchased-count">${regalo.purchased} purchased</span>
+         giftChoices.forEach(choice => {
+           html += `
+             <div class="donated-gift-card" style="background-image: url('${escapeHtml(choice.giftImageUrl)}');">
+               <div class="donated-gift-overlay">
+                 <div class="donated-gift-content">
+                   <h4 class="donated-gift-title">${escapeHtml(choice.giftTitle)}</h4>
+                   <div class="donated-gift-price">€${choice.giftAmount}</div>
+                   <div class="donated-gift-date">
+                     <i class="fas fa-calendar-check"></i>
+                     Donated on ${formatDate(choice.date)}
                    </div>
+                   ${choice.message ? `
+                     <div class="donated-gift-message">
+                       <i class="fas fa-quote-left"></i>
+                       ${escapeHtml(choice.message)}
+                     </div>
+                   ` : ''}
                  </div>
-                 <div class="gift-actions">
+               </div>
+             </div>
+           `;
+         });
+         
+         html += `
+             </div>
+           </div>
+         `;
+       }
+       
+       // ========== Section 2: Available Gifts Grid ==========
+       html += `
+         <div class="gifts-available-section">
+           <div class="available-gifts-header">
+             <i class="fas fa-gift"></i>
+             <h3>Gift Registry</h3>
+             <p>Choose from our carefully selected gifts</p>
+           </div>
+           <div class="gift-cards-grid">
+       `;
+       
+       if (gifts.length === 0) {
+         html += `
+           <div class="no-gifts-message">
+             <i class="fas fa-inbox"></i>
+             <h4>No gifts available</h4>
+             <p>Please check back later for our gift registry.</p>
+           </div>
+         `;
+       } else {
+         gifts.forEach(gift => {
+           const isAvailable = gift.stock > 0;
+           
+           html += `
+             <div class="gift-credit-card ${!isAvailable ? 'sold-out' : ''}" data-gift-id="${gift.id}">
+               <div class="gift-card-image-section" style="background-image: url('${escapeHtml(gift.imageUrl)}');">
+                 <div class="gift-card-image-overlay">
+                   <h4 class="gift-card-title">${escapeHtml(gift.title)}</h4>
+                   <div class="gift-card-price">${escapeHtml(gift.priceDisplay)}</div>
+                 </div>
+               </div>
+               <div class="gift-card-details">
+                 <p class="gift-card-description">${escapeHtml(gift.description)}</p>
+                 <div class="gift-card-stock">
+                   ${isAvailable
+                     ? `<span class="stock-available"><i class="fas fa-check-circle"></i> ${gift.stock} in stock</span>`
+                     : `<span class="stock-sold-out"><i class="fas fa-times-circle"></i> Sold Out</span>`
+                   }
+                 </div>
+                 <div class="gift-card-actions">
                    ${isAvailable ? `
-                     <button onclick="comprarRegalo('${regalo.id}')" class="btn-buy-gift">
-                       <i class="fas fa-gift"></i>
-                       Purchase Gift
+                     <button class="btn-buy-gift" onclick="purchaseGift('${gift.id}', '${escapeHtml(gift.title).replace(/'/g, "\\'")}', ${gift.amount})">
+                       <i class="fas fa-credit-card"></i>
+                       Buy Gift
                      </button>
                    ` : `
-                     <button disabled class="btn-disabled">
-                       <i class="fas fa-times"></i>
+                     <button class="btn-sold-out" disabled>
+                       <i class="fas fa-ban"></i>
                        Sold Out
                      </button>
                    `}
@@ -1480,17 +1562,139 @@ document.addEventListener('DOMContentLoaded', async () => {
              </div>
            `;
          });
-         
-         regalosHTML += '</div>';
-         regalosContent.innerHTML = regalosHTML;
-         
-       } else {
-         regalosContent.innerHTML = '<p class="error">Error al cargar la lista de regalos.</p>';
        }
+       
+       html += `
+           </div>
+         </div>
+       `;
+       
+       html += '</div>'; // Close gifts-container
+       
+       giftsContent.innerHTML = html;
+       
+       // Check for payment success/cancel in URL
+       const urlParams = new URLSearchParams(window.location.search);
+       const paymentStatus = urlParams.get('payment');
+       if (paymentStatus === 'success') {
+         showToast('Thank you for your gift! Your payment was successful.', 'success');
+         // Clean up URL
+         window.history.replaceState({}, document.title, window.location.pathname);
+         // Reload to show updated gift choices
+         setTimeout(() => loadGiftsContent(), 1000);
+       } else if (paymentStatus === 'cancelled') {
+         showToast('Payment was cancelled.', 'error');
+         // Clean up URL
+         window.history.replaceState({}, document.title, window.location.pathname);
+       }
+       
      } catch (err) {
-       regalosContent.innerHTML = '<p class="error">Error de conexión al cargar la lista de regalos.</p>';
+       console.error('Error loading gifts:', err);
+       giftsContent.innerHTML = `
+         <div class="error-message">
+           <i class="fas fa-exclamation-triangle"></i>
+           <h3>Error Loading Gifts</h3>
+           <p>There was a problem loading the gifts. Please try again.</p>
+           <button class="btn-retry" onclick="loadGiftsContent()">
+             <i class="fas fa-redo"></i>
+             Retry
+           </button>
+         </div>
+       `;
      }
    }
+   
+   // Make loadGiftsContent globally accessible
+   window.loadGiftsContent = loadGiftsContent;
+   
+   // Global function to purchase a gift
+   window.purchaseGift = async (giftId, giftTitle, giftAmount) => {
+     // Show a confirmation dialog with optional message
+     const overlay = document.createElement('div');
+     overlay.className = 'gift-purchase-overlay';
+     overlay.innerHTML = `
+       <div class="gift-purchase-dialog">
+         <div class="gift-purchase-header">
+           <i class="fas fa-gift"></i>
+           <h3>Purchase Gift</h3>
+         </div>
+         <div class="gift-purchase-content">
+           <p>You're about to purchase:</p>
+           <div class="gift-purchase-summary">
+             <strong>${giftTitle}</strong>
+             <span class="gift-purchase-amount">€${giftAmount}</span>
+           </div>
+           <div class="gift-message-input">
+             <label for="giftMessage">Add a personal message (optional):</label>
+             <textarea id="giftMessage" placeholder="Leave a lovely message for the couple..." rows="3"></textarea>
+           </div>
+         </div>
+         <div class="gift-purchase-actions">
+           <button class="btn-cancel-purchase">Cancel</button>
+           <button class="btn-confirm-purchase">
+             <i class="fas fa-credit-card"></i>
+             Proceed to Payment
+           </button>
+         </div>
+       </div>
+     `;
+     
+     document.body.appendChild(overlay);
+     setTimeout(() => overlay.classList.add('show'), 10);
+     
+     // Handle cancel
+     overlay.querySelector('.btn-cancel-purchase').addEventListener('click', () => {
+       overlay.classList.remove('show');
+       setTimeout(() => document.body.removeChild(overlay), 300);
+     });
+     
+     // Handle confirm
+     overlay.querySelector('.btn-confirm-purchase').addEventListener('click', async () => {
+       const message = document.getElementById('giftMessage').value.trim();
+       const confirmBtn = overlay.querySelector('.btn-confirm-purchase');
+       
+       // Show loading state
+       confirmBtn.disabled = true;
+       confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+       
+       try {
+         const response = await fetch('/api/guest/create-payment-session', {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+             'Authorization': token
+           },
+           body: JSON.stringify({ giftId, message })
+         });
+         
+         const data = await response.json();
+         
+         if (response.ok && data.checkoutUrl) {
+           // Redirect to Stripe checkout
+           window.location.href = data.checkoutUrl;
+         } else {
+           showToast(data.error || 'Error processing payment', 'error');
+           confirmBtn.disabled = false;
+           confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Payment';
+         }
+       } catch (err) {
+         console.error('Error creating payment session:', err);
+         showToast('Error connecting to payment service', 'error');
+         confirmBtn.disabled = false;
+         confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Payment';
+       }
+     });
+     
+     // Close on escape
+     const handleEscape = (e) => {
+       if (e.key === 'Escape') {
+         overlay.classList.remove('show');
+         setTimeout(() => document.body.removeChild(overlay), 300);
+         document.removeEventListener('keydown', handleEscape);
+       }
+     };
+     document.addEventListener('keydown', handleEscape);
+   };
 
    // Load messages content
    async function loadMessagesContent() {
@@ -1645,6 +1849,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   tabButtons.forEach(button => {
     button.addEventListener('click', () => {
       const targetTab = button.getAttribute('data-tab');
+      console.log("button Clicked: ", targetTab);
       
       //Remove active class from all buttons and contents
       tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -1655,28 +1860,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById(`${targetTab}-tab`).classList.add('active');
       
       // If the tab is menu, load the menu content
-      if (targetTab === 'menu') {
+      if (targetTab === 'menuContent') {
         loadMenuSelections();
       }
       
       // If the tab is events (RSVP), load the events content
-      if (targetTab === 'agenda') {
+      if (targetTab === 'eventsContent') {
         loadEventsContent();
       }
       
       // If the tab is gifts, load the gifts content
-      if (targetTab === 'gifts') {
+      if (targetTab === 'giftsContent') {
         loadGiftsContent();
       }
       
-      // If the tab is messages, load the messages content
-      if (targetTab === 'messages') {
-        loadMessagesContent();
-      }
-      
       // If the tab is summary, reload all the status data
-      if (targetTab === 'summary') {
+      if (targetTab === 'summaryContent') {
+        console.log("loading summary content");
         loadSummaryContent();
+        loadMessagesContent();
       }
 
     });

@@ -35,4 +35,8 @@ router.get('/gifts', auth('guest'), guestCtrl.getGifts);
 router.get('/gift-choices', auth('guest'), guestCtrl.getGiftChoices);
 router.post('/create-payment-session', auth('guest'), guestCtrl.createPaymentSession);
 
+// Stripe webhook (no auth - Stripe calls this directly)
+// Note: This needs raw body for signature verification, configured in app.js
+router.post('/stripe-webhook', guestCtrl.handleStripeWebhook);
+
 module.exports = router;

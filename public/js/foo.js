@@ -257,7 +257,7 @@
   
       // Función para recargar tarjetas cuando se cambie a la pestaña de efectivo
       function reloadCashGiftCards() {
-        const efectivoTab = document.querySelector('[data-tab="efectivo"]');
+        const efectivoTab = document.querySelector('[data-tab="gifts"]');
         if (efectivoTab) {
           efectivoTab.addEventListener('click', () => {
             // Recargar tarjetas cuando se haga clic en la pestaña de efectivo

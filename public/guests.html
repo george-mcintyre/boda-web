@@ -1759,7 +1759,7 @@
         </a>
         <button onclick="logoutGuest()" class="logout-btn">
           <i class="fas fa-sign-out-alt"></i>
-          <span data-i18n="guests:logout">Cerrar sesión</span>
+          <span data-i18n="guests:logout">Logout</span>
       </div>
     </div>
   </nav>
@@ -1768,43 +1768,43 @@
   <main class="main-content-full">
     <div class="tabs-container-full">
       <div class="tabs-header">
-        <button class="tab-btn active" data-tab="summary">
+        <button class="tab-btn active" data-tab="summaryContent">
           <i class="fas fa-chart-bar"></i>
-          <span data-i18n="guests:tabSummary">Resumen</span>
+          <span data-i18n="guests:tabSummary">Summary</span>
         </button>
-        <button class="tab-btn" data-tab="agenda">
+        <button class="tab-btn" data-tab="eventsContent">
           <i class="fas fa-calendar-alt"></i>
           <span data-i18n="guests:tabRSVP">RSVP</span>
         </button>
-        <button class="tab-btn" data-tab="menu">
+        <button class="tab-btn" data-tab="menuContent">
           <i class="fas fa-utensils"></i>
-          <span data-i18n="guests:tabMenu">Menú</span>
+          <span data-i18n="guests:tabMenu">Menu</span>
         </button>
-        <button class="tab-btn" data-tab="efectivo">
+        <button class="tab-btn" data-tab="giftsContent">
           <i class="fas fa-money-bill-wave"></i>
-          <span data-i18n="guests:tabCash">Regalos</span>
+          <span data-i18n="guests:tabCash">Gifts</span>
         </button>
       </div>
       
       <!-- Content of the Summary tab -->
-      <div id="summary-tab" class="tab-content active">
+      <div id="summaryContent-tab" class="tab-content active">
         <div class="summary-grid">
           <!-- RSVP Summary Section -->
-          <section id="infoAgenda" class="summary-card">
+          <section id="summaryContent" class="summary-card">
             <h2><i class="fas fa-calendar-alt"></i> <span data-i18n="guests:eventRSVP">RSVP</span></h2>
             <p class="section-description" data-i18n="guests:eventRSVPSummary">
-              Tus confirmaciones de asistencia a los eventos de nuestra boda.
+              Your attendance confirmations for our wedding events.
             </p>
-            <div id="agendaStatus" class="agenda-status">
-              <div id="agendaStatusContent"></div>
+            <div id="eventsStatus" class="events-status">
+              <div id="eventsStatusContent"></div>
             </div>
           </section>
           
           <!-- Comments Card Section -->
           <section class="summary-card comments-card">
             <div class="comments-header">
-              <h2><i class="fas fa-comments"></i> <span data-i18n="guests:commentsTitle">Comentarios</span></h2>
-              <p class="comments-subtitle" data-i18n="guests:commentsSubtitle">Comparte tus pensamientos con otros guests</p>
+              <h2><i class="fas fa-comments"></i> <span data-i18n="guests:commentsTitle">Comments</span></h2>
+              <p class="comments-subtitle" data-i18n="guests:commentsSubtitle">Share your thoughts with other guests</p>
             </div>
             
             <!-- New comment form -->
@@ -1814,7 +1814,7 @@
                   <textarea
                     id="newComment"
                     name="comment"
-                    placeholder="Escribe tu comentario..."
+                    placeholder="Write your comment..."
                     rows="3"
                     maxlength="500"
                     data-i18n-placeholder="guests:commentPlaceholder"
@@ -1826,7 +1826,7 @@
                   </div>
                   <button type="submit" class="comment-submit-btn">
                     <i class="fas fa-paper-plane"></i>
-                    <span data-i18n="guests:postComment">Publicar</span>
+                    <span data-i18n="guests:postComment">Post</span>
                   </button>
                 </div>
               </form>
@@ -1837,7 +1837,7 @@
               <!-- Comments will be loaded dynamically here -->
               <div class="loading-comments">
                 <i class="fas fa-spinner fa-spin"></i>
-                <span data-i18n="guests:loadingComments">Cargando comentarios...</span>
+                <span data-i18n="guests:loadingComments">Loading comments...</span>
               </div>
             </div>
           </section>
@@ -1845,31 +1845,31 @@
       </div>
       
       <!-- Content of the Menu tab -->
-      <div id="menu-tab" class="tab-content">
-        <section id="infoMenu">
+      <div id="menuContent-tab" class="tab-content">
+        <section id="menuContent">
           <h2><i class="fas fa-utensils"></i> <span data-i18n="guests:menuSelection">Menu Selection</span></h2>
           <p class="section-description" data-i18n="guests:menuSelectionDesc2">
-            Choose your favorite dishes for our wedding.
+            Choose your favorite dishes for our wedding celebrations.
           </p>
           <div id="menuContent"></div>
         </section>
       </div>
       
       <!-- Content of the RSVP tab -->
-      <div id="agenda-tab" class="tab-content">
-        <section id="infoAgendaFull">
-          <h2><i class="fas fa-calendar-alt"></i> <span data-i18n="guests:eventRSVP">RSVP</span></h2>
-          <p class="section-description" data-i18n="guests:eventRSVPDesc">
+      <div id="eventsContent-tab" class="tab-content">
+        <section id="eventsContent">
+          <h2><i class="fas fa-calendar-alt"></i> <span data-i18n="guests:eventsRSVP">RSVP</span></h2>
+          <p class="section-description" data-i18n="guests:eventsRSVPDesc">
             The celebrations will take place over three days: Friday, Saturday and Sunday. They kick off on Friday with a welcome dinner.   Saturday is a full day of activities including the wedding ceremony, the reception banquet, and dancing.   Sunday's activities include a farewell brunch.  Please confirm your attendance for which ever of these events you will be attending.
           </p>
-          <div id="agendaContent"></div>
+          <div id="eventsContent"></div>
         </section>
       </div>
       
       
       <!-- Content of the Gifts tab -->
-      <div id="efectivo-tab" class="tab-content">
-        <section id="infoEfectivo">
+      <div id="giftsContent-tab" class="tab-content">
+        <section id="giftsContent">
           <h2><i class="fas fa-money-bill-wave"></i> <span data-i18n="guests:cashGifts">Regalos en Efectivo</span></h2>
           <p class="section-description" data-i18n="guests:cashGiftsDesc">
             Si prefieres hacer un regalo en efectivo, puedes elegir una cantidad fija o personalizada. Tu generosidad nos ayudará a comenzar nuestra nueva vida juntos.
