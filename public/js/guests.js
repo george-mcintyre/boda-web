@@ -223,7 +223,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Iterate through courses in this group - each course gets its own card
         group.courses.forEach(course => {
-          const isSelectable = course.selectionRequired !== false;
+          const options = course.options || [];
+          // Course is not selectable if: explicitly marked as not required, OR only has one option
+          const isSelectable = course.selectionRequired !== false && options.length > 1;
           
           html += `
             <div class="menu-course-card" data-course-id="${course.id}" data-selectable="${isSelectable}">
@@ -235,7 +237,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           `;
 
           // Iterate through options in this course
-          const options = course.options || [];
           options.forEach((option, optionIndex) => {
             const imageUrl = getOptionImageUrl(option);
             
@@ -564,6 +565,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Find all member chips and their current positions (menu selections)
       document.querySelectorAll('.member-chip').forEach(chip => {
         const memberId = chip.dataset.memberId;
+        
+        // Skip invalid member IDs
+        if (!memberId || memberId === 'null' || memberId === 'undefined') {
+          console.warn('Skipping chip with invalid memberId:', memberId);
+          return;
+        }
+        
         const dropZone = chip.closest('.member-drop-zone');
         
         if (!dropZone) return;
@@ -594,6 +602,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.querySelectorAll('.special-request-card').forEach(card => {
         const memberId = card.dataset.memberId;
         
+        // Skip invalid member IDs
+        if (!memberId || memberId === 'null' || memberId === 'undefined') {
+          console.warn('Skipping special request card with invalid memberId:', memberId);
+          return;
+        }
+        
         if (!partyChoices[memberId]) {
           partyChoices[memberId] = {
             partyGuestId: memberId,
@@ -622,8 +636,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       });
 
-      // Convert to array format expected by API
-      const choicesArray = Object.values(partyChoices);
+      // Convert to array format expected by API, filtering out any with invalid IDs
+      const choicesArray = Object.values(partyChoices).filter(choice => {
+        const isValid = choice.partyGuestId &&
+                        choice.partyGuestId !== 'null' &&
+                        choice.partyGuestId !== 'undefined';
+        if (!isValid) {
+          console.warn('Filtering out invalid choice:', choice);
+        }
+        return isValid;
+      });
+      
+      // Log for debugging
+      console.log('Saving menu choices:', JSON.stringify({ choices: choicesArray }, null, 2));
 
       // Send to server
       const response = await fetch('/api/guest/menu-choices', {
