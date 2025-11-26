@@ -1659,7 +1659,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadMenuSelections();
       }
       
-      // If the tab is events, load the events content
+      // If the tab is events (RSVP), load the events content
       if (targetTab === 'agenda') {
         loadEventsContent();
       }
@@ -1681,6 +1681,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     });
   });
+
+  // Define loadSummaryContent function if not already defined
+  function loadSummaryContent() {
+    // Reload RSVP status
+    cargarStatusRSVP();
+  }
 
   // Load preferred language
   const savedLang = localStorage.getItem('i18nextLng');
