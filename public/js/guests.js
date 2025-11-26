@@ -221,14 +221,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="course-group-content">
         `;
 
-        // Iterate through courses in this group
+        // Iterate through courses in this group - each course gets its own card
         group.courses.forEach(course => {
           const isSelectable = course.selectionRequired !== false;
           
           html += `
-            <div class="menu-course-section" data-course-id="${course.id}" data-selectable="${isSelectable}">
-              <h4 class="course-section-title">${escapeHtml(course.label)}</h4>
-              <div class="course-options-list">
+            <div class="menu-course-card" data-course-id="${course.id}" data-selectable="${isSelectable}">
+              <div class="course-card-header">
+                <h4 class="course-card-title">${escapeHtml(course.label)}</h4>
+                ${isSelectable ? '<span class="selection-required-badge"><i class="fas fa-hand-pointer"></i> Selection Required</span>' : '<span class="info-only-badge"><i class="fas fa-info-circle"></i> Info Only</span>'}
+              </div>
+              <div class="course-card-content">
           `;
 
           // Iterate through options in this course
@@ -236,7 +239,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           options.forEach((option, optionIndex) => {
             const imageUrl = getOptionImageUrl(option);
             
-            // Determine which party members have selected this option
+            // Determine which party members have selected this option (only for selectable courses)
             let membersForOption = [];
             if (isSelectable) {
               partyData.forEach(member => {
@@ -311,6 +314,83 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         `;
       });
+
+      // Build special requests lookup from existing choices
+      const specialRequestsLookup = {};
+      menuChoicesData.forEach(memberChoice => {
+        specialRequestsLookup[memberChoice.partyGuestId] = {
+          specialRequest: memberChoice.specialRequest || [],
+          specialRequestDetail: memberChoice.specialRequestDetail || ''
+        };
+      });
+
+      // Add special dietary requests section
+      html += `
+        <div class="special-requests-section">
+          <div class="special-requests-header">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Dietary Requirements & Special Requests</h3>
+          </div>
+          <p class="special-requests-description">Please let us know about any dietary requirements or allergies for each guest.</p>
+          <div class="special-requests-cards">
+      `;
+
+      // Create a card for each party member
+      partyData.forEach(member => {
+        const memberRequests = specialRequestsLookup[member.id] || { specialRequest: [], specialRequestDetail: '' };
+        const selectedRequests = Array.isArray(memberRequests.specialRequest) ? memberRequests.specialRequest : [];
+        
+        const dietaryOptions = [
+          { name: 'vegetarian', label: 'Vegetarian', icon: 'fa-leaf' },
+          { name: 'lactose-intolerant', label: 'Lactose Intolerant', icon: 'fa-cheese' },
+          { name: 'gluten-intolerant', label: 'Gluten Intolerant', icon: 'fa-bread-slice' },
+          { name: 'nut-allergy', label: 'Nut Allergy', icon: 'fa-seedling' },
+          { name: 'other', label: 'Other', icon: 'fa-question-circle' }
+        ];
+
+        html += `
+          <div class="special-request-card" data-member-id="${member.id}">
+            <div class="special-request-card-header">
+              <i class="fas fa-user"></i>
+              <h4>${escapeHtml(member.name)}</h4>
+              ${member.primary ? '<span class="primary-badge">Primary</span>' : ''}
+            </div>
+            <div class="special-request-options">
+              ${dietaryOptions.map(opt => {
+                const isSelected = selectedRequests.some(r =>
+                  (typeof r === 'string' && r === opt.name) ||
+                  (typeof r === 'object' && r.name === opt.name && r.selected)
+                );
+                return `
+                  <label class="dietary-checkbox ${isSelected ? 'checked' : ''}">
+                    <input type="checkbox"
+                      name="dietary-${member.id}"
+                      value="${opt.name}"
+                      ${isSelected ? 'checked' : ''}
+                      onchange="updateDietaryCheckbox(this)">
+                    <i class="fas ${opt.icon}"></i>
+                    <span>${opt.label}</span>
+                  </label>
+                `;
+              }).join('')}
+            </div>
+            <div class="special-request-detail">
+              <label for="special-detail-${member.id}">Additional details or specific requirements:</label>
+              <textarea
+                id="special-detail-${member.id}"
+                name="special-detail-${member.id}"
+                placeholder="Please describe any specific dietary needs, allergies, or special requirements..."
+                rows="3"
+              >${escapeHtml(memberRequests.specialRequestDetail || '')}</textarea>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+          </div>
+        </div>
+      `;
 
       // Add save button
       html += `
@@ -456,6 +536,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Update dietary checkbox visual state
+  window.updateDietaryCheckbox = function(checkbox) {
+    const label = checkbox.closest('.dietary-checkbox');
+    if (label) {
+      if (checkbox.checked) {
+        label.classList.add('checked');
+      } else {
+        label.classList.remove('checked');
+      }
+    }
+    markMenuAsUnsaved();
+  };
+
   // Save all menu choices
   async function saveAllMenuChoices() {
     const saveBtn = document.getElementById('saveMenuChoicesBtn');
@@ -468,7 +561,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Build choices from current DOM state
       const partyChoices = {};
       
-      // Find all member chips and their current positions
+      // Find all member chips and their current positions (menu selections)
       document.querySelectorAll('.member-chip').forEach(chip => {
         const memberId = chip.dataset.memberId;
         const dropZone = chip.closest('.member-drop-zone');
@@ -481,7 +574,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!partyChoices[memberId]) {
           partyChoices[memberId] = {
             partyGuestId: memberId,
-            choices: []
+            choices: [],
+            specialRequest: [],
+            specialRequestDetail: null
           };
         }
         
@@ -492,6 +587,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             courseId: courseId,
             optionId: optionId
           });
+        }
+      });
+
+      // Collect special dietary requests for each member
+      document.querySelectorAll('.special-request-card').forEach(card => {
+        const memberId = card.dataset.memberId;
+        
+        if (!partyChoices[memberId]) {
+          partyChoices[memberId] = {
+            partyGuestId: memberId,
+            choices: [],
+            specialRequest: [],
+            specialRequestDetail: null
+          };
+        }
+        
+        // Get selected dietary options
+        const selectedOptions = [];
+        card.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+          selectedOptions.push({
+            name: checkbox.value,
+            selected: true
+          });
+        });
+        partyChoices[memberId].specialRequest = selectedOptions;
+        
+        // Get free text detail
+        const detailTextarea = card.querySelector('textarea');
+        if (detailTextarea && detailTextarea.value.trim()) {
+          partyChoices[memberId].specialRequestDetail = detailTextarea.value.trim();
+        } else {
+          partyChoices[memberId].specialRequestDetail = null;
         }
       });
 

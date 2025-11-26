@@ -2571,3 +2571,288 @@ header {
         align-items: flex-start;
     }
 }
+
+/* ========================================
+   Course Card Styles - Individual Cards
+   ======================================== */
+
+.menu-course-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.menu-course-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.course-card-header {
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e1e5e9;
+}
+
+.course-card-title {
+    margin: 0;
+    font-size: 1.15em;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.selection-required-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 20px;
+    font-size: 0.75em;
+    font-weight: 600;
+}
+
+.info-only-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    background: #6c757d;
+    color: white;
+    border-radius: 20px;
+    font-size: 0.75em;
+    font-weight: 600;
+}
+
+.course-card-content {
+    padding: 15px;
+}
+
+/* ========================================
+   Special Requests Section Styles
+   ======================================== */
+
+.special-requests-section {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-top: 30px;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+}
+
+.special-requests-header {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+    padding: 20px 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.special-requests-header i {
+    font-size: 1.8em;
+    opacity: 0.9;
+}
+
+.special-requests-header h3 {
+    margin: 0;
+    font-size: 1.4em;
+    font-weight: 600;
+}
+
+.special-requests-description {
+    padding: 15px 25px 5px;
+    margin: 0;
+    color: var(--text-light);
+    font-size: 0.95em;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.special-requests-cards {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.special-request-card {
+    background: #fafbfc;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.special-request-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(139, 90, 150, 0.1);
+}
+
+.special-request-card-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.special-request-card-header i {
+    font-size: 1em;
+    opacity: 0.9;
+}
+
+.special-request-card-header h4 {
+    margin: 0;
+    font-size: 1em;
+    font-weight: 600;
+    flex: 1;
+}
+
+.special-request-card-header .primary-badge {
+    background: rgba(255, 255, 255, 0.25);
+    padding: 3px 8px;
+    border-radius: 10px;
+    font-size: 0.7em;
+    text-transform: uppercase;
+}
+
+.special-request-options {
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.dietary-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: white;
+    border: 2px solid #e1e5e9;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85em;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.dietary-checkbox:hover {
+    border-color: var(--primary-color);
+    background: rgba(139, 90, 150, 0.05);
+}
+
+.dietary-checkbox.checked {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.dietary-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.dietary-checkbox i {
+    font-size: 1em;
+}
+
+.dietary-checkbox.checked i {
+    color: white;
+}
+
+.special-request-detail {
+    padding: 0 15px 15px;
+}
+
+.special-request-detail label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.special-request-detail textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 0.9em;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.special-request-detail textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(139, 90, 150, 0.1);
+}
+
+.special-request-detail textarea::placeholder {
+    color: #adb5bd;
+    font-style: italic;
+}
+
+/* Responsive styles for special requests */
+@media (max-width: 768px) {
+    .special-requests-header {
+        padding: 15px 20px;
+    }
+    
+    .special-requests-header h3 {
+        font-size: 1.2em;
+    }
+    
+    .special-requests-description {
+        padding: 12px 20px 5px;
+    }
+    
+    .special-requests-cards {
+        padding: 15px;
+        grid-template-columns: 1fr;
+    }
+    
+    .special-request-options {
+        padding: 12px;
+    }
+    
+    .dietary-checkbox {
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+    
+    .special-request-detail {
+        padding: 0 12px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .course-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .selection-required-badge,
+    .info-only-badge {
+        align-self: flex-start;
+    }
+    
+    .dietary-checkbox {
+        padding: 5px 10px;
+        font-size: 0.75em;
+        gap: 5px;
+    }
+}
