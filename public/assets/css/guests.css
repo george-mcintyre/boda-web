@@ -4407,10 +4407,18 @@ header {
 /* Member Edit Form */
 .member-edit-form {
     padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .member-edit-form .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 0;
+    flex: 1;
+}
+
+.member-edit-form .btn-remove-member {
+    align-self: flex-end;
 }
 
 .member-edit-form .form-group:last-child {

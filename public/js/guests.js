@@ -1926,7 +1926,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Party member edit cards
       partyData.forEach((member, index) => {
         html += `
-          <div class="party-member-edit-card" data-member-id="${member.id}" data-index="${index}">
+          <div class="party-member-edit-card ${member.primary ? 'primary-member' : ''}" data-member-id="${member.id}" data-index="${index}" data-is-primary="${member.primary ? 'true' : 'false'}">
             <div class="member-edit-header">
               <span class="member-number">${index + 1}</span>
               ${member.primary ? '<span class="primary-indicator"><i class="fas fa-star"></i> Primary Guest</span>' : ''}
@@ -1941,9 +1941,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                        id="member-name-${member.id}"
                        class="member-name-input"
                        data-member-id="${member.id}"
+                       data-is-primary="${member.primary ? 'true' : 'false'}"
                        value="${escapeHtml(member.name)}"
-                       placeholder="Enter name..."
-                       ${member.primary ? '' : ''}>
+                       placeholder="Enter name...">
               </div>
               ${!member.primary ? `
                 <button type="button" class="btn-remove-member" data-member-id="${member.id}" title="Remove member">
@@ -2011,7 +2011,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         html += `
           <div class="party-dietary-card" data-member-id="${member.id}">
-            <div class="dietary-card-header">
+            <div class="party-dietary-card-header">
               <i class="fas fa-user"></i>
               <h4>${escapeHtml(member.name)}</h4>
               ${member.primary ? '<span class="primary-badge">Primary</span>' : ''}
@@ -2219,10 +2219,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const card = document.querySelector(`.party-member-edit-card[data-member-id="${memberId}"]`);
     if (!card) return;
     
+    // Check if this is a new member (not yet saved) or an existing one
+    const isNewMember = memberId.startsWith('new-');
+    const memberName = card.querySelector('.member-name-input')?.value || 'this member';
+    
     // Confirm removal
     showConfirmDialog(
-      'Are you sure you want to remove this party member?',
-      () => {
+      `Are you sure you want to remove ${memberName} from your party?`,
+      async () => {
         card.remove();
         
         // Show add button again if under max
@@ -2244,7 +2248,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         
         updatePartyCountDisplay();
-        markPartyAsUnsaved();
+        
+        // If this was an existing member (not new), save immediately to persist the deletion
+        if (!isNewMember) {
+          // Auto-save to persist the deletion
+          await savePartyMembers();
+        } else {
+          // Just mark as unsaved for new members
+          markPartyAsUnsaved();
+        }
       }
     );
   }
@@ -2301,7 +2313,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       // Collect all member data from the form
       const memberCards = document.querySelectorAll('.party-member-edit-card');
-      const partyMembers = [];
+      const nonPrimaryMembers = [];
       
       memberCards.forEach(card => {
         const memberId = card.dataset.memberId;
@@ -2313,32 +2325,37 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
         
-        const isPrimary = card.querySelector('.primary-indicator') !== null;
+        // Check if this is the primary member - skip it for the API call
+        // The server automatically handles the primary guest
+        const isPrimary = card.dataset.isPrimary === 'true' || card.querySelector('.primary-indicator') !== null;
+        
+        if (isPrimary) {
+          // Primary member is handled by server, skip it
+          console.log('Skipping primary member for API:', name);
+          return;
+        }
+        
         const isChild = card.querySelector('.child-indicator') !== null;
         const isNew = memberId.startsWith('new-');
         
-        partyMembers.push({
+        nonPrimaryMembers.push({
           id: isNew ? null : memberId,
           name: name,
-          primary: isPrimary,
           adult: !isChild
         });
       });
       
-      // Validate at least primary member exists
-      if (partyMembers.length === 0) {
-        showToast('Please add at least one party member', 'error');
-        return;
-      }
+      console.log('Saving non-primary party members:', nonPrimaryMembers);
       
-      // Send to server
+      // Send only NON-primary members to server
+      // Server will automatically add the primary guest to the response
       const response = await fetch('/api/guest/party', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': token
         },
-        body: JSON.stringify(partyMembers)
+        body: JSON.stringify(nonPrimaryMembers)
       });
       
       if (response.ok) {
