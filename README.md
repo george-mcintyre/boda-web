@@ -511,10 +511,15 @@ Get menu selections per party member.
         "choices": [
           {
             "courseId": "string",
-            "optionId": "string | null"
+            "optionId": "string"
           }
         ],
-        "specialRequest": "string | null",
+        "specialRequest":  [
+          {
+            "name": "vegetarian | lactose-intolerant | gluten-intolerant | nut-allergy | other",
+            "selected": true
+          }
+        ],
         "specialRequestDetail": "string | null"
       }
     ]

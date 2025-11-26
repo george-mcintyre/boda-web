@@ -105,8 +105,8 @@ const translations = {
     'guests:menuSaved': 'Menu saved successfully',
     'common:home': 'Home',
     // Gifts
-    'guests:tabCash': 'Cash Gifts',
-    'guests:cashGifts': 'Cash Gifts',
+    'guests:tabCash': 'Gift Registry',
+    'guests:cashGifts': 'Gift Registry',
     'guests:cashGiftsDesc': 'If you prefer to give a cash gift, you can choose a fixed or custom amount. Your generosity will help us start our new life together.',
     'guests:cashGiftsSummaryDesc': 'Your cash gifts made for our wedding.',
     'guests:cashGiftsSummary': 'Cash Gifts Summary',
