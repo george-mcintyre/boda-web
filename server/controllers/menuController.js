@@ -214,6 +214,8 @@ async function updateGuestCourseOption(req, res, next) {
     }
     
     // Validate choices structure (supports both new and legacy format)
+    const allowedDietaryOptions = ['vegan', 'vegetarian', 'nut-allergy', 'nut allergy', 'lactose-intolerant', 'gluten-intolerant', 'other'];
+    
     for (const choice of choices) {
       if (!choice.partyGuestId || !Array.isArray(choice.choices)) {
         return res.status(400).json({ error: 'Invalid choice structure' });
@@ -229,8 +231,26 @@ async function updateGuestCourseOption(req, res, next) {
         }
       }
       
-      if (choice.specialRequest && !['vegan', 'vegetarian', 'nut allergy', 'other'].includes(choice.specialRequest)) {
-        return res.status(400).json({ error: 'Invalid specialRequest value' });
+      // Validate specialRequest - supports both string (legacy) and array (new) formats
+      if (choice.specialRequest) {
+        if (typeof choice.specialRequest === 'string') {
+          // Legacy string format
+          if (!allowedDietaryOptions.includes(choice.specialRequest)) {
+            return res.status(400).json({ error: 'Invalid specialRequest value' });
+          }
+        } else if (Array.isArray(choice.specialRequest)) {
+          // New array format: [{ name: 'vegetarian', selected: true }, ...]
+          for (const sr of choice.specialRequest) {
+            if (!sr.name || typeof sr.selected !== 'boolean') {
+              return res.status(400).json({ error: 'Invalid specialRequest format - each item must have name and selected' });
+            }
+            if (!allowedDietaryOptions.includes(sr.name)) {
+              return res.status(400).json({ error: `Invalid specialRequest option: ${sr.name}` });
+            }
+          }
+        } else {
+          return res.status(400).json({ error: 'specialRequest must be a string or array' });
+        }
       }
     }
     
