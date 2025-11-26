@@ -12,7 +12,7 @@ if exist package-lock.json (
 )
 echo.
 echo Iniciando servidor...
-node server.js
+node local-server.js
 pause
 
 

@@ -17,7 +17,7 @@ Write-Host ""
 
 # Iniciar el servidor
 Write-Host "Iniciando servidor..." -ForegroundColor Green
-node server.js
+node local-server.js
 
 
 

@@ -106,6 +106,6 @@ else
 fi
 
 echo "Starting server..."
-node server.js
+node local-server.js
 
 
