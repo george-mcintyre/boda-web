@@ -501,132 +501,311 @@ document.addEventListener('DOMContentLoaded', async () => {
 
    // Function to load the events content in the events tab
    async function loadEventsContent() {
-     const eventsContent = document.getElementById('eventsContent');
+     const eventsContent = document.getElementById('agendaContent');
+     
+     if (!eventsContent) return;
+     
+     // Show loading state
+     eventsContent.innerHTML = `
+       <div class="loading-events" style="text-align: center; padding: 40px;">
+         <i class="fas fa-spinner fa-spin" style="font-size: 2em; color: var(--primary-color); margin-bottom: 15px;"></i>
+         <p>Loading events...</p>
+       </div>
+     `;
      
      try {
-       const [eventsRes, eventChoicesRes] = await Promise.all([
-         fetch('/api/guest/events',{
-          method: 'GET',
-          headers: { 'Authorization': token }
+       // Fetch events, party members, and event choices in parallel
+       const [eventsRes, partyRes, eventChoicesRes] = await Promise.all([
+         fetch('/api/guest/events', {
+           method: 'GET',
+           headers: { 'Authorization': token }
+         }),
+         fetch('/api/guest/party', {
+           method: 'GET',
+           headers: { 'Authorization': token }
          }),
          fetch('/api/guest/event-choices', {
            method: 'GET',
            headers: { 'Authorization': token }
          })
        ]);
-      
-       const events = await eventsRes.json().catch(() => []);
-       const eventChoices = await eventChoicesRes.json().catch(() => ({}));
        
-       if (events) {
-         events.forEach(event => {
-           console.out(event);
+       const events = await eventsRes.json().catch(() => []);
+       const partyMembers = await partyRes.json().catch(() => []);
+       const eventChoices = await eventChoicesRes.json().catch(() => []);
+       
+       if (!eventsRes.ok || !Array.isArray(events) || events.length === 0) {
+         eventsContent.innerHTML = `
+           <div class="no-events-message">
+             <i class="fas fa-calendar-times"></i>
+             <h3>No Events Available</h3>
+             <p>There are no events scheduled yet. Please check back later.</p>
+           </div>
+         `;
+         return;
+       }
+       
+       // Build a lookup map for event choices: { partyGuestId: { eventId: attending } }
+       const choicesMap = {};
+       eventChoices.forEach(partyChoice => {
+         if (!choicesMap[partyChoice.partyGuestId]) {
+           choicesMap[partyChoice.partyGuestId] = {};
+         }
+         (partyChoice.choices || []).forEach(choice => {
+           choicesMap[partyChoice.partyGuestId][choice.eventId] = choice.attending;
+         });
+       });
+       
+       // Helper function to format date
+       const formatDate = (dateStr) => {
+         if (!dateStr) return '';
+         const date = new Date(dateStr);
+         return date.toLocaleDateString('en-GB', {
+           weekday: 'long',
+           year: 'numeric',
+           month: 'long',
+           day: 'numeric'
+         });
+       };
+       
+       // Helper function to format time
+       const formatTime = (dateStr) => {
+         if (!dateStr) return '';
+         const date = new Date(dateStr);
+         return date.toLocaleTimeString('en-GB', {
+           hour: '2-digit',
+           minute: '2-digit'
+         });
+       };
+       
+       // Helper function to get sub-event icon
+       const getSubEventIcon = (iconName) => {
+         const iconMap = {
+           'ceremony': 'ring',
+           'cocktails': 'glass-cheers',
+           'reception': 'utensils',
+           'dancing': 'music',
+           'dinner': 'utensils',
+           'party': 'music'
+         };
+         return iconMap[iconName] || 'calendar-check';
+       };
+       
+       // Group events by date
+       const eventsByDate = {};
+       events.forEach(event => {
+         const dateKey = formatDate(event.date);
+         if (!eventsByDate[dateKey]) {
+           eventsByDate[dateKey] = [];
+         }
+         eventsByDate[dateKey].push(event);
+       });
+       
+       let eventHTML = '<div class="events-container">';
+       
+       // Create event cards for each date
+       Object.keys(eventsByDate).forEach(dateKey => {
+         eventHTML += `
+           <div class="event-day">
+             <h3 class="day-title">
+               <i class="fas fa-calendar-day"></i>
+               ${dateKey}
+             </h3>
+             <div class="day-events">
+         `;
+         
+         eventsByDate[dateKey].forEach(event => {
+           // Event card
+           eventHTML += `
+             <div class="event-card" data-event-id="${event.id}">
+               <div class="event-card-header">
+                 ${event.image ? `<div class="event-image"><img src="${event.image}" alt="${event.name}" onerror="this.parentElement.style.display='none';"/></div>` : ''}
+                 <div class="event-header-content">
+                   <h4 class="event-title">${event.title || event.name}</h4>
+                   <p class="event-name">${event.name}</p>
+                 </div>
+               </div>
+               
+               <div class="event-details">
+                 <div class="event-time">
+                   <i class="fas fa-clock"></i>
+                   <span>${formatTime(event.date)}${event.end ? ' - ' + formatTime(event.end) : ''}</span>
+                 </div>
+                 
+                 ${event.locationAddress ? `
+                   <div class="event-location">
+                     <i class="fas fa-map-marker-alt"></i>
+                     <span>${event.locationAddress}</span>
+                     ${event.locationLatitude && event.locationLongitude ? `
+                       <a href="https://www.google.com/maps?q=${event.locationLatitude},${event.locationLongitude}"
+                          target="_blank"
+                          class="map-link"
+                          title="Open in Google Maps">
+                         <i class="fas fa-external-link-alt"></i>
+                       </a>
+                     ` : ''}
+                   </div>
+                 ` : ''}
+                 
+                 ${event.description ? `
+                   <div class="event-description">
+                     <p>${event.description}</p>
+                   </div>
+                 ` : ''}
+               </div>
+               
+               ${event.sub_events && event.sub_events.length > 0 ? `
+                 <div class="sub-events">
+                   <h5 class="sub-events-title">
+                     <i class="fas fa-list"></i>
+                     Schedule
+                   </h5>
+                   <div class="sub-events-list">
+                     ${event.sub_events.map(subEvent => `
+                       <div class="sub-event-item">
+                         <div class="sub-event-icon">
+                           <i class="fas fa-${getSubEventIcon(subEvent.icon)}"></i>
+                         </div>
+                         <div class="sub-event-info">
+                           <span class="sub-event-name">${subEvent.name}</span>
+                           <span class="sub-event-time">${formatTime(subEvent.date)}${subEvent.end ? ' - ' + formatTime(subEvent.end) : ''}</span>
+                         </div>
+                         ${subEvent.description ? `<p class="sub-event-description">${subEvent.description}</p>` : ''}
+                       </div>
+                     `).join('')}
+                   </div>
+                 </div>
+               ` : ''}
+               
+               <div class="event-attendance">
+                 <h5 class="attendance-title">
+                   <i class="fas fa-users"></i>
+                   Attendance
+                 </h5>
+                 <div class="attendance-list">
+                   ${partyMembers.map(member => {
+                     const isAttending = choicesMap[member.id] && choicesMap[member.id][event.id] === true;
+                     return `
+                       <div class="attendance-item">
+                         <label class="attendance-label">
+                           <input
+                             type="checkbox"
+                             class="attendance-checkbox"
+                             data-event-id="${event.id}"
+                             data-member-id="${member.id}"
+                             ${isAttending ? 'checked' : ''}
+                           />
+                           <span class="member-name">${member.name}</span>
+                           ${member.primary ? '<span class="primary-badge">Primary</span>' : ''}
+                           ${!member.adult ? '<span class="child-badge">Child</span>' : ''}
+                         </label>
+                       </div>
+                     `;
+                   }).join('')}
+                 </div>
+               </div>
+             </div>
+           `;
          });
          
-         let eventHTML = '';
+         eventHTML += '</div></div>';
+       });
+       
+       // Add save button
+       eventHTML += `
+         <div class="events-actions">
+           <button id="saveEventChoicesBtn" class="btn-save-choices">
+             <i class="fas fa-save"></i>
+             Save Attendance Choices
+           </button>
+         </div>
+       `;
+       
+       eventHTML += '</div>';
+       eventsContent.innerHTML = eventHTML;
+       
+       // Add event listener for save button
+       const saveBtn = document.getElementById('saveEventChoicesBtn');
+       if (saveBtn) {
+         saveBtn.addEventListener('click', saveEventChoices);
+       }
+       
+     } catch (err) {
+       console.error('Error loading events:', err);
+       eventsContent.innerHTML = `
+         <div class="error-message">
+           <i class="fas fa-exclamation-triangle"></i>
+           <h3>Error Loading Events</h3>
+           <p>There was an error loading the events. Please try again.</p>
+           <button class="btn-retry" onclick="loadEventsContent()">
+             <i class="fas fa-redo"></i>
+             Retry
+           </button>
+         </div>
+       `;
+     }
+   }
+   
+   // Function to save event attendance choices
+   async function saveEventChoices() {
+     const saveBtn = document.getElementById('saveEventChoicesBtn');
+     if (saveBtn) {
+       saveBtn.disabled = true;
+       saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+     }
+     
+     try {
+       // Collect all attendance checkboxes
+       const checkboxes = document.querySelectorAll('.attendance-checkbox');
+       
+       // Build the partyChoices structure
+       const partyChoicesMap = {};
+       
+       checkboxes.forEach(checkbox => {
+         const eventId = checkbox.dataset.eventId;
+         const memberId = checkbox.dataset.memberId;
+         const attending = checkbox.checked;
          
-         // Mostrar confirmaciones actuales si existen
-         if (confirmations && Object.keys(confirmations).length > 0) {
-           eventHTML += `
-             <div class="current-confirmations">
-               <h3><i class="fas fa-check-circle"></i> Tus confirmaciones actuales</h3>
-               <div class="confirmation-summary">
-           `;
-           
-           Object.keys(confirmations).forEach(eventoId => {
-             const confirmado = confirmations[eventoId];
-             const statusText = confirmado ? 'Confirmado' : 'No confirmado';
-             const statusClass = confirmado ? 'status-confirmado' : 'status-no-confirmado';
-             
-             eventHTML += `
-               <div class="confirmation-item">
-                 <span class="confirmation-label">Evento ${eventoId}:</span>
-                 <span class="confirmation-value">
-                   <span class="status-badge ${statusClass}">${statusText}</span>
-                 </span>
-               </div>
-             `;
-           });
-           
-           eventHTML += '</div></div>';
+         if (!partyChoicesMap[memberId]) {
+           partyChoicesMap[memberId] = {
+             partyGuestId: memberId,
+             choices: []
+           };
          }
          
-         // Mostrar la event de eventos
-         eventHTML += '<div class="event-content">';
-         
-         // Agrupar eventos por día
-         const eventosPorDia = {};
-         events.forEach(evento => {
-           const fecha = new Date(evento.fecha);
-           const dia = fecha.toLocaleDateString('es-ES', { 
-             weekday: 'long', 
-             year: 'numeric', 
-             month: 'long', 
-             day: 'numeric' 
-           });
-           
-           if (!eventosPorDia[dia]) {
-             eventosPorDia[dia] = [];
-           }
-           eventosPorDia[dia].push(evento);
+         partyChoicesMap[memberId].choices.push({
+           eventId: eventId,
+           attending: attending
          });
-         
-         Object.keys(eventosPorDia).forEach(dia => {
-           eventHTML += `
-             <div class="event-day">
-               <h3 class="day-title">
-                 <i class="fas fa-calendar-day"></i>
-                 ${dia}
-               </h3>
-               <div class="day-events">
-           `;
-           
-           eventosPorDia[dia].forEach(evento => {
-             const confirmado = confirmations && confirmations[evento.id];
-             const statusText = confirmado ? 'Confirmado' : 'No confirmado';
-             const statusClass = confirmado ? 'status-confirmado' : 'status-no-confirmado';
-             
-             eventHTML += `
-               <div class="event-item">
-                 <div class="event-event-info">
-                   <h4 class="event-event-title">${evento.titulo}</h4>
-                   <p class="event-event-description">${evento.descripcion}</p>
-                   <p class="event-event-time">
-                     <i class="fas fa-clock"></i>
-                     ${new Date(evento.fecha).toLocaleTimeString('es-ES', { 
-                       hour: '2-digit', 
-                       minute: '2-digit' 
-                     })}
-                   </p>
-                 </div>
-                 <div class="evento-acciones">
-                   <span class="status-badge ${statusClass}">${statusText}</span>
-                   ${eventBloqueada ? `
-                     <button disabled class="btn-disabled" title="Agenda bloqueada">
-                       <i class="fas fa-lock"></i>
-                       Bloqueado
-                     </button>
-                   ` : `
-                     <button onclick="confirmarEvento('${evento.id}', ${!confirmado})" class="${confirmado ? 'btn-cancelar' : 'btn-confirmar'}">
-                       ${confirmado ? 'Cancelar' : 'Confirmar'}
-                     </button>
-                   `}
-                 </div>
-               </div>
-             `;
-           });
-           
-           eventHTML += '</div></div>';
-         });
-         
-         eventHTML += '</div>';
-         eventsContent.innerHTML = eventHTML;
-         
+       });
+       
+       // Convert to array
+       const partyChoices = Object.values(partyChoicesMap);
+       
+       // Send to server
+       const response = await fetch('/api/guest/event-choices', {
+         method: 'PUT',
+         headers: {
+           'Content-Type': 'application/json',
+           'Authorization': token
+         },
+         body: JSON.stringify(partyChoices)
+       });
+       
+       if (response.ok) {
+         showToast('Attendance choices saved successfully!', 'success');
        } else {
-         eventsContent.innerHTML = '<p class="error">Error al cargar la event.</p>';
+         const data = await response.json();
+         showToast(data.error || 'Error saving attendance choices', 'error');
        }
      } catch (err) {
-       eventsContent.innerHTML = '<p class="error">Error de conexión al cargar la event.</p>';
+       console.error('Error saving event choices:', err);
+       showToast('Error saving attendance choices', 'error');
+     } finally {
+       if (saveBtn) {
+         saveBtn.disabled = false;
+         saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Attendance Choices';
+       }
      }
    }
 
