@@ -121,10 +121,18 @@
     "locationLatitude": 36.50704566918498,
     "locationLongitude": -4.892851492688078,
     "name": "Wedding Brunch",
-    "sub_events": [],
+    "sub_events": [
+      {
+        "name": "Eat A lot",
+        "date": {"$date": "2026-06-07T12:30:00.000Z"},
+        "end": {"$date": "2026-06-07T16:00:00.000Z"},
+        "description": "Eat and drink, play in the sand, take an ice cream.  Wave goodbye as we leave on our honeymoon",
+        "icon": "reception"
+      }
+    ],
     "title": {
       "en": "Bocana Beach"
     },
-    "updatedAt": {"$date": "2025-11-23T22:08:55.652Z"}
+    "updatedAt": {"$date": "2025-11-26T10:05:51.260Z"}
   }
 ]

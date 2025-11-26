@@ -1,18 +1,10 @@
 [
   {
-    "_id": {"$oid": "692359f38de762c4d68a40bc"},
-    "__v": 0,
-    "createdAt": {"$date": "2025-11-23T19:01:07.072Z"},
     "email": "admin@boda.com",
-    "password": "admin123",
-    "updatedAt": {"$date": "2025-11-23T19:01:07.072Z"}
+    "password": "admin123"
   },
   {
-    "_id": {"$oid": "6923a03149d24766fbcdad33"},
-    "__v": 0,
-    "createdAt": {"$date": "2025-11-24T00:00:49.678Z"},
     "email": "admin@example.com",
-    "password": "admin123",
-    "updatedAt": {"$date": "2025-11-24T00:00:49.678Z"}
+    "password": "admin123"
   }
 ]

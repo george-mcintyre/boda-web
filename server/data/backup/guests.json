@@ -97,7 +97,7 @@
   },
   {
     "_id": {"$oid": "692382fa76402958d7ee199f"},
-    "__v": 0,
+    "__v": 2,
     "companions": 0,
     "createdAt": {"$date": "2025-11-23T21:56:10.632Z"},
     "email": "benoit.heinrich@gmail.com",
@@ -105,13 +105,14 @@
     "name": "Benoit Heinrich",
     "partyMembers": [
       {
-        "name": "Benoit Heinrich - Guest 1",
+        "id": "692382fa76402958d7ee199f",
+        "name": "Benoit Heinrich",
         "adult": true
       }
     ],
     "specialMenu": "",
     "status": "pending",
-    "updatedAt": {"$date": "2025-11-23T21:56:10.632Z"}
+    "updatedAt": {"$date": "2025-11-26T13:59:36.851Z"}
   },
   {
     "_id": {"$oid": "692382fa76402958d7ee19a2"},
@@ -890,5 +891,24 @@
     "specialMenu": "",
     "status": "pending",
     "updatedAt": {"$date": "2025-11-24T00:47:45.003Z"}
+  },
+  {
+    "_id": {"$oid": "69270b463e8bb28c24c0e3e3"},
+    "__v": 1,
+    "companions": 0,
+    "createdAt": {"$date": "2025-11-26T14:14:30.898Z"},
+    "email": "jd@me.com",
+    "message": "",
+    "name": "Test",
+    "partyMembers": [
+      {
+        "id": null,
+        "name": "Test Member 1",
+        "adult": true
+      }
+    ],
+    "specialMenu": "",
+    "status": "pending",
+    "updatedAt": {"$date": "2025-11-26T14:14:46.686Z"}
   }
 ]

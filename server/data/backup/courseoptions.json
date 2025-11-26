@@ -27,7 +27,7 @@
     "description": "Slow-roasted and heirloom tomatoes layered with creamy Puglian burrata, basil oil and aged Modena balsamic, finished with toasted pine nuts and crisp sourdough shards.",
     "image": {"$oid": "69244dd7f907eaef83fee911"},
     "label": "Heritage Tomato & Burrata Salad",
-    "updatedAt": {"$date": "2025-11-24T12:46:54.511Z"},
+    "updatedAt": {"$date": "2025-11-24T15:32:56.047Z"},
     "containsAllergens": false,
     "containsLactose": true,
     "isVegetarian": true
@@ -40,7 +40,10 @@
     "description": "Delicately cured salmon with pink grapefruit segments, pickled cucumber ribbons, dill crème fraîche and rye crumble, finished with lemon oil and micro-herbs.",
     "image": null,
     "label": "Citrus-Cured Salmon",
-    "updatedAt": {"$date": "2025-11-24T08:51:16.946Z"}
+    "updatedAt": {"$date": "2025-11-24T15:32:14.790Z"},
+    "containsAllergens": false,
+    "containsLactose": true,
+    "isVegetarian": true
   },
   {
     "_id": {"$oid": "69241cc3417a12722a56b993"},

@@ -5,7 +5,6 @@ module.exports = {
   EventImage: require('./EventImage'),
   EventChoice: require('./EventChoice'),
   Message: require('./Message'),
-  Comment: require('./Comment'),
   Course: require('./Course'),
   CourseOption: require('./CourseOption'),
   MenuChoice: require('./MenuChoice'),
@@ -13,6 +12,5 @@ module.exports = {
   Gift: require('./Gift'),
   GiftImage: require('./GiftImage'),
   GiftChoice: require('./GiftChoice'),
-  CashGiftCard: require('./CashGiftCard'), // Legacy - will be removed in Phase 8
   Config: require('./Config'),
 };

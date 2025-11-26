@@ -162,7 +162,7 @@ curl -s -X POST http://localhost:3000/api/login \
 - Seed example data (non‑production): `node scripts/seed-db.js` (use `--force` to clean then seed)
 
 Seeding behavior:
-- On server start in non‑production, the app auto‑seeds if collections are empty.
+- On server start in non‑production, the app auto-seeds if collections are empty.
   - Guests: `guests.json`.
   - Events: `events.json`.
   - Messages: `messages.json`.
@@ -205,7 +205,7 @@ Schema compatibility notes:
 - If you integrate Stripe on the frontend, use `STRIPE_PUBLISHABLE_KEY` on the client (do not share the secret key).
 - For webhooks, configure `STRIPE_WEBHOOK_SECRET` and point Stripe to your public endpoint (e.g., via ngrok or a cloud deployment).
 
-# 🔐 Wedding API Specification
+# 🔐 Wedding API Specification - Updated
 
 API for the wedding guest & admin portals.
 
@@ -215,6 +215,7 @@ API for the wedding guest & admin portals.
 - **Namespaces**:
   - Guest portal: `/api/guest/...`
   - Admin portal: `/api/admin/...`
+- **Legacy Support**: Some legacy routes exist for backward compatibility (e.g., `/api/invitado`)
 
 ---
 
@@ -249,7 +250,6 @@ Use the token in all subsequent calls:
 
     Authorization: Bearer <token>
 
-
 ---
 
 ## 2. Guest Portal API
@@ -257,7 +257,6 @@ Use the token in all subsequent calls:
 All endpoints require a valid **guest** token.
 
 Base path: `/api/guest`
-
 
 ### 2.1 Guest Profile & Party
 
@@ -267,39 +266,37 @@ Returns information about the primary guest associated with the token.
 
 **Response**
 ```json
-    {
-      "id": "string",
-      "name": "string",
-      "email": "string",
-    }
+{
+  "id": "string",
+  "name": "string",
+  "email": "string"
+}
 ```
+
 Notes:
-
 - The primary guest is the one who logs in and owns the party.
-
 
 #### `GET /api/guest/party`
 
-Returns all members of the guest’s party.
+Returns all members of the guest's party.
 
 **Response**
 ```json
-    [
-      {
-        "id": "string",
-        "name": "string",
-        "adult": true,
-        "primary": true
-      }
-    ]
+[
+  {
+    "id": "string",
+    "name": "string",
+    "adult": true,
+    "primary": true
+  }
+]
 ```
-Notes:
 
+Notes:
 - `primary: true` for the primary guest.
 - Adults are guests over 18 (`adult: true`).
 - Party members may be matched server-side using case-insensitive, whitespace-insensitive names.
 - The primary guest is automatically added to the list of party members by the server
-
 
 #### `PUT /api/guest/party`
 
@@ -307,23 +304,20 @@ Replace/update the full party for this guest.
 
 **Request body**
 ```json
-    [
-      {
-        "id": "string | null",
-        "name": "string",
-        "adult": true
-      }
-    ]
+[
+  {
+    "id": "string | null",
+    "name": "string",
+    "adult": true
+  }
+]
 ```
+
 - `id` may be `null` for new party members.
-- guest must not be included in the list of party members, it is automatically appended by the server.
+- Guest must not be included in the list of party members, it is automatically appended by the server.
 
 **Response**
-
 - Same as `GET /api/guest/party`.
-
-
----
 
 ### 2.2 Events
 
@@ -333,29 +327,33 @@ List of events configured by the couple.
 
 **Response**
 ```json
-    [
+[
+  {
+    "id": "string",
+    "name": "string",
+    "date": "ISO8601",
+    "end": "ISO8601",
+    "location": "string",
+    "locationAddress": "string",
+    "locationLatitude": "number | null",
+    "locationLongitude": "number | null",
+    "title": "string",
+    "description": "string | null",
+    "image": "string | null",
+    "sub_events": [
       {
-        "id": "string",
         "name": "string",
         "date": "ISO8601",
         "end": "ISO8601",
-        "location": "string",
-        "title": "string",
         "description": "string | null",
-        "image": "string | null",
-        "sub_events" : [
-          {
-            "name": "string",
-            "date": "ISO8601",
-            "end": "ISO8601",
-            "description": "string | null",
-            "icon": "string" 
-          }
-        ]
+        "icon": "string"
       }
     ]
+  }
+]
 ```
-`icon` is one of  "ceremony", "cocktails", "reception", "dancing"
+
+`icon` is one of: "ceremony", "cocktails", "reception", "dancing"
 
 #### `GET /api/guest/event-choices`
 
@@ -363,45 +361,28 @@ Get attendance choices per party member for each event.
 
 **Response**
 ```json
-    [
+[
+  {
+    "partyGuestId": "string",
+    "choices": [
       {
-        "partyGuestId": "string",
-        "choices": [
-          {
-            "eventId": "string",
-            "attending": true
-          }
-        ]
+        "eventId": "string",
+        "attending": true
       }
     ]
-
+  }
+]
 ```
+
 #### `PUT /api/guest/event-choices`
 
 Create or update event attendance choices.
 
 **Request body**
+Same shape as the response above.
 
-Same shape as the response above:
-```json
-    [
-      {
-        "partyGuestId": "string",
-        "choices": [
-          {
-            "eventId": "string",
-            "attending": true
-          }
-        ]
-      }
-    ]
-
-```**Response**
-
+**Response**
 - Updated choices (same shape).
-
-
----
 
 ### 2.3 Messages (Guest View)
 
@@ -413,30 +394,29 @@ Returns a paginated list of messages.
 
 **Response**
 ```json
+{
+  "items": [
     {
-      "items": [
+      "id": "string",
+      "body": "string",
+      "createdAt": "ISO8601",
+      "author": "string | null",
+      "reactions": [
         {
-          "id": "string",
-          "body": "string",
-          "createdAt": "ISO8601",
-          "author": "string | null",
-          "reactions": [
-            {
-              "emoji": "string",
-              "count": 3,
-              "reacted": true
-            }
-          ]
+          "emoji": "string",
+          "count": 3,
+          "reacted": true
         }
-      ],
-      "nextCursor": "string | null"
+      ]
     }
+  ],
+  "nextCursor": "string | null"
+}
+```
 
-```Notes:
-
+Notes:
 - `author` may be `null` for system messages.
 - `reacted: true` indicates the current guest has reacted with that emoji.
-
 
 #### `POST /api/guest/messages`
 
@@ -444,14 +424,13 @@ Guest sends a message (e.g. to the couple).
 
 **Request body**
 ```json
-    {
-      "body": "string"
-    }
+{
+  "body": "string"
+}
 ```
+
 **Response**
-
 - Created message, same shape as items in `GET /api/guest/messages`.
-
 
 #### `POST /api/guest/messages/:id/reaction`
 
@@ -459,20 +438,17 @@ Set or change the reaction of the current guest to a message.
 
 **Request body**
 ```json
-    {
-      "emoji": "string"
-    }
-
-```**Response**
-
-Confirmation:
-```json
-    {
-      "status": "ok"
-    }
-
+{
+  "emoji": "string"
+}
 ```
----
+
+**Response**
+```json
+{
+  "status": "ok"
+}
+```
 
 ### 2.4 Menu (Guest Choices)
 
@@ -482,65 +458,67 @@ List menu courses (starters, mains, desserts, etc.) and options (onion soup, sal
 
 **Response**
 ```json
-    [
+[
+  {
+    "id": "string",
+    "course": "starter | main | dessert | drinks",
+    "label": "string",
+    "selectionRequired": true,
+    "selectionIcon": "string",
+    "options": [
       {
         "id": "string",
-        "course": "starter | main | dessert | drinks",
+        "courseId": "string",
         "label": "string",
-        "options": [
-          {
-            "id": "string",
-            "label": "string",
-            "image": "string",
-            "description": "string | null"
-          }
-        ]
+        "image": "string | null",
+        "description": "string | null",
+        "isVegetarian": false,
+        "containsAllergens": false,
+        "containsLactose": false,
+        "dietaryIcons": "string"
       }
     ]
-
+  }
+]
 ```
+
 #### `GET /api/guest/menu-choices`
 
 Get menu selections per party member.
 
 **Response**
 ```json
-    [
+[
+  {
+    "partyGuestId": "string",
+    "choices": [
       {
-        "partyGuestId": "string",
-        "choices": [
-          {
-            "courseId": "string",
-            "optionId": "string"
-          }
-        ],
-        "specialRequest":  [
-          {
-            "name": "vegetarian | lactose-intolerant | gluten-intolerant | nut-allergy | other",
-            "selected": true
-          }
-        ],
-        "specialRequestDetail": "string | null"
+        "courseId": "string",
+        "optionId": "string"
       }
-    ]
+    ],
+    "specialRequest": [
+      {
+        "name": "vegetarian | lactose-intolerant | gluten-intolerant | nut-allergy | other",
+        "selected": true
+      }
+    ],
+    "specialRequestDetail": "string | null"
+  }
+]
 ```
-- `specialRequest` is selected from a set of choices "vegan", "vegetarian", "nut allergy", "other".  If other then `specialRequestDetail` is a free text field to describe the special request.
 
+- `specialRequest` is selected from a set of choices "vegan", "vegetarian", "nut allergy", "other". If other then `specialRequestDetail` is a free text field to describe the special request.
 
 #### `PUT /api/guest/menu-choices`
 
 Update menu selections.
 
 **Request body**
-
 Same shape as the response above.
 
 **Response**
-
 - Updated choices.
-
-
----
 
 ### 2.5 Gifts
 
@@ -550,23 +528,28 @@ List available gift card options.
 
 **Response**
 ```json
-    [
-      {
-        "id": "string",
-        "title": "string",
-        "description": "string",
-        "amount": 100,
-        "available": 1,
-        "image": 10
-      }
-    ]
+[
+  {
+    "id": "string",
+    "title": "string",
+    "description": "string",
+    "amount": 100,
+    "available": 1,
+    "purchased": 0,
+    "stock": 1,
+    "image": "string | number",
+    "imageUrl": "string",
+    "priceDisplay": "€100"
+  }
+]
 ```
 
-- only shows gifts who's hidden field `enabled` is true.
-- `amount` is selected from a fixed set of values `25`, `50`, `100`, `200`, and `500` 
-- `image` is selected from a fixed set of images that are baked into the site: `/images/gift-cards/image_01.jpg` - `/images/gift-cards/image_30.jpg` only the number needs to be stored as the rest of the uri is fixed.
-- the number of these gifts that are still available 
-
+- only shows gifts whose hidden field `enabled` is true.
+- `amount` is selected from a fixed set of values `25`, `50`, `100`, `200`, and `500`
+- `image` can be an ObjectId reference to database-stored images or a number for legacy images
+- `imageUrl` is the URL to access the gift image
+- `stock` shows remaining available quantity after accounting for purchases
+- `purchased` shows how many have already been purchased
 
 #### `GET /api/guest/gift-choices`
 
@@ -574,13 +557,18 @@ List gifts already donated by this guest.
 
 **Response**
 ```json
-    [
-      {
-        "giftId": "string",
-        "date": "ISO8601",
-        "message": "string | null"
-      }
-    ]
+[
+  {
+    "id": "string",
+    "giftId": "string",
+    "giftTitle": "string",
+    "giftAmount": "number",
+    "giftDescription": "string",
+    "giftImageUrl": "string",
+    "date": "ISO8601",
+    "message": "string | null"
+  }
+]
 ```
 
 #### `POST /api/guest/create-payment-session`
@@ -589,20 +577,29 @@ Create a Stripe checkout session for a specific gift.
 
 **Request body**
 ```json
-    {
-      "giftId": "string",
-      "message": "string | null"
-    }
+{
+  "giftId": "string",
+  "message": "string | null"
+}
 ```
+
 **Response**
 ```json
-    {
-      "checkoutUrl": "string"
-    }
-
+{
+  "checkoutUrl": "string",
+  "sessionId": "string"
+}
 ```
 
 - when transaction completes successfully then the amount of that gift remaining is decremented by one.
+
+### 2.6 Stripe Webhooks
+
+#### `POST /api/guest/stripe-webhook`
+
+Handle Stripe payment confirmations. No authentication required.
+
+**Note**: This endpoint requires raw body processing for signature verification. Configure in app.js.
 
 ---
 
@@ -612,7 +609,6 @@ All endpoints require a valid **admin** token.
 
 Base path: `/api/admin`
 
-
 ### 3.1 Events Management
 
 #### `GET /api/admin/events`
@@ -621,27 +617,30 @@ List all events.
 
 **Response**
 ```json
-    [
+[
+  {
+    "id": "string",
+    "name": "string",
+    "date": "ISO8601",
+    "end": "ISO8601",
+    "location": "string",
+    "locationAddress": "string",
+    "locationLatitude": "number | null",
+    "locationLongitude": "number | null",
+    "title": "string",
+    "description": "string | null",
+    "image": "string | null",
+    "sub_events": [
       {
-        "id": "string",
         "name": "string",
         "date": "ISO8601",
         "end": "ISO8601",
-        "location": "string",
-        "title": "string",
         "description": "string | null",
-        "image": "string | null",
-        "sub_events" : [
-          {
-            "name": "string",
-            "date": "ISO8601",
-            "end": "ISO8601",
-            "description": "string | null",
-            "icon": "string" 
-          }
-        ]
+        "icon": "string"
       }
     ]
+  }
+]
 ```
 
 #### `POST /api/admin/events`
@@ -650,39 +649,38 @@ Create a new event.
 
 **Request body**
 ```json
+{
+  "name": "string",
+  "date": "ISO8601",
+  "end": "ISO8601",
+  "location": "string",
+  "locationAddress": "string",
+  "locationLatitude": "number | null",
+  "locationLongitude": "number | null",
+  "title": "string",
+  "description": "string | null",
+  "image": "string | null",
+  "sub_events": [
     {
       "name": "string",
       "date": "ISO8601",
       "end": "ISO8601",
-      "location": "string",
-      "title": "string",
       "description": "string | null",
-      "image": "string | null",
-      "sub_events" : [
-        {
-          "name": "string",
-          "date": "ISO8601",
-          "end": "ISO8601",
-          "description": "string | null",
-          "icon": "string" 
-        }
-      ]
+      "icon": "string"
     }
+  ]
+}
 ```
 
 **Response**
-
 - Created event (with `id`).
-
 
 #### `PUT /api/admin/events/:id`
 
 Update an existing event.
 
 **Request body**
-
 - Same as `POST /api/admin/events` (full).
-
 
 #### `DELETE /api/admin/events/:id`
 
@@ -690,14 +688,53 @@ Delete (or soft-delete) an event.
 
 **Response**
 ```json
-    {
-      "status": "ok"
-    }
-
+{
+  "status": "ok"
+}
 ```
----
 
-### 3.2 Guests & Party Management
+#### `POST /api/admin/events/upload-image`
+
+Upload an event image.
+
+**Request**
+- `multipart/form-data` with an `image` file field
+- Supports JPEG, PNG, GIF, WebP formats (max 5MB)
+
+**Response**
+```json
+{
+  "imageId": "string",
+  "contentType": "string",
+  "originalName": "string",
+  "size": "number"
+}
+```
+
+### 3.2 Event Image Serving
+
+#### `GET /api/admin/events/:eventId/image`
+
+Retrieve event image data.
+
+**Response**
+- Binary image data with appropriate Content-Type headers.
+
+#### `GET /api/admin/events/:eventId/image/thumbnail`
+
+Retrieve event image thumbnail.
+
+**Response**
+- Binary image data with appropriate Content-Type headers.
+
+#### `GET /api/admin/images/:imageId`
+
+Retrieve image by ID.
+
+**Response**
+- Binary image data with appropriate Content-Type headers.
+
+### 3.3 Guests & Party Management
 
 #### `GET /api/admin/guests?cursor=&limit=`
 
@@ -705,16 +742,16 @@ List all guests (paginated).
 
 **Response**
 ```json
+{
+  "items": [
     {
-      "items": [
-        {
-          "id": "string",
-          "name": "string",
-          "email": "string",
-        }
-      ],
-      "nextCursor": "string | null"
+      "id": "string",
+      "name": "string",
+      "email": "string"
     }
+  ],
+  "nextCursor": "string | null"
+}
 ```
 
 #### `POST /api/admin/guests`
@@ -723,15 +760,30 @@ Create a new guest (primary).
 
 **Request body**
 ```json
-    {
-      "name": "string",
-      "email": "string",
-    }
+{
+  "name": "string",
+  "email": "string"
+}
 ```
-**Response**
 
+**Response**
 - Created guest (with `id`).
 
+#### `POST /api/admin/guests/bulk-upload`
+
+Bulk upload multiple guests.
+
+**Request body**
+```json
+{
+  "guests": [
+    {
+      "name": "string",
+      "email": "string"
+    }
+  ]
+}
+```
 
 #### `GET /api/admin/guests/:id`
 
@@ -739,102 +791,100 @@ Get a single guest.
 
 **Response**
 ```json
-    {
-      "id": "string",
-      "name": "string",
-      "email": "string",
-    }
-
+{
+  "id": "string",
+  "name": "string",
+  "email": "string"
+}
 ```
+
 #### `PUT /api/admin/guests/:id`
 
 Update guest details.
 
 **Request body**
 ```json
-    {
-      "name": "string",
-      "email": "string",
-    }
-
+{
+  "name": "string",
+  "email": "string"
+}
 ```
+
 #### `DELETE /api/admin/guests/:id`
 
 Delete guest and their party.
 
 **Response**
 ```json
-    {
-      "status": "ok"
-    }
-
+{
+  "status": "ok"
+}
 ```
+
 #### `GET /api/admin/guests/:id/party`
 
 Get full party for this guest.
 
 **Response**
+Same schema as `/api/guest/party`, but for any chosen guest.
 
-Same schema as `/api/guest/party`, but for any chosen guest, for example:
 ```json
-    [
-      {
-        "id": "string",
-        "name": "string",
-        "adult": true,
-        "primary": true
-      }
-    ]
+[
+  {
+    "id": "string",
+    "name": "string",
+    "adult": true,
+    "primary": true
+  }
+]
 ```
 
 #### `PUT /api/admin/guests/:id/party`
 
-Replace/update the guest’s party.
+Replace/update the guest's party.
 
 **Request body**
-
 Same as the guest-side `PUT /api/guest/party`, but targeting the specified guest, does not include guest themselves:
-```json
-    [
-      {
-        "id": "string | null",
-        "name": "string",
-        "adult": true
-      }
-    ]
-```
-**Response**
 
+```json
+[
+  {
+    "id": "string | null",
+    "name": "string",
+    "adult": true
+  }
+]
+```
+
+**Response**
 - Updated party list.
 
-
----
-
-### 3.3 Menu Definition & Overview
+### 3.4 Menu Management
 
 #### `GET /api/admin/courseData`
 
-Get the list of all menu parts.
+Get the list of all menu courses.
 
 **Response**
-
 Same schema as `GET /api/guest/menu`:
+
 ```json
-    [
+[
+  {
+    "id": "string",
+    "course": "starter | main | dessert | drinks",
+    "label": "string",
+    "selectionRequired": true,
+    "options": [
       {
         "id": "string",
-        "course": "starter | main | dessert | drinks",
         "label": "string",
-        "options": [
-          {
-            "id": "string",
-            "label": "string",
-            "image": "string",
-            "description": "string | null"
-          }
-        ]
+        "image": "string",
+        "description": "string | null"
       }
     ]
+  }
+]
 ```
 
 #### `POST /api/admin/courseData`
@@ -843,22 +893,15 @@ Create a new menu course.
 
 **Request body**
 ```json
-    {
-      "course": "starter | main | dessert | drinks",
-      "label": "string",
-      "options": [
-        {
-          "label": "string",
-          "image": "string",
-          "description": "string | null"
-        }
-      ]
-    }
+{
+  "course": "starter | main | dessert | drinks",
+  "label": "string",
+  "selectionRequired": true
+}
 ```
+
 **Response**
-
-- Created menu course (with generated `id` and option `id`s).
-
+- Created menu course (with generated `id`).
 
 #### `PUT /api/admin/courseData/:id`
 
@@ -866,18 +909,11 @@ Update an existing menu course.
 
 **Request body**
 ```json
-    {
-      "course": "starter | main | dessert | drinks",
-      "label": "string",
-      "options": [
-        {
-          "id": "string | null",
-          "label": "string",
-          "image": "string",
-          "description": "string | null"
-        }
-      ]
-    }
+{
+  "course": "starter | main | dessert | drinks",
+  "label": "string",
+  "selectionRequired": true
+}
 ```
 
 #### `DELETE /api/admin/courseData/:id`
@@ -886,10 +922,103 @@ Delete a menu course.
 
 **Response**
 ```json
-    {
-      "status": "ok"
-    }
+{
+  "status": "ok"
+}
 ```
+
+### 3.5 Menu Options Management
+
+#### `GET /api/admin/courseData/:courseId/options`
+
+Get options for a specific menu course.
+
+**Response**
+```json
+[
+  {
+    "id": "string",
+    "courseId": "string",
+    "label": "string",
+    "image": "string | null",
+    "description": "string | null",
+    "isVegetarian": false,
+    "containsAllergens": false,
+    "containsLactose": false,
+    "dietaryIcons": "string"
+  }
+]
+```
+
+#### `GET /api/admin/courseData/:courseId/options/:optionId`
+
+Get a specific menu option by ID.
+
+**Response**
+- Same format as items in the options list above.
+
+#### `POST /api/admin/courseData/:courseId/options`
+
+Create a new menu option.
+
+**Request body**
+```json
+{
+  "label": "string",
+  "image": "string | object",
+  "description": "string | null",
+  "isVegetarian": false,
+  "containsAllergens": false,
+  "containsLactose": false
+}
+```
+
+#### `PUT /api/admin/courseData/:courseId/options/:optionId`
+
+Update an existing menu option.
+
+**Request body**
+```json
+{
+  "label": "string",
+  "image": "string | object | null",
+  "description": "string | null",
+  "isVegetarian": false,
+  "containsAllergens": false,
+  "containsLactose": false
+}
+```
+
+#### `DELETE /api/admin/courseData/:courseId/options/:optionId`
+
+Delete a menu option.
+
+**Response**
+```json
+{
+  "status": "ok"
+}
+```
+
+#### `POST /api/admin/menu-options/upload-image`
+
+Upload an image for menu options.
+
+**Request**
+- `multipart/form-data` with an `image` file field
+- Supports JPEG, PNG, GIF, WebP formats (max 5MB)
+
+**Response**
+```json
+{
+  "imageId": "string",
+  "contentType": "string",
+  "originalName": "string",
+  "size": "number"
+}
+```
+
+### 3.6 Menu Overview
 
 #### `GET /api/admin/course-choices`
 
@@ -897,56 +1026,54 @@ Overview of menu selections per guest.
 
 **Response**
 ```json
-    [
+[
+  {
+    "guestId": "string",
+    "guestName": "string",
+    "partyGuestId": "string",
+    "partyGuestName": "string",
+    "choices": [
       {
-        "guestId": "string",
-        "guestName": "string",
-        "partyGuestId": "string",
-        "partyGuestName": "string",
-        "choices": [
-          {
-            "courseId": "string",
-            "optionId": "string | null"
-          }
-        ],
-        "specialRequest": "string | null",
-        "specialRequestDetail": "string | null"
+        "courseId": "string",
+        "optionId": "string | null"
       }
-    ]
+    ],
+    "specialRequest": "string | null",
+    "specialRequestDetail": "string | null"
+  }
+]
 ```
 
-- `specialRequest` is selected from a set of choices "vegan", "vegetarian", "nut allergy", "other".  If other then `specialRequestDetail` is a free text field to describe the special request.
+- `specialRequest` is selected from a set of choices "vegan", "vegetarian", "nut allergy", "other". If other then `specialRequestDetail` is a free text field to describe the special request.
 
----
-
-### 3.4 Messages (Admin Console)
+### 3.7 Messages (Admin Console)
 
 #### `GET /api/admin/messages?cursor=&limit=`
 
 List all messages (guest and admin/system), paginated.
 
 **Response**
+Same message schema as guest messages but includes all messages.
 
-Same message schema as guest messages but includes all messages, for example:
 ```json
+{
+  "items": [
     {
-      "items": [
+      "id": "string",
+      "body": "string",
+      "createdAt": "ISO8601",
+      "author": "string | null",
+      "reactions": [
         {
-          "id": "string",
-          "body": "string",
-          "createdAt": "ISO8601",
-          "author": "string | null",
-          "reactions": [
-            {
-              "emoji": "string",
-              "count": 3,
-              "reacted": false
-            }
-          ]
+          "emoji": "string",
+          "count": 3,
+          "reacted": false
         }
-      ],
-      "nextCursor": "string | null"
+      ]
     }
+  ],
+  "nextCursor": "string | null"
+}
 ```
 
 #### `POST /api/admin/messages`
@@ -955,14 +1082,13 @@ Create a new message (e.g. announcement).
 
 **Request body**
 ```json
-    {
-      "body": "string"
-    }
+{
+  "body": "string"
+}
 ```
+
 **Response**
-
 - Created message object.
-
 
 #### `POST /api/admin/messages/:id/reaction`
 
@@ -970,9 +1096,9 @@ Add or change an admin reaction to a message.
 
 **Request body**
 ```json
-    {
-      "emoji": "string"
-    }
+{
+  "emoji": "string"
+}
 ```
 
 #### `PUT /api/admin/messages/:id`
@@ -981,9 +1107,9 @@ Edit a message.
 
 **Request body**
 ```json
-    {
-      "body": "string"
-    }
+{
+  "body": "string"
+}
 ```
 
 #### `DELETE /api/admin/messages/:id`
@@ -992,14 +1118,12 @@ Delete a message.
 
 **Response**
 ```json
-    {
-      "status": "ok"
-    }
+{
+  "status": "ok"
+}
 ```
 
----
-
-### 3.5 Gifts Management
+### 3.8 Gifts Management
 
 #### `GET /api/admin/gifts`
 
@@ -1007,22 +1131,24 @@ Get list of all defined gifts.
 
 **Response**
 ```json
-    [
-      {
-        "id": "string",
-        "title": "string",
-        "description": "string",
-        "amount": 100,
-        "available": 1,
-        "image": 10
-      }
-    ]
+[
+  {
+    "id": "string",
+    "title": "string",
+    "description": "string",
+    "amount": 100,
+    "available": 1,
+    "purchased": 0,
+    "image": "string | null",
+    "priceDisplay": "€100"
+  }
+]
 ```
 
-- only shows gifts who's hidden field `enabled` is true. (set to false when deleted)
-- `amount` is selected from a fixed set of values `25`, `50`, `100`, `200`, and `500` 
-- `image` is selected from a fixed set of images that are baked into the site: `/images/gift-cards/image_01.jpg` - `/images/gift-cards/image_30.jpg` only the number needs to be stored as the rest of the uri is fixed.
-- the number of these gifts that are still available 
+- only shows gifts whose hidden field `enabled` is true. (set to false when deleted)
+- `amount` is selected from a fixed set of values `25`, `50`, `100`, `200`, and `500`
+- `image` can be an ObjectId reference to database-stored images
+- the number of these gifts that are still available
 
 #### `POST /api/admin/gifts`
 
@@ -1030,18 +1156,17 @@ Create a new gift.
 
 **Request body**
 ```json
-    {
-      "title": "string",
-      "description": "string",
-      "amount": 100,
-      "available": 1,
-      "image": 10
-    }
+{
+  "title": "string",
+  "description": "string",
+  "amount": 100,
+  "available": 1,
+  "image": "string | object"
+}
 ```
+
 **Response**
-
 - Created gift (with `id`).
-
 
 #### `PUT /api/admin/gifts/:id`
 
@@ -1049,13 +1174,13 @@ Update an existing gift.
 
 **Request body**
 ```json
-    {
-      "title": "string",
-      "description": "string",
-      "amount": 100,
-      "available": 4,
-      "image": 10
-    }
+{
+  "title": "string",
+  "description": "string",
+  "amount": 100,
+  "available": 4,
+  "image": "string | object | null"
+}
 ```
 
 #### `DELETE /api/admin/gifts/:id`
@@ -1064,10 +1189,68 @@ Soft-delete a gift (e.g. hidden field `enabled = false`).
 
 **Response**
 ```json
-    {
-      "status": "ok"
-    }
+{
+  "status": "ok"
+}
 ```
+
+#### `POST /api/admin/gifts/upload-image`
+
+Upload a gift image.
+
+**Request**
+- `multipart/form-data` with an `image` file field
+- Supports JPEG, PNG, GIF, WebP formats (max 5MB)
+
+**Response**
+```json
+{
+  "imageId": "string",
+  "contentType": "string",
+  "originalName": "string",
+  "size": "number"
+}
+```
+
+#### `GET /api/admin/gift-images`
+
+Get list of legacy gift card images (will be removed).
+
+**Response**
+```json
+[
+  {
+    "number": 1,
+    "name": "image_01.jpg",
+    "url": "/assets/images/gift-cards/image_01.jpg"
+  }
+]
+```
+
+### 3.9 Gift Image Serving
+
+#### `GET /api/admin/gifts/:giftId/image`
+
+Retrieve gift image data.
+
+**Response**
+- Binary image data with appropriate Content-Type headers.
+
+#### `GET /api/admin/gifts/:giftId/image/thumbnail`
+
+Retrieve gift image thumbnail.
+
+**Response**
+- Binary image data with appropriate Content-Type headers.
+
+#### `GET /api/admin/gift-images/:imageId`
+
+Retrieve gift image by ID.
+
+**Response**
+- Binary image data with appropriate Content-Type headers.
+
+### 3.10 Gift Choices Overview
 
 #### `GET /api/admin/gift-choices`
 
@@ -1075,35 +1258,33 @@ List all gift choices/donations grouped by guest.
 
 **Response**
 ```json
-    [
-      {
-        "guestId": "string",
-        "guestName": "string",
-        "giftId": "string",
-        "amount": 100,
-        "date": "ISO8601",
-        "message": "string | null"
-      }
-    ]
-
+[
+  {
+    "guestId": "string",
+    "guestName": "string",
+    "giftId": "string",
+    "amount": 100,
+    "date": "ISO8601",
+    "message": "string | null"
+  }
+]
 ```
----
 
-### 3.6 Settings / Feature Toggles
+### 3.11 Settings / Feature Toggles
 
 #### `GET /api/admin/settings`
 
-Returns frontend feature toggles.
+Returns frontend feature toggles. (Public endpoint - no auth required)
 
 **Response**
 ```json
-    {
-      "guestsEnabled": true,
-      "eventsEnabled": true,
-      "menuEnabled": true,
-      "messagesEnabled": true,
-      "giftsEnabled": true
-    }
+{
+  "guestsEnabled": true,
+  "eventsEnabled": true,
+  "menuEnabled": true,
+  "messagesEnabled": true,
+  "giftsEnabled": true
+}
 ```
 
 #### `PUT /api/admin/settings`
@@ -1113,30 +1294,60 @@ Update feature toggles.
 **Request body**
 
 ```json
-    {
-      "guestsEnabled": true,
-      "eventsEnabled": true,
-      "menuEnabled": false,
-      "messagesEnabled": false,
-      "giftsEnabled": false
-    }
+{
+  "guestsEnabled": true,
+  "eventsEnabled": true,
+  "menuEnabled": false,
+  "messagesEnabled": false,
+  "giftsEnabled": false
+}
 ```
-**Response**
 
+**Response**
 - Updated settings:
+
 ```json
-    {
-      "guestsEnabled": true,
-      "eventsEnabled": true,
-      "menuEnabled": false,
-      "messagesEnabled": false,
-      "giftsEnabled": false
-    }
+{
+  "guestsEnabled": true,
+  "eventsEnabled": true,
+  "menuEnabled": false,
+  "messagesEnabled": false,
+  "giftsEnabled": false
+}
 ```
 
 ---
 
-## 4. Global Conventions
+## 4. Legacy Routes
+
+For backward compatibility, the following legacy routes still exist:
+
+### 4.1 Guest Legacy Routes
+
+#### `GET /api/invitado` 
+Legacy Spanish route for guest profile. Same as `/api/guest/profile`.
+
+#### `GET /api/messages`
+Public list of messages (using guest endpoint for backwards compatibility).
+
+#### `POST /api/messages`
+Guests can create messages.
+
+#### `POST /api/messages/:id/reaction`
+Guests can toggle a reaction on a message.
+
+#### `GET /api/event`
+Public agenda endpoint with language negotiation.
+
+#### `GET /api/events`
+Simple event admin endpoints.
+
+#### `POST /api/events`
+Create events (admin only).
+
+---
+
+## 5. Global Conventions
 
 - **Auth**:  
   `Authorization: Bearer <jwt>`
@@ -1152,26 +1363,35 @@ Update feature toggles.
 
 - **Pagination**:  
   For large lists (messages, guests), use cursor-based pagination:
-  
+
 ```http
-    GET /api/.../resource?cursor=<cursor>&limit=<n>
+GET /api/.../resource?cursor=<cursor>&limit=<n>
 ```
+
   Responses:
+
 ```json
-    {
-      "items": [ /* ... */ ],
-      "nextCursor": "string | null"
-    }
+{
+  "items": [ /* ... */ ],
+  "nextCursor": "string | null"
+}
 ```
+
+- **Image References**:  
+  Images can be stored either as:
+  - ObjectId references to database-stored images
+  - Numeric indices for legacy static images
+  - Base64 data URLs for inline images
+
 - **Errors** (example format):
+
 ```json
-    {
-      "error": {
-        "code": "INVALID_INPUT",
-        "message": "Email is required",
-        "details": {
-          "field": "email"
-        }
-      }
+{
+  "error": {
+    "code": "INVALID_INPUT",
+    "message": "Email is required",
+    "details": {
+      "field": "email"
     }
-```
+  }
+}
