@@ -1,23 +1,23 @@
-// Sistema de comentarios para la página de guests
+// Comments system for the guests page
 class CommentsSystem {
     constructor() {
         this.comments = [];
+        this.nextCursor = null;
         this.currentUser = this.getCurrentUser();
         this.isAdmin = this.checkIfAdmin();
         this.injectStyles();
         this.init();
     }
 
-    // Inicializar el sistema
+    // Initialize the system
     init() {
         this.loadComments();
         this.setupEventListeners();
         this.updateCharCount();
     }
 
-    // Obtener usuario actual desde localStorage
+    // Get current user from localStorage
     getCurrentUser() {
-        // Obtener el name y email del invitado logueado desde localStorage
         const name = localStorage.getItem('name');
         const email = localStorage.getItem('email');
         const token = localStorage.getItem('token');
@@ -30,20 +30,20 @@ class CommentsSystem {
             };
         }
         
-        // Usuario por defecto para pruebas (solo si no hay datos de login)
+        // Default user for testing (only if no login data)
         return {
             id: 'guest_' + Date.now(),
-            name: 'Invitado',
-            email: 'invitado@example.com'
+            name: 'Guest',
+            email: 'guest@example.com'
         };
     }
 
-    // Verificar si es administrador
+    // Check if user is admin
     checkIfAdmin() {
         return localStorage.getItem('isAdmin') === 'true';
     }
 
-    // Configurar event listeners
+    // Setup event listeners
     setupEventListeners() {
         const commentForm = document.getElementById('commentForm');
         const commentInput = document.getElementById('newComment');
@@ -62,7 +62,7 @@ class CommentsSystem {
         }
     }
 
-    // Actualizar contador de caracteres
+    // Update character counter
     updateCharCount() {
         const commentInput = document.getElementById('newComment');
         const charCount = document.querySelector('.char-count');
@@ -71,7 +71,7 @@ class CommentsSystem {
             const length = commentInput.value.length;
             charCount.textContent = `${length}/500`;
             
-            // Cambiar color si se excede el límite
+            // Change color if limit is exceeded
             if (length > 450) {
                 charCount.style.color = '#dc3545';
             } else if (length > 400) {
@@ -82,31 +82,43 @@ class CommentsSystem {
         }
     }
 
-    // Cargar comentarios desde el servidor
+    // Load comments from the server
     async loadComments() {
         try {
-            const response = await fetch('/api/messages');
+            const token = localStorage.getItem('token') || '';
+            const response = await fetch('/api/guest/messages', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            
             if (response.ok) {
-                const items = await response.json();
-                // Normalize server fields (Message) to comments UI format
-                this.comments = (Array.isArray(items) ? items : []).map(it => ({
-                    id: it._id || it.id,
-                    name: it.name || it.name || 'Guest',
-                    comentario: it.content || it.contenido || '',
-                    fecha: it.createdAt || it.fecha || Date.now(),
-                    reacciones: it.reacciones || {}
+                const data = await response.json();
+                // API returns { items: [...], nextCursor: string|null }
+                const items = data.items || [];
+                this.nextCursor = data.nextCursor || null;
+                
+                // Map API response format to internal format
+                this.comments = items.map(msg => ({
+                    id: msg.id,
+                    name: msg.author || 'Guest',
+                    body: msg.body || '',
+                    createdAt: msg.createdAt,
+                    reactions: msg.reactions || []
                 }));
             } else {
+                console.error('Failed to load comments:', response.status);
                 this.comments = [];
             }
         } catch (error) {
-            console.error('Error al cargar comentarios:', error);
+            console.error('Error loading comments:', error);
             this.comments = [];
         }
         this.renderComments();
     }
 
-    // Inyectar estilos para el selector flotante de reacciones
+    // Inject styles for floating reaction picker
     injectStyles() {
         if (document.getElementById('reaction-styles')) return;
         const style = document.createElement('style');
@@ -126,29 +138,30 @@ class CommentsSystem {
           .emoji-option .count { position:absolute; bottom:-10px; right:-6px; background:#8B5A96; color:#fff; border-radius:10px; padding:0 6px; font-size:.7em; line-height:18px; height:18px; }
           /* Summary list when there are reactions */
           .reaction-summary { display:inline-flex; align-items:center; gap:8px; padding:4px 6px; border:1px solid #eee; border-radius:16px; background:#fff; }
-          .summary-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 8px; border-radius:12px; background:#f8f9fa; border:1px solid #eee; font-size:.9em; }
+          .summary-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 8px; border-radius:12px; background:#f8f9fa; border:1px solid #eee; font-size:.9em; cursor:pointer; }
           .summary-pill .count { color:#555; font-weight:600; }
+          .summary-pill.reacted { outline: 2px solid #8B5A96; background: #f8f0fa; }
         `;
         document.head.appendChild(style);
     }
 
-    // Emojis disponibles para reacciones
+    // Available emojis for reactions
     getAvailableEmojis() {
         return [
-            { emoji: '❤️', name: 'corazón' },
-            { emoji: '👍', name: 'pulgar arriba' },
-            { emoji: '😊', name: 'sonrisa' },
-            { emoji: '🎉', name: 'celebración' },
-            { emoji: '👏', name: 'aplausos' },
-            { emoji: '💕', name: 'amor' }
+            { emoji: '❤️', name: 'heart' },
+            { emoji: '👍', name: 'thumbs up' },
+            { emoji: '😊', name: 'smile' },
+            { emoji: '🎉', name: 'celebration' },
+            { emoji: '👏', name: 'applause' },
+            { emoji: '💕', name: 'love' }
         ];
     }
 
-    // Agregar/quitar reacción
+    // Add/toggle reaction
     async toggleReaction(commentId, emoji) {
         try {
             const token = localStorage.getItem('token') || '';
-            const res = await fetch(`/api/messages/${commentId}/reaction`, {
+            const res = await fetch(`/api/guest/messages/${commentId}/reaction`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -156,121 +169,121 @@ class CommentsSystem {
                 },
                 body: JSON.stringify({ emoji })
             });
-            const data = await res.json().catch(()=>({}));
+            
+            const data = await res.json().catch(() => ({}));
             if (!res.ok) {
-                const msg = data && (data.error || data.message) || 'Error al actualizar reacción';
+                const msg = (data && (data.error || data.message)) || 'Error updating reaction';
                 this.showToast(msg, 'error');
                 return;
             }
-            // Recargar comentarios para reflejar conteos actualizados
+            
+            // Reload comments to reflect updated counts
             await this.loadComments();
         } catch (err) {
-            console.error('Error al aplicar reacción:', err);
-            this.showToast('Error de conexión al aplicar reacción', 'error');
+            console.error('Error applying reaction:', err);
+            this.showToast('Connection error when applying reaction', 'error');
         }
     }
 
-    // Verificar si el usuario actual reaccionó con un emoji específico
-    hasUserReacted(reacciones, emoji) {
-        if (!reacciones || !reacciones[emoji]) return false;
-        const userEmail = localStorage.getItem('email');
-        return reacciones[emoji].includes(userEmail);
+    // Check if user reacted with a specific emoji using the new API format
+    hasUserReacted(reactions, emoji) {
+        if (!reactions || !Array.isArray(reactions)) return false;
+        const reaction = reactions.find(r => r.emoji === emoji);
+        return reaction ? reaction.reacted === true : false;
     }
 
-    // Obtener el emoji seleccionado por el usuario (una sola selección)
-    getUserSelectedEmoji(reacciones) {
-        const userEmail = localStorage.getItem('email');
-        if (!userEmail || !reacciones) return null;
-        for (const [emoji, list] of Object.entries(reacciones)) {
-            if (Array.isArray(list) && list.includes(userEmail)) return emoji;
-        }
-        return null;
+    // Get the emoji selected by the user (if any)
+    getUserSelectedEmoji(reactions) {
+        if (!reactions || !Array.isArray(reactions)) return null;
+        const reaction = reactions.find(r => r.reacted === true);
+        return reaction ? reaction.emoji : null;
     }
 
-    getCountFor(reacciones, emoji) {
-        return (reacciones && Array.isArray(reacciones[emoji])) ? reacciones[emoji].length : 0;
+    // Get count for a specific emoji
+    getCountFor(reactions, emoji) {
+        if (!reactions || !Array.isArray(reactions)) return 0;
+        const reaction = reactions.find(r => r.emoji === emoji);
+        return reaction ? reaction.count : 0;
     }
 
     // Total reactions across all emojis
-    getTotalReactionsCount(reacciones) {
-        if (!reacciones) return 0;
-        let sum = 0;
-        for (const v of Object.values(reacciones)) {
-            if (Array.isArray(v)) sum += v.length;
-        }
-        return sum;
+    getTotalReactionsCount(reactions) {
+        if (!reactions || !Array.isArray(reactions)) return 0;
+        return reactions.reduce((sum, r) => sum + (r.count || 0), 0);
     }
 
-    // Agregar nuevo comentario
+    // Add new comment
     async addComment() {
         const commentInput = document.getElementById('newComment');
-        const content = commentInput.value.trim();
+        const body = commentInput.value.trim();
 
-        if (!content) {
-            this.showToast('Por favor, escribe un comentario.', 'error');
+        if (!body) {
+            this.showToast('Please write a comment.', 'error');
             return;
         }
 
-        if (content.length > 500) {
-            this.showToast('El comentario no puede exceder 500 caracteres.', 'error');
+        if (body.length > 500) {
+            this.showToast('Comment cannot exceed 500 characters.', 'error');
             return;
         }
 
         try {
-            const response = await fetch('/api/messages', {
+            const token = localStorage.getItem('token') || '';
+            const response = await fetch('/api/guest/messages', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                    'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ content })
+                body: JSON.stringify({ body })
             });
 
             if (response.ok) {
-                // Limpiar formulario
+                // Clear form
                 commentInput.value = '';
                 this.updateCharCount();
                 
-                // Recargar comentarios
+                // Reload comments
                 await this.loadComments();
                 
-                this.showToast('Comentario publicado con éxito', 'success');
+                this.showToast('Comment posted successfully', 'success');
             } else {
                 const errorData = await response.json();
-                this.showToast(errorData.error || 'Error al publicar comentario', 'error');
+                this.showToast(errorData.error || 'Error posting comment', 'error');
             }
         } catch (error) {
-            console.error('Error al publicar comentario:', error);
-            this.showToast('Error de conexión al publicar comentario', 'error');
+            console.error('Error posting comment:', error);
+            this.showToast('Connection error when posting comment', 'error');
         }
     }
 
-    // Eliminar comentario
+    // Delete comment (admin only)
     async deleteComment(commentId) {
         if (!this.isAdmin) {
-            this.showToast('Solo los administradores pueden eliminar comentarios.', 'error');
+            this.showToast('Only administrators can delete comments.', 'error');
             return;
         }
 
-        if (confirm('¿Estás seguro de que quieres eliminar este comentario?')) {
+        if (confirm('Are you sure you want to delete this comment?')) {
             try {
-                const response = await fetch(`/api/messages/${commentId}`, {
+                const token = localStorage.getItem('adminToken') || localStorage.getItem('token') || '';
+                const response = await fetch(`/api/admin/messages/${commentId}`, {
                     method: 'DELETE',
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('adminToken') || ''}`
+                        'Authorization': `Bearer ${token}`
                     }
                 });
 
                 if (response.ok) {
                     await this.loadComments();
-                    this.showToast('Comentario eliminado con éxito', 'success');
+                    this.showToast('Comment deleted successfully', 'success');
                 } else {
                     const errorData = await response.json();
-                    this.showToast(errorData.error || 'Error al eliminar comentario', 'error');
+                    this.showToast(errorData.error || 'Error deleting comment', 'error');
                 }
             } catch (error) {
-                console.error('Error al eliminar comentario:', error);
-                this.showToast('Error de conexión al eliminar comentario', 'error');
+                console.error('Error deleting comment:', error);
+                this.showToast('Connection error when deleting comment', 'error');
             }
         }
     }
@@ -290,27 +303,29 @@ class CommentsSystem {
             return;
         }
 
-        // Ordenar comentarios por fecha (más recientes primero)
-        const sortedComments = this.comments.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        // Sort comments by date (most recent first)
+        const sortedComments = this.comments.sort((a, b) => 
+            new Date(b.createdAt) - new Date(a.createdAt)
+        );
         
         const commentsHTML = sortedComments.map(comment => {
-            const reacciones = comment.reacciones || {};
+            const reactions = comment.reactions || [];
             const emojisDisponibles = this.getAvailableEmojis();
 
-            // Render, according to requirement:
+            // Render according to requirement:
             // 1) If no reactions yet -> show a single heart button (no count). Hover shows picker.
-            // 2) If one or more reactions exist -> show a summary list of emojis with their counts instead of the heart.
+            // 2) If one or more reactions exist -> show a summary list of emojis with their counts.
             // 3) Hover over the summary list also shows the picker for selection.
-            const selectedEmoji = this.getUserSelectedEmoji(reacciones);
-            const totalCount = this.getTotalReactionsCount(reacciones);
+            const selectedEmoji = this.getUserSelectedEmoji(reactions);
+            const totalCount = this.getTotalReactionsCount(reactions);
 
             const pickerHTML = emojisDisponibles.map(({ emoji, name }) => {
-                const count = this.getCountFor(reacciones, emoji);
+                const count = this.getCountFor(reactions, emoji);
                 const isActive = selectedEmoji === emoji ? 'active' : '';
                 return `
                   <button class="emoji-option ${isActive}" title="${name}" onclick="commentsSystem.toggleReaction('${comment.id}', '${emoji}')">
                     <span>${emoji}</span>
-                    ${count > 0 ? `<span class=\"count\">${count}</span>` : ''}
+                    ${count > 0 ? `<span class="count">${count}</span>` : ''}
                   </button>`;
             }).join('');
 
@@ -318,17 +333,17 @@ class CommentsSystem {
             if (totalCount <= 0) {
               // Show only heart icon with no count when no reactions have been made
               triggerAreaHTML = `
-                <button class="heart-btn" onclick="commentsSystem.toggleReaction('${comment.id}', '❤️')" title="Me gusta (❤️)">
+                <button class="heart-btn" onclick="commentsSystem.toggleReaction('${comment.id}', '❤️')" title="Like (❤️)">
                   <span>❤️</span>
                 </button>`;
             } else {
               // Build summary list of reactions with their counts
-              const summaryPills = emojisDisponibles.map(({ emoji }) => {
-                const c = this.getCountFor(reacciones, emoji);
-                if (c <= 0) return '';
-                const isMine = selectedEmoji === emoji ? ' style="outline:2px solid #8B5A96;"' : '';
-                return `<span class="summary-pill"${isMine}><span>${emoji}</span><span class=\"count\">${c}</span></span>`;
-              }).join('');
+              const summaryPills = reactions
+                .filter(r => r.count > 0)
+                .map(r => {
+                  const isMine = r.reacted ? 'reacted' : '';
+                  return `<span class="summary-pill ${isMine}" onclick="commentsSystem.toggleReaction('${comment.id}', '${r.emoji}')"><span>${r.emoji}</span><span class="count">${r.count}</span></span>`;
+                }).join('');
               triggerAreaHTML = `<div class="reaction-summary">${summaryPills}</div>`;
             }
 
@@ -343,7 +358,7 @@ class CommentsSystem {
                 <div class="comment-item" data-comment-id="${comment.id}">
                     <div class="comment-header">
                         <span class="comment-author">${this.escapeHtml(comment.name)}</span>
-                        <span class="comment-date">${new Date(comment.fecha).toLocaleDateString('es-ES', {
+                        <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString('es-ES', {
                             year: 'numeric',
                             month: 'short',
                             day: 'numeric',
@@ -351,13 +366,13 @@ class CommentsSystem {
                             minute: '2-digit'
                         })}</span>
                     </div>
-                    <div class="comment-content">${this.escapeHtml(comment.comentario)}</div>
+                    <div class="comment-content">${this.escapeHtml(comment.body)}</div>
                     <div class="comment-reactions">
                         ${reaccionesHTML}
                     </div>
                     ${this.isAdmin ? `
                         <div class="comment-actions">
-                            <button class="delete-comment-btn" onclick="commentsSystem.deleteComment('${comment.id}')" title="Eliminar comentario">
+                            <button class="delete-comment-btn" onclick="commentsSystem.deleteComment('${comment.id}')" title="Delete comment">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </div>
@@ -369,16 +384,17 @@ class CommentsSystem {
         commentsList.innerHTML = commentsHTML;
     }
 
-    // Escapar HTML para prevenir XSS
+    // Escape HTML to prevent XSS
     escapeHtml(text) {
+        if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
 
-    // Mostrar toast de notificación
+    // Show toast notification
     showToast(message, type = 'success') {
-        // Crear toast si no existe
+        // Create toast if it doesn't exist
         let toast = document.querySelector('.toast');
         if (!toast) {
             toast = document.createElement('div');
@@ -386,7 +402,7 @@ class CommentsSystem {
             document.body.appendChild(toast);
         }
 
-        // Configurar contenido
+        // Configure content
         toast.className = `toast ${type === 'error' ? 'toast-error' : 'toast-success'}`;
         toast.innerHTML = `
             <div class="toast-content">
@@ -395,37 +411,37 @@ class CommentsSystem {
             </div>
         `;
 
-        // Mostrar toast
+        // Show toast
         setTimeout(() => {
             toast.classList.add('show');
         }, 100);
 
-        // Ocultar toast después de 3 segundos
+        // Hide toast after 3 seconds
         setTimeout(() => {
             toast.classList.remove('show');
         }, 3000);
     }
 
-    // Actualizar usuario actual
+    // Update current user
     updateCurrentUser(user) {
         this.currentUser = user;
         localStorage.setItem('currentGuest', JSON.stringify(user));
     }
 
-    // Actualizar estado de administrador
+    // Update admin status
     updateAdminStatus(isAdmin) {
         this.isAdmin = isAdmin;
         localStorage.setItem('isAdmin', isAdmin.toString());
-        this.renderComments(); // Re-renderizar para mostrar/ocultar botones de eliminar
+        this.renderComments(); // Re-render to show/hide delete buttons
     }
 }
 
-// Inicializar sistema de comentarios cuando el DOM esté listo
+// Initialize comments system when DOM is ready
 let commentsSystem;
 
 document.addEventListener('DOMContentLoaded', () => {
     commentsSystem = new CommentsSystem();
 });
 
-// Hacer disponible globalmente para uso en otros scripts
+// Make available globally for use in other scripts
 window.commentsSystem = commentsSystem;

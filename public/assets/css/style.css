@@ -2433,7 +2433,7 @@ footer {
   color: #6c757d;
 }
 
-.comment-actions {
+.comment-item .comment-actions {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
