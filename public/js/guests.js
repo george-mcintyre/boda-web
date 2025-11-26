@@ -829,48 +829,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   };
   
-    // Cargar y mostrar el status del RSVP
-  async function cargarStatusRSVP() {
-    try {
-      // Obtener eventos y selecciones de RSVP
-      const [eventsRes, guestRes] = await Promise.all([
-        fetch('/api/event'),
-        fetch('/api/invitado', {
-          headers: { 'Authorization': token }
-        })
-      ]);
-      
-      const events = await eventsRes.json().catch(() => []);
-      const guestData = await guestRes.json().catch(() => ({}));
-      
-      const eventStatusContent = document.getElementById('eventStatusContent');
-      if (!eventStatusContent) return;
-      
-      if (eventsRes.ok && events.length > 0) {
-        // Mostrar eventos disponibles para RSVP
-        eventStatusContent.innerHTML = `
-          <h4><i class="fas fa-check-circle"></i> Tus confirmaciones de eventos</h4>
-          <p class="no-selection">Visita la pestaña RSVP para confirmar tu asistencia a cada evento.</p>
-        `;
-      } else {
-        eventStatusContent.innerHTML = `
-          <h4><i class="fas fa-info-circle"></i> Estado de RSVP</h4>
-          <p class="no-selection">Aún no hay eventos disponibles para confirmar asistencia.</p>
-        `;
-      }
-    } catch (err) {
-      console.error('Error loading the RSVP Status:', err);
-    }
-  }
-  
-  // Load and show the gift status
-  async function loadStatusGifts() {
-  }
-
-// Load messages
-  async function loadMessages() {
-  }
-
    // Helper function to initialize a map for an event
    function initEventMap(mapContainerId, lat, lng) {
      try {
