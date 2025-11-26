@@ -1842,6 +1842,627 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Error connecting to the server.');
   }
 
+  /**
+   * Load and display party content in the party tab
+   * Allows managing party members (add/edit names, max 4 members)
+   * And managing dietary requirements for each member
+   */
+  async function loadPartyContent() {
+    const partyContent = document.getElementById('partyContent');
+    
+    if (!partyContent) {
+      console.error('Party content container not found');
+      return;
+    }
+    
+    // Show loading state
+    partyContent.innerHTML = `
+      <div class="loading-party">
+        <i class="fas fa-spinner fa-spin fa-3x"></i>
+        <p>Loading party...</p>
+      </div>
+    `;
+    
+    try {
+      // Fetch party members and menu choices (for dietary info) in parallel
+      const [partyResponse, menuChoicesResponse] = await Promise.all([
+        fetch('/api/guest/party', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        }),
+        fetch('/api/guest/menu-choices', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        })
+      ]);
+      
+      if (!partyResponse.ok) {
+        throw new Error('Failed to load party data');
+      }
+      
+      const partyData = await partyResponse.json();
+      const menuChoicesData = menuChoicesResponse.ok ? await menuChoicesResponse.json() : [];
+      
+      // Build dietary requests lookup from existing choices
+      const dietaryLookup = {};
+      menuChoicesData.forEach(memberChoice => {
+        dietaryLookup[memberChoice.partyGuestId] = {
+          specialRequest: memberChoice.specialRequest || [],
+          specialRequestDetail: memberChoice.specialRequestDetail || ''
+        };
+      });
+      
+      // Helper to escape HTML
+      const escapeHtml = (str) => {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      };
+      
+      const maxPartySize = 4;
+      const canAddMore = partyData.length < maxPartySize;
+      
+      // Build HTML
+      let html = '<div class="party-management-container">';
+      
+      // ========== Section 1: Party Members List ==========
+      html += `
+        <div class="party-members-management">
+          <div class="party-members-header">
+            <h3><i class="fas fa-users"></i> Party Members</h3>
+            <span class="party-count">${partyData.length} / ${maxPartySize} members</span>
+          </div>
+          <p class="party-description">
+            Your party includes everyone who will attend the wedding with you. You can add up to ${maxPartySize} party members including yourself.
+            ${!canAddMore ? '<strong>You have reached the maximum party size. Please contact the wedding administrators if you need to add more guests.</strong>' : ''}
+          </p>
+          <div class="party-members-edit-list">
+      `;
+      
+      // Party member edit cards
+      partyData.forEach((member, index) => {
+        html += `
+          <div class="party-member-edit-card" data-member-id="${member.id}" data-index="${index}">
+            <div class="member-edit-header">
+              <span class="member-number">${index + 1}</span>
+              ${member.primary ? '<span class="primary-indicator"><i class="fas fa-star"></i> Primary Guest</span>' : ''}
+              ${member.adult === false ? '<span class="child-indicator"><i class="fas fa-child"></i> Child</span>' : ''}
+            </div>
+            <div class="member-edit-form">
+              <div class="form-group">
+                <label for="member-name-${member.id}">
+                  <i class="fas fa-user"></i> Name
+                </label>
+                <input type="text"
+                       id="member-name-${member.id}"
+                       class="member-name-input"
+                       data-member-id="${member.id}"
+                       value="${escapeHtml(member.name)}"
+                       placeholder="Enter name..."
+                       ${member.primary ? '' : ''}>
+              </div>
+              ${!member.primary ? `
+                <button type="button" class="btn-remove-member" data-member-id="${member.id}" title="Remove member">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      });
+      
+      // Add new member button (if under max)
+      if (canAddMore) {
+        html += `
+          <div class="add-member-card">
+            <button type="button" id="addPartyMemberBtn" class="btn-add-member">
+              <i class="fas fa-plus-circle"></i>
+              <span>Add Party Member</span>
+            </button>
+          </div>
+        `;
+      } else {
+        html += `
+          <div class="max-members-notice">
+            <i class="fas fa-info-circle"></i>
+            <p>Maximum party size reached. Need more guests? <a href="mailto:wedding@example.com">Contact us</a></p>
+          </div>
+        `;
+      }
+      
+      html += `
+          </div>
+          <div class="party-members-actions">
+            <button type="button" id="savePartyMembersBtn" class="btn-save-party">
+              <i class="fas fa-save"></i>
+              Save Party Members
+            </button>
+          </div>
+        </div>
+      `;
+      
+      // ========== Section 2: Dietary Requirements ==========
+      html += `
+        <div class="party-dietary-management">
+          <div class="dietary-header">
+            <h3><i class="fas fa-utensils"></i> Dietary Requirements</h3>
+          </div>
+          <p class="dietary-description">
+            Please let us know about any dietary requirements or allergies for each party member.
+          </p>
+          <div class="party-dietary-cards">
+      `;
+      
+      const dietaryOptions = [
+        { name: 'vegetarian', label: 'Vegetarian', icon: 'fa-leaf' },
+        { name: 'lactose-intolerant', label: 'Lactose Intolerant', icon: 'fa-cheese' },
+        { name: 'gluten-intolerant', label: 'Gluten Intolerant', icon: 'fa-bread-slice' },
+        { name: 'nut-allergy', label: 'Nut Allergy', icon: 'fa-seedling' },
+        { name: 'other', label: 'Other', icon: 'fa-question-circle' }
+      ];
+      
+      partyData.forEach(member => {
+        const memberDietary = dietaryLookup[member.id] || { specialRequest: [], specialRequestDetail: '' };
+        const selectedRequests = Array.isArray(memberDietary.specialRequest) ? memberDietary.specialRequest : [];
+        
+        html += `
+          <div class="party-dietary-card" data-member-id="${member.id}">
+            <div class="dietary-card-header">
+              <i class="fas fa-user"></i>
+              <h4>${escapeHtml(member.name)}</h4>
+              ${member.primary ? '<span class="primary-badge">Primary</span>' : ''}
+            </div>
+            <div class="dietary-options">
+              ${dietaryOptions.map(opt => {
+                const isSelected = selectedRequests.some(r =>
+                  (typeof r === 'string' && r === opt.name) ||
+                  (typeof r === 'object' && r.name === opt.name && r.selected)
+                );
+                return `
+                  <label class="dietary-checkbox ${isSelected ? 'checked' : ''}">
+                    <input type="checkbox"
+                      name="party-dietary-${member.id}"
+                      value="${opt.name}"
+                      ${isSelected ? 'checked' : ''}
+                      onchange="updatePartyDietaryCheckbox(this)">
+                    <i class="fas ${opt.icon}"></i>
+                    <span>${opt.label}</span>
+                  </label>
+                `;
+              }).join('')}
+            </div>
+            <div class="dietary-detail">
+              <label for="party-dietary-detail-${member.id}">Additional details or specific requirements:</label>
+              <textarea
+                id="party-dietary-detail-${member.id}"
+                name="party-dietary-detail-${member.id}"
+                class="dietary-detail-textarea"
+                data-member-id="${member.id}"
+                placeholder="Please describe any specific dietary needs, allergies, or special requirements..."
+                rows="2"
+              >${escapeHtml(memberDietary.specialRequestDetail || '')}</textarea>
+            </div>
+          </div>
+        `;
+      });
+      
+      html += `
+          </div>
+          <div class="party-dietary-actions">
+            <button type="button" id="saveDietaryBtn" class="btn-save-dietary">
+              <i class="fas fa-save"></i>
+              Save Dietary Requirements
+            </button>
+          </div>
+        </div>
+      `;
+      
+      html += '</div>'; // Close party-management-container
+      
+      partyContent.innerHTML = html;
+      
+      // ========== Attach Event Listeners ==========
+      
+      // Add new member button
+      const addMemberBtn = document.getElementById('addPartyMemberBtn');
+      if (addMemberBtn) {
+        addMemberBtn.addEventListener('click', addNewPartyMember);
+      }
+      
+      // Save party members button
+      const savePartyBtn = document.getElementById('savePartyMembersBtn');
+      if (savePartyBtn) {
+        savePartyBtn.addEventListener('click', savePartyMembers);
+      }
+      
+      // Save dietary button
+      const saveDietaryBtn = document.getElementById('saveDietaryBtn');
+      if (saveDietaryBtn) {
+        saveDietaryBtn.addEventListener('click', savePartyDietary);
+      }
+      
+      // Remove member buttons
+      document.querySelectorAll('.btn-remove-member').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const memberId = this.dataset.memberId;
+          removePartyMember(memberId);
+        });
+      });
+      
+      // Mark as unsaved when inputs change
+      document.querySelectorAll('.member-name-input').forEach(input => {
+        input.addEventListener('input', markPartyAsUnsaved);
+      });
+      
+      console.log('Party content loaded successfully');
+      
+    } catch (err) {
+      console.error('Error loading party content:', err);
+      partyContent.innerHTML = `
+        <div class="error-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Error Loading Party</h3>
+          <p>There was a problem loading your party information. Please try again.</p>
+          <button class="btn-retry" onclick="loadPartyContent()">
+            <i class="fas fa-redo"></i>
+            Retry
+          </button>
+        </div>
+      `;
+    }
+  }
+  
+  // Make loadPartyContent globally accessible
+  window.loadPartyContent = loadPartyContent;
+  
+  // Track new members to add (temporary IDs)
+  let newMemberCounter = 0;
+  
+  // Add a new party member to the list
+  function addNewPartyMember() {
+    const membersList = document.querySelector('.party-members-edit-list');
+    const addCard = document.querySelector('.add-member-card');
+    const maxMembersNotice = document.querySelector('.max-members-notice');
+    
+    if (!membersList) return;
+    
+    // Count current members
+    const currentMembers = membersList.querySelectorAll('.party-member-edit-card');
+    const maxPartySize = 4;
+    
+    if (currentMembers.length >= maxPartySize) {
+      showToast('Maximum party size reached (4 members)', 'error');
+      return;
+    }
+    
+    newMemberCounter++;
+    const tempId = `new-${newMemberCounter}`;
+    const index = currentMembers.length;
+    
+    // Create new member card
+    const newCard = document.createElement('div');
+    newCard.className = 'party-member-edit-card new-member';
+    newCard.dataset.memberId = tempId;
+    newCard.dataset.index = index;
+    newCard.innerHTML = `
+      <div class="member-edit-header">
+        <span class="member-number">${index + 1}</span>
+        <span class="new-member-indicator"><i class="fas fa-plus-circle"></i> New</span>
+      </div>
+      <div class="member-edit-form">
+        <div class="form-group">
+          <label for="member-name-${tempId}">
+            <i class="fas fa-user"></i> Name
+          </label>
+          <input type="text"
+                 id="member-name-${tempId}"
+                 class="member-name-input new-member-input"
+                 data-member-id="${tempId}"
+                 value=""
+                 placeholder="Enter name..."
+                 autofocus>
+        </div>
+        <button type="button" class="btn-remove-member" data-member-id="${tempId}" title="Remove member">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
+    `;
+    
+    // Insert before add button or max notice
+    if (addCard) {
+      membersList.insertBefore(newCard, addCard);
+    } else if (maxMembersNotice) {
+      membersList.insertBefore(newCard, maxMembersNotice);
+    } else {
+      membersList.appendChild(newCard);
+    }
+    
+    // Check if we've reached max
+    const updatedCount = membersList.querySelectorAll('.party-member-edit-card').length;
+    if (updatedCount >= maxPartySize && addCard) {
+      addCard.style.display = 'none';
+      
+      // Add max notice if not present
+      if (!maxMembersNotice) {
+        const notice = document.createElement('div');
+        notice.className = 'max-members-notice';
+        notice.innerHTML = `
+          <i class="fas fa-info-circle"></i>
+          <p>Maximum party size reached. Need more guests? <a href="mailto:wedding@example.com">Contact us</a></p>
+        `;
+        membersList.appendChild(notice);
+      }
+    }
+    
+    // Update party count display
+    updatePartyCountDisplay();
+    
+    // Attach remove listener to new button
+    newCard.querySelector('.btn-remove-member').addEventListener('click', function() {
+      removePartyMember(tempId);
+    });
+    
+    // Mark as unsaved
+    markPartyAsUnsaved();
+    
+    // Focus the new input
+    const newInput = newCard.querySelector('.member-name-input');
+    if (newInput) newInput.focus();
+  }
+  
+  // Remove a party member from the list
+  function removePartyMember(memberId) {
+    const card = document.querySelector(`.party-member-edit-card[data-member-id="${memberId}"]`);
+    if (!card) return;
+    
+    // Confirm removal
+    showConfirmDialog(
+      'Are you sure you want to remove this party member?',
+      () => {
+        card.remove();
+        
+        // Show add button again if under max
+        const membersList = document.querySelector('.party-members-edit-list');
+        const currentMembers = membersList.querySelectorAll('.party-member-edit-card');
+        const addCard = document.querySelector('.add-member-card');
+        const maxMembersNotice = document.querySelector('.max-members-notice');
+        
+        if (currentMembers.length < 4) {
+          if (addCard) addCard.style.display = '';
+          if (maxMembersNotice) maxMembersNotice.remove();
+        }
+        
+        // Re-number members
+        membersList.querySelectorAll('.party-member-edit-card').forEach((card, idx) => {
+          const numberEl = card.querySelector('.member-number');
+          if (numberEl) numberEl.textContent = idx + 1;
+          card.dataset.index = idx;
+        });
+        
+        updatePartyCountDisplay();
+        markPartyAsUnsaved();
+      }
+    );
+  }
+  
+  // Update the party count display
+  function updatePartyCountDisplay() {
+    const countEl = document.querySelector('.party-count');
+    const membersList = document.querySelector('.party-members-edit-list');
+    if (countEl && membersList) {
+      const count = membersList.querySelectorAll('.party-member-edit-card').length;
+      countEl.textContent = `${count} / 4 members`;
+    }
+  }
+  
+  // Mark party changes as unsaved
+  function markPartyAsUnsaved() {
+    const saveBtn = document.getElementById('savePartyMembersBtn');
+    if (saveBtn && !saveBtn.classList.contains('unsaved')) {
+      saveBtn.classList.add('unsaved');
+      saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Party Members *';
+    }
+  }
+  
+  // Update party dietary checkbox visual state
+  window.updatePartyDietaryCheckbox = function(checkbox) {
+    const label = checkbox.closest('.dietary-checkbox');
+    if (label) {
+      if (checkbox.checked) {
+        label.classList.add('checked');
+      } else {
+        label.classList.remove('checked');
+      }
+    }
+    markDietaryAsUnsaved();
+  };
+  
+  // Mark dietary changes as unsaved
+  function markDietaryAsUnsaved() {
+    const saveBtn = document.getElementById('saveDietaryBtn');
+    if (saveBtn && !saveBtn.classList.contains('unsaved')) {
+      saveBtn.classList.add('unsaved');
+      saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Dietary Requirements *';
+    }
+  }
+  
+  // Save party members
+  async function savePartyMembers() {
+    const saveBtn = document.getElementById('savePartyMembersBtn');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    }
+    
+    try {
+      // Collect all member data from the form
+      const memberCards = document.querySelectorAll('.party-member-edit-card');
+      const partyMembers = [];
+      
+      memberCards.forEach(card => {
+        const memberId = card.dataset.memberId;
+        const nameInput = card.querySelector('.member-name-input');
+        const name = nameInput ? nameInput.value.trim() : '';
+        
+        if (!name) {
+          // Skip empty names
+          return;
+        }
+        
+        const isPrimary = card.querySelector('.primary-indicator') !== null;
+        const isChild = card.querySelector('.child-indicator') !== null;
+        const isNew = memberId.startsWith('new-');
+        
+        partyMembers.push({
+          id: isNew ? null : memberId,
+          name: name,
+          primary: isPrimary,
+          adult: !isChild
+        });
+      });
+      
+      // Validate at least primary member exists
+      if (partyMembers.length === 0) {
+        showToast('Please add at least one party member', 'error');
+        return;
+      }
+      
+      // Send to server
+      const response = await fetch('/api/guest/party', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify(partyMembers)
+      });
+      
+      if (response.ok) {
+        showToast('Party members saved successfully!', 'success');
+        if (saveBtn) {
+          saveBtn.classList.remove('unsaved');
+          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Party Members';
+        }
+        // Reload to get updated IDs and refresh dietary cards
+        loadPartyContent();
+      } else {
+        const data = await response.json();
+        showToast(data.error || 'Error saving party members', 'error');
+      }
+    } catch (err) {
+      console.error('Error saving party members:', err);
+      showToast('Error saving party members', 'error');
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        if (!saveBtn.classList.contains('unsaved')) {
+          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Party Members';
+        }
+      }
+    }
+  }
+  
+  // Save party dietary requirements
+  async function savePartyDietary() {
+    const saveBtn = document.getElementById('saveDietaryBtn');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    }
+    
+    try {
+      // Get current menu choices first
+      const currentChoicesResponse = await fetch('/api/guest/menu-choices', {
+        method: 'GET',
+        headers: { 'Authorization': token }
+      });
+      
+      let currentChoices = [];
+      if (currentChoicesResponse.ok) {
+        currentChoices = await currentChoicesResponse.json();
+      }
+      
+      // Collect dietary data from cards
+      const dietaryCards = document.querySelectorAll('.party-dietary-card');
+      
+      dietaryCards.forEach(card => {
+        const memberId = card.dataset.memberId;
+        
+        // Skip invalid member IDs
+        if (!memberId || memberId.startsWith('new-')) return;
+        
+        // Get selected dietary options
+        const selectedOptions = [];
+        card.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
+          selectedOptions.push({
+            name: checkbox.value,
+            selected: true
+          });
+        });
+        
+        // Get free text detail
+        const detailTextarea = card.querySelector('.dietary-detail-textarea');
+        const specialRequestDetail = detailTextarea && detailTextarea.value.trim() ? detailTextarea.value.trim() : null;
+        
+        // Find or create choice for this member
+        let memberChoice = currentChoices.find(c => c.partyGuestId === memberId);
+        if (!memberChoice) {
+          memberChoice = {
+            partyGuestId: memberId,
+            choices: []
+          };
+          currentChoices.push(memberChoice);
+        }
+        
+        memberChoice.specialRequest = selectedOptions;
+        memberChoice.specialRequestDetail = specialRequestDetail;
+      });
+      
+      // Filter out any with invalid IDs
+      const validChoices = currentChoices.filter(choice =>
+        choice.partyGuestId &&
+        !choice.partyGuestId.startsWith('new-') &&
+        choice.partyGuestId !== 'null' &&
+        choice.partyGuestId !== 'undefined'
+      );
+      
+      // Send to server
+      const response = await fetch('/api/guest/menu-choices', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ choices: validChoices })
+      });
+      
+      if (response.ok) {
+        showToast('Dietary requirements saved successfully!', 'success');
+        if (saveBtn) {
+          saveBtn.classList.remove('unsaved');
+          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Dietary Requirements';
+        }
+      } else {
+        const data = await response.json();
+        showToast(data.error || 'Error saving dietary requirements', 'error');
+      }
+    } catch (err) {
+      console.error('Error saving dietary requirements:', err);
+      showToast('Error saving dietary requirements', 'error');
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        if (!saveBtn.classList.contains('unsaved')) {
+          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Dietary Requirements';
+        }
+      }
+    }
+  }
+
   // Tabs functionality
   const tabButtons = document.querySelectorAll('.tab-btn');
   const tabContents = document.querySelectorAll('.tab-content');
@@ -1858,6 +2479,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Add active class to the clicked button and its content
       button.classList.add('active');
       document.getElementById(`${targetTab}-tab`).classList.add('active');
+      
+      // If the tab is party, load the party content
+      if (targetTab === 'partyContent') {
+        loadPartyContent();
+      }
       
       // If the tab is menu, load the menu content
       if (targetTab === 'menuContent') {
@@ -2255,6 +2881,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load appropriate content for the active tab
     if (targetTab === 'summaryContent') {
       loadSummaryContent();
+    } else if (targetTab === 'partyContent') {
+      loadPartyContent();
     } else if (targetTab === 'menuContent') {
       loadMenuSelections();
     } else if (targetTab === 'eventsContent') {

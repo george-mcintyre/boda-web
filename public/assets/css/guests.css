@@ -4171,3 +4171,666 @@ header {
     background: linear-gradient(135deg, rgba(139, 90, 150, 0.08), rgba(212, 165, 165, 0.05));
     border-color: var(--primary-color);
 }
+
+
+/* ========================================
+   Party Management Tab Styles
+   ======================================== */
+
+.party-management-container {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.loading-party {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-light);
+}
+
+.loading-party i {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    display: block;
+}
+
+.loading-party p {
+    font-size: 1.1em;
+    margin: 0;
+}
+
+/* Party Members Management Section */
+.party-members-management {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 30px;
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+}
+
+.party-members-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.party-members-header h3 {
+    margin: 0;
+    font-size: 1.4em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.party-members-header h3 i {
+    font-size: 1em;
+    opacity: 0.9;
+}
+
+.party-count-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    backdrop-filter: blur(5px);
+}
+
+.party-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-add-member {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(5px);
+}
+
+.btn-add-member:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+}
+
+.btn-add-member:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-add-member i {
+    font-size: 0.9em;
+}
+
+/* Party Members List */
+.party-members-edit-list {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Party Member Edit Card */
+.party-member-edit-card {
+    background: #fafbfc;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.party-member-edit-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(139, 90, 150, 0.1);
+}
+
+.party-member-edit-card.new-member {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #f8fff8, #f0fff0);
+}
+
+.party-member-edit-card.primary-member {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(139, 90, 150, 0.05), rgba(212, 165, 165, 0.03));
+}
+
+.member-edit-header {
+    background: linear-gradient(135deg, rgba(139, 90, 150, 0.1), rgba(212, 165, 165, 0.05));
+    padding: 12px 15px;
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.member-edit-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.member-edit-header i {
+    color: var(--primary-color);
+    font-size: 1.1em;
+}
+
+.member-edit-header h4 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.member-badges {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.primary-indicator {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    font-size: 0.7em;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.new-member-indicator {
+    background: #28a745;
+    color: white;
+    font-size: 0.7em;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.child-indicator {
+    background: #17a2b8;
+    color: white;
+    font-size: 0.7em;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-remove-member {
+    background: transparent;
+    color: #dc3545;
+    border: 2px solid #dc3545;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-remove-member:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-remove-member i {
+    font-size: 0.85em;
+}
+
+/* Member Edit Form */
+.member-edit-form {
+    padding: 15px;
+}
+
+.member-edit-form .form-group {
+    margin-bottom: 15px;
+}
+
+.member-edit-form .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.member-edit-form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 0.9em;
+}
+
+.member-edit-form input[type="text"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.member-edit-form input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(139, 90, 150, 0.1);
+}
+
+.member-edit-form input[type="text"]:disabled {
+    background: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.checkbox-group label {
+    margin-bottom: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* Party Actions */
+.party-members-actions {
+    padding: 20px;
+    border-top: 1px solid #e9ecef;
+    background: #fafbfc;
+    text-align: center;
+}
+
+.btn-save-party {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 10px;
+    font-size: 1.05em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(139, 90, 150, 0.3);
+}
+
+.btn-save-party:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 90, 150, 0.4);
+}
+
+.btn-save-party:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-save-party.unsaved {
+    animation: pulse-unsaved 1.5s infinite;
+}
+
+/* Max Members Notice */
+.max-members-notice {
+    background: linear-gradient(135deg, #fff3cd, #ffeeba);
+    border: 1px solid #ffc107;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin: 0 20px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.max-members-notice i {
+    color: #856404;
+    font-size: 1.2em;
+    margin-top: 2px;
+}
+
+.max-members-notice p {
+    margin: 0;
+    color: #856404;
+    font-size: 0.95em;
+    line-height: 1.5;
+}
+
+/* Party Dietary Management Section */
+.party-dietary-management {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border: 1px solid #e9ecef;
+}
+
+.party-dietary-header {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+    padding: 20px 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.party-dietary-header i {
+    font-size: 1.5em;
+    opacity: 0.9;
+}
+
+.party-dietary-header h3 {
+    margin: 0;
+    font-size: 1.4em;
+    font-weight: 600;
+}
+
+.party-dietary-description {
+    padding: 15px 25px;
+    margin: 0;
+    color: var(--text-light);
+    font-size: 0.95em;
+    border-bottom: 1px solid #e9ecef;
+    background: #fffbf5;
+}
+
+/* Party Dietary Cards */
+.party-dietary-cards {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.party-dietary-card {
+    background: #fafbfc;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.party-dietary-card:hover {
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(139, 90, 150, 0.1);
+}
+
+.party-dietary-card-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 12px 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.party-dietary-card-header i {
+    font-size: 1em;
+    opacity: 0.9;
+}
+
+.party-dietary-card-header h4 {
+    margin: 0;
+    font-size: 1em;
+    font-weight: 600;
+    flex: 1;
+}
+
+.party-dietary-card-header .badge-primary {
+    background: rgba(255, 255, 255, 0.25);
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 0.7em;
+    text-transform: uppercase;
+}
+
+/* Dietary Options */
+.dietary-options {
+    padding: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.dietary-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: white;
+    border: 2px solid #e1e5e9;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85em;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.dietary-checkbox:hover {
+    border-color: var(--primary-color);
+    background: rgba(139, 90, 150, 0.05);
+}
+
+.dietary-checkbox.checked {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.dietary-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.dietary-checkbox i {
+    font-size: 1em;
+}
+
+.dietary-checkbox.checked i {
+    color: white;
+}
+
+/* Dietary Detail Input */
+.dietary-detail {
+    padding: 0 15px 15px;
+}
+
+.dietary-detail label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.dietary-detail textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 0.9em;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 80px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.dietary-detail textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(139, 90, 150, 0.1);
+}
+
+.dietary-detail textarea::placeholder {
+    color: #adb5bd;
+    font-style: italic;
+}
+
+/* Dietary Actions */
+.party-dietary-actions {
+    padding: 20px;
+    border-top: 1px solid #e9ecef;
+    background: #fffbf5;
+    text-align: center;
+}
+
+.btn-save-dietary {
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+    border: none;
+    padding: 14px 40px;
+    border-radius: 10px;
+    font-size: 1.05em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+}
+
+.btn-save-dietary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+}
+
+.btn-save-dietary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-save-dietary.unsaved {
+    animation: pulse-unsaved-dietary 1.5s infinite;
+}
+
+@keyframes pulse-unsaved-dietary {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 25px rgba(255, 152, 0, 0.6);
+    }
+}
+
+/* Responsive Styles for Party Management */
+@media (max-width: 768px) {
+    .party-members-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .party-header-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .party-members-header h3 {
+        font-size: 1.2em;
+    }
+    
+    .party-dietary-header {
+        padding: 15px 20px;
+    }
+    
+    .party-dietary-header h3 {
+        font-size: 1.2em;
+    }
+    
+    .party-dietary-cards {
+        padding: 15px;
+        grid-template-columns: 1fr;
+    }
+    
+    .member-edit-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .btn-remove-member {
+        align-self: flex-end;
+        margin-top: -5px;
+    }
+    
+    .max-members-notice {
+        margin: 0 15px 15px;
+        padding: 12px 15px;
+    }
+    
+    .btn-save-party,
+    .btn-save-dietary {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 20px;
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .party-members-edit-list {
+        padding: 15px;
+    }
+    
+    .member-edit-form {
+        padding: 12px;
+    }
+    
+    .dietary-options {
+        padding: 12px;
+    }
+    
+    .dietary-checkbox {
+        padding: 6px 12px;
+        font-size: 0.8em;
+        gap: 5px;
+    }
+    
+    .dietary-detail {
+        padding: 0 12px 12px;
+    }
+    
+    .party-members-actions,
+    .party-dietary-actions {
+        padding: 15px;
+    }
+}
