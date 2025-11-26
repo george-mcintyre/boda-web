@@ -499,254 +499,402 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function loadMessagesContent() {
   }
 
-   // Function to load the events content in the events tab
-   async function loadEventsContent() {
-     const eventsContent = document.getElementById('agendaContent');
-     
-     if (!eventsContent) return;
-     
-     // Show loading state
-     eventsContent.innerHTML = `
-       <div class="loading-events" style="text-align: center; padding: 40px;">
-         <i class="fas fa-spinner fa-spin" style="font-size: 2em; color: var(--primary-color); margin-bottom: 15px;"></i>
-         <p>Loading events...</p>
-       </div>
-     `;
-     
+   // Helper function to initialize a map for an event
+   function initEventMap(mapContainerId, lat, lng) {
      try {
-       // Fetch events, party members, and event choices in parallel
-       const [eventsRes, partyRes, eventChoicesRes] = await Promise.all([
-         fetch('/api/guest/events', {
-           method: 'GET',
-           headers: { 'Authorization': token }
-         }),
-         fetch('/api/guest/party', {
-           method: 'GET',
-           headers: { 'Authorization': token }
-         }),
-         fetch('/api/guest/event-choices', {
-           method: 'GET',
-           headers: { 'Authorization': token }
-         })
-       ]);
-       
-       const events = await eventsRes.json().catch(() => []);
-       const partyMembers = await partyRes.json().catch(() => []);
-       const eventChoices = await eventChoicesRes.json().catch(() => []);
-       
-       if (!eventsRes.ok || !Array.isArray(events) || events.length === 0) {
-         eventsContent.innerHTML = `
-           <div class="no-events-message">
-             <i class="fas fa-calendar-times"></i>
-             <h3>No Events Available</h3>
-             <p>There are no events scheduled yet. Please check back later.</p>
-           </div>
-         `;
-         return;
-       }
-       
-       // Build a lookup map for event choices: { partyGuestId: { eventId: attending } }
-       const choicesMap = {};
-       eventChoices.forEach(partyChoice => {
-         if (!choicesMap[partyChoice.partyGuestId]) {
-           choicesMap[partyChoice.partyGuestId] = {};
-         }
-         (partyChoice.choices || []).forEach(choice => {
-           choicesMap[partyChoice.partyGuestId][choice.eventId] = choice.attending;
-         });
-       });
-       
-       // Helper function to format date
-       const formatDate = (dateStr) => {
-         if (!dateStr) return '';
-         const date = new Date(dateStr);
-         return date.toLocaleDateString('en-GB', {
-           weekday: 'long',
-           year: 'numeric',
-           month: 'long',
-           day: 'numeric'
-         });
-       };
-       
-       // Helper function to format time
-       const formatTime = (dateStr) => {
-         if (!dateStr) return '';
-         const date = new Date(dateStr);
-         return date.toLocaleTimeString('en-GB', {
-           hour: '2-digit',
-           minute: '2-digit'
-         });
-       };
-       
-       // Helper function to get sub-event icon
-       const getSubEventIcon = (iconName) => {
-         const iconMap = {
-           'ceremony': 'ring',
-           'cocktails': 'glass-cheers',
-           'reception': 'utensils',
-           'dancing': 'music',
-           'dinner': 'utensils',
-           'party': 'music'
-         };
-         return iconMap[iconName] || 'calendar-check';
-       };
-       
-       // Group events by date
-       const eventsByDate = {};
-       events.forEach(event => {
-         const dateKey = formatDate(event.date);
-         if (!eventsByDate[dateKey]) {
-           eventsByDate[dateKey] = [];
-         }
-         eventsByDate[dateKey].push(event);
-       });
-       
-       let eventHTML = '<div class="events-container">';
-       
-       // Create event cards for each date
-       Object.keys(eventsByDate).forEach(dateKey => {
-         eventHTML += `
-           <div class="event-day">
-             <h3 class="day-title">
-               <i class="fas fa-calendar-day"></i>
-               ${dateKey}
-             </h3>
-             <div class="day-events">
-         `;
+       // Check if Leaflet is available
+       if (typeof L !== 'undefined') {
+         const mapContainer = document.getElementById(mapContainerId);
          
-         eventsByDate[dateKey].forEach(event => {
-           // Event card
-           eventHTML += `
-             <div class="event-card" data-event-id="${event.id}">
-               <div class="event-card-header">
-                 ${event.image ? `<div class="event-image"><img src="${event.image}" alt="${event.name}" onerror="this.parentElement.style.display='none';"/></div>` : ''}
-                 <div class="event-header-content">
-                   <h4 class="event-title">${event.title || event.name}</h4>
-                   <p class="event-name">${event.name}</p>
-                 </div>
-               </div>
-               
-               <div class="event-details">
-                 <div class="event-time">
-                   <i class="fas fa-clock"></i>
-                   <span>${formatTime(event.date)}${event.end ? ' - ' + formatTime(event.end) : ''}</span>
-                 </div>
-                 
-                 ${event.locationAddress ? `
-                   <div class="event-location">
-                     <i class="fas fa-map-marker-alt"></i>
-                     <span>${event.locationAddress}</span>
-                     ${event.locationLatitude && event.locationLongitude ? `
-                       <a href="https://www.google.com/maps?q=${event.locationLatitude},${event.locationLongitude}"
-                          target="_blank"
-                          class="map-link"
-                          title="Open in Google Maps">
-                         <i class="fas fa-external-link-alt"></i>
-                       </a>
-                     ` : ''}
-                   </div>
-                 ` : ''}
-                 
-                 ${event.description ? `
-                   <div class="event-description">
-                     <p>${event.description}</p>
-                   </div>
-                 ` : ''}
-               </div>
-               
-               ${event.sub_events && event.sub_events.length > 0 ? `
-                 <div class="sub-events">
-                   <h5 class="sub-events-title">
-                     <i class="fas fa-list"></i>
-                     Schedule
-                   </h5>
-                   <div class="sub-events-list">
-                     ${event.sub_events.map(subEvent => `
-                       <div class="sub-event-item">
-                         <div class="sub-event-icon">
-                           <i class="fas fa-${getSubEventIcon(subEvent.icon)}"></i>
-                         </div>
-                         <div class="sub-event-info">
-                           <span class="sub-event-name">${subEvent.name}</span>
-                           <span class="sub-event-time">${formatTime(subEvent.date)}${subEvent.end ? ' - ' + formatTime(subEvent.end) : ''}</span>
-                         </div>
-                         ${subEvent.description ? `<p class="sub-event-description">${subEvent.description}</p>` : ''}
-                       </div>
-                     `).join('')}
-                   </div>
-                 </div>
-               ` : ''}
-               
-               <div class="event-attendance">
-                 <h5 class="attendance-title">
-                   <i class="fas fa-users"></i>
-                   Attendance
-                 </h5>
-                 <div class="attendance-list">
-                   ${partyMembers.map(member => {
-                     const isAttending = choicesMap[member.id] && choicesMap[member.id][event.id] === true;
-                     return `
-                       <div class="attendance-item">
-                         <label class="attendance-label">
-                           <input
-                             type="checkbox"
-                             class="attendance-checkbox"
-                             data-event-id="${event.id}"
-                             data-member-id="${member.id}"
-                             ${isAttending ? 'checked' : ''}
-                           />
-                           <span class="member-name">${member.name}</span>
-                           ${member.primary ? '<span class="primary-badge">Primary</span>' : ''}
-                           ${!member.adult ? '<span class="child-badge">Child</span>' : ''}
-                         </label>
-                       </div>
-                     `;
-                   }).join('')}
-                 </div>
+         if (mapContainer) {
+           const map = L.map(mapContainerId).setView([parseFloat(lat), parseFloat(lng)], 16);
+           
+           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+             attribution: '© OpenStreetMap contributors'
+           }).addTo(map);
+           
+           L.marker([parseFloat(lat), parseFloat(lng)]).addTo(map);
+           
+           // Fix map sizing issue when container is hidden
+           setTimeout(() => {
+             map.invalidateSize();
+           }, 100);
+         }
+       } else {
+         // Fallback: Show a simple coordinate display with map link
+         const mapContainer = document.getElementById(mapContainerId);
+         
+         if (mapContainer) {
+           mapContainer.innerHTML = `
+             <div style="width:100%;height:100%;background:linear-gradient(45deg,#f0f0f0,#e0e0e0);display:flex;align-items:center;justify-content:center;border-radius:8px;">
+               <div style="text-align:center;color:#666;">
+                 <i class="fas fa-map-marker-alt" style="font-size:2em;color:#e74c3c;margin-bottom:10px;"></i>
+                 <div>Location: ${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)}</div>
+                 <small>Interactive map requires Leaflet.js</small>
                </div>
              </div>
            `;
-         });
-         
-         eventHTML += '</div></div>';
-       });
-       
-       // Add save button
-       eventHTML += `
-         <div class="events-actions">
-           <button id="saveEventChoicesBtn" class="btn-save-choices">
-             <i class="fas fa-save"></i>
-             Save Attendance Choices
-           </button>
-         </div>
-       `;
-       
-       eventHTML += '</div>';
-       eventsContent.innerHTML = eventHTML;
-       
-       // Add event listener for save button
-       const saveBtn = document.getElementById('saveEventChoicesBtn');
-       if (saveBtn) {
-         saveBtn.addEventListener('click', saveEventChoices);
+         }
        }
+     } catch (error) {
+       console.error('Map initialization error:', error);
+       const mapContainer = document.getElementById(mapContainerId);
        
-     } catch (err) {
-       console.error('Error loading events:', err);
-       eventsContent.innerHTML = `
-         <div class="error-message">
-           <i class="fas fa-exclamation-triangle"></i>
-           <h3>Error Loading Events</h3>
-           <p>There was an error loading the events. Please try again.</p>
-           <button class="btn-retry" onclick="loadEventsContent()">
-             <i class="fas fa-redo"></i>
-             Retry
-           </button>
-         </div>
-       `;
+       if (mapContainer) {
+         mapContainer.innerHTML = `
+           <div style="width:100%;height:100%;background:linear-gradient(45deg,#f0f0f0,#e0e0e0);display:flex;align-items:center;justify-content:center;border-radius:8px;">
+             <div style="text-align:center;color:#666;">
+               <i class="fas fa-map-marker-alt" style="font-size:2em;color:#e74c3c;margin-bottom:10px;"></i>
+               <div>Location: ${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)}</div>
+               <small>Open in Maps to view</small>
+             </div>
+           </div>
+         `;
+       }
      }
    }
+
+  /**
+   * Load and display events content in the events tab
+   * Fetches events, party members, and event choices from the API
+   * Creates event cards with attendance checkboxes for each party member
+   */
+  async function loadEventsContent() {
+    const eventsContent = document.getElementById('agendaContent');
+    
+    if (!eventsContent) {
+      console.error('Events content container not found');
+      return;
+    }
+    
+    // Show loading state
+    eventsContent.innerHTML = `
+      <div class="loading-events">
+        <i class="fas fa-spinner fa-spin fa-3x"></i>
+        <p>Loading events...</p>
+      </div>
+    `;
+    
+    try {
+      // Fetch all required data in parallel
+      const [eventsResponse, partyResponse, choicesResponse] = await Promise.all([
+        fetch('/api/guest/events', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        }),
+        fetch('/api/guest/party', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        }),
+        fetch('/api/guest/event-choices', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        })
+      ]);
+      
+      // Parse responses with error handling
+      let events = [];
+      let partyMembers = [];
+      let eventChoices = [];
+      
+      if (eventsResponse.ok) {
+        events = await eventsResponse.json();
+      } else {
+        console.error('Failed to fetch events:', eventsResponse.status);
+      }
+      
+      if (partyResponse.ok) {
+        partyMembers = await partyResponse.json();
+      } else {
+        console.error('Failed to fetch party members:', partyResponse.status);
+      }
+      
+      if (choicesResponse.ok) {
+        eventChoices = await choicesResponse.json();
+      } else {
+        // Event choices may not exist yet - not an error
+        console.log('No event choices found (may be first time)');
+      }
+      
+      // Handle no events case
+      if (!Array.isArray(events) || events.length === 0) {
+        eventsContent.innerHTML = `
+          <div class="no-events-message">
+            <i class="fas fa-calendar-times"></i>
+            <h3>No Events Available</h3>
+            <p>There are no events scheduled yet. Please check back later.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Build attendance lookup: { partyGuestId: { eventId: boolean } }
+      const attendanceLookup = {};
+      if (Array.isArray(eventChoices)) {
+        eventChoices.forEach(memberChoice => {
+          const memberId = memberChoice.partyGuestId;
+          if (!attendanceLookup[memberId]) {
+            attendanceLookup[memberId] = {};
+          }
+          if (Array.isArray(memberChoice.choices)) {
+            memberChoice.choices.forEach(choice => {
+              attendanceLookup[memberId][choice.eventId] = choice.attending === true;
+            });
+          }
+        });
+      }
+      
+      // Date/time formatting helpers
+      const formatEventDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-GB', {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        });
+      };
+      
+      const formatEventTime = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleTimeString('en-GB', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      };
+      
+      // Map sub-event icon names to Font Awesome icons
+      const getIconClass = (iconName) => {
+        const icons = {
+          'ceremony': 'fa-ring',
+          'cocktails': 'fa-glass-cheers',
+          'reception': 'fa-utensils',
+          'dancing': 'fa-music',
+          'dinner': 'fa-utensils',
+          'party': 'fa-champagne-glasses',
+          'welcome': 'fa-hand-wave'
+        };
+        return icons[iconName] || 'fa-calendar-check';
+      };
+      
+      // Group events by date for better organization
+      const eventsByDate = {};
+      events.forEach(event => {
+        const dateKey = formatEventDate(event.date);
+        if (!eventsByDate[dateKey]) {
+          eventsByDate[dateKey] = [];
+        }
+        eventsByDate[dateKey].push(event);
+      });
+      
+      // Track events with coordinates for map initialization
+      const mapsToInitialize = [];
+      
+      // Build HTML output
+      let html = '<div class="events-container">';
+      
+      Object.entries(eventsByDate).forEach(([dateKey, dateEvents]) => {
+        html += `
+          <div class="event-day">
+            <h3 class="day-title">
+              <i class="fas fa-calendar-day"></i>
+              ${dateKey}
+            </h3>
+            <div class="day-events">
+        `;
+        
+        dateEvents.forEach(event => {
+          const eventId = event.id;
+          const mapContainerId = `event-map-${eventId}`;
+          const hasLocation = event.locationLatitude && event.locationLongitude;
+          
+          // Track for map initialization
+          if (hasLocation) {
+            mapsToInitialize.push({
+              containerId: mapContainerId,
+              lat: event.locationLatitude,
+              lng: event.locationLongitude
+            });
+          }
+          
+          // Build event card
+          html += `
+            <div class="event-card" data-event-id="${eventId}">
+              <!-- Event Header -->
+              <div class="event-card-header">
+                ${event.image ? `
+                  <div class="event-image">
+                    <img src="${event.image}" alt="${event.name}" onerror="this.parentElement.style.display='none';">
+                  </div>
+                ` : ''}
+                <div class="event-header-content">
+                  <h4 class="event-title">${event.title || event.name}</h4>
+                  ${event.title && event.name !== event.title ? `<p class="event-name">${event.name}</p>` : ''}
+                </div>
+              </div>
+              
+              <!-- Event Details -->
+              <div class="event-details">
+                <div class="event-time">
+                  <i class="fas fa-clock"></i>
+                  <span>${formatEventTime(event.date)}${event.end ? ' - ' + formatEventTime(event.end) : ''}</span>
+                </div>
+                
+                ${event.locationAddress || event.location ? `
+                  <div class="event-location">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${event.locationAddress || event.location}</span>
+                    ${hasLocation ? `
+                      <a href="https://www.google.com/maps?q=${event.locationLatitude},${event.locationLongitude}"
+                         target="_blank"
+                         class="map-link"
+                         title="Open in Google Maps">
+                        <i class="fas fa-external-link-alt"></i>
+                      </a>
+                    ` : ''}
+                  </div>
+                ` : ''}
+                
+                ${hasLocation ? `
+                  <div class="event-map-container">
+                    <div id="${mapContainerId}" class="event-map"></div>
+                    <div class="map-coordinates">
+                      <span>${parseFloat(event.locationLatitude).toFixed(4)}, ${parseFloat(event.locationLongitude).toFixed(4)}</span>
+                      <a href="https://www.openstreetmap.org/?mlat=${event.locationLatitude}&mlon=${event.locationLongitude}#map=16/${event.locationLatitude}/${event.locationLongitude}"
+                         target="_blank"
+                         class="osm-link">
+                        View Larger Map
+                      </a>
+                    </div>
+                  </div>
+                ` : ''}
+                
+                ${event.description ? `
+                  <div class="event-description">
+                    <p>${event.description}</p>
+                  </div>
+                ` : ''}
+              </div>
+              
+              <!-- Sub-Events Schedule -->
+              ${Array.isArray(event.sub_events) && event.sub_events.length > 0 ? `
+                <div class="sub-events">
+                  <h5 class="sub-events-title">
+                    <i class="fas fa-list-ul"></i>
+                    Schedule
+                  </h5>
+                  <div class="sub-events-list">
+                    ${event.sub_events.map(subEvent => `
+                      <div class="sub-event-item">
+                        <div class="sub-event-icon">
+                          <i class="fas ${getIconClass(subEvent.icon)}"></i>
+                        </div>
+                        <div class="sub-event-info">
+                          <span class="sub-event-name">${subEvent.name}</span>
+                          <span class="sub-event-time">
+                            ${formatEventTime(subEvent.date)}${subEvent.end ? ' - ' + formatEventTime(subEvent.end) : ''}
+                          </span>
+                          ${subEvent.description ? `<p class="sub-event-description">${subEvent.description}</p>` : ''}
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : ''}
+              
+              <!-- Party Member Attendance -->
+              <div class="event-attendance">
+                <h5 class="attendance-title">
+                  <i class="fas fa-users"></i>
+                  Who's Attending?
+                </h5>
+                <div class="attendance-list">
+                  ${Array.isArray(partyMembers) && partyMembers.length > 0 ?
+                    partyMembers.map(member => {
+                      // Check if this member is attending this event
+                      const isAttending = attendanceLookup[member.id]
+                        ? attendanceLookup[member.id][eventId] === true
+                        : false;
+                      
+                      return `
+                        <div class="attendance-item">
+                          <label class="attendance-label">
+                            <input
+                              type="checkbox"
+                              class="attendance-checkbox"
+                              data-event-id="${eventId}"
+                              data-member-id="${member.id}"
+                              ${isAttending ? 'checked' : ''}
+                            >
+                            <span class="member-name">${member.name}</span>
+                            ${member.primary ? '<span class="primary-badge">Primary</span>' : ''}
+                            ${member.adult === false ? '<span class="child-badge">Child</span>' : ''}
+                          </label>
+                        </div>
+                      `;
+                    }).join('')
+                  : '<p class="no-members">No party members found.</p>'}
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        
+        html += '</div></div>'; // Close day-events and event-day
+      });
+      
+      // Save button
+      html += `
+        <div class="events-actions">
+          <button type="button" id="saveEventChoicesBtn" class="btn-save-choices">
+            <i class="fas fa-save"></i>
+            Save Attendance Choices
+          </button>
+        </div>
+      `;
+      
+      html += '</div>'; // Close events-container
+      
+      // Update DOM
+      eventsContent.innerHTML = html;
+      
+      // Initialize maps after DOM update
+      if (mapsToInitialize.length > 0) {
+        setTimeout(() => {
+          mapsToInitialize.forEach(mapConfig => {
+            initEventMap(mapConfig.containerId, mapConfig.lat, mapConfig.lng);
+          });
+        }, 150);
+      }
+      
+      // Attach save button event listener
+      const saveButton = document.getElementById('saveEventChoicesBtn');
+      if (saveButton) {
+        saveButton.addEventListener('click', saveEventChoices);
+      }
+      
+    } catch (error) {
+      console.error('Error loading events:', error);
+      eventsContent.innerHTML = `
+        <div class="error-message">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Error Loading Events</h3>
+          <p>There was a problem loading the events. Please try again.</p>
+          <button class="btn-retry" onclick="loadEventsContent()">
+            <i class="fas fa-redo"></i>
+            Retry
+          </button>
+        </div>
+      `;
+    }
+  }
+  
+  // Make loadEventsContent globally accessible for retry button
+  window.loadEventsContent = loadEventsContent;
    
-   // Function to save event attendance choices
+  // Function to save event attendance choices
    async function saveEventChoices() {
      const saveBtn = document.getElementById('saveEventChoicesBtn');
      if (saveBtn) {
