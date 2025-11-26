@@ -5,32 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title data-i18n="admin:pageTitle">Panel de Administración - Boda de Iluminada & George</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/wedding.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
           crossorigin=""/>
 </head>
 <body>
-  <header>
-    <div class="header-content">
-      <h1 data-i18n="admin:title">Panel de Administración</h1>
-      <a href="index.html" class="home-link">
-        <i class="fas fa-home"></i>
-        <span data-i18n="admin:home">Inicio</span>
-      </a>
+  <!-- Sticky Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="header-left">
+        <h1 data-i18n="admin:title"><i class="fas fa-user-shield"></i> Administration Panel</h1>
+        <span id="guestNameDisplay" class="guest-name-display" style="display: none;"></span>
+      </div>
+      <div class="header-actions" aria-label="Top-right actions">
+        <!-- Language Selector Component -->
+        <div data-auto-init="language-selector" class="language-selector"></div>
+        <a href="index.html" class="home-link">
+          <i class="fas fa-home" aria-hidden="true"></i>
+          <span data-i18n="common:home">Home</span>
+        </a>
+        <button id="logoutAdmin" class="admin-action">
+          <i class="fas fa-sign-out-alt"></i>
+          <span data-i18n="admin:logout">Log out</span>
+        </button>
+      </div>
     </div>
-  </header>
+  </nav>
 
   <main>
     <!-- Admin Panel -->
     <section id="adminPanelSection">
       <div class="admin-header">
-        <button id="logoutAdmin" class="admin-action">
-          <i class="fas fa-sign-out-alt"></i>
-          <span data-i18n="admin:logout">Cerrar sesión</span>
-        </button>
-        <div class="admin-welcome">
-          <h2><i class="fas fa-user-shield"></i> <span data-i18n="admin:welcomeTitle">Bienvenido, Administrador</span></h2>
           <p data-i18n="admin:welcomeDesc">Gestiona toda la información de la boda de Iluminada y George</p>
         </div>
       </div>
@@ -82,7 +89,7 @@
 
   <!-- i18n common system -->
   <script src="/js/i18n.js"></script>
-
+  <script src="components/language-selector.js"></script>
   <script>
     // Verify authentication on page load
     document.addEventListener('DOMContentLoaded', () => {

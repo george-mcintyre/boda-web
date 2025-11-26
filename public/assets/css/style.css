@@ -122,7 +122,7 @@ header::before {
   align-items: center;
   gap: 0.5rem;
   background: rgba(255, 255, 255, 0.2);
-  color: var(--white);
+  color: #605047;
   text-decoration: none;
   padding: 0.8rem 1.5rem;
   border-radius: 50px;
@@ -1055,9 +1055,18 @@ footer {
 }
 
 #logoutAdmin {
-  background: linear-gradient(135deg, #DC3545 0%, #C82333 100%);
-  float: right;
-  margin-bottom: 1em;
+   display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: #605047;
+  text-decoration: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  backdrop-filter: blur(10px);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* Styles for statistics */

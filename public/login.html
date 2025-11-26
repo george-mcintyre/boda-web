@@ -8,23 +8,28 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <header>
-    <div class="header-content">
-      <h1 data-i18n="login:header">Guest access</h1>
-      <a href="index.html" class="home-link">
-        <i class="fas fa-home"></i>
-        <span data-i18n="login:home">Home</span>
-      </a>
-    </div>
-  </header>
   <main>
-    <form id="loginForm" autocomplete="off">
-      <label for="email" data-i18n="login:emailLabel">Email:</label>
-      <input type="email" id="email" name="email" autocomplete="off" data-i18n-placeholder="login:emailPlaceholder" placeholder="Enter your email" required>
-      <button type="submit" data-i18n="login:submit">Continue</button>
-    </form>
-    <div id="loginMessage" style="margin-top:1em;"></div>
-  </main>
+    <div class="admin-login-container fade-in-up">
+
+
+      <div class="admin-login-icon">
+        <i class="fas fa-user"></i>
+      </div>
+      <h2 data-i18n="login:header">Guest Login</h2>
+
+      <form id="loginForm" autocomplete="off">
+        <label for="email" data-i18n="login:emailLabel">Email:</label>
+        <input type="email" id="email" name="email" autocomplete="off" data-i18n-placeholder="login:emailPlaceholder" placeholder="Enter your email" required>
+        <a href="index.html" class="home-link">
+          <i class="fas fa-home" aria-hidden="true"></i>
+          <span data-i18n="common:home">Cancel</span>
+        </a>
+        <button type="submit" data-i18n="login:submit">Continue</button>
+      </form>
+      <div id="loginMessage" style="margin-top:1em;"></div>
+    </div>
+  </div>
+</main>
   <script src="js/i18n.js"></script>
   <script src="js/auth-check.js"></script>
   <script src="js/login.js"></script>

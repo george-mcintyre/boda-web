@@ -49,7 +49,7 @@ const translations = {
     'common:gift': 'Gift',
 
     'guests:title': 'Guest Zone - Iluminada & George Wedding',
-    'guests:welcomeTitle': 'Welcome to the guest zone',
+    'guests:welcomeTitle': 'Guest Zone',
     'guests:tabSummary': 'Summary',
     'guests:tabMenu': 'Menu',
     'guests:tabAgenda': 'Agenda',
@@ -105,8 +105,8 @@ const translations = {
     'guests:menuSaved': 'Menu saved successfully',
     'common:home': 'Home',
     // Gifts
-    'guests:tabCash': 'Gift Registry',
-    'guests:cashGifts': 'Gift Registry',
+    'guests:tabCash': 'Gifts',
+    'guests:cashGifts': 'Gifts',
     'guests:cashGiftsDesc': 'If you prefer to give a cash gift, you can choose a fixed or custom amount. Your generosity will help us start our new life together.',
     'guests:cashGiftsSummaryDesc': 'Your cash gifts made for our wedding.',
     'guests:cashGiftsSummary': 'Cash Gifts Summary',
@@ -175,7 +175,7 @@ const translations = {
     'login:emailNotFound': 'Email no encontrado en la lista de guests',
     'login:serverError': 'Error de conexión con el servidor',
 
-    'adminLogin:pageTitle': 'Acceso Administrador - Boda de Iluminada & George',
+    'adminLogin:pageTitle': 'Acceso Administrador',
     'adminLogin:header': 'Acceso Administrador',
     'adminLogin:home': 'Inicio',
     'adminLogin:subHeader': 'Acceso al Panel de Administrador',
@@ -186,8 +186,8 @@ const translations = {
     'adminLogin:passwordPlaceholder': 'Tu contraseña secreta',
     'adminLogin:submit': 'Iniciar Sesión',
 
-    'guests:title': 'Zona de guests - Boda de Iluminada & George',
-    'guests:welcomeTitle': 'Bienvenido a la zona de guests',
+    'guests:title': 'Zona de Invitados - Boda de Iluminada & George',
+    'guests:welcomeTitle': 'Zona de Invitados',
     'guests:tabSummary': 'Resumen',
     'guests:tabMenu': 'Menú',
     'guests:tabAgenda': 'Agenda',
@@ -273,7 +273,7 @@ const translations = {
     'guests:error': 'Error al procesar el pago',
 
     // Admin
-    'admin:pageTitle': 'Panel de Administración - Boda de Iluminada & George',
+    'admin:pageTitle': 'Panel de Administración',
     'admin:title': 'Panel de Administración',
     'admin:home': 'Inicio',
     'admin:logout': 'Cerrar sesión',
@@ -318,7 +318,7 @@ const translations = {
     'common:seconds': 'Secondes',
 
     'common:login': 'Se connecter',
-    'login:pageTitle': 'Accès Invités - Mariage d\'Iluminada & George',
+    'login:pageTitle': 'Accès Invités',
     'login:header': 'Accès Invités',
     'login:home': 'Accueil',
     'login:emailLabel': 'Email:',
@@ -329,7 +329,7 @@ const translations = {
     'login:emailNotFound': 'Email non trouvé dans la liste des invités',
     'login:serverError': 'Erreur de connexion au serveur',
 
-    'adminLogin:pageTitle': 'Accès Administrateur - Mariage d\'Iluminada & George',
+    'adminLogin:pageTitle': 'Accès Administrateur ',
     'adminLogin:header': 'Accès Administrateur',
     'adminLogin:home': 'Accueil',
     'adminLogin:subHeader': 'Accès au Panel Administrateur',
@@ -353,8 +353,9 @@ const translations = {
     'common:currentTime': 'Heure Actuelle',
     'common:currencyFormatting': 'Formatage de Devise',
     'common:gift': 'Cadeau',
+
     'guests:title': 'Zone des Invités - Mariage d\'Iluminada & George',
-    'guests:welcomeTitle': 'Bienvenue dans la zone des invités',
+    'guests:welcomeTitle': 'Zone des invités',
     'guests:tabSummary': 'Résumé',
     'guests:tabMenu': 'Menu',
     'guests:tabAgenda': 'Agenda',
@@ -411,15 +412,15 @@ const translations = {
     'guests:menuSaved': 'Menu enregistré avec succès',
     'common:home': 'Accueil',
     // Traducciones para regalos en efectivo
-    'guests:tabCash': 'Cadeaux en Espèces',
-    'guests:cashGifts': 'Cadeaux en Espèces',
+    'guests:tabCash': 'Cadeaux',
+    'guests:cashGifts': 'Cadeaux',
     'guests:cashGiftsDesc': 'Si vous préférez faire un cadeau en espèces, vous pouvez choisir un montant fixe ou personnalisé. Votre générosité nous aidera à commencer notre nouvelle vie ensemble.',
     'guests:cashGiftsSummaryDesc': 'Vos cadeaux en espèces faits pour notre mariage.',
-    'guests:cashGiftsSummary': 'Résumé des Cadeaux en Espèces',
+    'guests:cashGiftsSummary': 'Résumé des Cadeaux',
     'guests:totalAmount': 'Montant total:',
     'guests:giftCount': 'Name de cadeaux:',
     'guests:lastGift': 'Dernier cadeau:',
-    'guests:noCashGifts': 'Vous n\'avez pas encore fait de cadeaux en espèces.',
+    'guests:noCashGifts': 'Vous n\'avez pas encore fait de cadeaux.',
     'guests:giftDate': 'Date du cadeau:',
     'guests:giftMessage': 'Message:',
     'guests:giftHistory': 'Historique des cadeaux',
@@ -440,7 +441,7 @@ const translations = {
     'guests:error': 'Erreur lors du traitement du paiement',
 
     // Admin
-    'admin:pageTitle': 'Panel d\'Administration - Mariage d\'Iluminada & George',
+    'admin:pageTitle': 'Panel d\'Administration',
     'admin:title': 'Panel d\'Administration',
     'admin:home': 'Accueil',
     'admin:logout': 'Se déconnecter',
@@ -449,7 +450,7 @@ const translations = {
     'admin:tab.guests': 'Invités',
     'admin:tab.gifts': 'Liste de Cadeaux',
     'admin:tab.messages': 'Messages',
-    'admin:tab.events': 'Agenda des Événements',
+    'admin:tab.events': 'Les Événements',
     'admin:tab.menus': 'Gestion des Menus',
     'admin:tab.settings': 'Configuration',
     'admin:loading': 'Chargement du panel d\'administration...',

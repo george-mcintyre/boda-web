@@ -8,23 +8,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <h1 data-i18n="adminLogin:header">Acceso Administrador</h1>
-            <a href="index.html" class="home-link">
-                <i class="fas fa-home"></i>
-                <span data-i18n="adminLogin:home">Inicio</span>
-            </a>
-        </div>
-    </header>
     <main>
         <div class="admin-login-container fade-in-up">
             <div class="admin-login-icon">
                 <i class="fas fa-cog"></i>
             </div>
-            <h2 data-i18n="adminLogin:subHeader">Acceso al Panel de Administrador</h2>
+            <h2 data-i18n="adminLogin:subHeader">Administrator Login</h2>
             <p class="admin-login-description" data-i18n="adminLogin:description">
-                Introduce tus credenciales para gestionar los detalles de la boda y las confirmaciones de asistencia.
+                Enter your credentials to manage the wedding details and attendance confirmations.
             </p>
 
             <form id="adminLoginForm" class="admin-login-form">
@@ -41,8 +32,12 @@
                         </button>
                     </div>
                 </div>
-                <button type="submit" class="admin-login-btn">
-                    <i class="fas fa-sign-in-alt"></i> <span data-i18n="adminLogin:submit">Iniciar Sesión</span>
+                <a href="index.html" class="home-link">
+                    <i class="fas fa-home" aria-hidden="true"></i>
+                    <span data-i18n="common:home">Cancel</span>
+                </a>
+                <button type="submit" class="login-submit">
+                    <i class="fas fa-sign-in-alt"></i> <span data-i18n="adminLogin:submit">Login</span>
                 </button>
             </form>
 

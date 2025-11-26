@@ -388,25 +388,6 @@
     };
   }
 
-  function updateMapPreview(div, lat, lng) {
-    if (lat && lng) {
-      div.innerHTML = `
-        <div style="position:relative;width:100%;height:100%;border-radius:8px;overflow:hidden;">
-          <div style="width:100%;height:100%;background:linear-gradient(45deg,#f0f0f0,#e0e0e0);display:flex;align-items:center;justify-content:center;border-radius:8px;">
-            <div style="text-align:center;color:#666;">
-              <i class="fas fa-map-marker-alt" style="font-size:2em;color:#e74c3c;margin-bottom:10px;"></i>
-              <div>Location: ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
-              <small>Open in Google Maps to view</small>
-            </div>
-          </div>
-          <div style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.7);color:white;padding:5px 10px;border-radius:4px;font-size:12px;">
-            ${lat.toFixed(4)}, ${lng.toFixed(4)}
-          </div>
-        </div>
-      `;
-    }
-  }
-
   // CSV Parser for guest bulk upload
   function parseCSV(text) {
     const lines = text.split('\n').map(line => line.trim()).filter(line => line);
@@ -3242,6 +3223,7 @@ function openMenuCourseOptionsForm(courseId, optionId = null) {
 
   // Router for tabs
   function showTab(tab){
+    localStorage.setItem('adminPage', tab);
     // Add styles for party management
     addPartyStyles();
     
@@ -3265,9 +3247,11 @@ function openMenuCourseOptionsForm(courseId, optionId = null) {
       window.location.href = 'admin-login.html';
     });
   }
-  tabs.forEach(tab => tab.addEventListener('click', ()=> showTab(tab.dataset.tab)));
+  tabs.forEach(tab => tab.addEventListener('click', () => showTab(tab.dataset.tab)));
+  
+  const savedPage = localStorage.getItem('adminPage') || 'guests';
 
   // Default
-  showTab('guests');
+  showTab(savedPage);
 })();
 

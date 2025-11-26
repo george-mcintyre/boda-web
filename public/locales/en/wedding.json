@@ -38,7 +38,7 @@
     },
     "guestZone": {
       "title": "Guest Zone",
-      "welcome": "Welcome to the guest zone",
+      "welcome": "Guest Zone",
       "description": "Here you can manage all the details of your participation in our wedding."
     },
     "menu": {
