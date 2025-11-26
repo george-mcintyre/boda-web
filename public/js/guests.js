@@ -2246,6 +2246,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateLanguageSelector();
   updateFormatting();
   
+  // Check which tab is active on page load and load its content
+  const activeTab = document.querySelector('.tab-btn.active');
+  if (activeTab) {
+    const targetTab = activeTab.getAttribute('data-tab');
+    console.log('Initial tab on page load:', targetTab);
+    
+    // Load appropriate content for the active tab
+    if (targetTab === 'summaryContent') {
+      loadSummaryContent();
+    } else if (targetTab === 'menuContent') {
+      loadMenuSelections();
+    } else if (targetTab === 'eventsContent') {
+      loadEventsContent();
+    } else if (targetTab === 'giftsContent') {
+      loadGiftsContent();
+    }
+  }
+  
   console.log(`i18n system initialized, language: ${currentLanguage}`);
 });
 
