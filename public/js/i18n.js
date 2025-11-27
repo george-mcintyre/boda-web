@@ -2,7 +2,7 @@
 const translations = {
   en: {
     'wedding:title': 'Iluminada & George',
-    'wedding:subtitle': 'We are getting married',
+    'wedding:subtitle': 'We\'re getting married',
     'wedding:date': 'June 6th, 2026 • Marbella, Spain',
     'wedding:hero.title': 'We invite you to celebrate our love!',
     'wedding:hero.description': 'Iluminada and George are getting married on the beach in Marbella this June, and we couldn’t be happier to share it with you. Expect sun, sea and a little sand, plus plenty of laughter, happy tears and memories we’ll treasure forever.',
@@ -152,7 +152,7 @@ const translations = {
   },
   es: {
     'wedding:title': 'Iluminada & George',
-    'wedding:subtitle': 'Nos casamos',
+    'wedding:subtitle': 'Nos casamos!',
     'wedding:date': '6 de Junio, 2026 • Marbella, Spain',
     'wedding:hero.description': 'Iluminada y George se darán el “sí quiero” en la playa de Marbella este junio y nos hace inmensamente felices poder compartirlo con vosotros. Sol, mar, algo de arena en los zapatos y un día lleno de risas, lágrimas de emoción y recuerdos que guardaremos siempre.',
     'wedding:hero.description2': 'Esta web será vuestro centro de la boda. Iniciad sesión con el mismo correo del RSVP para confirmar cuántos venís y vuestros names, elegir menú y restricciones alimentarias, ver el programa, consultar la lista de regalos y chatear con otros invitados, incluso en conversaciones privadas que los novios no verán.',
@@ -291,7 +291,7 @@ const translations = {
   },
   fr: {
     'wedding:title': 'Iluminada & George',
-    'wedding:subtitle': 'Nous nous marions',
+    'wedding:subtitle': 'On se marie!',
     'wedding:date': '6 Juin 2026 • Marbella, Spain',
     'wedding:hero.title': 'Nous vous invitons à célébrer notre amour !',
     'wedding:hero.description': 'Iluminada et George vont se dire « oui » sur la plage de Marbella en juin et nous sommes ravis de pouvoir partager ce moment avec vous. Soleil, mer, un peu de sable et une journée pleine de rires, de larmes de joie et de souvenirs que nous chérirons toujours.',
