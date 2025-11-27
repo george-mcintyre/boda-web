@@ -2,7 +2,7 @@
 const translations = {
   en: {
     'wedding:title': 'Iluminada & George',
-    'wedding:subtitle': 'We\'re getting married',
+    'wedding:subtitle': 'We\'re getting married!',
     'wedding:date': 'June 6th, 2026 • Marbella, Spain',
     'wedding:hero.title': 'We invite you to celebrate our love!',
     'wedding:hero.description': 'Iluminada and George are getting married on the beach in Marbella this June, and we couldn’t be happier to share it with you. Expect sun, sea and a little sand, plus plenty of laughter, happy tears and memories we’ll treasure forever.',
@@ -456,6 +456,157 @@ const translations = {
     'admin:loading': 'Chargement du panel d\'administration...',
     'admin:footer': 'Panel d\'administration'
   },
+  de: {
+    'wedding:title': 'Iluminada & George',
+    'wedding:subtitle': 'Wir heiraten!',
+    'wedding:date': '6. Juni 2026 • Marbella, Spanien',
+    'wedding:hero.title': 'Wir laden euch ein, unsere Liebe zu feiern!',
+    'wedding:hero.description': 'Iluminada und George heiraten im Juni am Strand von Marbella, und wir könnten nicht glücklicher sein, das mit euch zu teilen. Freut euch auf Sonne, Meer und ein bisschen Sand in den Schuhen – und auf viel Lachen, Freudentränen und Erinnerungen, die wir für immer bewahren werden.',
+    'wedding:hero.description2': 'Diese Seite ist euer zentraler Ort für alles rund um unsere Hochzeit. Meldet euch mit der E-Mail-Adresse an, mit der ihr euer RSVP abgebt, um eure Gäste und ihre Namen zu bestätigen, euer Menü und eventuelle Essenswünsche auszuwählen, den kompletten Ablauf zu sehen, unsere Geschenkliste zu durchsuchen und mit anderen Gästen zu chatten – sogar in privaten Gesprächen, die das Brautpaar nicht sehen kann.',
+  
+    'wedding:guestZone.title': 'Gästebereich',
+    'wedding:guestZone.description': 'Hier könnt ihr alle Details zu eurer Teilnahme an unserer Hochzeit verwalten.',
+    'common:days': 'Tage',
+    'common:hours': 'Stunden',
+    'common:minutes': 'Minuten',
+    'common:seconds': 'Sekunden',
+  
+    'common:login': 'Anmelden',
+    'login:pageTitle': 'Gastzugang – Hochzeit',
+    'login:header': 'Gastzugang',
+    'login:home': 'Startseite',
+    'login:emailLabel': 'E-Mail:',
+    'login:emailPlaceholder': 'E-Mail-Adresse eingeben',
+    'login:submit': 'Weiter',
+    'login:enterEmail': 'Bitte gebt eure E-Mail-Adresse ein.',
+    'login:successRedirect': 'Anmeldung erfolgreich. Weiterleitung...',
+    'login:emailNotFound': 'E-Mail-Adresse nicht in der Gästeliste gefunden',
+    'login:serverError': 'Serververbindungsfehler',
+  
+    'adminLogin:pageTitle': 'Admin-Login – Hochzeit von Iluminada & George',
+    'adminLogin:header': 'Admin-Login',
+    'adminLogin:home': 'Startseite',
+    'adminLogin:subHeader': 'Zugang zum Adminbereich',
+    'adminLogin:description': 'Gebt eure Zugangsdaten ein, um Hochzeitsdetails und RSVPs zu verwalten.',
+    'adminLogin:username': 'Benutzername',
+    'adminLogin:usernamePlaceholder': 'Benutzername',
+    'adminLogin:password': 'Passwort',
+    'adminLogin:passwordPlaceholder': 'Euer geheimes Passwort',
+    'adminLogin:submit': 'Anmelden',
+  
+    'common:advancedFeatures': 'Beispiele für erweiterte Funktionen',
+    'common:numberFormatting': 'Zahlenformatierung',
+    'common:price': 'Preis',
+    'common:percentage': 'Prozentangabe',
+    'common:dateFormatting': 'Datumsformatierung',
+    'common:currentDate': 'Heutiges Datum',
+    'common:currentTime': 'Aktuelle Uhrzeit',
+    'common:currencyFormatting': 'Währungsformatierung',
+    'common:gift': 'Geschenk',
+  
+    'guests:title': 'Gästebereich – Hochzeit von Iluminada & George',
+    'guests:welcomeTitle': 'Gästebereich',
+    'guests:tabSummary': 'Übersicht',
+    'guests:tabMenu': 'Menü',
+    'guests:tabAgenda': 'Programm',
+    'guests:tabRSVP': 'RSVP',
+    'guests:tabGifts': 'Geschenke',
+    'guests:menuSelection': 'Menüauswahl',
+    'guests:menuSelectionDesc': 'Eure aktuelle Menüauswahl für unsere Hochzeit.',
+    'guests:menuSelectionDesc2': 'Wählt eure bevorzugten Gerichte für unsere Hochzeit.',
+    'guests:eventAgenda': 'Veranstaltungsprogramm',
+    'guests:eventAgendaDesc': 'Eure Teilnahmebestätigungen für unsere Hochzeitsveranstaltungen.',
+    'guests:eventAgendaDesc2': 'Bestätigt eure Teilnahme an unseren Hochzeitsveranstaltungen.',
+    'guests:eventRSVP': 'RSVP',
+    'guests:eventRSVPSummary': 'Eure Teilnahmebestätigungen für unsere Hochzeitsveranstaltungen.',
+    'guests:eventRSVPDesc': 'Die Feierlichkeiten finden an drei Tagen statt: Freitag, Samstag und Sonntag. Am Freitag beginnt alles mit einem Willkommensabendessen. Am Samstag gibt es ein ganztägiges Programm mit Trauung, Festessen und Tanzen. Am Sonntag erwartet euch ein Abschiedsbrunch. Bitte bestätigt, an welchen dieser Veranstaltungen ihr teilnehmen werdet.',
+    'guests:giftList': 'Geschenkliste',
+    'guests:giftListDesc': 'Eure reservierten Geschenke aus unserer Wunschliste.',
+    'guests:giftListDesc2': 'Wenn ihr uns ein Geschenk machen möchtet, findet ihr hier unsere Wunschliste. Ihr könnt jedes Geschenk reservieren, das euch gefällt.',
+    'guests:logout': 'Abmelden',
+    'guests:backToHome': 'Zurück zur Startseite',
+    'guests:confirmed': 'Bestätigt',
+    'guests:pending': 'Ausstehend',
+    'guests:event': 'Veranstaltung',
+    'guests:reserved': 'Reserviert',
+    'guests:currentSelection': 'Eure aktuelle Auswahl',
+    'guests:starter': 'Vorspeise:',
+    'guests:mainCourse': 'Hauptgang:',
+    'guests:dessert': 'Dessert:',
+    'guests:specialOption': 'Spezialoption:',
+    'guests:allergies': 'Allergien:',
+    'guests:notSelected': 'Nicht ausgewählt',
+    'guests:selectionStatus': 'Auswahlstatus',
+    'guests:noSelectionYet': 'Ihr habt euer Menü noch nicht ausgewählt. Klickt oben auf die Schaltfläche, um zu beginnen.',
+    'guests:eventConfirmations': 'Eure Veranstaltungsbestätigungen',
+    'guests:noEventConfirmations': 'Ihr habt noch keine Teilnahme an Veranstaltungen bestätigt.',
+    'guests:giftReservations': 'Eure reservierten Geschenke',
+    'guests:noGiftReservations': 'Ihr habt noch keine Geschenke aus unserer Liste reserviert.',
+    'guests:confirmAction': 'Aktion bestätigen',
+    'guests:commentsTitle': 'Kommentare',
+    'guests:commentsSubtitle': 'Teilt eure Gedanken mit anderen Gästen',
+    'guests:commentPlaceholder': 'Schreibt euren Kommentar...',
+    'guests:postComment': 'Veröffentlichen',
+    'guests:loadingComments': 'Kommentare werden geladen...',
+    'guests:noComments': 'Noch keine Kommentare. Seid die Ersten!',
+    'guests:commentPosted': 'Kommentar erfolgreich veröffentlicht',
+    'guests:commentDeleted': 'Kommentar erfolgreich gelöscht',
+    'guests:deleteCommentConfirm': 'Seid ihr sicher, dass ihr diesen Kommentar löschen möchtet?',
+    'guests:cancel': 'Abbrechen',
+    'guests:confirm': 'Bestätigen',
+    'guests:errorLoadingMenu': 'Fehler beim Laden des Menüs:',
+    'guests:errorConnection': 'Serververbindungsfehler.',
+    'guests:welcome': 'Willkommen',
+    'guests:welcomePersonalized': 'Willkommen',
+    'guests:menuSaved': 'Menü erfolgreich gespeichert',
+    'common:home': 'Startseite',
+  
+    // Gifts
+    'guests:tabCash': 'Geschenke',
+    'guests:cashGifts': 'Geldgeschenke',
+    'guests:cashGiftsDesc': 'Wenn ihr uns lieber ein Geldgeschenk machen möchtet, könnt ihr einen festen oder eigenen Betrag wählen. Eure Großzügigkeit hilft uns, unser gemeinsames Leben zu beginnen.',
+    'guests:cashGiftsSummaryDesc': 'Eure geleisteten Geldgeschenke zu unserer Hochzeit.',
+    'guests:cashGiftsSummary': 'Übersicht Geldgeschenke',
+    'guests:totalAmount': 'Gesamtbetrag:',
+    'guests:giftCount': 'Anzahl der Geschenke:',
+    'guests:lastGift': 'Letztes Geschenk:',
+    'guests:noCashGifts': 'Ihr habt bisher noch keine Geldgeschenke gemacht.',
+    'guests:giftDate': 'Geschenkt am:',
+    'guests:giftMessage': 'Nachricht:',
+    'guests:giftHistory': 'Geschenkverlauf',
+    'guests:smallGift': 'Kleines Geschenk',
+    'guests:mediumGift': 'Mittleres Geschenk',
+    'guests:generousGift': 'Großzügiges Geschenk',
+    'guests:specialGift': 'Besonderes Geschenk',
+    'guests:donorInfo': 'Eure Angaben',
+    'guests:donorName': 'Vollständiger Name',
+    'guests:donorEmail': 'E-Mail',
+    'guests:donorMessage': 'Nachricht an das Paar (optional)',
+    'guests:messagePlaceholder': 'Schreibt eine besondere Nachricht an Iluminada und George...',
+    'guests:paymentSummary': 'Geschenkübersicht',
+    'guests:proceedPayment': 'Zur Zahlung fortfahren',
+    'guests:selectAmount': 'Bitte wählt einen Betrag',
+    'guests:fillRequired': 'Bitte füllt alle Pflichtfelder aus',
+    'guests:processing': 'Zahlung wird verarbeitet...',
+    'guests:error': 'Fehler bei der Zahlungsabwicklung',
+  
+    // Admin
+    'admin:pageTitle': 'Adminbereich – Hochzeit von Iluminada & George',
+    'admin:title': 'Adminbereich',
+    'admin:home': 'Startseite',
+    'admin:logout': 'Abmelden',
+    'admin:welcomeTitle': 'Willkommen, Administrator',
+    'admin:welcomeDesc': 'Verwalte alle Hochzeitsinformationen für Iluminada und George',
+    'admin:tab.guests': 'Gäste',
+    'admin:tab.gifts': 'Geschenkliste',
+    'admin:tab.messages': 'Nachrichten',
+    'admin:tab.events': 'Veranstaltungen',
+    'admin:tab.menus': 'Menüverwaltung',
+    'admin:tab.settings': 'Einstellungen',
+    'admin:loading': 'Adminbereich wird geladen...',
+    'admin:footer': 'Adminbereich'
+  },
+    
 
 };
 
@@ -464,10 +615,11 @@ const languages = {
   es: { name: 'Español', flag: '🇪🇸', rtl: false },
   en: { name: 'English', flag: '🇬🇧', rtl: false },
   fr: { name: 'Français', flag: '🇫🇷', rtl: false },
-
+  de: { name: 'Deutsch', flag: '🇩🇪', rtl: false },
 };
 
-let currentLanguage = 'es';
+// Initialize current language - check localStorage first, then browser preferences, fallback to 'es'
+let currentLanguage = detectAndSetBrowserLanguage();
 
 function translate(key, lang = currentLanguage) {
   const translation = translations[lang]?.[key];
@@ -547,6 +699,74 @@ async function changeLanguage(lang) {
     console.error(`Error changing language: ${error.message}`);
     return false;
   }
+}
+
+function detectAndSetBrowserLanguage() {
+  // Check if language is already set in localStorage
+  const savedLanguage = localStorage.getItem('i18nextLng');
+  if (savedLanguage) {
+    console.log(`Language already set to: ${savedLanguage}`);
+    return savedLanguage;
+  }
+
+  // Get browser's preferred languages
+  const browserLanguages = [
+    navigator.language,
+    navigator.languages?.[0],
+    navigator.userLanguage,
+    navigator.browserLanguage
+  ].filter(Boolean); // Remove undefined values
+
+  console.log('Browser preferred languages:', browserLanguages);
+
+  // Map browser languages to supported languages
+  const languageMap = {
+    // Spanish variants
+    'es': 'es', 'es-ES': 'es', 'es-MX': 'es', 'es-AR': 'es', 'es-CO': 'es', 'es-PE': 'es', 
+    'es-VE': 'es', 'es-CL': 'es', 'es-UY': 'es', 'es-PY': 'es', 'es-BO': 'es', 'es-EC': 'es',
+    'es-CR': 'es', 'es-PA': 'es', 'es-NI': 'es', 'es-HN': 'es', 'es-GT': 'es', 'es-SV': 'es',
+    'es-DO': 'es', 'es-PR': 'es', 'es-CU': 'es',
+    
+    // English variants  
+    'en': 'en', 'en-US': 'en', 'en-GB': 'en', 'en-CA': 'en', 'en-AU': 'en', 'en-NZ': 'en',
+    'en-IE': 'en', 'en-ZA': 'en', 'en-IN': 'en', 'en-SG': 'en', 'en-HK': 'en',
+    
+    // French variants
+    'fr': 'fr', 'fr-FR': 'fr', 'fr-CA': 'fr', 'fr-BE': 'fr', 'fr-CH': 'fr', 'fr-LU': 'fr',
+    'fr-MC': 'fr', 'fr-DZ': 'fr', 'fr-MA': 'fr', 'fr-TN': 'fr', 'fr-SN': 'fr', 'fr-ML': 'fr',
+    'fr-BF': 'fr', 'fr-NE': 'fr', 'fr-CI': 'fr', 'fr-CM': 'fr', 'fr-CD': 'fr', 'fr-CG': 'fr',
+    'fr-GA': 'fr', 'fr-GQ': 'fr', 'fr-VU': 'fr', 'fr-PM': 'fr', 'fr-WF': 'fr', 'fr-YT': 'fr',
+    'fr-PF': 'fr', 'fr-NC': 'fr', 'fr-RE': 'fr', 'fr-MF': 'fr', 'fr-GP': 'fr', 'fr-MQ': 'fr',
+    'fr-GF': 'fr'
+  };
+
+  // Try to find a supported language from browser preferences
+  for (const browserLang of browserLanguages) {
+    const normalizedLang = browserLang.toLowerCase();
+    
+    // Try exact match first
+    if (languageMap[normalizedLang]) {
+      const supportedLang = languageMap[normalizedLang];
+      localStorage.setItem('i18nextLng', supportedLang);
+      console.log(`Browser language detected and set to: ${supportedLang} (from: ${browserLang})`);
+      return supportedLang;
+    }
+    
+    // Try base language match (e.g., 'en-US' -> 'en')
+    const baseLang = normalizedLang.split('-')[0];
+    if (languageMap[baseLang]) {
+      const supportedLang = languageMap[baseLang];
+      localStorage.setItem('i18nextLng', supportedLang);
+      console.log(`Browser base language detected and set to: ${supportedLang} (from: ${browserLang})`);
+      return supportedLang;
+    }
+  }
+
+  // Fallback to default language if no match found
+  const defaultLanguage = 'es';
+  localStorage.setItem('i18nextLng', defaultLanguage);
+  console.log(`No matching browser language found, using default: ${defaultLanguage}`);
+  return defaultLanguage;
 }
 
 function updateFormatting() {

@@ -16,9 +16,41 @@ class LanguageSelector {
       es: { name: 'Español', flag: '🇪🇸', rtl: false },
       en: { name: 'English', flag: '🇬🇧', rtl: false },
       fr: { name: 'Français', flag: '🇫🇷', rtl: false },
+      de: { name: 'Deutsch', flag: '🇩🇪', rtl: false },
     };
     
-    const lang = localStorage.getItem('i18nextLng') || window.currentLanguage || 'es';
+    let lang = localStorage.getItem('i18nextLng');
+    if (!lang) {
+      // If no language is saved, detect browser preference
+      const browserLanguages = [
+        navigator.language,
+        navigator.languages?.[0],
+        navigator.userLanguage,
+        navigator.browserLanguage
+      ].filter(Boolean);
+
+      const languageMap = {
+        'es': 'es', 'es-ES': 'es', 'es-MX': 'es', 'es-AR': 'es', 'es-CO': 'es', 'es-PE': 'es',
+        'en': 'en', 'en-US': 'en', 'en-GB': 'en', 'en-CA': 'en', 'en-AU': 'en', 'en-NZ': 'en',
+        'fr': 'fr', 'fr-FR': 'fr', 'fr-CA': 'fr', 'fr-BE': 'fr', 'fr-CH': 'fr'
+      };
+
+      for (const browserLang of browserLanguages) {
+        const normalizedLang = browserLang.toLowerCase();
+        if (languageMap[normalizedLang]) {
+          lang = languageMap[normalizedLang];
+          break;
+        }
+        const baseLang = normalizedLang.split('-')[0];
+        if (languageMap[baseLang]) {
+          lang = languageMap[baseLang];
+          break;
+        }
+      }
+    }
+    
+    lang = lang || window.currentLanguage || 'es';
+    localStorage.setItem('i18nextLng', lang); // Ensure it's saved
 
     this.currentLanguage = lang;
     this.isOpen = false;
@@ -62,6 +94,10 @@ class LanguageSelector {
                 <button class="language-option" data-lang="fr">
                   <span class="flag">🇫🇷</span>
                   <span class="name">Français</span>
+                </button>
+                <button class="language-option" data-lang="de">
+                  <span class="flag">🇩🇪</span>
+                  <span class="name">Deutsch</span>
                 </button>
               </div>
             </div>
