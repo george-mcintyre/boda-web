@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="admin:pageTitle">Panel de Administración - Boda de Iluminada & George</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/wedding.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+          crossorigin=""/>
+</head>
+<body>
+  <!-- Sticky Navbar -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="header-left">
+        <h1 data-i18n="admin:title"><i class="fas fa-user-shield"></i> Administration Panel</h1>
+        <span id="guestNameDisplay" class="guest-name-display" style="display: none;"></span>
+      </div>
+      <div class="header-actions" aria-label="Top-right actions">
+        <!-- Language Selector Component -->
+        <div data-auto-init="language-selector" class="language-selector"></div>
+        <a href="index.html" class="home-link">
+          <i class="fas fa-home" aria-hidden="true"></i>
+          <span data-i18n="common:home">Home</span>
+        </a>
+        <button id="logoutAdmin" class="admin-action">
+          <i class="fas fa-sign-out-alt"></i>
+          <span data-i18n="admin:logout">Log out</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Admin Panel -->
+    <section id="adminPanelSection">
+      <div class="admin-header">
+          <p data-i18n="admin:welcomeDesc">Manage all the information of the wedding of Iluminada and George</p>
+        </div>
+      </div>
+      
+      <div class="button-grid">
+        <button class="adminTab active" data-tab="guests">
+          <i class="fas fa-users"></i>
+          <span data-i18n="admin:tab.guests">Guests</span>
+        </button>
+
+        <button class="adminTab" data-tab="event">
+          <i class="fas fa-calendar-alt"></i>
+          <span data-i18n="admin:tab.events">Events</span>
+        </button>
+        <button class="adminTab" data-tab="menu">
+          <i class="fas fa-utensils"></i>
+          <span data-i18n="admin:tab.menus">Menu</span>
+        </button>
+        <button class="adminTab" data-tab="gifts">
+          <i class="fas fa-gift"></i>
+          <span data-i18n="admin:tab.gifts">Gifts List</span>
+        </button>
+        <button class="adminTab" data-tab="messages">
+          <i class="fas fa-comments"></i>
+          <span data-i18n="admin:tab.messages">Messages</span>
+        </button>
+        <button class="adminTab" data-tab="configuration">
+          <i class="fas fa-cog"></i>
+          <span data-i18n="admin:tab.settings">Settings</span>
+        </button>
+      </div>
+
+      <div id="adminContent">
+        <!-- Content will load dynamically here -->
+        <div class="admin-loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p data-i18n="admin:loading">Loading administration panel...</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <p>&copy; 2026 Boda de Iluminada & George</p>
+      <p data-i18n="admin:footer">Administration Panel</p>
+    </div>
+  </footer>
+
+  <!-- i18n common system -->
+  <script src="/js/i18n.js"></script>
+  <script src="components/language-selector.js"></script>
+  <script>
+    // Verify authentication on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      const adminToken = localStorage.getItem('adminToken');
+      if (!adminToken) {
+        // If no token, redirect to login
+        window.location.href = 'admin-login.html';
+        return;
+      }
+      
+      // Load Leaflet.js first, then admin script
+      const leafletScript = document.createElement('script');
+      leafletScript.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+      leafletScript.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+      leafletScript.crossOrigin = '';
+      
+      leafletScript.onload = () => {
+        console.log('Leaflet script loaded correctly');
+        // Load admin script after Leaflet is loaded
+        const adminScript = document.createElement('script');
+        adminScript.src = 'js/admin.js';
+        adminScript.onload = () => {
+          console.log('Admin script loaded correctly');
+        };
+        document.body.appendChild(adminScript);
+      };
+      
+      document.body.appendChild(leafletScript);
+    });
+  </script>
+</body>
+</html>
