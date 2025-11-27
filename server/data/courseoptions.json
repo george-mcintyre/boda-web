@@ -22,7 +22,7 @@
     "courseId": {"$oid": "69241bec417a12722a56b96d"},
     "createdAt": {"$date": "2025-11-24T08:49:39.133Z"},
     "description": "Slow-roasted and heirloom tomatoes layered with creamy Puglian burrata, basil oil and aged Modena balsamic, finished with toasted pine nuts and crisp sourdough shards.",
-    "image": {"$oid": "69244dd7f907eaef83fee911"},
+    "image": null,
     "label": "Heritage Tomato & Burrata Salad",
     "updatedAt": {"$date": "2025-11-24T15:32:56.047Z"},
     "containsAllergens": false,

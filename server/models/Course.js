@@ -8,7 +8,7 @@ const courseSchema = new Schema({
   },
   label: { type: String, required: true },
   // Selection Required flag - determines if guests need to choose one option or all are provided
-  selectionRequired: { type: Boolean, default: true }
+  selectionRequired: { type: Boolean, default: false }
 }, { timestamps: true });
 
 module.exports = model('Course', courseSchema);

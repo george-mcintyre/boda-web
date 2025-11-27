@@ -8,8 +8,8 @@ const courseOptionSchema = new Schema({
   },
   label: { type: String, required: true },
   image: { 
-    type: Schema.Types.ObjectId,                      // Reference to MenuOptionImage model
-    ref: 'MenuOptionImage'                            // Reference to MenuOptionImage collection
+    type: Schema.Types.ObjectId,
+    ref: 'CourseOptionImage'
   },
   description: { type: String, default: null },
   // Special Dietary Indicators

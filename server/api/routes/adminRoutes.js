@@ -58,5 +58,5 @@ router.put('/api/admin/courseData/:courseId/options/:optionId', auth('admin'), m
 router.delete('/api/admin/courseData/:courseId/options/:optionId', auth('admin'), menuCtrl.deleteCourseOption);
 
 // Menu Option Images
-router.post('/api/admin/menu-options/upload-image', auth('admin'), upload.single('image'), adminCtrl.uploadMenuOptionImage);
+router.post('/api/admin/menu-options/upload-image', auth('admin'), upload.single('image'), adminCtrl.uploadCourseOptionImage);
 module.exports = router;

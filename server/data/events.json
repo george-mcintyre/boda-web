@@ -7,8 +7,7 @@
       "en": "Come and join us as we celebrate our love.  The beach wedding!"
     },
     "end": {"$date": "2026-06-06T23:00:00.000Z"},
-    "image": {"$oid": "69237f3876402958d7ee195d"},
-    "location": "Urbanización las Chapas, s/n, 29604 Marbella, Málaga",
+    "image": null,
     "locationAddress": "Urbanización las Chapas, s/n, 29604 Marbella, Málaga",
     "locationLatitude": 36.49992141718805,
     "locationLongitude": -4.81805492057585,
@@ -70,8 +69,7 @@
       "en": "Join us to meet the others in the wedding party and get in the mood for love!"
     },
     "end": {"$date": "2026-06-05T22:00:00.000Z"},
-    "image": {"$oid": "6923828776402958d7ee197e"},
-    "location": "Playa Padron, Carr. de Cadiz, Km 159, 29680 Estepona, Málaga",
+    "image": null,
     "locationAddress": "Playa Padron, Carr. de Cadiz, Km 159, 29680 Estepona, Málaga",
     "locationLatitude": 36.438354134601,
     "locationLongitude": -5.104264180418514,
@@ -112,8 +110,7 @@
       "en": "Wedding Brunch"
     },
     "end": {"$date": "2026-06-07T16:00:00.000Z"},
-    "image": {"$oid": "6923849276402958d7ee1a71"},
-    "location": "P.º Marítimo, num 2, 29600 Marbella, Málaga",
+    "image": null,
     "locationAddress": "P.º Marítimo, num 2, 29600 Marbella, Málaga",
     "locationLatitude": 36.50704566918498,
     "locationLongitude": -4.892851492688078,

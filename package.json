@@ -8,10 +8,18 @@
     "start": "node server/server.js",
     "dev": "node server/server.js"
   },
-  "keywords": ["wedding", "website", "mongodb", "vercel"],
+  "keywords": [
+    "wedding",
+    "website",
+    "mongodb",
+    "vercel"
+  ],
   "author": "George McIntyre",
   "license": "ISC",
   "engines": {
     "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "bson": "^7.0.0"
   }
 }

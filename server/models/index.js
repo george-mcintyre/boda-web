@@ -8,7 +8,7 @@ module.exports = {
   Course: require('./Course'),
   CourseOption: require('./CourseOption'),
   MenuChoice: require('./MenuChoice'),
-  MenuOptionImage: require('./MenuOptionImage'),
+  CourseOptionImage: require('./CourseOptionImage'),
   Gift: require('./Gift'),
   GiftImage: require('./GiftImage'),
   GiftChoice: require('./GiftChoice'),

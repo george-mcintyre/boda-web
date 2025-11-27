@@ -1,15 +1,1 @@
-[
-  {
-    "id": 1755957219397,
-    "name": "Jane Doe",
-    "email": "jd@me.com",
-    "telefono": "",
-    "asistencia": "pendiente",
-    "companions": 0,
-    "notas": "",
-    "fechaRegistro": "2025-08-23T13:53:39.397Z",
-    "seleccionMenu": null,
-    "confirmacionesAgenda": {},
-    "token": "6306beb9-093f-4b51-b9f5-78d2729a52e9"
-  }
-]
+[]

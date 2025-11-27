@@ -1,4 +1,4 @@
-const { Message, Config, Gift, Event, GiftChoice, Course, CourseOption, MenuOptionImage, GiftImage } = require('../models');
+const { Message, Config, Gift, Event, GiftChoice, Course, CourseOption, CourseOptionImage, GiftImage } = require('../models');
 const { getAvailableGiftCardImages } = require('../utils/imageUtils');
 const { generateDietaryIconsHTML, generateSelectionIconHTML } = require('../utils/menuIcons');
 
@@ -708,7 +708,7 @@ async function uploadEventImage(req, res, next) {
 }
 
 // Image upload for menu options
-async function uploadMenuOptionImage(req, res, next) {
+async function uploadCourseOptionImage(req, res, next) {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No image file provided' });
@@ -734,7 +734,7 @@ async function uploadMenuOptionImage(req, res, next) {
     fs.unlinkSync(req.file.path);
 
     // Store image in database
-    const menuOptionImage = await MenuOptionImage.create({
+    const courseOptionImage = await CourseOptionImage.create({
       data: imageData,
       contentType: req.file.mimetype,
       originalName: req.file.originalname,
@@ -743,7 +743,7 @@ async function uploadMenuOptionImage(req, res, next) {
 
     // Return the image ID and metadata
     res.json({ 
-      imageId: menuOptionImage._id.toString(),
+      imageId: courseOptionImage._id.toString(),
       contentType: req.file.mimetype,
       originalName: req.file.originalname,
       size: req.file.size
@@ -804,7 +804,7 @@ module.exports = {
   // agenda
   listEventsAdmin, createEventsItem, updateEventsItem, deleteEventsItem, uploadEventImage,
   // menu options
-  uploadMenuOptionImage,
+  uploadCourseOptionImage,
   // settings
   getSettings, updateSettings,
   formatCourseForApi, formatCourseOptionForApi

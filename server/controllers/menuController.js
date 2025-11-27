@@ -1,4 +1,4 @@
-const { MenuCourse, MenuChoice, Guest, Course, CourseOption, MenuOptionImage } = require('../models');
+const { MenuCourse, MenuChoice, Guest, Course, CourseOption, CourseOptionImage } = require('../models');
 const { formatCourseForApi, formatCourseOptionForApi } = require('../controllers/adminController');
 const { generateSelectionIconHTML, generateDietaryIconsHTML } = require('../utils/menuIcons');
 

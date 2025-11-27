@@ -4,55 +4,20 @@
     "description": "Help us start our celebration with a toast",
     "amount": 25,
     "available": 10,
-    "image": {"$oid": "69245fdf3d2dd38bc5a3df69"}
-  },
-  {
-    "title": "Wedding Flowers",
-    "description": "Beautiful bouquet for our special day",
-    "amount": 50,
-    "available": 8,
-    "image": {"$oid": "69245fdf3d2dd38bc5a3df69"}
-  },
-  {
-    "title": "Reception Dinner",
-    "description": "Contribute to our wedding dinner experience",
-    "amount": 100,
-    "available": 15,
-    "image": {"$oid": "69245fdf3d2dd38bc5a3df69"}
+    "image": null
   },
   {
     "title": "Honeymoon Accommodation",
     "description": "Help fund our romantic getaway",
     "amount": 200,
     "available": 5,
-    "image": {"$oid": "69245fdf3d2dd38bc5a3df69"}
+    "image": null
   },
   {
     "title": "Dream Honeymoon",
     "description": "Make our honeymoon unforgettable",
     "amount": 500,
     "available": 3,
-    "image": {"$oid": "69245fdf3d2dd38bc5a3df69"}
-  },
-  {
-    "title": "Cocktail Reception",
-    "description": "Support our welcome cocktails for guests",
-    "amount": 25,
-    "available": 12,
-    "image": {"$oid": "69245fdf3d2dd38bc5a3df69"}
-  },
-  {
-    "title": "Wedding Cake",
-    "description": "Help us get the perfect wedding cake",
-    "amount": 50,
-    "available": 6,
-    "image": {"$oid": "69245fdf3d2dd38bc5a3df69"}
-  },
-  {
-    "title": "Photography Package",
-    "description": "Capture our precious memories",
-    "amount": 100,
-    "available": 4,
-    "image": {"$oid": "69245fdf3d2dd38bc5a3df69"}
+    "image": null
   }
 ]

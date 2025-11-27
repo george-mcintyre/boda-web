@@ -22,8 +22,8 @@
 - Stripe (setup, variables, and webhooks)
 
 ## ✨ Overview
-- Guests: login by email → guest profile, event attendance, menu selection, messages, gift registry.
-- Admin: manage guests, events, menus, messags, gift registry, and global settings
+- Guests: Login by email → guest summary and messages, guest party, event attendance, menu selection, gift registry.
+- Admin : Login by email and password → Manage guests, events, menus, messags, gift registry, and global settings
 - JWT authentication.
 - Modular backend with Express + MongoDB (Mongoose) and JWT.
 
