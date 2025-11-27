@@ -329,7 +329,7 @@ body.wedding-landing-active footer { display: none !important; }
     z-index: 1;
     background: var(--pepe-bg);
     background-image: url('../images/black-and-red.png');
-    background-size: 100% auto;
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     padding: 10px;
@@ -337,6 +337,8 @@ body.wedding-landing-active footer { display: none !important; }
     max-width: none !important;
     margin-right: 0 !important;
     width: 100% !important;
+    /* Ensure the div takes full height from below header to bottom */
+    min-height: calc(100vh - 60px); /* Adjust 60px based on navbar height */
   }
 
   .wedding-landing .pepe-left::before {
@@ -435,9 +437,11 @@ body.wedding-landing-active footer { display: none !important; }
     z-index: 1;
     background: var(--pepe-bg);
     background-image: url('../images/black-and-red.png');
-    background-size: 100% auto;
+    background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
+    /* Ensure the div takes full height from below header to bottom */
+    min-height: calc(100vh - 60px); /* Adjust 60px based on navbar height */
   }
 
   .wedding-landing .pepe-left::before {
