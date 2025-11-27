@@ -1,0 +1,12 @@
+[
+  {
+    "createdAt": {"$date": "2025-11-23T19:01:07.085Z"},
+    "defaultLanguage": "en",
+    "eventsEnabled": false,
+    "giftsEnabled": false,
+    "guestsEnabled": false,
+    "menuEnabled": false,
+    "messagesEnabled": false,
+    "updatedAt": {"$date": "2025-11-25T17:17:19.432Z"}
+  }
+]
