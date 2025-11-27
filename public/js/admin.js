@@ -157,10 +157,10 @@
         </div>
       </div>
       <div style="display:flex;gap:10px;">
-        <button type="button" id="${id}_use_map" class="admin-action" style="background:#17a2b8;">
+        <button type="button" id="${id}_use_map" class="btn btn-info">
           <i class="fas fa-map"></i> Use Map
         </button>
-        <button type="button" id="${id}_search" class="admin-action" style="background:#28a745;">
+        <button type="button" id="${id}_search" class="btn btn-success">
           <i class="fas fa-search"></i> Search Address
         </button>
       </div>
@@ -652,7 +652,7 @@
     modal.innerHTML = `
       <div style="padding:22px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
         <h3 style="margin:0;color:#333;">${title}</h3>
-        <button id="mfClose" class="admin-action" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:8px;">Close</button>
+        <button id="mfClose" class="btn btn-secondary">Close</button>
       </div>
       <form id="mfForm" style="padding:18px 24px;">
         <div id="mfError" style="display:none;margin-bottom:10px;color:#dc3545;font-weight:600;"></div>
@@ -747,8 +747,8 @@
           }
         }).join('')}
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;">
-          <button type="button" id="mfCancel" class="admin-action" style="background:#6c757d;color:#fff;border:none;padding:10px 16px;border-radius:8px;">Cancel</button>
-          <button type="submit" class="admin-action" style="background:#28a745;color:#fff;border:none;padding:10px 16px;border-radius:8px;">${submitText}</button>
+          <button type="button" id="mfCancel" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-success">${submitText}</button>
         </div>
       </form>`;
     overlay.appendChild(modal);
@@ -906,13 +906,13 @@
           <td>${g.email || ''}</td>
           <td>${g.partySize || 1}</td>
           <td>
-            <button class="admin-action" data-action="manage-party" data-id="${g.id || g._id}" title="Manage Party">
+            <button class="btn btn-info" data-action="manage-party" data-id="${g.id || g._id}" title="Manage Party">
               <i class="fas fa-users"></i>
             </button>
-            <button class="admin-action" data-action="edit" data-id="${g.id || g._id}">
+            <button class="btn btn-primary" data-action="edit" data-id="${g.id || g._id}">
               <i class="fas fa-edit"></i>
             </button>
-            <button class="admin-action danger" data-action="del" data-id="${g.id || g._id}">
+            <button class="btn btn-danger" data-action="del" data-id="${g.id || g._id}">
               <i class="fas fa-trash"></i>
             </button>
           </td>
@@ -926,8 +926,8 @@
               <p style="margin:0;color:#666;font-size:0.9em;">Across ${guests.length} part${guests.length !== 1 ? 'ies' : 'y'}</p>
             </div>
             <div>
-              <button id="addGuest" class="admin-action"><i class="fas fa-user-plus"></i> Add Guest</button>
-              <button id="bulkUploadGuests" class="admin-action" style="background:#17a2b8;margin-left:8px;"><i class="fas fa-file-upload"></i> Bulk Upload CSV</button>
+              <button id="addGuest" class="btn btn-success"><i class="fas fa-user-plus"></i> Add Guest</button>
+              <button id="bulkUploadGuests" class="btn btn-info" style="margin-left:8px;"><i class="fas fa-file-upload"></i> Bulk Upload CSV</button>
             </div>
           </div>
           <div class="table-container">
@@ -1066,7 +1066,7 @@
             <i class="fas fa-exclamation-triangle"></i>
             <h3>Error Loading Guests</h3>
             <p>Failed to load guests: ${e.message}</p>
-            <button onclick="showGuests()" class="btn-retry">
+            <button onclick="showGuests()" class="btn btn-primary">
               <i class="fas fa-redo"></i> Retry
             </button>
           </div>
