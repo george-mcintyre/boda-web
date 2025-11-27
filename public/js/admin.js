@@ -1646,28 +1646,375 @@
   }
 
   // ========== Messages ==========
+  // Global delete function for onclick handlers
+  window.deleteMessage = async function(messageId) {
+    if (!confirm('Are you sure you want to delete this message?')) {
+      return;
+    }
+
+    try {
+      const r = await api(`/api/admin/messages/${messageId}`, { 
+        method: 'DELETE' 
+      });
+      
+      if (r.ok) {
+        // Remove the message from the DOM with animation
+        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (messageElement) {
+          messageElement.style.opacity = '0';
+          messageElement.style.transform = 'translateX(-20px)';
+          setTimeout(() => {
+            messageElement.remove();
+            // Check if there are no more messages
+            const remainingMessages = document.querySelectorAll('.message-item');
+            if (remainingMessages.length === 0) {
+              const messagesList = document.getElementById('adminMessagesList');
+              if (messagesList) {
+                messagesList.innerHTML = `
+                  <div class="no-messages">
+                    <i class="fas fa-comments"></i>
+                    <p>No messages yet. Guests will appear here when they post comments.</p>
+                  </div>
+                `;
+              }
+            }
+          }, 300);
+        }
+        notify('Message deleted successfully', 'success');
+      } else {
+        const errorData = await r.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to delete message');
+      }
+    } catch (error) {
+      console.error('Error deleting message:', error);
+      notify('Error deleting message: ' + error.message, 'error');
+    }
+  };
+
   async function showMessages(){
     activate('messages');
     setLoading('Loading messages...');
 
-    const res = await api('/api/admin/messages');
-    const data = res.ok ? await res.json() : [];
-    const rows = (data||[]).map(m => `
-      <tr>
-        <td>${m.name || ''}</td>
-        <td>${m.email||''}</td>
-        <td>${(m.content || '').slice(0,120)}</td>
-        <td>${new Date(m.createdAt).toLocaleString()}</td>
-        <td><button class="admin-action danger" data-id="${m._id}"><i class="fas fa-trash"></i></button></td>
-      </tr>`).join('');
-    content.innerHTML = renderTable({title:'Messages', columns:['Name','Email','Content','Date','Actions']}, rows);
-    const tbody = content.querySelector('tbody');
-    tbody.addEventListener('click', async (e)=>{
-      const btn = e.target.closest('button'); if(!btn) return;
-      if (!confirm('Delete this message?')) return;
-      const r = await api(`/api/admin/messages/${btn.dataset.id}`, { method:'DELETE' });
-      if (r.ok) showMessages(); else notify('Error','error');
+    try {
+      const res = await api('/api/admin/messages');
+      const data = res.ok ? await res.json() : [];
+      
+      // Use the same data structure as the guest comments system
+      const messages = data.items || data || [];
+      
+      // Add styles for the messages section
+      addMessagesStyles();
+      
+      content.innerHTML = `
+        <div class="admin-content">
+          <div class="messages-header">
+            <h3><i class="fas fa-comments"></i>Messages Cleanup</h3>
+            <p class="messages-subtitle">Delete any guest messages that are inappropriate or offensive</p>
+          </div>
+          
+          <!-- Messages list -->
+          <div class="messages-list" id="adminMessagesList">
+            ${messages.length === 0 ? `
+              <div class="no-messages">
+                <i class="fas fa-comments"></i>
+                <p>No messages yet. Guests will appear here when they post comments.</p>
+              </div>
+            ` : ''}
+            <div class="loading-messages">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span>Loading messages...</span>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Render the messages
+      renderAdminMessages(messages);
+      
+    } catch (error) {
+      console.error('Error loading messages:', error);
+      content.innerHTML = `
+        <div class="admin-content">
+          <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>Error Loading Messages</h3>
+            <p>Failed to load messages: ${error.message}</p>
+            <button onclick="showMessages()" class="btn-retry">
+              <i class="fas fa-redo"></i> Retry
+            </button>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // Render admin messages with delete functionality
+  function renderAdminMessages(messages) {
+    const messagesList = document.getElementById('adminMessagesList');
+    if (!messagesList) return;
+
+    if (messages.length === 0) {
+      return; // Already handled in showMessages
+    }
+
+    // Sort messages by date (most recent first)
+    const sortedMessages = messages.sort((a, b) => 
+      new Date(b.createdAt) - new Date(a.createdAt)
+    );
+
+    const messagesHTML = sortedMessages.map(message => {
+      const authorName = message.author || message.name || 'Guest';
+      const body = message.body || message.content || '';
+      const createdAt = message.createdAt;
+      const messageId = message.id;
+      
+      return `
+        <div class="message-item" data-message-id="${messageId}">
+          <div class="message-header">
+            <span class="message-author">${escapeHtml(authorName)}</span>
+            <span class="message-date">${formatMessageDate(createdAt)}</span>
+          </div>
+          <div class="message-content">${escapeHtml(body)}</div>
+          <div class="message-actions">
+            <button class="admin-action danger" onclick="deleteMessage('${messageId}')" title="Delete message">
+              <i class="fas fa-trash"></i>
+              Delete
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    messagesList.innerHTML = messagesHTML;
+  }
+
+  // Format message date for display
+  function formatMessageDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
+  }
+
+  // Escape HTML to prevent XSS
+  function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+
+
+  // Add styles for the messages section
+  function addMessagesStyles(){
+    if (document.getElementById('messages-styles')) return;
+    
+    const style = document.createElement('style');
+    style.id = 'messages-styles';
+    style.textContent = `
+      .messages-header {
+        margin-bottom: 24px;
+        text-align: center;
+      }
+      
+      .messages-header h3 {
+        margin: 0 0 8px 0;
+        color: #333;
+        font-size: 1.5em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+      
+      .messages-header h3 i {
+        color: #8B5A96;
+      }
+      
+      .messages-subtitle {
+        color: #666;
+        margin: 0;
+        font-size: 1em;
+      }
+      
+      .messages-list {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      
+      .message-item {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border-left: 4px solid #8B5A96;
+        transition: all 0.3s ease;
+      }
+      
+      .message-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+      }
+      
+      .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      
+      .message-author {
+        font-weight: 600;
+        color: #333;
+        font-size: 1.1em;
+      }
+      
+      .message-date {
+        color: #666;
+        font-size: 0.9em;
+      }
+      
+      .message-content {
+        color: #444;
+        line-height: 1.6;
+        margin-bottom: 16px;
+        font-size: 1em;
+      }
+      
+      .message-actions {
+        text-align: right;
+      }
+      
+      .message-actions .admin-action {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      
+      .message-actions .admin-action:hover {
+        background: #c82333;
+        transform: translateY(-1px);
+      }
+      
+      .no-messages {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+        background: #f8f9fa;
+        border-radius: 12px;
+        border: 2px dashed #dee2e6;
+      }
+      
+      .no-messages i {
+        font-size: 3em;
+        color: #ccc;
+        margin-bottom: 16px;
+        display: block;
+      }
+      
+      .no-messages p {
+        margin: 0;
+        font-size: 1.1em;
+      }
+      
+      .loading-messages {
+        text-align: center;
+        padding: 40px 20px;
+        color: #666;
+      }
+      
+      .loading-messages i {
+        font-size: 2em;
+        color: #8B5A96;
+        margin-bottom: 12px;
+        display: block;
+      }
+      
+      .loading-messages span {
+        font-size: 1.1em;
+      }
+      
+      .error-message {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        margin: 20px 0;
+        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+      }
+      
+      .error-message i {
+        font-size: 2em;
+        margin-bottom: 10px;
+        display: block;
+      }
+      
+      .error-message h3 {
+        margin: 0 0 10px 0;
+        font-size: 1.3em;
+      }
+      
+      .error-message p {
+        margin: 0 0 15px 0;
+        line-height: 1.4;
+      }
+      
+      .btn-retry {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .btn-retry:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
+      }
+      
+      @media (max-width: 768px) {
+        .message-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+        
+        .message-actions {
+          text-align: left;
+          margin-top: 12px;
+        }
+        
+        .message-item {
+          padding: 16px;
+        }
+      }
+    `;
+    document.head.appendChild(style);
   }
 
   // ========== Event schedule ==========
@@ -2301,6 +2648,7 @@
       notify('Error deleting menu part: ' + error.message, 'error');
     }
   };
+
   window.deleteMenuCourseOption = async function(courseId, optionId) {
     if (!confirm('Delete this menu option?')) return;
     
@@ -2404,7 +2752,8 @@
       showForm();
     }
   }
-function openMenuCourseOptionsForm(courseId, optionId = null) {
+
+  function openMenuCourseOptionsForm(courseId, optionId = null) {
     // Load existing menu data for editing
     let existingData = null;
     
@@ -3244,7 +3593,7 @@ function openMenuCourseOptionsForm(courseId, optionId = null) {
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminEmail');
-      window.location.href = 'admin-login.html';
+      window.location.href = 'index.html';
     });
   }
   tabs.forEach(tab => tab.addEventListener('click', () => showTab(tab.dataset.tab)));

@@ -1779,7 +1779,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     localStorage.removeItem('token');
     localStorage.removeItem('name');
     localStorage.removeItem('email');
-    window.location.href = 'login.html';
+    window.location.href = 'index.html';
   };
   
   // Main function

@@ -43,7 +43,7 @@
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminEmail');
-      window.location.href = '/admin-login.html';
+      window.location.href = '/index.html';
     });
   }
 })();
