@@ -4166,6 +4166,43 @@ header {
     color: var(--secondary-color);
 }
 
+/* Clickable summary section titles with navigation arrows */
+.summary-section-title.clickable {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    padding-right: 30px;
+}
+
+.summary-section-title.clickable:hover {
+    color: var(--secondary-color);
+    transform: translateX(5px);
+}
+
+.summary-section-title.clickable:hover .section-nav-arrow {
+    opacity: 1;
+    transform: translateX(3px);
+}
+
+.section-nav-arrow {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.6;
+    transition: all 0.3s ease;
+    color: var(--primary-color);
+    font-size: 0.9em;
+}
+
+.summary-section-title.clickable:active {
+    transform: translateX(2px);
+}
+
+.summary-section-title.clickable:active .section-nav-arrow {
+    transform: translateX(5px) translateY(-50%);
+}
+
 /* Primary member highlight */
 .party-member-item.primary-member {
     background: linear-gradient(135deg, rgba(139, 90, 150, 0.08), rgba(212, 165, 165, 0.05));

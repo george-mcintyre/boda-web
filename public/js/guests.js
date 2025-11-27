@@ -2485,6 +2485,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
+  // Function to switch to a specific tab
+  window.switchToTab = function(tabName) {
+    // Remove active class from all buttons and contents
+    tabButtons.forEach(btn => btn.classList.remove('active'));
+    tabContents.forEach(content => content.classList.remove('active'));
+
+    // Find and activate the target tab button
+    const targetButton = document.querySelector(`[data-tab="${tabName}"]`);
+    if (targetButton) {
+      targetButton.classList.add('active');
+    }
+
+    // Find and activate the target tab content
+    const targetContent = document.getElementById(`${tabName}-tab`);
+    if (targetContent) {
+      targetContent.classList.add('active');
+    }
+
+    // Load content for the specific tab
+    if (tabName === 'partyContent') {
+      loadPartyContent();
+    } else if (tabName === 'menuContent') {
+      loadMenuSelections();
+    } else if (tabName === 'eventsContent') {
+      loadEventsContent();
+    } else if (tabName === 'giftsContent') {
+      loadGiftsContent();
+    } else if (tabName === 'summaryContent') {
+      loadSummaryContent();
+      loadMessagesContent();
+    }
+  }
+
   // Define loadSummaryContent function to load all summary data
   async function loadSummaryContent() {
     const summaryContent = document.getElementById('summaryContent');
@@ -2635,9 +2668,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       // ========== 1. Party Members Card ==========
       html += `
         <div class="summary-section party-members-section">
-          <h3 class="summary-section-title">
+          <h3 class="summary-section-title clickable" onclick="switchToTab('partyContent')" style="cursor: pointer;">
             <i class="fas fa-users"></i>
             Your Party (${partyMembers.length} ${partyMembers.length === 1 ? 'person' : 'people'})
+            <i class="fas fa-arrow-right section-nav-arrow"></i>
           </h3>
           <div class="party-members-list">
       `;
@@ -2667,9 +2701,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       // ========== 2. RSVP Summary Card ==========
       html += `
         <div class="summary-section rsvp-summary-section">
-          <h3 class="summary-section-title">
+          <h3 class="summary-section-title clickable" onclick="switchToTab('eventsContent')" style="cursor: pointer;">
             <i class="fas fa-calendar-check"></i>
             RSVP Summary
+            <i class="fas fa-arrow-right section-nav-arrow"></i>
           </h3>
       `;
       
@@ -2713,9 +2748,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       // ========== 3. Menu Choices Summary Card ==========
       html += `
         <div class="summary-section menu-summary-section">
-          <h3 class="summary-section-title">
+          <h3 class="summary-section-title clickable" onclick="switchToTab('menuContent')" style="cursor: pointer;">
             <i class="fas fa-utensils"></i>
             Menu Selections
+            <i class="fas fa-arrow-right section-nav-arrow"></i>
           </h3>
       `;
       
@@ -2779,9 +2815,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (giftChoices.length > 0) {
         html += `
           <div class="summary-section gifts-summary-section">
-            <h3 class="summary-section-title">
+            <h3 class="summary-section-title clickable" onclick="switchToTab('giftsContent')" style="cursor: pointer;">
               <i class="fas fa-gift"></i>
               Your Gifts
+              <i class="fas fa-arrow-right section-nav-arrow"></i>
             </h3>
             <div class="gifts-list">
         `;
