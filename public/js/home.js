@@ -48,6 +48,44 @@ function updateCountdown() {
     observer.observe(el);
   });
   
+  // Update guest access visibility based on settings
+  async function updateGuestAccessVisibility() {
+    try {
+      const response = await fetch('/api/admin/settings');
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const settings = await response.json();
+      const guestsEnabled = settings.guestsEnabled !== undefined ? settings.guestsEnabled : true;
+      
+      // Find all guest login buttons
+      const guestLoginButtons = document.querySelectorAll('[data-action="guest-login"]');
+      
+      guestLoginButtons.forEach(button => {
+        // Check if the button should be hidden based on its parent container
+        // Header button is in .login-access-icon, bottom button is in .cta-row
+        const parent = button.closest('.login-access-icon, .cta-row');
+        
+        if (parent && !guestsEnabled) {
+          parent.style.display = 'none';
+        } else if (parent && guestsEnabled) {
+          parent.style.display = '';
+        }
+      });
+      
+      console.log('Guest access visibility updated:', { guestsEnabled, buttonCount: guestLoginButtons.length });
+    } catch (error) {
+      console.error('Error fetching guest settings:', error);
+      // On error, show the buttons as default (fail-safe behavior)
+      const guestLoginButtons = document.querySelectorAll('[data-action="guest-login"]');
+      guestLoginButtons.forEach(button => {
+        const parent = button.closest('.login-access-icon, .cta-row');
+        if (parent) parent.style.display = '';
+      });
+    }
+  }
+
   // Home page i18n
   document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM loaded, initializing i18n system...');
@@ -94,6 +132,9 @@ function updateCountdown() {
     updatePageContent();
     updateLanguageSelector();
     updateFormatting();
+    
+    // Update guest access visibility based on settings
+    updateGuestAccessVisibility();
     
     console.log(`i18n system initialized, language: ${currentLanguage}`);
   });
