@@ -924,6 +924,7 @@
         <tr>
           <td>${g.name || ''}</td>
           <td>${g.email || ''}</td>
+          <td>${g.adult !== false ? 'Adult' : 'Child'}</td>
           <td>${g.partySize || 1}</td>
           <td>
             <button class="btn btn-info" data-action="manage-party" data-id="${g.id || g._id}" title="Manage Party">
@@ -952,7 +953,7 @@
           </div>
           <div class="table-container">
             <table class="data-table">
-              <thead><tr>${['Name','Email','Party Size','Actions'].map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+              <thead><tr>${['Name','Email','Age Category','Party Size','Actions'].map(c=>`<th>${c}</th>`).join('')}</tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </div>
@@ -974,17 +975,27 @@
             submitText: 'Save',
             fields: [
               { name:'name', label:'Name', required:true },
-              { name:'email', label:'Email', type:'email', required:true }
+              { name:'email', label:'Email', type:'email', required:true },
+              { name:'adult', label:'Age Category', type:'select', options:[
+                { value: 'true', label: 'Adult (18+)' },
+                { value: 'false', label: 'Child (Under 18)' }
+              ], required:true }
             ],
             initialValues: {
               name: current.name || '',
-              email: current.email || ''
+              email: current.email || '',
+              adult: current.adult !== undefined ? String(current.adult) : 'true'
             },
             onSubmit: async (values, close) => {
+              const guestData = {
+                name: values.name,
+                email: values.email,
+                adult: values.adult === 'true'
+              };
               const r = await api(`/api/admin/guests/${id}`, { 
                 method:'PUT', 
                 headers:{'Content-Type':'application/json'}, 
-                body: JSON.stringify(values)
+                body: JSON.stringify(guestData)
               });
               if (!r.ok) throw new Error('Failed to update guest');
               close();
@@ -1002,13 +1013,22 @@
           submitText: 'Add',
           fields: [
             { name:'name', label:'Name', required:true },
-            { name:'email', label:'Email', type:'email', required:true }
+            { name:'email', label:'Email', type:'email', required:true },
+            { name:'adult', label:'Age Category', type:'select', options:[
+              { value: 'true', label: 'Adult (18+)' },
+              { value: 'false', label: 'Child (Under 18)' }
+            ], required:true, default: 'true' }
           ],
           onSubmit: async (values, close) => {
+            const guestData = {
+              name: values.name,
+              email: values.email,
+              adult: values.adult === 'true'
+            };
             const r = await api('/api/admin/guests', { 
               method:'POST', 
               headers:{'Content-Type':'application/json'}, 
-              body: JSON.stringify(values)
+              body: JSON.stringify(guestData)
             });
             if (!r.ok) throw new Error('Failed to create guest');
             close();
@@ -1152,6 +1172,9 @@
             <div class="primary-guest-info">
               <strong>${primaryGuest ? primaryGuest.name : 'Unknown'}</strong> 
               <span class="badge badge-primary">Primary</span>
+              <span class="badge ${primaryGuest && primaryGuest.adult === false ? 'badge-info' : 'badge-secondary'}">
+                ${primaryGuest && primaryGuest.adult === false ? 'Child' : 'Adult'}
+              </span>
             </div>
           </div>
           

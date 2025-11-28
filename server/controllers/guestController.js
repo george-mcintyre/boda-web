@@ -158,7 +158,8 @@ async function getById(req, res, next) {
     res.json({
       id: guest._id.toString(),
       name: guest.name,
-      email: guest.email
+      email: guest.email,
+      adult: guest.adult !== false // Default to true if not specified
     });
   } catch (e) { next(e); }
 }

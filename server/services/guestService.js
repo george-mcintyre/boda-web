@@ -21,6 +21,7 @@ async function list() {
     id: guest._id.toString(),
     name: guest.name,
     email: guest.email,
+    adult: guest.adult !== false, // Default to true if not specified
     partySize: 1 + (guest.partyMembers ? guest.partyMembers.length : 0), // 1 for primary guest + party members
     partyMembers: guest.partyMembers || []
   }));
