@@ -414,6 +414,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Initialize drag and drop functionality
       initMenuDragDrop();
 
+      // Initialize image zoom functionality
+      initImageZoom();
+
       // Attach save button handler
       const saveBtn = document.getElementById('saveMenuChoicesBtn');
       if (saveBtn) {
@@ -434,6 +437,94 @@ document.addEventListener('DOMContentLoaded', async () => {
           </button>
         </div>
       `;
+    }
+  }
+
+  // Initialize image zoom functionality for menu thumbnails
+  function initImageZoom() {
+    // Create zoom overlay element
+    const zoomOverlay = document.createElement('div');
+    zoomOverlay.className = 'image-zoom-overlay';
+    zoomOverlay.innerHTML = '<img src="" alt="Zoomed Image" class="zoom-image">';
+    document.body.appendChild(zoomOverlay);
+
+    // Get all image containers
+    const imageContainers = document.querySelectorAll('.option-image-container');
+    
+    imageContainers.forEach(container => {
+      const img = container.querySelector('.option-thumbnail');
+      
+      if (!img) return; // Skip if no image found
+      
+      container.addEventListener('mouseenter', function(e) {
+        const imageUrl = img.src;
+        
+        if (!imageUrl || imageUrl === '') return;
+        
+        // Show zoom overlay
+        const zoomImg = zoomOverlay.querySelector('.zoom-image');
+        zoomImg.src = imageUrl;
+        zoomOverlay.style.display = 'block';
+        
+        // Position overlay
+        positionZoomOverlay(e);
+      });
+      
+      container.addEventListener('mousemove', function(e) {
+        if (zoomOverlay.style.display === 'block') {
+          positionZoomOverlay(e);
+        }
+      });
+      
+      container.addEventListener('mouseleave', function() {
+        zoomOverlay.style.display = 'none';
+      });
+    });
+    
+    // Position the zoom overlay based on mouse position
+    function positionZoomOverlay(e) {
+      const zoomImg = zoomOverlay.querySelector('.zoom-image');
+      const overlay = zoomOverlay;
+      
+      // Get mouse position
+      const mouseX = e.clientX;
+      const mouseY = e.clientY;
+      
+      // Get viewport dimensions
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      
+      // Default zoom image dimensions
+      const zoomWidth = 300;
+      const zoomHeight = 300;
+      
+      // Calculate position (try to keep overlay on screen)
+      let left = mouseX + 20; // Offset from cursor
+      let top = mouseY + 20;
+      
+      // Adjust if going off right edge
+      if (left + zoomWidth > viewportWidth) {
+        left = mouseX - zoomWidth - 20;
+      }
+      
+      // Adjust if going off bottom edge
+      if (top + zoomHeight > viewportHeight) {
+        top = mouseY - zoomHeight - 20;
+      }
+      
+      // Adjust if going off left edge
+      if (left < 10) {
+        left = 10;
+      }
+      
+      // Adjust if going off top edge
+      if (top < 10) {
+        top = 10;
+      }
+      
+      // Apply positioning
+      overlay.style.left = left + 'px';
+      overlay.style.top = top + 'px';
     }
   }
 
