@@ -22,7 +22,7 @@ async function getParty(req, res, next) {
       {
         id: me._id.toString(),
         name: me.name,
-        adult: true, // Assuming primary guest is always adult
+        adult: me.adult, // Use actual adult status from database
         primary: true
       },
       ...(me.partyMembers || []).map(member => ({
@@ -98,7 +98,7 @@ async function getPartyByGuestId(req, res, next) {
       {
         id: guest._id.toString(),
         name: guest.name,
-        adult: true, // Assuming primary guest is always adult
+        adult: guest.adult, // Use actual adult status from database
         primary: true
       },
       ...(guest.partyMembers || []).map(member => ({
@@ -140,7 +140,7 @@ async function updatePartyByGuestId(req, res, next) {
       {
         id: guest._id.toString(),
         name: guest.name,
-        adult: true,
+        adult: guest.adult, // Use actual adult status from database
         primary: true
       },
       ...processedMembers
