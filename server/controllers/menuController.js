@@ -214,7 +214,7 @@ async function updateGuestCourseOption(req, res, next) {
     }
     
     // Validate choices structure (supports both new and legacy format)
-    const allowedDietaryOptions = ['vegan', 'vegetarian', 'nut-allergy', 'nut allergy', 'lactose-intolerant', 'gluten-intolerant', 'other'];
+    const allowedDietaryOptions = ['vegan', 'vegetarian', 'nut-allergy', 'nut allergy', 'lactose-intolerant', 'gluten-intolerant', 'spicy', 'contains-nuts', 'other'];
     
     for (const choice of choices) {
       if (!choice.partyGuestId || !Array.isArray(choice.choices)) {
@@ -277,7 +277,7 @@ async function updateGuestCourseOption(req, res, next) {
 async function createCourseOption(req, res, next) {
   try {
     const { courseId } = req.params;
-    const { label, image, description, isVegetarian, containsAllergens, containsLactose } = req.body;
+    const { label, image, description, isVegetarian, containsAllergens, containsLactose, isSpicy, containsNuts } = req.body;
 
     // Verify course exists
     const course = await Course.findById(courseId);
@@ -306,7 +306,9 @@ async function createCourseOption(req, res, next) {
       description: description || null,
       isVegetarian: isVegetarian || false,
       containsAllergens: containsAllergens || false,
-      containsLactose: containsLactose || false
+      containsLactose: containsLactose || false,
+      isSpicy: isSpicy || false,
+      containsNuts: containsNuts || false
     });
     
     // Populate image for response
@@ -320,7 +322,7 @@ async function createCourseOption(req, res, next) {
 async function updateCourseOption(req, res, next) {
   try {
     const { optionId } = req.params;
-    const { label, image, description, isVegetarian, containsAllergens, containsLactose } = req.body;
+    const { label, image, description, isVegetarian, containsAllergens, containsLactose, isSpicy, containsNuts } = req.body;
     
     // Handle image reference
     let imageRef = undefined;
@@ -344,6 +346,8 @@ async function updateCourseOption(req, res, next) {
     if (isVegetarian !== undefined) updateData.isVegetarian = isVegetarian;
     if (containsAllergens !== undefined) updateData.containsAllergens = containsAllergens;
     if (containsLactose !== undefined) updateData.containsLactose = containsLactose;
+    if (isSpicy !== undefined) updateData.isSpicy = isSpicy;
+    if (containsNuts !== undefined) updateData.containsNuts = containsNuts;
     
     const option = await CourseOption.findByIdAndUpdate(optionId, updateData, { new: true })
       .populate('image');

@@ -280,6 +280,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                       ${option.isVegetarian ? '<span class="dietary-badge vegetarian"><i class="fas fa-leaf"></i> Vegetarian</span>' : ''}
                       ${option.containsAllergens ? '<span class="dietary-badge allergens"><i class="fas fa-exclamation-triangle"></i> Allergens</span>' : ''}
                       ${option.containsLactose ? '<span class="dietary-badge lactose"><i class="fas fa-cheese"></i> Lactose</span>' : ''}
+                      ${option.isSpicy ? '<span class="dietary-badge spicy"><i class="fas fa-pepper-hot"></i> Spicy</span>' : ''}
+                      ${option.containsNuts ? '<span class="dietary-badge contains-nuts"><i class="fas fa-seedling"></i> Contains Nuts</span>' : ''}
                     </div>
                   </div>
                 </div>
@@ -346,6 +348,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           { name: 'lactose-intolerant', label: 'Lactose Intolerant', icon: 'fa-cheese' },
           { name: 'gluten-intolerant', label: 'Gluten Intolerant', icon: 'fa-bread-slice' },
           { name: 'nut-allergy', label: 'Nut Allergy', icon: 'fa-seedling' },
+          { name: 'spicy', label: 'Spicy', icon: 'fa-pepper-hot' },
+          { name: 'contains-nuts', label: 'Contains Nuts', icon: 'fa-seedling' },
           { name: 'other', label: 'Other', icon: 'fa-question-circle' }
         ];
 
@@ -1960,6 +1964,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         { name: 'lactose-intolerant', label: 'Lactose Intolerant', icon: 'fa-cheese' },
         { name: 'gluten-intolerant', label: 'Gluten Intolerant', icon: 'fa-bread-slice' },
         { name: 'nut-allergy', label: 'Nut Allergy', icon: 'fa-seedling' },
+        { name: 'spicy', label: 'Spicy', icon: 'fa-pepper-hot' },
+        { name: 'contains-nuts', label: 'Contains Nuts', icon: 'fa-seedling' },
         { name: 'other', label: 'Other', icon: 'fa-question-circle' }
       ];
       

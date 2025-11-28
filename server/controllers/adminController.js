@@ -262,6 +262,8 @@ function formatCourseOptionForApi(option) {
     isVegetarian: option.isVegetarian || false,
     containsAllergens: option.containsAllergens || false,
     containsLactose: option.containsLactose || false,
+    isSpicy: option.isSpicy || false,
+    containsNuts: option.containsNuts || false,
     dietaryIcons: generateDietaryIconsHTML(option)
   };
 }

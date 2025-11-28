@@ -22,6 +22,18 @@ const dietaryIcons = {
     color: '#fd7e14',
     label: 'Contains Lactose',
     tooltip: 'This option contains lactose/dairy products'
+  },
+  spicy: {
+    icon: 'fa-pepper-hot',
+    color: '#dc3545',
+    label: 'Spicy',
+    tooltip: 'This option contains spicy ingredients'
+  },
+  containsNuts: {
+    icon: 'fa-seedling',
+    color: '#8b4513',
+    label: 'Contains Nuts',
+    tooltip: 'This option may contain nuts'
   }
 };
 
@@ -59,6 +71,14 @@ function getDietaryIcons(option) {
   
   if (option.containsLactose) {
     icons.push(dietaryIcons.lactose);
+  }
+  
+  if (option.isSpicy) {
+    icons.push(dietaryIcons.spicy);
+  }
+  
+  if (option.containsNuts) {
+    icons.push(dietaryIcons.containsNuts);
   }
   
   return icons;

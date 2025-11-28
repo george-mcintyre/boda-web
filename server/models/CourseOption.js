@@ -15,7 +15,9 @@ const courseOptionSchema = new Schema({
   // Special Dietary Indicators
   isVegetarian: { type: Boolean, default: false },
   containsAllergens: { type: Boolean, default: false },
-  containsLactose: { type: Boolean, default: false }
+  containsLactose: { type: Boolean, default: false },
+  isSpicy: { type: Boolean, default: false },
+  containsNuts: { type: Boolean, default: false }
 }, { timestamps: true });
 
 module.exports = model('CourseOption', courseOptionSchema);

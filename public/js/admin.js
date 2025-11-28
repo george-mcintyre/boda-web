@@ -2473,6 +2473,8 @@
           { name: 'isVegetarian', label: 'Vegetarian', type: 'checkbox', help: 'This option is suitable for vegetarians' },
           { name: 'containsAllergens', label: 'Contains Allergens', type: 'checkbox', help: 'This option contains allergens - please check ingredient list' },
           { name: 'containsLactose', label: 'Contains Lactose', type: 'checkbox', help: 'This option contains lactose/dairy products' },
+          { name: 'isSpicy', label: 'Spicy', type: 'checkbox', help: 'This option contains spicy ingredients' },
+          { name: 'containsNuts', label: 'Contains Nuts', type: 'checkbox', help: 'This option may contain nuts' },
         ],
         initialValues: {
           label: existingData?.label || '',
@@ -2480,7 +2482,9 @@
           description: existingData?.description || '',
           isVegetarian: existingData?.isVegetarian || false,
           containsAllergens: existingData?.containsAllergens || false,
-          containsLactose: existingData?.containsLactose || false
+          containsLactose: existingData?.containsLactose || false,
+          isSpicy: existingData?.isSpicy || false,
+          containsNuts: existingData?.containsNuts || false
         },
         onSubmit: async (values, close, modal) => {
           try {
@@ -2536,7 +2540,9 @@
               description: values.description,
               isVegetarian: values.isVegetarian || false,
               containsAllergens: values.containsAllergens || false,
-              containsLactose: values.containsLactose || false
+              containsLactose: values.containsLactose || false,
+              isSpicy: values.isSpicy || false,
+              containsNuts: values.containsNuts || false
             };
             
             const url = optionId ? `/api/admin/courseData/${courseId}/options/${optionId}` : `/api/admin/courseData/${courseId}/options`;
