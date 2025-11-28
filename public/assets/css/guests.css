@@ -1476,5 +1476,1572 @@ body {
 }
 
 /* ========================================
+   MENU DRAG-DROP COMPONENTS
+   ======================================== */
+
+/* Unified Menu Container */
+.unified-menu-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 10px 0;
+}
+
+/* Menu Course Group */
+.menu-course-group {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+}
+
+.course-group-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.course-group-header i {
+    font-size: 1.5em;
+    opacity: 0.9;
+}
+
+.course-group-header h3 {
+    margin: 0;
+    font-size: 1.3em;
+    font-weight: 600;
+}
+
+.course-group-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Menu Option Card */
+.menu-option-card {
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.menu-option-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.option-card-main {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+}
+
+/* Option Image */
+.option-image-container {
+    flex: 0 0 80px;
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #e9ecef, #dee2e6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.option-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.option-image-placeholder {
+    color: #adb5bd;
+    font-size: 2em;
+}
+
+.option-image-container.no-image {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    opacity: 0.3;
+}
+
+/* Option Details */
+.option-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.option-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.option-name {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.dietary-icons {
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+.option-description-text {
+    margin: 0;
+    font-size: 0.9em;
+    color: #6c757d;
+    line-height: 1.4;
+}
+
+.dietary-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.dietary-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: 500;
+}
+
+.dietary-badge.vegetarian {
+    background: #d4edda;
+    color: #155724;
+}
+
+.dietary-badge.allergens {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.dietary-badge.lactose {
+    background: #fff3cd;
+    color: #856404;
+}
+
+/* Option Selection Panel - The Drop Zone Container */
+.option-selection-panel {
+    background: white;
+    border-top: 2px dashed #e9ecef;
+    padding: 15px;
+}
+
+.selection-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.panel-label {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.member-count {
+    font-size: 0.85em;
+    color: #6c757d;
+    background: #e9ecef;
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+
+/* Member Drop Zone - THE KEY STYLING FOR DRAG-DROP */
+.member-drop-zone {
+    min-height: 60px;
+    padding: 12px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 2px dashed #ced4da;
+    border-radius: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: flex-start;
+    align-content: flex-start;
+    transition: all 0.3s ease;
+}
+
+.member-drop-zone:empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.member-drop-zone:empty::after {
+    content: 'Drag members here';
+    color: #adb5bd;
+    font-size: 0.9em;
+    font-style: italic;
+}
+
+/* Drop Zone States */
+.member-drop-zone.drop-target-highlight {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(139, 90, 150, 0.05), rgba(139, 90, 150, 0.1));
+}
+
+.member-drop-zone.drag-over {
+    border-color: var(--secondary-color);
+    border-style: solid;
+    background: linear-gradient(135deg, rgba(139, 90, 150, 0.1), rgba(139, 90, 150, 0.15));
+    transform: scale(1.02);
+    box-shadow: 0 4px 15px rgba(139, 90, 150, 0.2);
+}
+
+/* Member Chip - Draggable Elements */
+.member-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: grab;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    user-select: none;
+}
+
+.member-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 90, 150, 0.3);
+}
+
+.member-chip:active {
+    cursor: grabbing;
+}
+
+.member-chip.dragging {
+    opacity: 0.5;
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(139, 90, 150, 0.4);
+}
+
+.member-chip i {
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.member-chip .badge {
+    padding: 2px 6px;
+    font-size: 0.7em;
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+}
+
+/* Special Requests Section */
+.special-requests-section {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    padding: 25px;
+    margin-top: 20px;
+}
+
+.special-requests-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.special-requests-header i {
+    font-size: 1.5em;
+    color: #ffc107;
+}
+
+.special-requests-header h3 {
+    margin: 0;
+    font-size: 1.3em;
+    color: var(--text-color);
+}
+
+.special-requests-description {
+    color: #6c757d;
+    margin-bottom: 20px;
+}
+
+.special-requests-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* Dietary Checkbox (for special requests) */
+.dietary-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 8px;
+}
+
+.dietary-checkbox:hover {
+    border-color: var(--primary-color);
+    background: rgba(139, 90, 150, 0.05);
+}
+
+.dietary-checkbox.checked {
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, rgba(139, 90, 150, 0.1), rgba(139, 90, 150, 0.15));
+}
+
+.dietary-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.dietary-checkbox i {
+    font-size: 1.1em;
+    color: var(--primary-color);
+    width: 20px;
+    text-align: center;
+}
+
+.dietary-checkbox span {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.dietary-checkbox.checked span {
+    color: var(--primary-color);
+}
+
+/* Special Request Detail Textarea */
+.special-request-detail {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.special-request-detail label {
+    display: block;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 8px;
+}
+
+.special-request-detail textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 0.95em;
+    resize: vertical;
+    min-height: 60px;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.special-request-detail textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(139, 90, 150, 0.1);
+}
+
+/* ========================================
+   PARTY MANAGEMENT COMPONENTS
+   ======================================== */
+
+.party-management-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Party Members Management Section */
+.party-members-management {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    padding: 25px;
+}
+
+.party-members-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.party-members-header h3 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.party-count {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.party-description {
+    color: #6c757d;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.party-members-edit-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Party Member Edit Card */
+.party-member-edit-card {
+    background: #f8f9fa;
+    padding: 15px 20px;
+}
+
+.party-member-edit-card.primary-member {
+    background: linear-gradient(135deg, rgba(139, 90, 150, 0.05), rgba(139, 90, 150, 0.1));
+    border-color: var(--primary-color);
+}
+
+.party-member-edit-card.new-member {
+    border-style: dashed;
+    border-color: var(--secondary-color);
+}
+
+.member-edit-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.member-number {
+    width: 28px;
+    height: 28px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.primary-indicator,
+.child-indicator,
+.new-member-indicator {
+    font-size: 0.8em;
+    padding: 3px 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.primary-indicator {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.child-indicator {
+    background: #cce5ff;
+    color: #004085;
+}
+
+.new-member-indicator {
+    background: #d4edda;
+    color: #155724;
+}
+
+.member-edit-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+}
+
+.member-edit-form .form-group {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.member-edit-form label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 6px;
+}
+
+.member-edit-form label i {
+    color: var(--primary-color);
+}
+
+/* Add Member Card */
+.add-member-card {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border: 2px dashed #ced4da;
+    border-radius: 15px;
+}
+
+.max-members-notice {
+    text-align: center;
+    padding: 15px;
+    background: #fff3cd;
+    border-radius: 10px;
+    color: #856404;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.max-members-notice i {
+    font-size: 1.2em;
+}
+
+.max-members-notice p {
+    margin: 0;
+}
+
+.max-members-notice a {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Party Dietary Management Section */
+.party-dietary-management {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    padding: 25px;
+}
+
+.dietary-header h3 {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dietary-description {
+    color: #6c757d;
+    margin: 10px 0 20px 0;
+}
+
+.party-dietary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.party-dietary-card {
+    padding: 20px;
+}
+
+.party-dietary-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.party-dietary-card-header i {
+    color: var(--primary-color);
+}
+
+.party-dietary-card-header h4 {
+    margin: 0;
+    font-size: 1.1em;
+    flex: 1;
+}
+
+.dietary-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.dietary-detail {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.dietary-detail label {
+    display: block;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 8px;
+}
+
+.dietary-detail-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    font-size: 0.9em;
+    resize: vertical;
+    min-height: 50px;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.dietary-detail-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(139, 90, 150, 0.1);
+}
+
+/* ========================================
+   CONFIRMATION DIALOG
+   ======================================== */
+
+.confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.confirm-overlay.show {
+    opacity: 1;
+}
+
+.confirm-dialog {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+    width: 90%;
+    overflow: hidden;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.confirm-overlay.show .confirm-dialog {
+    transform: scale(1);
+}
+
+.confirm-content {
+    padding: 30px;
+    text-align: center;
+}
+
+.confirm-content i {
+    font-size: 3em;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.confirm-content h3 {
+    margin: 0 0 10px 0;
+    color: var(--text-color);
+}
+
+.confirm-content p {
+    color: #6c757d;
+    margin-bottom: 25px;
+}
+
+.confirm-content .form-actions {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* ========================================
+   GIFT PURCHASE DIALOG
+   ======================================== */
+
+.gift-purchase-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.gift-purchase-overlay.show {
+    opacity: 1;
+}
+
+.gift-purchase-dialog {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    max-width: 450px;
+    width: 90%;
+    overflow: hidden;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.gift-purchase-overlay.show .gift-purchase-dialog {
+    transform: scale(1);
+}
+
+.gift-purchase-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.gift-purchase-header i {
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.gift-purchase-header h3 {
+    margin: 0;
+}
+
+.gift-purchase-content {
+    padding: 25px;
+}
+
+.gift-purchase-content > p {
+    color: #6c757d;
+    margin: 0 0 10px 0;
+}
+
+.gift-purchase-summary {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.gift-purchase-summary strong {
+    color: var(--text-color);
+}
+
+.gift-purchase-amount {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.gift-message-input label {
+    display: block;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 8px;
+}
+
+.gift-message-input textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e1e5e9;
+    border-radius: 8px;
+    resize: vertical;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.gift-message-input textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Gift Purchase Dialog Actions */
+.gift-purchase-dialog .action-container {
+    padding: 0 25px 25px 25px;
+    margin: 0;
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+/* ========================================
+   EVENTS COMPONENTS
+   ======================================== */
+
+.events-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.event-day {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.day-title {
+    color: var(--primary-color);
+    font-size: 1.3em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--accent-color);
+}
+
+.day-events {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.event-details {
+    padding: 20px;
+}
+
+.event-time,
+.event-location {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+.event-time i,
+.event-location i {
+    color: var(--primary-color);
+    width: 20px;
+}
+
+.event-description {
+    color: var(--text-color);
+    line-height: 1.5;
+    margin-top: 15px;
+}
+
+.event-map-container {
+    margin-top: 15px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.event-map {
+    height: 200px;
+    border-radius: 10px;
+}
+
+.map-coordinates {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    font-size: 0.85em;
+    color: #6c757d;
+}
+
+.osm-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.osm-link:hover {
+    text-decoration: underline;
+}
+
+/* Sub Events */
+.sub-events {
+    padding: 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.sub-events-title {
+    margin: 0 0 15px 0;
+    font-size: 1em;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sub-events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sub-event-item {
+    display: flex;
+    gap: 15px;
+    padding: 12px;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.sub-event-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.sub-event-info {
+    flex: 1;
+}
+
+.sub-event-name {
+    font-weight: 600;
+    color: var(--text-color);
+    display: block;
+}
+
+.sub-event-time {
+    font-size: 0.85em;
+    color: #6c757d;
+}
+
+.sub-event-description {
+    margin: 5px 0 0 0;
+    font-size: 0.9em;
+    color: #6c757d;
+}
+
+/* Event Attendance */
+.event-attendance {
+    padding: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.attendance-title {
+    margin: 0 0 15px 0;
+    font-size: 1em;
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.attendance-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.attendance-item {
+    display: flex;
+    align-items: center;
+}
+
+.attendance-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+    width: 100%;
+}
+
+.attendance-label:hover {
+    background: #f8f9fa;
+}
+
+.attendance-checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary-color);
+}
+
+.member-name {
+    flex: 1;
+    font-weight: 500;
+}
+
+/* ========================================
+   GIFTS COMPONENTS
+   ======================================== */
+
+.gifts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* Thank You Section */
+.gifts-thank-you-section {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 15px;
+    padding: 30px;
+    color: white;
+}
+
+.thank-you-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.thank-you-header i {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.thank-you-header h3 {
+    margin: 0 0 5px 0;
+    font-size: 1.5em;
+}
+
+.thank-you-header p {
+    margin: 0;
+    opacity: 0.9;
+}
+
+.donated-gifts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.donated-gift-card {
+    position: relative;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+}
+
+.donated-gift-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.3));
+    display: flex;
+    align-items: flex-end;
+}
+
+.donated-gift-content {
+    padding: 20px;
+    width: 100%;
+}
+
+.donated-gift-title {
+    margin: 0 0 5px 0;
+    font-size: 1.1em;
+}
+
+.donated-gift-price {
+    font-size: 1.3em;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.donated-gift-date {
+    font-size: 0.85em;
+    opacity: 0.9;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.donated-gift-message {
+    margin-top: 10px;
+    font-size: 0.9em;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+/* Available Gifts Section */
+.gifts-available-section {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    padding: 25px;
+}
+
+.available-gifts-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.available-gifts-header i {
+    font-size: 2em;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.available-gifts-header h3 {
+    margin: 0 0 5px 0;
+    color: var(--text-color);
+}
+
+.available-gifts-header p {
+    margin: 0;
+    color: #6c757d;
+}
+
+.gift-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.gift-credit-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.gift-credit-card.sold-out {
+    opacity: 0.7;
+}
+
+.gift-card-image-section {
+    height: 150px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.gift-card-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 15px;
+    color: white;
+}
+
+.gift-card-title {
+    margin: 0 0 5px 0;
+    font-size: 1.1em;
+}
+
+.gift-card-price {
+    font-size: 1.2em;
+    font-weight: 700;
+}
+
+.gift-card-details {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.gift-card-description {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+.gift-card-stock {
+    font-size: 0.85em;
+}
+
+.stock-available {
+    color: #28a745;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.stock-sold-out {
+    color: #dc3545;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* ========================================
+   SUMMARY SECTION COMPONENTS
+   ======================================== */
+
+.summary-section {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e9ecef;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.summary-section-title {
+    margin: 0 0 15px 0;
+    color: var(--primary-color);
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.summary-section-title.clickable:hover {
+    color: var(--secondary-color);
+}
+
+.section-nav-arrow {
+    margin-left: auto;
+    font-size: 0.9em;
+    opacity: 0.5;
+}
+
+.clickable:hover .section-nav-arrow {
+    opacity: 1;
+}
+
+/* Party Members List in Summary */
+.party-members-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.party-member-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: #f8f9fa;
+    border-radius: 20px;
+    border: 1px solid #e9ecef;
+}
+
+.party-member-item.primary-member {
+    background: linear-gradient(135deg, rgba(139, 90, 150, 0.1), rgba(139, 90, 150, 0.15));
+    border-color: var(--primary-color);
+}
+
+/* RSVP Summary */
+.rsvp-event-item {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.rsvp-event-item:last-child {
+    margin-bottom: 0;
+}
+
+.rsvp-event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.rsvp-event-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.rsvp-event-name {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.rsvp-event-datetime {
+    font-size: 0.85em;
+    color: #6c757d;
+}
+
+.rsvp-attendee-count {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+
+.rsvp-attendee-count.has-attendees {
+    background: #d4edda;
+    color: #155724;
+}
+
+.rsvp-attendee-count.no-attendees {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.rsvp-attendees-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.attendee-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: #d4edda;
+    color: #155724;
+    border-radius: 12px;
+    font-size: 0.85em;
+}
+
+.no-attendees-message {
+    color: #6c757d;
+    font-size: 0.9em;
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Menu Summary */
+.menu-member-card {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.menu-member-card:last-child {
+    margin-bottom: 0;
+}
+
+.menu-member-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.menu-member-header i {
+    color: var(--primary-color);
+}
+
+.menu-member-name {
+    font-weight: 600;
+    flex: 1;
+}
+
+.menu-choices-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.menu-choice-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9em;
+}
+
+.menu-choice-item.info-only {
+    opacity: 0.7;
+}
+
+.menu-course-label {
+    color: #6c757d;
+}
+
+.menu-option-label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.menu-option-label.not-selected {
+    color: #dc3545;
+    font-style: italic;
+}
+
+/* Gifts Summary */
+.gifts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.gift-summary-item {
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.gift-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.gift-title {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.gift-amount {
+    font-size: 1.1em;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.gift-summary-date {
+    font-size: 0.85em;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gift-summary-message {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #6c757d;
+    font-style: italic;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+/* No Data State */
+.no-data {
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+/* ========================================
+   RESPONSIVE STYLES FOR NEW COMPONENTS
+   ======================================== */
+
+@media (max-width: 768px) {
+    .option-card-main {
+        flex-direction: column;
+    }
+    
+    .option-image-container {
+        flex: none;
+        width: 100%;
+        height: 120px;
+    }
+    
+    .member-drop-zone {
+        min-height: 50px;
+    }
+    
+    .member-chip {
+        padding: 6px 10px;
+        font-size: 0.85em;
+    }
+    
+    .special-requests-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .party-dietary-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .day-events {
+        grid-template-columns: 1fr;
+    }
+    
+    .gift-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .donated-gifts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .member-edit-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .member-edit-form .btn-base.btn-danger {
+        align-self: flex-end;
+    }
+    
+    .rsvp-event-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .rsvp-attendee-count {
+        align-self: flex-start;
+    }
+}
+
+/* ========================================
    END OF REFACTORED CSS
    ======================================== */

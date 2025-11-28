@@ -56,9 +56,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           <i class="fas fa-question-circle"></i>
           <h3>Confirm action</h3>
           <p>${message}</p>
-          <div class="confirm-buttons">
-            <button class="btn-cancel-confirm">cancel</button>
-            <button class="btn-confirm-action">confirm</button>
+          <div class="form-actions">
+            <button class="btn-base btn-outline btn-md">cancel</button>
+            <button class="btn-base btn-primary btn-md">confirm</button>
           </div>
         </div>
       </div>
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => overlay.classList.add('show'), 100);
     
     // Event listeners
-    overlay.querySelector('.btn-cancel-confirm').addEventListener('click', () => {
+    overlay.querySelector('.btn-base.btn-outline').addEventListener('click', () => {
       overlay.classList.remove('show');
       setTimeout(() => {
         document.body.removeChild(overlay);
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }, 300);
     });
     
-    overlay.querySelector('.btn-confirm-action').addEventListener('click', () => {
+    overlay.querySelector('.btn-base.btn-primary').addEventListener('click', () => {
       overlay.classList.remove('show');
       setTimeout(() => {
         document.body.removeChild(overlay);
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Show loading state
     menuContent.innerHTML = `
-      <div class="loading-menu">
+      <div class="loading-state">
         <i class="fas fa-spinner fa-spin fa-3x"></i>
         <p>Loading menu...</p>
       </div>
@@ -135,14 +135,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (!partyResponse.ok || !menuResponse.ok) {
         menuContent.innerHTML = `
-          <div class="error-message">
-            <i class="fas fa-exclamation-triangle"></i>
-            <h3>Error Loading Menu</h3>
-            <p>Unable to load menu data. Please try again later.</p>
-            <button class="btn-retry" onclick="loadMenuSelections()">
-              <i class="fas fa-redo"></i> Retry
-            </button>
-          </div>
+        <div class="error-state">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Error Loading Menu</h3>
+          <p>Unable to load menu data. Please try again later.</p>
+          <button class="btn-retry" onclick="loadMenuSelections()">
+            <i class="fas fa-redo"></i> Retry
+          </button>
+        </div>
         `;
         return;
       }
@@ -228,12 +228,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           const isSelectable = course.selectionRequired !== false && options.length > 1;
           
           html += `
-            <div class="menu-course-card" data-course-id="${course.id}" data-selectable="${isSelectable}">
-              <div class="course-card-header">
-                <h4 class="course-card-title">${escapeHtml(course.label)}</h4>
-                ${isSelectable ? '<span class="selection-required-badge"><i class="fas fa-hand-pointer"></i> Selection Required</span>' : '<span class="info-only-badge"><i class="fas fa-info-circle"></i> Info Only</span>'}
+            <div class="card" data-course-id="${course.id}" data-selectable="${isSelectable}">
+              <div class="card-header">
+                <h4>${escapeHtml(course.label)}</h4>
+                ${isSelectable ? '<span class="badge badge-warning"><i class="fas fa-hand-pointer"></i> Selection Required</span>' : '<span class="badge badge-secondary"><i class="fas fa-info-circle"></i> Info Only</span>'}
               </div>
-              <div class="course-card-content">
+              <div class="card-content">
           `;
 
           // Iterate through options in this course
@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div class="member-chip" draggable="true" data-member-id="${member.id}" data-member-name="${escapeHtml(member.name)}">
                           <i class="fas fa-user"></i>
                           <span>${escapeHtml(member.name)}</span>
-                          ${member.primary ? '<span class="chip-badge primary">Primary</span>' : ''}
+                          ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
                         </div>
                       `).join('')}
                     </div>
@@ -350,13 +350,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         ];
 
         html += `
-          <div class="special-request-card" data-member-id="${member.id}">
-            <div class="special-request-card-header">
+          <div class="card" data-member-id="${member.id}">
+            <div class="card-header">
               <i class="fas fa-user"></i>
               <h4>${escapeHtml(member.name)}</h4>
-              ${member.primary ? '<span class="primary-badge">Primary</span>' : ''}
+              ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
             </div>
-            <div class="special-request-options">
+            <div class="card-content">
               ${dietaryOptions.map(opt => {
                 const isSelected = selectedRequests.some(r =>
                   (typeof r === 'string' && r === opt.name) ||
@@ -395,8 +395,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Add save button
       html += `
-        <div class="menu-actions">
-          <button type="button" id="saveMenuChoicesBtn" class="btn-save-menu">
+        <div class="action-container">
+          <button type="button" id="saveMenuChoicesBtn" class="btn-base btn-primary btn-lg">
             <i class="fas fa-save"></i>
             Save Menu Selections
           </button>
@@ -421,7 +421,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
       console.error('Error loading menu selections:', err);
       menuContent.innerHTML = `
-        <div class="error-message">
+        <div class="error-state">
           <i class="fas fa-exclamation-triangle"></i>
           <h3>Error Loading Menu</h3>
           <p>There was a problem loading the menu. Please try again.</p>
@@ -899,7 +899,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Show loading state
     eventsContent.innerHTML = `
-      <div class="loading-events">
+      <div class="loading-state">
         <i class="fas fa-spinner fa-spin fa-3x"></i>
         <p>Loading events...</p>
       </div>
@@ -949,7 +949,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Handle no events case
       if (!Array.isArray(events) || events.length === 0) {
         eventsContent.innerHTML = `
-          <div class="no-events-message">
+          <div class="empty-state">
             <i class="fas fa-calendar-times"></i>
             <h3>No Events Available</h3>
             <p>There are no events scheduled yet. Please check back later.</p>
@@ -1087,8 +1087,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <label class="attendance-label">
                   <input type="checkbox" class="attendance-checkbox" data-event-id="${eventId}" data-member-id="${member.id}" ${isAttending ? 'checked' : ''}>
                   <span class="member-name">${escapeHtml(member.name)}</span>
-                  ${member.primary ? '<span class="primary-badge">Primary</span>' : ''}
-                  ${member.adult === false ? '<span class="child-badge">Child</span>' : ''}
+                  ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
+                  ${member.adult === false ? '<span class="badge badge-info">Child</span>' : ''}
                 </label>
               </div>
             `;
@@ -1157,8 +1157,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Assemble the complete event card
         return `
-          <div class="event-card" data-event-id="${eventId}">
-            <div class="event-card-header">
+          <div class="card" data-event-id="${eventId}">
+            <div class="card-header">
               ${imageHtml}
               <div class="event-header-content">
                 <h4 class="event-title">${escapeHtml(event.title || event.name)}</h4>
@@ -1210,8 +1210,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // Save button
       html += `
-        <div class="events-actions">
-          <button type="button" id="saveEventChoicesBtn" class="btn-save-choices">
+        <div class="action-container">
+          <button type="button" id="saveEventChoicesBtn" class="btn-base btn-primary btn-lg">
             <i class="fas fa-save"></i>
             Save Attendance Choices
           </button>
@@ -1241,7 +1241,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
       console.error('Error loading events:', error);
       eventsContent.innerHTML = `
-        <div class="error-message">
+        <div class="error-state">
           <i class="fas fa-exclamation-triangle"></i>
           <h3>Error Loading Events</h3>
           <p>There was a problem loading the events. Please try again.</p>
@@ -1368,7 +1368,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      
      // Show loading state
      giftsContent.innerHTML = `
-       <div class="loading-gifts">
+       <div class="loading-state">
          <i class="fas fa-spinner fa-spin fa-3x"></i>
          <p>Loading gifts...</p>
        </div>
@@ -1477,7 +1477,7 @@ document.addEventListener('DOMContentLoaded', async () => {
        
        if (gifts.length === 0) {
          html += `
-           <div class="no-gifts-message">
+           <div class="empty-state">
              <i class="fas fa-inbox"></i>
              <h4>No gifts available</h4>
              <p>Please check back later for our gift registry.</p>
@@ -1488,7 +1488,7 @@ document.addEventListener('DOMContentLoaded', async () => {
            const isAvailable = gift.stock > 0;
            
            html += `
-             <div class="gift-credit-card ${!isAvailable ? 'sold-out' : ''}" data-gift-id="${gift.id}">
+             <div class="card gift-credit-card ${!isAvailable ? 'sold-out' : ''}" data-gift-id="${gift.id}">
                <div class="gift-card-image-section" style="background-image: url('${escapeHtml(gift.imageUrl)}');">
                  <div class="gift-card-image-overlay">
                    <h4 class="gift-card-title">${escapeHtml(gift.title)}</h4>
@@ -1503,14 +1503,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                      : `<span class="stock-sold-out"><i class="fas fa-times-circle"></i> Sold Out</span>`
                    }
                  </div>
-                 <div class="gift-card-actions">
+                 <div class="action-container">
                    ${isAvailable ? `
-                     <button class="btn-buy-gift" onclick="purchaseGift('${gift.id}', '${escapeHtml(gift.title).replace(/'/g, "\\'")}', ${gift.amount})">
+                     <button class="btn-base btn-primary btn-md" onclick="purchaseGift('${gift.id}', '${escapeHtml(gift.title).replace(/'/g, "\\'")}', ${gift.amount})">
                        <i class="fas fa-credit-card"></i>
                        Buy Gift
                      </button>
                    ` : `
-                     <button class="btn-sold-out" disabled>
+                     <button class="btn-disabled" disabled>
                        <i class="fas fa-ban"></i>
                        Sold Out
                      </button>
@@ -1549,7 +1549,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      } catch (err) {
        console.error('Error loading gifts:', err);
        giftsContent.innerHTML = `
-         <div class="error-message">
+         <div class="error-state">
            <i class="fas fa-exclamation-triangle"></i>
            <h3>Error Loading Gifts</h3>
            <p>There was a problem loading the gifts. Please try again.</p>
@@ -1587,9 +1587,9 @@ document.addEventListener('DOMContentLoaded', async () => {
              <textarea id="giftMessage" placeholder="Leave a lovely message for the couple..." rows="3"></textarea>
            </div>
          </div>
-         <div class="gift-purchase-actions">
-           <button class="btn-cancel-purchase">Cancel</button>
-           <button class="btn-confirm-purchase">
+         <div class="action-container">
+           <button class="btn-base btn-outline btn-md btn-cancel-purchase">Cancel</button>
+           <button class="btn-base btn-primary btn-md btn-confirm-purchase">
              <i class="fas fa-credit-card"></i>
              Proceed to Payment
            </button>
@@ -1815,7 +1815,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Show loading state
     partyContent.innerHTML = `
-      <div class="loading-party">
+      <div class="loading-state">
         <i class="fas fa-spinner fa-spin fa-3x"></i>
         <p>Loading party...</p>
       </div>
@@ -1884,7 +1884,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Party member edit cards
       partyData.forEach((member, index) => {
         html += `
-          <div class="party-member-edit-card ${member.primary ? 'primary-member' : ''}" data-member-id="${member.id}" data-index="${index}" data-is-primary="${member.primary ? 'true' : 'false'}">
+          <div class="card party-member-edit-card ${member.primary ? 'primary-member' : ''}" data-member-id="${member.id}" data-index="${index}" data-is-primary="${member.primary ? 'true' : 'false'}">
             <div class="member-edit-header">
               <span class="member-number">${index + 1}</span>
               ${member.primary ? '<span class="primary-indicator"><i class="fas fa-star"></i> Primary Guest</span>' : ''}
@@ -1897,14 +1897,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </label>
                 <input type="text"
                        id="member-name-${member.id}"
-                       class="member-name-input"
+                       class="form-control member-name-input"
                        data-member-id="${member.id}"
                        data-is-primary="${member.primary ? 'true' : 'false'}"
                        value="${escapeHtml(member.name)}"
                        placeholder="Enter name...">
               </div>
               ${!member.primary ? `
-                <button type="button" class="btn-remove-member" data-member-id="${member.id}" title="Remove member">
+                <button type="button" class="btn-base btn-danger btn-sm" data-member-id="${member.id}" title="Remove member">
                   <i class="fas fa-trash-alt"></i>
                 </button>
               ` : ''}
@@ -1917,7 +1917,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (canAddMore) {
         html += `
           <div class="add-member-card">
-            <button type="button" id="addPartyMemberBtn" class="btn-add-member">
+            <button type="button" id="addPartyMemberBtn" class="btn-base btn-secondary btn-md">
               <i class="fas fa-plus-circle"></i>
               <span>Add Party Member</span>
             </button>
@@ -1934,8 +1934,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       html += `
           </div>
-          <div class="party-members-actions">
-            <button type="button" id="savePartyMembersBtn" class="btn-save-party">
+          <div class="action-container">
+            <button type="button" id="savePartyMembersBtn" class="btn-base btn-primary btn-lg">
               <i class="fas fa-save"></i>
               Save Party Members
             </button>
@@ -1968,11 +1968,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const selectedRequests = Array.isArray(memberDietary.specialRequest) ? memberDietary.specialRequest : [];
         
         html += `
-          <div class="party-dietary-card" data-member-id="${member.id}">
+          <div class="card party-dietary-card" data-member-id="${member.id}">
             <div class="party-dietary-card-header">
               <i class="fas fa-user"></i>
               <h4>${escapeHtml(member.name)}</h4>
-              ${member.primary ? '<span class="primary-badge">Primary</span>' : ''}
+              ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
             </div>
             <div class="dietary-options">
               ${dietaryOptions.map(opt => {
@@ -1998,7 +1998,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <textarea
                 id="party-dietary-detail-${member.id}"
                 name="party-dietary-detail-${member.id}"
-                class="dietary-detail-textarea"
+                class="form-control dietary-detail-textarea"
                 data-member-id="${member.id}"
                 placeholder="Please describe any specific dietary needs, allergies, or special requirements..."
                 rows="2"
@@ -2010,8 +2010,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       html += `
           </div>
-          <div class="party-dietary-actions">
-            <button type="button" id="saveDietaryBtn" class="btn-save-dietary">
+          <div class="action-container">
+            <button type="button" id="saveDietaryBtn" class="btn-base btn-primary btn-lg">
               <i class="fas fa-save"></i>
               Save Dietary Requirements
             </button>
@@ -2044,7 +2044,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       
       // Remove member buttons
-      document.querySelectorAll('.btn-remove-member').forEach(btn => {
+      document.querySelectorAll('.btn-base.btn-danger.btn-sm').forEach(btn => {
         btn.addEventListener('click', function() {
           const memberId = this.dataset.memberId;
           removePartyMember(memberId);
@@ -2061,7 +2061,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (err) {
       console.error('Error loading party content:', err);
       partyContent.innerHTML = `
-        <div class="error-message">
+        <div class="error-state">
           <i class="fas fa-exclamation-triangle"></i>
           <h3>Error Loading Party</h3>
           <p>There was a problem loading your party information. Please try again.</p>
@@ -2103,7 +2103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Create new member card
     const newCard = document.createElement('div');
-    newCard.className = 'party-member-edit-card new-member';
+    newCard.className = 'card party-member-edit-card new-member';
     newCard.dataset.memberId = tempId;
     newCard.dataset.index = index;
     newCard.innerHTML = `
@@ -2118,13 +2118,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           </label>
           <input type="text"
                  id="member-name-${tempId}"
-                 class="member-name-input new-member-input"
+                 class="form-control member-name-input new-member-input"
                  data-member-id="${tempId}"
                  value=""
                  placeholder="Enter name..."
                  autofocus>
         </div>
-        <button type="button" class="btn-remove-member" data-member-id="${tempId}" title="Remove member">
+        <button type="button" class="btn-base btn-danger btn-sm" data-member-id="${tempId}" title="Remove member">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
@@ -2160,7 +2160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updatePartyCountDisplay();
     
     // Attach remove listener to new button
-    newCard.querySelector('.btn-remove-member').addEventListener('click', function() {
+    newCard.querySelector('.btn-base.btn-danger.btn-sm').addEventListener('click', function() {
       removePartyMember(tempId);
     });
     
@@ -2529,7 +2529,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Show loading state
     summaryContent.innerHTML = `
-      <div class="loading-summary">
+      <div class="loading-state">
         <i class="fas fa-spinner fa-spin fa-2x"></i>
         <p>Loading summary...</p>
       </div>
@@ -2685,7 +2685,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${escapeHtml(member.name)}
               </span>
               ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
-              ${member.adult === false ? '<span class="badge badge-child">Child</span>' : ''}
+              ${member.adult === false ? '<span class="badge badge-info">Child</span>' : ''}
             </div>
           `;
         });
@@ -2856,7 +2856,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (error) {
       console.error('Error loading summary:', error);
       summaryContent.innerHTML = `
-        <div class="error-message">
+        <div class="error-state">
           <i class="fas fa-exclamation-triangle"></i>
           <h3>Error Loading Summary</h3>
           <p>There was a problem loading your summary. Please try again.</p>
