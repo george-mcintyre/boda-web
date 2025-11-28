@@ -560,9 +560,23 @@ main.main-content-full {
 
 .course-group-content {
   padding: 20px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 20px;
+}
+
+/* Two-column layout for course cards on tablet and up when there's enough space */
+@media (min-width: 768px) {
+  .course-group-content {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Three-column layout for course cards on larger desktop screens */
+@media (min-width: 1200px) {
+  .course-group-content {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 /* Menu Option Card */
