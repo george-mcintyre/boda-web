@@ -570,13 +570,12 @@ footer .back-btn:hover {
   max-width: 50%;
   position: relative;
   overflow: hidden;
-  min-height: 350px;
 }
 
 .event-image {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  display: block;
   transition: transform var(--transition-normal);
 }
 
@@ -774,8 +773,6 @@ footer .back-btn:hover {
     flex: none;
     max-width: 100%;
     width: 100%;
-    min-height: 250px;
-    max-height: 300px;
   }
 
   .event-details-card {
@@ -788,8 +785,7 @@ footer .back-btn:hover {
 
 @media (max-width: 600px) {
   .event-image-container {
-    min-height: 200px;
-    max-height: 250px;
+    /* Height will be determined by image aspect ratio */
   }
 
   .event-details-card {
