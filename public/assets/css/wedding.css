@@ -35,6 +35,11 @@ body {
   align-items: center;
 }
 
+/* Override for wedding landing page to allow right alignment */
+body.wedding-landing-active .navbar .container {
+  justify-content: flex-end;
+}
+
 .header-left {
   flex: 1;
   display: flex;
