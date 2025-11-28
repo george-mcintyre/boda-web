@@ -116,69 +116,138 @@ function translateEvent(event) {
   };
 }
 
+// Function to format time from ISO date string
+function formatEventTime(dateString, endString) {
+  if (!dateString) return '';
+  const start = new Date(dateString);
+  const end = endString ? new Date(endString) : null;
+  const options = { hour: '2-digit', minute: '2-digit' };
+  let timeStr = start.toLocaleTimeString(undefined, options);
+  if (end) {
+    timeStr += ` - ${end.toLocaleTimeString(undefined, options)}`;
+  }
+  return timeStr;
+}
+
+// Function to get a default event image based on the event name
+function getDefaultEventImage(eventName) {
+  const name = (eventName || '').toLowerCase();
+  if (name.includes('cocktail') || name.includes('welcome') || name.includes('bienvenida')) {
+    return '/assets/images/reception.png';
+  } else if (name.includes('ceremony') || name.includes('ceremonia') || name.includes('wedding')) {
+    return '/assets/images/celebrate.png';
+  } else if (name.includes('reception') || name.includes('dinner') || name.includes('cena')) {
+    return '/assets/images/dinner.png';
+  } else if (name.includes('brunch') || name.includes('breakfast') || name.includes('desayuno')) {
+    return '/assets/images/marbella.png';
+  } else if (name.includes('party') || name.includes('fiesta') || name.includes('dancing')) {
+    return '/assets/images/paradise.png';
+  }
+  return '/assets/images/event.png';
+}
+
+// Function to render sub-events timeline
+function renderSubEvents(subEvents) {
+  if (!subEvents || subEvents.length === 0) return '';
+  
+  const subEventItems = subEvents.map(sub => {
+    const time = formatEventTime(sub.date, sub.end);
+    const iconClass = sub.icon ? `sub-event-icon-${sub.icon}` : '';
+    return `
+      <div class="sub-event-item ${iconClass}">
+        <div class="sub-event-icon">
+          <img src="/assets/icons/${sub.icon || 'ceremony'}.svg" alt="${sub.name}" />
+        </div>
+        <div class="sub-event-details">
+          <span class="sub-event-name">${sub.name}</span>
+          ${time ? `<span class="sub-event-time"><i class="fas fa-clock"></i> ${time}</span>` : ''}
+          ${sub.description ? `<span class="sub-event-description">${sub.description}</span>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="sub-events-timeline">
+      <h4><i class="fas fa-list-ul"></i> Schedule</h4>
+      ${subEventItems}
+    </div>
+  `;
+}
+
 // Function to load events dynamically from the database and group by day
 async function loadEvents() {
   const eventsGrid = document.getElementById('events-grid');
   if (!eventsGrid) return;
 
   try {
-    const response = await fetch('/api/event'); // returns an array of located events
+    const response = await fetch('/api/events'); // Use public API endpoint
     const events = response.ok ? await response.json() : [];
 
     if (Array.isArray(events) && events.length > 0) {
-      // Normalize date to day key (YYYY-MM-DD) and visible label (event.day or formatted date)
-      const groups = new Map(); // key -> { label, items: [] }
-      for (const ev of events) {
-        const dt = ev.date ? new Date(ev.date) : null;
-        const key = dt ? dt.toISOString().slice(0,10) : (ev.day || '');
-        const label = ev.day || (dt ? dt.toLocaleDateString(undefined, { weekday:'long', year:'numeric', month:'long', day:'numeric' }) : '');
-        const item = {
-          title: ev.title || '',
-          description: ev.description || '',
-          venue: ev.venue || '',
-          address: ev.address || '',
-          time: ev.time || '',
-        };
-        if (!groups.has(key)) groups.set(key, { label, items: [] });
-        groups.get(key).items.push(item);
-      }
-
-      // Create HTML for each day, max 3 cards; the rest as subevents
-      const daysHtml = Array.from(groups.entries()).map(([key, group]) => {
-        const firstThree = group.items.slice(0,3);
-        const rest = group.items.slice(3);
-
-        const cards = firstThree.map(event => {
-          const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${event.venue} ${event.address}`.trim())}`;
-          return `
-            <div class="info-card">
-              <div class="info-icon">
-                <i class="${getEventIcon(event.title || '')}"></i>
-              </div>
-              <h3>${event.title}</h3>
-              ${event.venue ? `<p><strong>${event.venue}</strong></p>` : ''}
-              ${event.address ? `<p>${event.address}</p>` : ''}
-              ${event.time ? `<p class=\"time\"><i class=\"fas fa-clock\"></i> ${event.time}</p>` : ''}
-              ${event.description ? `<p class=\"event-description\">${event.description}</p>` : ''}
-              ${(event.venue || event.address) ? `<a class=\"btn-ver-mapa\" href=\"${mapsUrl}\" target=\"_blank\" rel=\"noopener\">\n                    <i class=\"fas fa-map\"></i> ${translate('wedding:location.viewMap')}\n                  </a>` : ''}
-            </div>
-          `;
-        }).join('');
-
-        const subEvents = rest.length ? `
-          <div class="sub-events">
-            <h4>${group.label ? `${group.label} -` : ''} ${rest.length} ${rest.length===1? 'more event':'more events'}</h4>
-            <ul>
-              ${rest.map(ev => `<li>${ev.time ? `<strong>${ev.time}</strong> - `: ''}${ev.title}${ev.venue?` @ ${ev.venue}`:''}</li>`).join('')}
-            </ul>
-          </div>
-        ` : '';
+      // Render each event as a two-column card (image left, details right)
+      const eventCards = events.map(event => {
+        const eventImage = event.image || getDefaultEventImage(event.name);
+        const eventTime = formatEventTime(event.date, event.end);
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${event.title || ''} ${event.locationAddress || ''}`.trim())}`;
+        const hasLocation = event.locationLatitude && event.locationLongitude;
+        
+        // Format the date for display
+        const eventDate = event.date ? new Date(event.date) : null;
+        const dateLabel = eventDate ? eventDate.toLocaleDateString(undefined, {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        }) : '';
 
         return `
-          <div class="day-group">
-            ${group.label ? `<h3 style=\"text-align:center; margin: 0.5rem 0 0;\">${group.label}</h3>` : ''}
-            <div class="events-row">${cards}</div>
-            ${subEvents}
+          <div class="event-card-horizontal">
+            <div class="event-image-container">
+              <img src="${eventImage}" alt="${event.name || event.title || 'Event'}" class="event-image" />
+              <div class="event-date-badge">
+                <i class="fas fa-calendar-alt"></i>
+                <span>${dateLabel}</span>
+              </div>
+            </div>
+            <div class="event-details-card">
+              <div class="event-header">
+                <div class="event-icon">
+                  <i class="${getEventIcon(event.name || event.title || '')}"></i>
+                </div>
+                <h3 class="event-title">${event.name || ''}</h3>
+              </div>
+              
+              ${event.title ? `<h4 class="event-venue-name">${event.title}</h4>` : ''}
+              
+              ${event.description ? `<p class="event-description">${event.description}</p>` : ''}
+              
+              <div class="event-meta">
+                ${eventTime ? `
+                  <div class="event-meta-item">
+                    <i class="fas fa-clock"></i>
+                    <span>${eventTime}</span>
+                  </div>
+                ` : ''}
+                
+                ${event.locationAddress ? `
+                  <div class="event-meta-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${event.locationAddress}</span>
+                  </div>
+                ` : ''}
+              </div>
+              
+              ${renderSubEvents(event.sub_events)}
+              
+              ${(event.locationAddress || hasLocation) ? `
+                <div class="event-actions">
+                  <a class="btn-ver-mapa" href="${mapsUrl}" target="_blank" rel="noopener">
+                    <i class="fas fa-map"></i> ${translate('wedding:location.viewMap')}
+                  </a>
+                </div>
+              ` : ''}
+            </div>
           </div>
         `;
       }).join('');
@@ -199,7 +268,9 @@ async function loadEvents() {
 
       eventsGrid.innerHTML = `
         <div class="events-container">
-          ${daysHtml}
+          <div class="events-list">
+            ${eventCards}
+          </div>
           <div class="location-section">${locationCard}</div>
         </div>
       `;

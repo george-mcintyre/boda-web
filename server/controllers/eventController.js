@@ -48,7 +48,8 @@ function formatEventForApi(event) {
 // Guest: List events
 async function listEvents(req, res, next) {
   try {
-    const events = await Event.find({}).sort({ date: 1, order: 1, createdAt: 1 }).lean();
+    // Populate image to get the actual image data for base64 conversion
+    const events = await Event.find({}).sort({ date: 1, order: 1, createdAt: 1 }).populate('image');
     const items = events.map(formatEventForApi);
     res.json(items);
   } catch (e) {
@@ -106,7 +107,8 @@ async function updateEventChoices(req, res, next) {
 // Admin: List all events
 async function listEventsAdmin(req, res, next) {
   try {
-    const events = await Event.find({}).sort({ date: 1, order: 1, createdAt: 1 }).lean();
+    // Populate image to get the actual image data for base64 conversion
+    const events = await Event.find({}).sort({ date: 1, order: 1, createdAt: 1 }).populate('image');
     const items = events.map(formatEventForApi);
     res.json(items);
   } catch (e) {

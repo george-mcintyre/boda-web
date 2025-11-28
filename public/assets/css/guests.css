@@ -1327,12 +1327,16 @@ main.main-content-full {
   display: flex;
   flex-direction: column;
   gap: 30px;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .event-day {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .day-title {
@@ -1347,9 +1351,9 @@ main.main-content-full {
 }
 
 .day-events {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
 }
 
 .event-details {
@@ -1406,6 +1410,246 @@ main.main-content-full {
 
 .osm-link:hover {
   text-decoration: underline;
+}
+
+/* ========================================
+   HORIZONTAL EVENT CARD LAYOUT
+   ======================================== */
+.event-card-horizontal {
+  display: flex;
+  flex-direction: row;
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--gray-100);
+  overflow: hidden;
+  margin-bottom: 30px;
+  transition: all var(--transition-normal);
+  width: 100%;
+}
+
+/* When no image, card details take full width */
+.event-card-horizontal.no-image .event-details-card {
+  flex: 1 1 100%;
+  min-width: 100%;
+}
+
+.event-card-horizontal:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.event-image-container {
+  flex: 0 0 50%;
+  max-width: 50%;
+  min-height: 400px;
+  position: relative;
+  overflow: hidden;
+  align-self: stretch;
+}
+
+.event-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.event-image-container .no-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
+  color: var(--gray-400);
+  font-size: 4em;
+}
+
+.event-details-card {
+  flex: 1 1 50%;
+  min-width: 50%;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 20px;
+}
+
+.event-details-card .event-title {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 1.8em;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.event-details-card .event-description {
+  margin: 0;
+  color: var(--text-dark);
+  line-height: 1.6;
+  font-size: 1em;
+}
+
+.event-details-card .event-info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--text-dark);
+}
+
+.event-details-card .event-info-row i {
+  color: var(--primary-color);
+  width: 20px;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.event-details-card .event-info-row .info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.event-details-card .event-info-row .info-label {
+  font-weight: 600;
+  color: var(--text-dark);
+}
+
+.event-details-card .event-info-row .info-value {
+  color: var(--text-light);
+}
+
+.event-details-card .map-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--gradient-primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  text-decoration: none;
+  width: fit-content;
+}
+
+.event-details-card .map-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Sub Events Timeline in Horizontal Card */
+.event-details-card .sub-events-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 20px;
+  border-left: 3px solid var(--accent-color);
+  margin-top: 10px;
+}
+
+.event-details-card .sub-event-timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+  position: relative;
+}
+
+.event-details-card .sub-event-timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -26px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  background: var(--primary-color);
+  border-radius: 50%;
+  border: 3px solid var(--white);
+}
+
+.event-details-card .sub-event-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.event-details-card .sub-event-content {
+  flex: 1;
+}
+
+.event-details-card .sub-event-name {
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 4px;
+}
+
+.event-details-card .sub-event-time {
+  font-size: 0.85em;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Event Attendance in Horizontal Card */
+.event-details-card .event-attendance {
+  padding: 0;
+  border-top: none;
+  margin-top: 10px;
+}
+
+.event-details-card .attendance-title {
+  margin-bottom: 10px;
+}
+
+/* Responsive: Stack vertically on smaller screens */
+@media (max-width: 900px) {
+  .event-card-horizontal {
+    flex-direction: column;
+  }
+
+  .event-image-container {
+    flex: 0 0 auto;
+    max-width: 100%;
+    min-height: 250px;
+  }
+
+  .event-details-card {
+    flex: 0 0 auto;
+    max-width: 100%;
+    max-height: none;
+    padding: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .event-image-container {
+    min-height: 200px;
+  }
+
+  .event-details-card {
+    padding: 20px;
+    gap: 15px;
+  }
+
+  .event-details-card .event-title {
+    font-size: 1.4em;
+  }
 }
 
 /* Sub Events */

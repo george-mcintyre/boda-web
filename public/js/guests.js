@@ -1036,12 +1036,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // Track events with coordinates for map initialization
       const mapsToInitialize = [];
-      
-      // Build HTML for a single event card
+
+      // Build HTML for a single event card (horizontal layout: image left, details right)
       const buildEventCard = (event) => {
         const eventId = event.id;
         const mapContainerId = `event-map-${eventId}`;
         const hasLocation = event.locationLatitude && event.locationLongitude;
+        
+        // Get event image from API (can be null if no image uploaded)
+        const eventImage = event.image;
         
         // Track for map initialization
         if (hasLocation) {
@@ -1052,31 +1055,29 @@ document.addEventListener('DOMContentLoaded', async () => {
           });
         }
         
-        // Build sub-events HTML
+        // Build sub-events timeline HTML
         let subEventsHtml = '';
         if (Array.isArray(event.sub_events) && event.sub_events.length > 0) {
           const subEventItems = event.sub_events.map(subEvent => `
             <div class="sub-event-item">
               <div class="sub-event-icon">
-                <i class="fas ${getIconClass(subEvent.icon)}"></i>
+                <img src="/assets/icons/${subEvent.icon || 'ceremony'}.svg" alt="${escapeHtml(subEvent.name)}" />
               </div>
-              <div class="sub-event-info">
+              <div class="sub-event-details">
                 <span class="sub-event-name">${escapeHtml(subEvent.name)}</span>
-                <span class="sub-event-time">${formatEventTime(subEvent.date)}${subEvent.end ? ' - ' + formatEventTime(subEvent.end) : ''}</span>
-                ${subEvent.description ? `<p class="sub-event-description">${escapeHtml(subEvent.description)}</p>` : ''}
+                <span class="sub-event-time">
+                  <i class="fas fa-clock"></i>
+                  ${formatEventTime(subEvent.date)}${subEvent.end ? ' - ' + formatEventTime(subEvent.end) : ''}
+                </span>
+                ${subEvent.description ? `<span class="sub-event-description">${escapeHtml(subEvent.description)}</span>` : ''}
               </div>
             </div>
           `).join('');
           
           subEventsHtml = `
-            <div class="sub-events">
-              <h5 class="sub-events-title">
-                <i class="fas fa-list-ul"></i>
-                Schedule
-              </h5>
-              <div class="sub-events-list">
-                ${subEventItems}
-              </div>
+            <div class="sub-events-timeline">
+              <h4><i class="fas fa-list-ul"></i> Schedule</h4>
+              ${subEventItems}
             </div>
           `;
         }
@@ -1101,91 +1102,69 @@ document.addEventListener('DOMContentLoaded', async () => {
           attendanceItemsHtml = '<p class="no-members">No party members found.</p>';
         }
         
-        // Build location HTML
-        let locationHtml = '';
-        if (event.locationAddress || event.location) {
-          const mapLinkHtml = hasLocation ? `
-            <a href="https://www.google.com/maps?q=${event.locationLatitude},${event.locationLongitude}" target="_blank" class="map-link" title="Open in Google Maps">
-              <i class="fas fa-external-link-alt"></i>
-            </a>
-          ` : '';
-          
-          locationHtml = `
-            <div class="event-location">
-              <i class="fas fa-map-marker-alt"></i>
-              <span>${escapeHtml(event.locationAddress || event.location)}</span>
-              ${mapLinkHtml}
-            </div>
-          `;
-        }
-        
-        // Build map HTML
-        let mapHtml = '';
-        if (hasLocation) {
-          mapHtml = `
-            <div class="event-map-container">
-              <div id="${mapContainerId}" class="event-map"></div>
-              <div class="map-coordinates">
-                <span>${parseFloat(event.locationLatitude).toFixed(4)}, ${parseFloat(event.locationLongitude).toFixed(4)}</span>
-                <a href="https://www.openstreetmap.org/?mlat=${event.locationLatitude}&mlon=${event.locationLongitude}#map=16/${event.locationLatitude}/${event.locationLongitude}" target="_blank" class="osm-link">View Larger Map</a>
-              </div>
-            </div>
-          `;
-        }
-        
-        // Build description HTML
-        let descriptionHtml = '';
-        if (event.description) {
-          descriptionHtml = `
-            <div class="event-description">
-              <p>${escapeHtml(event.description)}</p>
-            </div>
-          `;
-        }
-        
-        // Build image HTML
-        let imageHtml = '';
-        if (event.image) {
-          imageHtml = `
-            <div class="event-image">
-              <img src="${event.image}" alt="${escapeHtml(event.name)}" onerror="this.parentElement.style.display='none';">
-            </div>
-          `;
-        }
-        
-        // Build event name subtitle HTML
-        let eventNameHtml = '';
-        if (event.title && event.name !== event.title) {
-          eventNameHtml = `<p class="event-name">${escapeHtml(event.name)}</p>`;
-        }
-        
-        // Assemble the complete event card
+        // Build Google Maps link
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${event.title || ''} ${event.locationAddress || ''}`.trim())}`;
+
+        // Build image HTML - only show if image exists
+        const imageHtml = eventImage ? `
+          <div class="event-image-container">
+            <img src="${eventImage}" alt="${escapeHtml(event.name || event.title || 'Event')}" class="event-image" />
+          </div>
+        ` : '';
+
+        // Assemble the complete horizontal event card (image left 50%, details right 50%)
         return `
-          <div class="card" data-event-id="${eventId}">
-            <div class="card-header">
-              ${imageHtml}
-              <div class="event-header-content">
-                <h4 class="event-title">${escapeHtml(event.title || event.name)}</h4>
-                ${eventNameHtml}
+          <div class="event-card-horizontal ${eventImage ? '' : 'no-image'}" data-event-id="${eventId}">
+            ${imageHtml}
+            <div class="event-details-card">
+              <div class="event-date-badge">
+                <i class="fas fa-calendar-alt"></i>
+                <span>${formatEventDate(event.date)}</span>
               </div>
-            </div>
-            <div class="event-details">
-              <div class="event-time">
-                <i class="fas fa-clock"></i>
-                <span>${formatEventTime(event.date)}${event.end ? ' - ' + formatEventTime(event.end) : ''}</span>
+              
+              <div class="event-header">
+                <div class="event-icon">
+                  <i class="fas ${getIconClass(event.name || event.title || '')}"></i>
+                </div>
+                <h3 class="event-title">${escapeHtml(event.name || '')}</h3>
               </div>
-              ${locationHtml}
-              ${mapHtml}
-              ${descriptionHtml}
-            </div>
-            ${subEventsHtml}
-            <div class="event-attendance">
-              <h5 class="attendance-title">
-                <i class="fas fa-users"></i>
-                Who's Attending?
-              </h5>
-              <div class="attendance-list">
-                ${attendanceItemsHtml}
+              
+              ${event.title && event.name !== event.title ? `<h4 class="event-venue-name">${escapeHtml(event.title)}</h4>` : ''}
+              
+              ${event.description ? `<p class="event-description">${escapeHtml(event.description)}</p>` : ''}
+              
+              <div class="event-meta">
+                <div class="event-meta-item">
+                  <i class="fas fa-clock"></i>
+                  <span>${formatEventTime(event.date)}${event.end ? ' - ' + formatEventTime(event.end) : ''}</span>
+                </div>
+                
+                ${event.locationAddress ? `
+                  <div class="event-meta-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>${escapeHtml(event.locationAddress)}</span>
+                  </div>
+                ` : ''}
+              </div>
+              
+              ${subEventsHtml}
+              
+              ${(event.locationAddress || hasLocation) ? `
+                <div class="event-actions">
+                  <a class="btn-ver-mapa" href="${mapsUrl}" target="_blank" rel="noopener">
+                    <i class="fas fa-map"></i> View on Map
+                  </a>
+                </div>
+              ` : ''}
+              
+              <div class="event-attendance">
+                <h5 class="attendance-title">
+                  <i class="fas fa-users"></i>
+                  Who's Attending?
+                </h5>
+                <div class="attendance-list">
+                  ${attendanceItemsHtml}
+                </div>
               </div>
             </div>
           </div>
