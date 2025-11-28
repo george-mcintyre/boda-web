@@ -2775,7 +2775,11 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="menu-choices-list">
           `;
           
-          menu.forEach(course => {
+          // Sort menu courses by the correct order: starter, main, dessert, drinks
+          const courseOrder = { starter: 1, main: 2, dessert: 3, drinks: 4 };
+          const sortedMenu = menu.slice().sort((a, b) => (courseOrder[a.course] || 999) - (courseOrder[b.course] || 999));
+          
+          sortedMenu.forEach(course => {
             const selectedOptionId = memberChoices[course.id];
             const isSelectable = course.selectionRequired !== false && course.options && course.options.length > 1;
             
