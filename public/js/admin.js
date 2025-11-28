@@ -388,6 +388,23 @@
     };
   }
 
+  // 24-char hex, looks like a Mongo ObjectId
+  function makeObjectIdLike() {
+    const bytes = new Uint8Array(12); // 12 bytes = 24 hex chars
+
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      // Browser or modern runtime
+     crypto.getRandomValues(bytes);
+    } else {
+      // Fallback (e.g. older Node without crypto in this scope)
+      for (let i = 0; i < 12; i++) {
+        bytes[i] = Math.floor(Math.random() * 256);
+      }
+    }
+
+    return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+  }
+
   // CSV Parser for guest bulk upload
   function parseCSV(text) {
     const lines = text.split('\n').map(line => line.trim()).filter(line => line);
@@ -429,6 +446,7 @@
         const additionalAdults = Math.max(0, adultsInParty - 1);
         for (let j = 0; j < additionalAdults; j++) {
           guest.partyMembers.push({
+            id: makeObjectIdLike(),
             name: `${guest.name} - Guest ${j + 1}`,
             adult: true
           });
@@ -437,6 +455,7 @@
         // Add children
         for (let j = 0; j < childrenInParty; j++) {
           guest.partyMembers.push({
+            id: makeObjectIdLike(),
             name: `${guest.name} - Child ${j + 1}`,
             adult: false
           });
@@ -1165,7 +1184,7 @@
             const newMember = {
               name: values.name,
               adult: values.adult === 'true',
-              id: null // New member, no ID yet
+              id: makeObjectIdLike(),
             };
             
             const updatedParty = [...party, newMember];

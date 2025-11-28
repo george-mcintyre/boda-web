@@ -49,11 +49,23 @@ async function updateParty(req, res, next) {
     }
     
     // Process party members (excluding primary guest who is handled separately)
-    const processedMembers = partyMembers.map(member => ({
-      id: member.id || null,
-      name: member.name,
-      adult: member.adult !== false // Default to true if not specified
-    }));
+    const myId = me._id.toString();
+    // 1) Find the member that corresponds to "me"
+    const meMember = partyMembers.find(
+      member => member.id && member.id.toString() === myId
+    );
+
+    if (meMember) {
+      me.name = meMember.name; // Update my name if provided
+    }
+
+    const processedMembers = partyMembers
+     .filter(member => member.id !== myId) // exclude yourself
+     .map(member => ({
+       id: member.id || null,
+       name: member.name,
+       adult: member.adult !== false // default to true
+     }));
     
     // Update the guest with new party members
     me.partyMembers = processedMembers;

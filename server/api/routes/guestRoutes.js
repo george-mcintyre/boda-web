@@ -2,9 +2,6 @@ const router = require('express').Router();
 const { auth } = require('../../auth/middleware');
 const ctrl = require('../../controllers/guestController');
 
-// Guest: own profile (keeping Spanish path for compatibility)
-router.get('/invitado', auth('guest'), ctrl.getMe);
-
 // Admin CRUD (keeping Spanish paths for compatibility)
 router.get('/guests', auth('admin'), ctrl.list);
 router.post('/guests', auth('admin'), ctrl.create);

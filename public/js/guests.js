@@ -2121,9 +2121,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // Remove member buttons
       document.querySelectorAll('.btn-base.btn-danger.btn-sm').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const memberId = this.dataset.memberId;
-          removePartyMember(memberId);
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const card = this.closest('.party-member-edit-card');
+          if (card) {
+            const memberId = card.getAttribute('data-member-id');
+            console.log('Button clicked, card found:', card, 'memberId:', memberId);
+            removePartyMember(memberId);
+          }
         });
       });
       
@@ -2155,7 +2161,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Track new members to add (temporary IDs)
   let newMemberCounter = 0;
-  
+
+  // 24-char hex, looks like a Mongo ObjectId
+  function makeObjectIdLike() {
+    const bytes = new Uint8Array(12); // 12 bytes = 24 hex chars
+
+    if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+      // Browser or modern runtime
+     crypto.getRandomValues(bytes);
+    } else {
+      // Fallback (e.g. older Node without crypto in this scope)
+      for (let i = 0; i < 12; i++) {
+        bytes[i] = Math.floor(Math.random() * 256);
+      }
+    }
+
+    return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+  }
+
   // Add a new party member to the list
   function addNewPartyMember() {
     const membersList = document.querySelector('.party-members-edit-list');
@@ -2174,13 +2197,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     newMemberCounter++;
-    const tempId = `new-${newMemberCounter}`;
     const index = currentMembers.length;
-    
+    const id = makeObjectIdLike();
+
     // Create new member card
     const newCard = document.createElement('div');
     newCard.className = 'card party-member-edit-card new-member';
-    newCard.dataset.memberId = tempId;
+    newCard.dataset.memberId = id;
     newCard.dataset.index = index;
     newCard.innerHTML = `
       <div class="member-edit-header">
@@ -2189,18 +2212,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
       <div class="member-edit-form">
         <div class="form-group">
-          <label for="member-name-${tempId}">
+          <label for="member-name-${id}">
             <i class="fas fa-user"></i> Name
           </label>
           <input type="text"
-                 id="member-name-${tempId}"
+                 id="member-name-${id}"
                  class="form-control member-name-input new-member-input"
-                 data-member-id="${tempId}"
+                 data-member-id="${id}"
                  value=""
                  placeholder="Enter name..."
                  autofocus>
         </div>
-        <button type="button" class="btn-base btn-danger btn-sm" data-member-id="${tempId}" title="Remove member">
+        <button type="button" class="btn-base btn-danger btn-sm" data-member-id="${id}" title="Remove member">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
@@ -2253,8 +2276,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const card = document.querySelector(`.party-member-edit-card[data-member-id="${memberId}"]`);
     if (!card) return;
     
-    // Check if this is a new member (not yet saved) or an existing one
-    const isNewMember = memberId.startsWith('new-');
     const memberName = card.querySelector('.member-name-input')?.value || 'this member';
     
     // Confirm removal
@@ -2282,15 +2303,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
         
         updatePartyCountDisplay();
-        
-        // If this was an existing member (not new), save immediately to persist the deletion
-        if (!isNewMember) {
-          // Auto-save to persist the deletion
-          await savePartyMembers();
-        } else {
-          // Just mark as unsaved for new members
-          markPartyAsUnsaved();
-        }
+
+        await savePartyMembers();
       }
     );
   }
@@ -2347,7 +2361,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       // Collect all member data from the form
       const memberCards = document.querySelectorAll('.party-member-edit-card');
-      const nonPrimaryMembers = [];
+      const members = [];
       
       memberCards.forEach(card => {
         const memberId = card.dataset.memberId;
@@ -2359,37 +2373,24 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
         
-        // Check if this is the primary member - skip it for the API call
-        // The server automatically handles the primary guest
-        const isPrimary = card.dataset.isPrimary === 'true' || card.querySelector('.primary-indicator') !== null;
-        
-        if (isPrimary) {
-          // Primary member is handled by server, skip it
-          console.log('Skipping primary member for API:', name);
-          return;
-        }
-        
         const isChild = card.querySelector('.child-indicator') !== null;
-        const isNew = memberId.startsWith('new-');
-        
-        nonPrimaryMembers.push({
-          id: isNew ? null : memberId,
+
+        members.push({
+          id: memberId,
           name: name,
           adult: !isChild
         });
       });
       
-      console.log('Saving non-primary party members:', nonPrimaryMembers);
+      console.log('Saving party members:', members);
       
-      // Send only NON-primary members to server
-      // Server will automatically add the primary guest to the response
       const response = await fetch('/api/guest/party', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': token
         },
-        body: JSON.stringify(nonPrimaryMembers)
+        body: JSON.stringify(members)
       });
       
       if (response.ok) {
