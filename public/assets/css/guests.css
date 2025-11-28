@@ -678,6 +678,16 @@ main.main-content-full {
   color: var(--warning-color);
 }
 
+.dietary-badge.spicy {
+  background: #ffebee;
+  color: #d32f2f;
+}
+
+.dietary-badge.contains-nuts {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
 /* Option Selection Panel - Drop Zone */
 .option-selection-panel {
   background: var(--white);
