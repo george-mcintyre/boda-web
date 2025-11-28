@@ -332,37 +332,31 @@ footer {
   margin: 0 0.5rem;
 }
 
-/* Logout/Back Buttons in Footer */
-.logout-btn,
-footer .back-btn {
-  padding: 0.8rem 1.5rem;
+/* Navbar Logout Button Styles - Still needed for navbar */
+.logout-btn, .home-link {
+  padding: 0.6rem 1rem;
   border: none;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-round);
   cursor: pointer;
   font-weight: 500;
+  font-size: 0.9rem;
   transition: all var(--transition-normal);
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--text-light);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .logout-btn {
   background: var(--danger-color);
   color: white;
 }
-
 .logout-btn:hover {
-  background: #c82333;
   transform: translateY(-2px);
-}
-
-footer .back-btn {
-  background: var(--primary-color);
-  color: white;
-}
-
-footer .back-btn:hover {
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 /* ========================================
