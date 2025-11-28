@@ -41,7 +41,8 @@ async function update(id, data) {
   return {
     id: guest._id.toString(),
     name: guest.name,
-    email: guest.email
+    email: guest.email,
+    adult: guest.adult
   };
 }
 

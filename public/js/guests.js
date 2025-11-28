@@ -1977,6 +1977,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                        value="${escapeHtml(member.name)}"
                        placeholder="Enter name...">
               </div>
+              <div class="form-group">
+                <label for="member-age-${member.id}">
+                  <i class="fas fa-birthday-cake"></i> Age Category
+                </label>
+                <select id="member-age-${member.id}"
+                        class="form-control member-age-select"
+                        data-member-id="${member.id}"
+                        data-is-primary="${member.primary ? 'true' : 'false'}">
+                  <option value="adult" ${member.adult !== false ? 'selected' : ''}>Adult (18+)</option>
+                  <option value="child" ${member.adult === false ? 'selected' : ''}>Child (Under 18)</option>
+                </select>
+              </div>
               ${!member.primary ? `
                 <button type="button" class="btn-base btn-danger btn-sm" data-member-id="${member.id}" title="Remove member">
                   <i class="fas fa-trash-alt"></i>
@@ -2138,6 +2150,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         input.addEventListener('input', markPartyAsUnsaved);
       });
       
+      // Mark as unsaved when age selector changes
+      document.querySelectorAll('.member-age-select').forEach(select => {
+        select.addEventListener('change', markPartyAsUnsaved);
+      });
+      
       console.log('Party content loaded successfully');
       
     } catch (err) {
@@ -2222,6 +2239,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                  value=""
                  placeholder="Enter name..."
                  autofocus>
+        </div>
+        <div class="form-group">
+          <label for="member-age-${id}">
+            <i class="fas fa-birthday-cake"></i> Age Category
+          </label>
+          <select id="member-age-${id}"
+                  class="form-control member-age-select new-member-age-select"
+                  data-member-id="${id}">
+            <option value="adult" selected>Adult (18+)</option>
+            <option value="child">Child (Under 18)</option>
+          </select>
         </div>
         <button type="button" class="btn-base btn-danger btn-sm" data-member-id="${id}" title="Remove member">
           <i class="fas fa-trash-alt"></i>
@@ -2366,6 +2394,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       memberCards.forEach(card => {
         const memberId = card.dataset.memberId;
         const nameInput = card.querySelector('.member-name-input');
+        const ageSelect = card.querySelector('.member-age-select');
         const name = nameInput ? nameInput.value.trim() : '';
         
         if (!name) {
@@ -2373,12 +2402,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
         
-        const isChild = card.querySelector('.child-indicator') !== null;
+        // Read adult property from the form selector
+        const ageCategory = ageSelect ? ageSelect.value : 'adult';
+        const isAdult = ageCategory === 'adult';
 
         members.push({
           id: memberId,
           name: name,
-          adult: !isChild
+          adult: isAdult
         });
       });
       

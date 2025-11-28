@@ -11,10 +11,9 @@ const partyMemberSchema = new Schema({
 const guestSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, unique: true, sparse: true },
-  status: { type: String, enum: ['pending', 'confirmed', 'declined'], default: 'pending', alias: 'estado' },
+  adult: { type: Boolean, default: true },
   partyMembers: [partyMemberSchema],
-  specialMenu: { type: String, default: '' },
-  message: { type: String, default: '' },
+  specialMenu: { type: String, default: '' }
 }, { timestamps: true });
 
 module.exports = model('Guest', guestSchema);

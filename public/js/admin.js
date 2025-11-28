@@ -430,6 +430,7 @@
       const guest = {
         name: row['Name'] || row['name'] || '',
         email: row['email'] || row['Email'] || '',
+        adult: true,
         partyMembers: []
       };
       

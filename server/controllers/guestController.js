@@ -7,7 +7,7 @@ async function getMe(req, res, next) {
   try {
     const me = await guestService.getByEmail(req.user.email);
     if (!me) return res.status(404).json({ error: 'Guest not found' });
-    res.json({ name: me.name, email: me.email, status: me.status, companions: me.companions, specialMenu: me.specialMenu, message: me.message });
+    res.json({ name: me.name, email: me.email, partyMembers: me.partyMembers, specialMenu: me.specialMenu, message: me.message });
   } catch (e) { next(e); }
 }
 
@@ -57,6 +57,7 @@ async function updateParty(req, res, next) {
 
     if (meMember) {
       me.name = meMember.name; // Update my name if provided
+      me.adult = meMember.adult; // Update adult status if provided
     }
 
     const processedMembers = partyMembers
@@ -76,7 +77,7 @@ async function updateParty(req, res, next) {
       {
         id: me._id.toString(),
         name: me.name,
-        adult: true,
+        adult: me.adult,
         primary: true
       },
       ...processedMembers
