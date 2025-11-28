@@ -333,6 +333,7 @@ body.wedding-landing-active footer { display: none !important; }
     background-position: center;
     background-repeat: no-repeat;
     padding: 10px;
+    padding-top: 90px; /* Add extra top padding for mobile navbar */
     margin-bottom: 50vh; /* Make room for images below */
     max-width: none !important;
     margin-right: 0 !important;
@@ -442,6 +443,8 @@ body.wedding-landing-active footer { display: none !important; }
     background-repeat: no-repeat;
     /* Ensure the div takes full height from below header to bottom */
     min-height: calc(100vh - 60px); /* Adjust 60px based on navbar height */
+    /* Add top padding to account for navbar height and ensure content is visible */
+    padding-top: 80px;
   }
 
   .wedding-landing .pepe-left::before {
