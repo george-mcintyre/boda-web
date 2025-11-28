@@ -5,11 +5,12 @@ const messageCtrl = require('../../controllers/messageController');
 const menuCtrl = require('../../controllers/menuController');
 const adminCtrl = require('../../controllers/adminController');
 const multer = require('multer');
+const os = require('os');
 
 // Configure multer for menu option image uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'temp_uploads/'); // Temporary upload directory
+    cb(null, os.tmpdir()); // Temporary upload directory
   },
   filename: function (req, file, cb) {
     // Generate unique filename

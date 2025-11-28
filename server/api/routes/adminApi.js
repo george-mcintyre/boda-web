@@ -4,11 +4,12 @@ const guestCtrl = require('../../controllers/guestController');
 const adminCtrl = require('../../controllers/adminController');
 const messageCtrl = require('../../controllers/messageController');
 const multer = require('multer');
+const os = require('os');
 
 // Configure multer for event image uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'temp_uploads/'); // Temporary upload directory
+    cb(null, os.tmpdir()); // Temporary upload directory
   },
   filename: function (req, file, cb) {
     // Generate unique filename
