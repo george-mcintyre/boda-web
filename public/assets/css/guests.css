@@ -971,9 +971,23 @@ main.main-content-full {
 }
 
 .party-members-edit-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: 15px;
+}
+
+/* Medium screens: 2 columns */
+@media (min-width: 768px) {
+  .party-members-edit-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Large screens: 3 columns */
+@media (min-width: 1200px) {
+  .party-members-edit-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 /* Party Member Edit Card */
