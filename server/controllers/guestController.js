@@ -198,8 +198,8 @@ async function getGifts(req, res, next) {
       if (typeof gift.image === 'number') {
         imageUrl = `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`;
       } else if (gift.image) {
-        // ObjectId reference - use the gift image endpoint
-        imageUrl = `/api/admin/gifts/${gift._id}/image`;
+        // ObjectId reference - use the guest gift image endpoint
+        imageUrl = `/api/guest/gifts/${gift._id}/image`;
       } else {
         // Default fallback image
         imageUrl = `/assets/images/gift-cards/image_01.jpg`;
@@ -241,7 +241,8 @@ async function getGiftChoices(req, res, next) {
       if (gift && typeof gift.image === 'number') {
         imageUrl = `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`;
       } else if (gift && gift.image) {
-        imageUrl = `/api/admin/gifts/${gift._id}/image`;
+        // ObjectId reference - use the guest gift image endpoint
+        imageUrl = `/api/guest/gifts/${gift._id}/image`;
       } else {
         imageUrl = `/assets/images/gift-cards/image_01.jpg`;
       }

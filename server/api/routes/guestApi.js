@@ -35,6 +35,45 @@ router.get('/gifts', auth('guest'), guestCtrl.getGifts);
 router.get('/gift-choices', auth('guest'), guestCtrl.getGiftChoices);
 router.post('/create-payment-session', auth('guest'), guestCtrl.createPaymentSession);
 
+// Gift image serving endpoint (public - no auth required for CSS background-image loading)
+router.get('/gifts/:giftId/image', async (req, res, next) => {
+  try {
+    const { giftId } = req.params;
+    const { Gift } = require('../../models');
+    
+    // Don't use .lean() to preserve Buffer types
+    const gift = await Gift.findById(giftId).populate('image');
+    
+    if (!gift) {
+      return res.status(404).json({ error: 'Gift not found' });
+    }
+
+    if (!gift.image) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+
+    // Handle database-stored image (GiftImage reference)
+    if (gift.image.data && gift.image.contentType) {
+      // Ensure data is a proper Buffer
+      const imageBuffer = Buffer.isBuffer(gift.image.data)
+        ? gift.image.data
+        : Buffer.from(gift.image.data);
+      
+      res.setHeader('Content-Type', gift.image.contentType);
+      res.setHeader('Content-Length', String(imageBuffer.length));
+      res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
+      res.send(imageBuffer);
+    } else if (typeof gift.image === 'string' && gift.image.startsWith('/')) {
+      // Legacy format - redirect to file system
+      res.redirect(gift.image);
+    } else {
+      return res.status(400).json({ error: 'Invalid image data' });
+    }
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Stripe webhook (no auth - Stripe calls this directly)
 // Note: This needs raw body for signature verification, configured in app.js
 router.post('/stripe-webhook', guestCtrl.handleStripeWebhook);
