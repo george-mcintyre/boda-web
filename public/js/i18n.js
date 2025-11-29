@@ -555,6 +555,7 @@ const translations = {
     'common:hours': 'Stunden',
     'common:minutes': 'Minuten',
     'common:seconds': 'Sekunden',
+    'common:primary': 'Hauptgast',
   
     'common:login': 'Anmelden',
     'login:pageTitle': 'Gastzugang – Hochzeit',
