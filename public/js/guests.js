@@ -1,4 +1,145 @@
 
+// Settings management for guest access control
+let settingsCache = null;
+let settingsCacheTimestamp = 0;
+const SETTINGS_CACHE_DURATION = 300000; // 5 minutes
+
+// Fetch application settings (same logic as auth-check.js)
+async function fetchSettings() {
+    try {
+        // Check if we have cached settings that are still valid
+        const now = Date.now();
+        if (settingsCache && (now - settingsCacheTimestamp) < SETTINGS_CACHE_DURATION) {
+            return settingsCache;
+        }
+
+        const response = await fetch('/api/admin/settings');
+        if (!response.ok) {
+            throw new Error(`Failed to fetch settings: ${response.status}`);
+        }
+        
+        const settings = await response.json();
+        settingsCache = settings;
+        settingsCacheTimestamp = now;
+        return settings;
+    } catch (error) {
+        console.error('Error fetching settings:', error);
+        // Return default settings if fetch fails
+        return {
+            guestsEnabled: false,
+            eventsEnabled: false,
+            menuEnabled: false,
+            messagesEnabled: false,
+            giftsEnabled: false
+        };
+    }
+}
+
+// Apply settings-based visibility control
+function applySettingsVisibility(settings) {
+    console.log('Applying settings visibility:', settings);
+    
+    // Control tabs-header visibility
+    const partyTab = document.querySelector('[data-tab="partyContent"]');
+    const eventsTab = document.querySelector('[data-tab="eventsContent"]');
+    const menuTab = document.querySelector('[data-tab="menuContent"]');
+    const giftsTab = document.querySelector('[data-tab="giftsContent"]');
+    
+    // Party tab - disable if guestsEnabled is not true
+    if (partyTab) {
+        if (settings.guestsEnabled) {
+            partyTab.style.display = '';
+            partyTab.classList.remove('disabled');
+        } else {
+            partyTab.style.display = 'none';
+            partyTab.classList.add('disabled');
+        }
+    }
+    
+    // RSVP/Events tab - disable if eventsEnabled is not true
+    if (eventsTab) {
+        if (settings.eventsEnabled) {
+            eventsTab.style.display = '';
+            eventsTab.classList.remove('disabled');
+        } else {
+            eventsTab.style.display = 'none';
+            eventsTab.classList.add('disabled');
+        }
+    }
+    
+    // Menu tab - disable if menuEnabled is not true
+    if (menuTab) {
+        if (settings.menuEnabled) {
+            menuTab.style.display = '';
+            menuTab.classList.remove('disabled');
+        } else {
+            menuTab.style.display = 'none';
+            menuTab.classList.add('disabled');
+        }
+    }
+    
+    // Gifts tab - disable if giftsEnabled is not true
+    if (giftsTab) {
+        if (settings.giftsEnabled) {
+            giftsTab.style.display = '';
+            giftsTab.classList.remove('disabled');
+        } else {
+            giftsTab.style.display = 'none';
+            giftsTab.classList.add('disabled');
+        }
+    }
+    
+    // Control summary-section visibility
+    const rsvpSummarySection = document.querySelector('.rsvp-summary-section');
+    const menuSummarySection = document.querySelector('.menu-summary-section');
+    
+    // RSVP summary section - only show if eventsEnabled is true
+    if (rsvpSummarySection) {
+        if (settings.eventsEnabled) {
+            rsvpSummarySection.style.display = '';
+        } else {
+            rsvpSummarySection.style.display = 'none';
+        }
+    }
+    
+    // Menu summary section - only show if menuEnabled is true
+    if (menuSummarySection) {
+        if (settings.menuEnabled) {
+            menuSummarySection.style.display = '';
+        } else {
+            menuSummarySection.style.display = 'none';
+        }
+    }
+    
+    // If current active tab is now hidden, switch to summary
+    const activeTab = document.querySelector('.tab-btn.active');
+    if (activeTab && (activeTab.style.display === 'none' || activeTab.classList.contains('disabled'))) {
+        const summaryTab = document.querySelector('[data-tab="summaryContent"]');
+        if (summaryTab) {
+            summaryTab.click();
+        }
+    }
+}
+
+// Initialize settings and apply visibility
+async function initializeSettingsVisibility() {
+    try {
+        const settings = await fetchSettings();
+        applySettingsVisibility(settings);
+    } catch (error) {
+        console.error('Error initializing settings visibility:', error);
+        // Apply default visibility (hide all conditional sections)
+        const defaultSettings = {
+            guestsEnabled: false,
+            eventsEnabled: false,
+            menuEnabled: false,
+            messagesEnabled: false,
+            giftsEnabled: false
+        };
+        applySettingsVisibility(defaultSettings);
+    }
+}
+
 // Configurar event listeners
 document.addEventListener('DOMContentLoaded', async () => {
   const token = localStorage.getItem('token');
@@ -8,6 +149,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   console.log('DOM loaded, initializing i18n system...');
+  
+  // Initialize settings-based visibility
+  await initializeSettingsVisibility();
+  
+  // Refresh settings when window regains focus (in case admin changed settings)
+  window.addEventListener('focus', async () => {
+    console.log('Window focused, refreshing settings...');
+    await initializeSettingsVisibility();
+  });
 
   // Show welcome message
   function showMessage(elementId, msg, type = 'error') {
@@ -2578,7 +2728,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Tabs functionality
+  // Tabs functionality with settings-based access control
   const tabButtons = document.querySelectorAll('.tab-btn');
   const tabContents = document.querySelectorAll('.tab-content');
 
@@ -2586,6 +2736,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     button.addEventListener('click', () => {
       const targetTab = button.getAttribute('data-tab');
       console.log("button Clicked: ", targetTab);
+      
+      // Check if tab is disabled due to settings
+      if (button.style.display === 'none' || button.classList.contains('disabled')) {
+        const currentLang = localStorage.getItem('i18nextLng') || 'es';
+        const messages = {
+          en: 'This section is not yet enabled. Please check back later or contact the organizers for more information.',
+          es: 'Esta sección aún no está habilitada. Vuelve a consultar más tarde o contacta con los organizadores para más información.',
+          fr: 'Cette section n\'est pas encore activée. Veuillez vérifier plus tard ou contacter les organisateurs pour plus d\'informations.'
+        };
+        
+        showToast(messages[currentLang] || messages.es, 'info');
+        return;
+      }
       
       //Remove active class from all buttons and contents
       tabButtons.forEach(btn => btn.classList.remove('active'));
@@ -2627,15 +2790,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Function to switch to a specific tab
   window.switchToTab = function(tabName) {
+    // Find and check if target tab is accessible
+    const targetButton = document.querySelector(`[data-tab="${tabName}"]`);
+    if (!targetButton) return;
+    
+    // Check if tab is disabled due to settings
+    if (targetButton.style.display === 'none' || targetButton.classList.contains('disabled')) {
+      const currentLang = localStorage.getItem('i18nextLng') || 'es';
+      const messages = {
+        en: 'This section is not yet enabled. Please check back later or contact the organizers for more information.',
+        es: 'Esta sección aún no está habilitada. Vuelve a consultar más tarde o contacta con los organizadores para más información.',
+        fr: 'Cette section n\'est pas encore activée. Veuillez vérifier plus tard ou contacter les organisateurs pour plus d\'informations.'
+      };
+      
+      showToast(messages[currentLang] || messages.es, 'info');
+      return;
+    }
+    
     // Remove active class from all buttons and contents
     tabButtons.forEach(btn => btn.classList.remove('active'));
     tabContents.forEach(content => content.classList.remove('active'));
 
-    // Find and activate the target tab button
-    const targetButton = document.querySelector(`[data-tab="${tabName}"]`);
-    if (targetButton) {
-      targetButton.classList.add('active');
-    }
+    // Activate the target tab button
+    targetButton.classList.add('active');
 
     // Find and activate the target tab content
     const targetContent = document.getElementById(`${tabName}-tab`);
@@ -2665,6 +2842,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!summaryContent) {
       console.error('Summary content container not found');
       return;
+    }
+    
+    // Re-apply settings visibility to control summary sections
+    try {
+      const settings = await fetchSettings();
+      applySettingsVisibility(settings);
+    } catch (error) {
+      console.error('Error refreshing settings for summary:', error);
     }
     
     // Show loading state
