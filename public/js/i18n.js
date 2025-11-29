@@ -7,6 +7,8 @@ const translations = {
     'common:seconds': 'Seconds',
     'common:login': 'Login',
 
+    'common:primary': 'Primary',
+
     'wedding:title': 'Iluminada & George',
     'wedding:subtitle': 'We\'re getting married!',
     'wedding:date': 'June 6th, 2026 • Marbella, Spain',
@@ -39,8 +41,26 @@ const translations = {
     'guests:menuSelectionDesc2': 'Choose your preferred dishes for our wedding.',
 
     // Summary Page
-    'guests:summaryPageTitle': 'Welcome to the Iluminada & George\'s Wedding pages',
-    'guests:summaryPageDescription': 'Here you\'ll find all the information you need to get to, and enjoy the wedding.',
+    'guests:summaryPageTitle': 'Your guest area for Iluminada & George\'s wedding',
+    'rich:guests:summaryPageDescription': `
+      <p>
+        Welcome to your personal space for Iluminada &amp; George\'s wedding. 
+        From here you can share in the planning, keep your details up to date, 
+        and help us make the celebration feel just right for you and your party.
+      </p>
+      <p>
+        In this area you can update the names of everyone in your party, tell us about any food allergies 
+        or special dietary needs, confirm who will attend each of the wedding events, 
+        choose your preferred courses and drinks for the banquet, send messages to other guests 
+        and, if you wish, select a gift for us from the wedding registry.  
+        We\'re so happy to be celebrating this with you. 🤍
+      </p>
+    `,
+    'guests:summaryYourParty': 'Your Party',
+    'guests:summaryPeople': 'people',
+    'guests:summaryPerson': 'person',
+    'guests:summaryRSVP': 'RSVP Summary',
+    'guests:summaryMenuSelections': 'Menu Selections',
 
     // Party Page
     'guests:partyPageTitle': 'Party Management',
@@ -173,6 +193,7 @@ const translations = {
     'common:hours': 'Horas',
     'common:minutes': 'Minutos',
     'common:seconds': 'Segundos',
+    'common:primary': 'Principal',
 
     'wedding:title': 'Iluminada & George',
     'wedding:subtitle': 'Nos casamos!',
@@ -219,7 +240,14 @@ const translations = {
 
         // Summary Page
     'guests:summaryPageTitle': 'Bienvenido a las páginas de la Boda de Iluminada & George',
-    'guests:summaryPageDescription': 'Aquí encontrarás toda la información que necesitas para llegar y disfrutar de la boda.',
+    'rich:guests:summaryPageDescription': 'Aquí encontrarás toda la información que necesitas para llegar y disfrutar de la boda.',
+
+    'guests:summaryYourParty': 'Tu Grupo',
+    'guests:summaryPeople': 'personas',
+    'guests:summaryPerson': 'persona',
+    'guests:summaryRSVP': 'Resumen de RSVP',
+    'guests:summaryMenuSelections': 'Selecciones de Menú',
+
 
     // Party Page
     'guests:partyPageTitle': 'Gestión de la Grupo',
@@ -332,6 +360,7 @@ const translations = {
     'common:hours': 'Heures',
     'common:minutes': 'Minutes',
     'common:seconds': 'Secondes',
+    'common:primary': 'Principal',
 
     'wedding:title': 'Iluminada & George',
     'wedding:subtitle': 'On se marie!',
@@ -405,7 +434,7 @@ const translations = {
 
     // Summary Page
     'guests:summaryPageTitle': 'Bienvenue aux pages Ilu et George',
-    'guests:summaryPageDescription': 'Ici tu trouvera tous ce qu\'il faut d\'arriver et bien profiter du marriage.',
+    'rich:guests:summaryPageDescription': 'Ici tu trouvera tous ce qu\'il faut d\'arriver et bien profiter du marriage.',
 
     // Party Page
     'guests:partyPageTitle': 'Your party members',
@@ -573,7 +602,7 @@ const translations = {
 
     // Summary Page
     'guests:summaryPageTitle': 'Willkommen auf den Seiten von Iluminada & George',
-    'guests:summaryPageDescription': 'Hier findest du alle Informationen, die du benötigst, um zur Hochzeit zu kommen und sie zu genießen.',
+    'rich:guests:summaryPageDescription': 'Hier findest du alle Informationen, die du benötigst, um zur Hochzeit zu kommen und sie zu genießen.',
 
     // Party Page
     'guests:partyPageTitle': 'Ihre Gruppe',
@@ -703,9 +732,15 @@ function translate(key, lang = currentLanguage) {
 function updatePageContent() {
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
+    const isRich = key.startsWith('rich:');
     const translation = translate(key);
+
     if (translation !== key) {
-      element.textContent = translation;
+      if (isRich) {
+        element.innerHTML = translation;   // render HTML
+      } else {
+        element.textContent = translation; // plain text
+      }
     }
   });
 }
@@ -811,8 +846,12 @@ function detectAndSetBrowserLanguage() {
     'fr-BF': 'fr', 'fr-NE': 'fr', 'fr-CI': 'fr', 'fr-CM': 'fr', 'fr-CD': 'fr', 'fr-CG': 'fr',
     'fr-GA': 'fr', 'fr-GQ': 'fr', 'fr-VU': 'fr', 'fr-PM': 'fr', 'fr-WF': 'fr', 'fr-YT': 'fr',
     'fr-PF': 'fr', 'fr-NC': 'fr', 'fr-RE': 'fr', 'fr-MF': 'fr', 'fr-GP': 'fr', 'fr-MQ': 'fr',
-    'fr-GF': 'fr'
+    'fr-GF': 'fr',
+  
+    // German variants
+    'de': 'de', 'de-DE': 'de', 'de-AT': 'de', 'de-CH': 'de', 'de-LU': 'de', 'de-LI': 'de'
   };
+  
 
   // Try to find a supported language from browser preferences
   for (const browserLang of browserLanguages) {

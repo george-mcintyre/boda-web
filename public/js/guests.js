@@ -36,9 +36,7 @@ async function fetchSettings() {
 }
 
 // Apply settings-based visibility control
-function applySettingsVisibility(settings) {
-    console.log('Applying settings visibility:', settings);
-    
+function applySettingsVisibility(settings) {    
     // Control tabs-header visibility
     const partyTab = document.querySelector('[data-tab="partyContent"]');
     const eventsTab = document.querySelector('[data-tab="eventsContent"]');
@@ -476,7 +474,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div class="member-chip" draggable="true" data-member-id="${member.id}" data-member-name="${escapeHtml(member.name)}">
                           <i class="fas fa-user"></i>
                           <span>${escapeHtml(member.name)}</span>
-                          ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
+                          ${member.primary ? '<span class="badge badge-primary" data-i18n="common:primary">Primary</span>' : ''}
                         </div>
                       `).join('')}
                     </div>
@@ -536,7 +534,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="card-header">
               <i class="fas fa-user"></i>
               <h4>${escapeHtml(member.name)}</h4>
-              ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
+              ${member.primary ? '<span class="badge badge-primary" data-i18n="common:primary">Primary</span>' : ''}
             </div>
             <div class="card-content">
               ${dietaryOptions.map(opt => {
@@ -1361,7 +1359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <label class="attendance-label">
                   <input type="checkbox" class="attendance-checkbox" data-event-id="${eventId}" data-member-id="${member.id}" ${isAttending ? 'checked' : ''}>
                   <span class="member-name">${escapeHtml(member.name)}</span>
-                  ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
+                  ${member.primary ? '<span class="badge badge-primary" data-i18n="common:primary">Primary</span>' : ''}
                   ${member.adult === false ? '<span class="badge badge-info">Child</span>' : ''}
                 </label>
               </div>
@@ -2257,7 +2255,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="party-dietary-card-header">
               <i class="fas fa-user"></i>
               <h4>${escapeHtml(member.name)}</h4>
-              ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
+              ${member.primary ? '<span class="badge badge-primary" data-i18n="common:primary">Primary</span>' : ''}
             </div>
             <div class="dietary-options">
               ${dietaryOptions.map(opt => {
@@ -2750,7 +2748,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   tabButtons.forEach(button => {
     button.addEventListener('click', () => {
       const targetTab = button.getAttribute('data-tab');
-      console.log("button Clicked: ", targetTab);
       
       // Check if tab is disabled due to settings
       if (button.style.display === 'none' || button.classList.contains('disabled')) {
@@ -2795,7 +2792,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // If the tab is summary, reload all the status data
       if (targetTab === 'summaryContent') {
-        console.log("loading summary content");
         loadSummaryContent();
       }
 
@@ -2846,6 +2842,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (tabName === 'summaryContent') {
       loadSummaryContent();
     }
+    updatePageContent();
   }
 
   // Define loadSummaryContent function to load all summary data
@@ -3001,7 +2998,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="summary-section party-members-section">
           <h3 class="summary-section-title clickable" onclick="switchToTab('partyContent')" style="cursor: pointer;">
             <i class="fas fa-users"></i>
-            Your Party (${partyMembers.length} ${partyMembers.length === 1 ? 'person' : 'people'})
+            <div data-i18n="guests:summaryYourParty">Your Party</div>
+            ( ${partyMembers.length} <div data-i18n="${partyMembers.length === 1 ? 'guests:summaryPerson' : 'guests:summaryPeople'}">Person</div>)
             <i class="fas fa-arrow-right section-nav-arrow"></i>
           </h3>
           <div class="party-members-list">
@@ -3015,7 +3013,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <i class="fas fa-user"></i>
                 ${escapeHtml(member.name)}
               </span>
-              ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
+              ${member.primary ? '<span class="badge badge-primary" data-i18n="common:primary">Primary</span>' : ''}
               ${member.adult === false ? '<span class="badge badge-info">Child</span>' : ''}
             </div>
           `;
@@ -3034,7 +3032,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="summary-section rsvp-summary-section">
           <h3 class="summary-section-title clickable" onclick="switchToTab('eventsContent')" style="cursor: pointer;">
             <i class="fas fa-calendar-check"></i>
-            RSVP Summary
+            <div data-i18n="guests:summaryRSVP">RSVP Summary</div>
             <i class="fas fa-arrow-right section-nav-arrow"></i>
           </h3>
       `;
@@ -3081,7 +3079,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="summary-section menu-summary-section">
           <h3 class="summary-section-title clickable" onclick="switchToTab('menuContent')" style="cursor: pointer;">
             <i class="fas fa-utensils"></i>
-            Menu Selections
+            <div data-i18n="guests:summaryMenuSelections">Menu Selections</div>
             <i class="fas fa-arrow-right section-nav-arrow"></i>
           </h3>
       `;
@@ -3095,7 +3093,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="menu-member-header">
                 <i class="fas fa-user"></i>
                 <span class="menu-member-name">${escapeHtml(member.name)}</span>
-                ${member.primary ? '<span class="badge badge-primary">Primary</span>' : ''}
+                ${member.primary ? '<span class="badge badge-primary" data-i18n="common:primary">Primary</span>' : ''}
               </div>
               <div class="menu-choices-list">
           `;
@@ -3222,13 +3220,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentLanguage = savedLang;
   }
   
-  // Initialize
-  updateDocumentDirection();
-  updatePageContent();
-  updateLanguageSelector();
-  updateFormatting();
+    // Initialize
+    console.log('Initializing guests page');
+    updateDocumentDirection();
+    updatePageContent();
+    updateLanguageSelector();
+    updateFormatting();
   
-  // Check which tab is active on page load and load its content
+    // Check which tab is active on page load and load its content
   const activeTab = document.querySelector('.tab-btn.active');
   if (activeTab) {
     const targetTab = activeTab.getAttribute('data-tab');
@@ -3247,7 +3246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       loadGiftsContent();
     }
   }
-  
+    
   console.log(`i18n system initialized, language: ${currentLanguage}`);
 });
 
