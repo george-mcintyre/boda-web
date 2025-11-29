@@ -149,7 +149,7 @@ async function listGuestCourseOption(req, res, next) {
     // Build party member list including primary guest
     const partyMembers = [
       { 
-        partyGuestId: `primary-${guestId}`, 
+        partyGuestId: `${guestId}`, 
         name: guest.name || 'Primary Guest',
         adult: true,
         primary: true 
@@ -180,7 +180,7 @@ async function listGuestCourseOption(req, res, next) {
         partyChoices: partyMembers.map(member => ({
           partyGuestId: member.partyGuestId,
           choices: [],
-          specialRequest: null,
+          specialRequests: [],  // Fixed: was specialRequest, now specialRequests
           specialRequestDetail: null
         }))
       });
@@ -192,17 +192,18 @@ async function listGuestCourseOption(req, res, next) {
       return {
         partyGuestId: choice.partyGuestId,
         choices: choice.choices || [],
-        specialRequest: choice.specialRequest,
+        specialRequest: choice.specialRequests || [],  // Fixed: map specialRequests to specialRequest for API compatibility
         specialRequestDetail: choice.specialRequestDetail,
         memberName: partyMember ? partyMember.name : 'Unknown'
       };
     });
-    
+        
     res.json(formattedChoices);
   } catch (e) {
     next(e);
   }
 }
+
 // Guest: update menu selections
 async function updateGuestCourseOption(req, res, next) {
   try {
@@ -214,7 +215,7 @@ async function updateGuestCourseOption(req, res, next) {
     }
     
     // Validate choices structure (supports both new and legacy format)
-    const allowedDietaryOptions = ['vegan', 'vegetarian', 'nut-allergy', 'nut allergy', 'lactose-intolerant', 'gluten-intolerant', 'spicy', 'contains-nuts', 'other'];
+    const allowedDietaryOptions = ['vegan', 'vegetarian', 'nut-allergy', 'nut allergy', 'lactose-intolerant', 'gluten-intolerant', 'other'];
     
     for (const choice of choices) {
       if (!choice.partyGuestId || !Array.isArray(choice.choices)) {
@@ -230,16 +231,10 @@ async function updateGuestCourseOption(req, res, next) {
           return res.status(400).json({ error: 'optionId is required' });
         }
       }
-      
+
       // Validate specialRequest - supports both string (legacy) and array (new) formats
       if (choice.specialRequest) {
-        if (typeof choice.specialRequest === 'string') {
-          // Legacy string format
-          if (!allowedDietaryOptions.includes(choice.specialRequest)) {
-            return res.status(400).json({ error: 'Invalid specialRequest value' });
-          }
-        } else if (Array.isArray(choice.specialRequest)) {
-          // New array format: [{ name: 'vegetarian', selected: true }, ...]
+        if (Array.isArray(choice.specialRequest)) {
           for (const sr of choice.specialRequest) {
             if (!sr.name || typeof sr.selected !== 'boolean') {
               return res.status(400).json({ error: 'Invalid specialRequest format - each item must have name and selected' });
@@ -249,22 +244,24 @@ async function updateGuestCourseOption(req, res, next) {
             }
           }
         } else {
-          return res.status(400).json({ error: 'specialRequest must be a string or array' });
+          return res.status(400).json({ error: 'specialRequest must be an array' });
         }
       }
-    }
+    }  
     
     // Update or create menu choices
+    const partyChoicesToSave = choices.map(choice => ({
+      partyGuestId: choice.partyGuestId,
+      choices: choice.choices,
+      specialRequests: choice.specialRequest || [],
+      specialRequestDetail: choice.specialRequestDetail || ''
+    }));
+
+    console.log('DEBUG: partyChoicesToSave:', JSON.stringify(partyChoicesToSave, null, 2));
+    
     const menuChoice = await MenuChoice.findOneAndUpdate(
       { guestId },
-      { 
-        partyChoices: choices.map(choice => ({
-          partyGuestId: choice.partyGuestId,
-          choices: choice.choices,
-          specialRequest: choice.specialRequest || null,
-          specialRequestDetail: choice.specialRequestDetail || null
-        }))
-      },
+      { partyChoices: partyChoicesToSave },
       { upsert: true, new: true }
     );
     
@@ -406,7 +403,7 @@ async function getMenuChoicesOverview(req, res, next) {
           partyGuestId: partyChoice.partyGuestId,
           partyGuestName: partyChoice.partyGuestId.startsWith('primary-') ? guest.name : 'Party Member',
           choices: choices,
-          specialRequest: partyChoice.specialRequest,
+          specialRequest: partyChoice.specialRequests || [],  // Fixed: map specialRequests to specialRequest for API compatibility
           specialRequestDetail: partyChoice.specialRequestDetail
         });
       }

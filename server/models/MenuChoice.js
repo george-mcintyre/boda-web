@@ -13,14 +13,14 @@ const specialRequestSchema = new Schema({
 const individualMenuOptionChoiceSchema = new Schema({
   courseId: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
   optionId: { type: Schema.Types.ObjectId, ref: 'CourseOption', required: true },
-  specialRequests: [specialRequestSchema],
-  specialRequestDetail: { type: String, default: '' }
 }, { _id: false });
 
 // Schema for party guest's menu choices
 const partyMenuChoiceSchema = new Schema({
   partyGuestId: { type: String, required: true }, // References party member or primary guest ID
-  choices: [individualMenuOptionChoiceSchema]
+  choices: [individualMenuOptionChoiceSchema],
+  specialRequests: [specialRequestSchema],
+  specialRequestDetail: { type: String, default: '' }
 }, { _id: false });
 
 const menuChoiceSchema = new Schema({

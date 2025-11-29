@@ -348,8 +348,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           { name: 'lactose-intolerant', label: 'Lactose Intolerant', icon: 'fa-cheese' },
           { name: 'gluten-intolerant', label: 'Gluten Intolerant', icon: 'fa-bread-slice' },
           { name: 'nut-allergy', label: 'Nut Allergy', icon: 'fa-seedling' },
-          { name: 'spicy', label: 'Spicy', icon: 'fa-pepper-hot' },
-          { name: 'contains-nuts', label: 'Contains Nuts', icon: 'fa-seedling' },
           { name: 'other', label: 'Other', icon: 'fa-question-circle' }
         ];
 
@@ -1573,7 +1571,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                  <p class="gift-card-description">${escapeHtml(gift.description)}</p>
                  <div class="gift-card-stock">
                    ${isAvailable
-                     ? `<span class="stock-available"><i class="fas fa-check-circle"></i> ${gift.stock} in stock</span>`
+                     ? `<span class="stock-available"><i class="fas fa-check-circle"></i> ${gift.stock} available</span>`
                      : `<span class="stock-sold-out"><i class="fas fa-times-circle"></i> Sold Out</span>`
                    }
                  </div>
@@ -2046,8 +2044,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         { name: 'lactose-intolerant', label: 'Lactose Intolerant', icon: 'fa-cheese' },
         { name: 'gluten-intolerant', label: 'Gluten Intolerant', icon: 'fa-bread-slice' },
         { name: 'nut-allergy', label: 'Nut Allergy', icon: 'fa-seedling' },
-        { name: 'spicy', label: 'Spicy', icon: 'fa-pepper-hot' },
-        { name: 'contains-nuts', label: 'Contains Nuts', icon: 'fa-seedling' },
         { name: 'other', label: 'Other', icon: 'fa-question-circle' }
       ];
       
@@ -2512,7 +2508,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         choice.partyGuestId !== 'null' &&
         choice.partyGuestId !== 'undefined'
       );
-      
+
       // Send to server
       const response = await fetch('/api/guest/menu-choices', {
         method: 'PUT',
