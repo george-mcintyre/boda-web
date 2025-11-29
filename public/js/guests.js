@@ -1201,7 +1201,22 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         ` : '';
 
-        // Assemble the complete horizontal event card (image left 50%, details right 50%)
+        // Build map HTML
+        let mapHtml = '';
+        if (hasLocation) {
+            mapHtml = `
+          <div class="event-map-container">
+            <div id="${mapContainerId}" class="event-map"></div>
+            <div class="event-actions">
+              <a class="btn-ver-mapa" href="${mapsUrl}" target="_blank" rel="noopener">
+                <i class="fas fa-map"></i> View on Map
+              </a>
+            </div>
+          </div>
+        `;
+        }
+
+          // Assemble the complete horizontal event card (image left 50%, details right 50%)
         return `
           <div class="event-card-horizontal ${eventImage ? '' : 'no-image'}" data-event-id="${eventId}">
             ${imageHtml}
@@ -1227,7 +1242,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <i class="fas fa-clock"></i>
                   <span>${formatEventTime(event.date)}${event.end ? ' - ' + formatEventTime(event.end) : ''}</span>
                 </div>
-                
                 ${event.locationAddress ? `
                   <div class="event-meta-item">
                     <i class="fas fa-map-marker-alt"></i>
@@ -1235,16 +1249,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                   </div>
                 ` : ''}
               </div>
-              
+                ${(event.locationAddress || hasLocation) ? `
+                  ${mapHtml}
+                ` : ''}
               ${subEventsHtml}
-              
-              ${(event.locationAddress || hasLocation) ? `
-                <div class="event-actions">
-                  <a class="btn-ver-mapa" href="${mapsUrl}" target="_blank" rel="noopener">
-                    <i class="fas fa-map"></i> View on Map
-                  </a>
-                </div>
-              ` : ''}
               
               <div class="event-attendance">
                 <h5 class="attendance-title">

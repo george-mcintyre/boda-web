@@ -753,7 +753,7 @@ footer {
 
 /* Event Actions */
 .event-actions {
-  margin-top: auto;
+  margin-top: 0px;
   padding-top: 1rem;
 }
 
