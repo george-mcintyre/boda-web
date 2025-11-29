@@ -93,9 +93,9 @@ function applySettingsVisibility(settings) {
     const rsvpSummarySection = document.querySelector('.rsvp-summary-section');
     const menuSummarySection = document.querySelector('.menu-summary-section');
     
-    // RSVP summary section - only show if eventsEnabled is true
+  // RSVP summary section - only show if eventsEnabled is true
     if (rsvpSummarySection) {
-        if (settings.eventsEnabled) {
+      if (settings.eventsEnabled) {
             rsvpSummarySection.style.display = '';
         } else {
             rsvpSummarySection.style.display = 'none';
@@ -2857,14 +2857,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
     
-    // Re-apply settings visibility to control summary sections
-    try {
-      const settings = await fetchSettings();
-      applySettingsVisibility(settings);
-    } catch (error) {
-      console.error('Error refreshing settings for summary:', error);
-    }
-    
     // Show loading state
     summaryContent.innerHTML = `
       <div class="loading-state">
@@ -3210,6 +3202,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         </div>
       `;
     }
+
+    // Re-apply settings visibility to control summary sections
+    try {
+      const settings = await fetchSettings();
+      applySettingsVisibility(settings);
+    } catch (error) {
+      console.error('Error refreshing settings for summary:', error);
+    }
+
   }
   
   // Make loadSummaryContent globally accessible
