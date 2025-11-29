@@ -205,6 +205,17 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Build HTML for the unified menu
       let html = '<div class="unified-menu-container">';
 
+      html += `
+      <div class="intro-card">
+        <h2 class="card-title">
+          <div data-i18n="guests:menuPageTitle">${translate('guests:menuPageTitle')}</div>
+        </h2>
+        <p class="card-description">
+          <div data-i18n="guests:menuPageDescription">${translate('guests:menuPageDescription')}</div>
+        </p>
+      </div>
+    `;
+    
       // Iterate through course groups
       const groupOrder = ['starter', 'main', 'dessert', 'drinks'];
       
@@ -1272,12 +1283,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       let html = '<div class="events-container">';
       
       html += `
-        <div class="rsvp-intro-card">
-          <h2 class="rsvp-card-title">
-            <i class="fas fa-calendar-check"></i>
+        <div class="intro-card">
+          <h2 class="card-title">
             <div data-i18n="guests:eventsPageTitle">${translate('guests:eventsPageTitle')}</div>
           </h2>
-          <p class="rsvp-card-description">
+          <p class="card-description">
             <div data-i18n="guests:eventsPageDescription">${translate('guests:eventsPageDescription')}</div>
           </p>
         </div>
@@ -1499,7 +1509,18 @@ document.addEventListener('DOMContentLoaded', async () => {
        };
        
        let html = '<div class="gifts-container">';
-       
+
+       html += `
+       <div class="intro-card">
+         <h2 class="card-title">
+           <div data-i18n="guests:giftsPageTitle">${translate('guests:giftsPageTitle')}</div>
+         </h2>
+         <p class="card-description">
+           <div data-i18n="guests:giftsPageDescription">${translate('guests:giftsPageDescription')}</div>
+         </p>
+       </div>
+     `;
+             
        // ========== Section 1: Thank You Section (if there are donated gifts) ==========
        if (giftChoices.length > 0) {
          html += `
@@ -1943,6 +1964,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // Build HTML
       let html = '<div class="party-management-container">';
+      html += `
+        <div class="intro-card">
+          <h2 class="card-title">
+            <div data-i18n="guests:partyPageTitle">${translate('guests:partyPageTitle')}</div>
+          </h2>
+          <p class="card-description">
+            <div data-i18n="guests:partyPageDescription">${translate('guests:partyPageDescription')}</div>
+          </p>
+        </div>
+      `;      
       
       // ========== Section 1: Party Members List ==========
       html += `
@@ -2773,6 +2804,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // Start building HTML
       let html = '';
+
       
       // ========== 1. Party Members Card ==========
       html += `

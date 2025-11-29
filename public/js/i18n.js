@@ -58,6 +58,16 @@ const translations = {
     'guests:menuSelection': 'Menu Selection',
     'guests:menuSelectionDesc': 'Your current menu selection for our wedding.',
     'guests:menuSelectionDesc2': 'Choose your preferred dishes for our wedding.',
+
+    // Summary Page
+    'guests:summaryPageTitle': 'Welcome to the Iluminada & George\'s Wedding pages',
+    'guests:summaryPageDescription': 'Here you\'ll find all the information you need to get to, and enjoy the wedding.',
+
+    // Party Page
+    'guests:partyPageTitle': 'Party Management',
+    'guests:partyPageDescription': 'Manage your wedding party members and their dietary requirements.',
+
+    // Events Page
     'guests:eventsPageTitle': 'RSVP to the Wedding Events below',
     'guests:eventsPageDescription': 'We are thrilled to have to have you join us for the wedding. Here are the details of all the events that will be taking place. Please select your name in each event in the Who\'s Attending section. That way we can prepare everything for you to have a great time.',
     'guests:eventAgenda': 'Event Agenda',
@@ -75,6 +85,10 @@ const translations = {
     'guests:pending': 'Pending',
     'guests:event': 'Event',
     'guests:reserved': 'Reserved',
+
+    // Menu Page
+    'guests:menuPageTitle': 'Menu Selection',
+    'guests:menuPageDescription': 'Choose your preferred dishes for the wedding banquet.',
     'guests:currentSelection': 'Your current selection',
     'guests:starter': 'Starter:',
     'guests:mainCourse': 'Main course:',
@@ -106,7 +120,10 @@ const translations = {
     'guests:welcomePersonalized': 'Welcome',
     'guests:menuSaved': 'Menu saved successfully',
     'common:home': 'Home',
-    // Gifts
+
+    // Gifts Page
+    'guests:giftsPageTitle': 'Gifts list',
+    'guests:giftsPageDescription': 'Your presence is our gift. But if you want to contribute to our honeymoon you can choose an amusing gift from the list below and it will be printed with your message and displayed on a big wall at the wedding banquet.  The cash amount you choose will be used to fund our honeymoon.  Thank you',
     'guests:tabCash': 'Gifts',
     'guests:cashGifts': 'Gifts',
     'guests:cashGiftsDesc': 'If you prefer to give a cash gift, you can choose a fixed or custom amount. Your generosity will help us start our new life together.',
@@ -197,6 +214,16 @@ const translations = {
     'guests:menuSelection': 'Selección de Menú',
     'guests:menuSelectionDesc': 'Tu selección actual de menú para nuestra boda.',
     'guests:menuSelectionDesc2': 'Elige tus platos preferidos para nuestra boda.',
+
+        // Summary Page
+    'guests:summaryPageTitle': 'Bienvenido a las páginas de la Boda de Iluminada & George',
+    'guests:summaryPageDescription': 'Aquí encontrarás toda la información que necesitas para llegar y disfrutar de la boda.',
+
+    // Party Page
+    'guests:partyPageTitle': 'Gestión de la Grupo',
+    'guests:partyPageDescription': 'Gestiona a tus miembros de su grupo de invitados y sus requisitos dietéticos.',
+
+    // Events Page
     'guests:eventsPageTitle': 'RSVP a los Eventos de la Boda a continuación',
     'guests:eventsPageDescription': 'Estamos emocionados de tenerte con nosotros en la boda. Aquí están los detalles de todos los eventos que tendrán lugar. Por favor selecciona tu nombre en cada evento en la sección Who\'s Attending. Así podemos preparar todo para que tengas un gran tiempo.',
     'guests:eventAgenda': 'Agenda de Eventos',
@@ -214,6 +241,10 @@ const translations = {
     'guests:pending': 'Pendiente',
     'guests:event': 'Evento',
     'guests:reserved': 'Reservado',
+
+    // Menu Page
+    'guests:menuPageTitle': 'Selección de Menú',
+    'guests:menuPageDescription': 'Elige tus platos preferidos para nuestra boda.',
     'guests:currentSelection': 'Tu selección actual',
     'guests:starter': 'Entrante:',
     'guests:mainCourse': 'Plato principal:',
@@ -247,6 +278,8 @@ const translations = {
     'common:home': 'Inicio',
     
     // Gifts
+    'guests:giftsPageTitle': 'Gifts list',
+    'guests:giftsPageDescription': 'Your presence is our gift. But if you want to contribute to our honeymoon you can choose an amusing gift from the list below and it will be printed with your message and displayed on a big wall at the wedding banquet.  The cash amount you choose will be used to fund our honeymoon.  Thank you',
     'guests:tabCash': 'Regalos',
     'guests:cashGifts': 'Regalos',
     'guests:cashGiftsDesc': 'Si prefieres hacer un regalo en efectivo, puedes elegir una cantidad fija o personalizada. Tu generosidad nos ayudará a comenzar nuestra nueva vida juntos.',
@@ -367,6 +400,16 @@ const translations = {
     'guests:menuSelection': 'Sélection du Menu',
     'guests:menuSelectionDesc': 'Votre sélection actuelle de menu pour notre mariage.',
     'guests:menuSelectionDesc2': 'Choisissez vos plats préférés pour notre mariage.',
+
+    // Summary Page
+    'guests:summaryPageTitle': 'Bienvenue aux pages Ilu et George',
+    'guests:summaryPageDescription': 'Ici tu trouvera tous ce qu\'il faut d\'arriver et bien profiter du marriage.',
+
+    // Party Page
+    'guests:partyPageTitle': 'Your party members',
+    'guests:partyPageDescription': 'Management of your party members and their dietry requirements',
+
+    // Events Page
     'guests:eventsPageTitle': 'RSVP aux Événements de Mariage ci-dessous',
     'guests:eventsPageDescription': 'Nous sommes ravis de vous avoir avec nous pour le mariage. Voici les détails de tous les événements qui auront lieu. Veuillez sélectionner votre nom dans chaque événement dans la section Who\'s Attending. Ainsi nous pouvons préparer tout pour que vous.passiez un excellent moment.',
     'guests:eventAgenda': 'Agenda des Événements',
@@ -391,6 +434,10 @@ const translations = {
     'guests:dessert': 'Dessert:',
     'guests:specialOption': 'Option spéciale:',
     'guests:allergies': 'Allergies:',
+
+    // Menu Page
+    'guests:menuPageTitle': 'Menu Selection',
+    'guests:menuPageDescription': 'Choose your preferred dishes for the wedding banquet.',
     'guests:notSelected': 'Non sélectionné',
     'guests:selectionStatus': 'Statut de sélection',
     'guests:noSelectionYet': 'Vous n\'avez pas encore fait votre sélection de menu. Cliquez sur le bouton ci-dessus pour commencer.',
@@ -416,7 +463,10 @@ const translations = {
     'guests:welcomePersonalized': 'Bienvenue',
     'guests:menuSaved': 'Menu enregistré avec succès',
     'common:home': 'Accueil',
-    // Traducciones para regalos en efectivo
+
+    // Gifts
+    'guests:giftsPageTitle': 'Gifts list',
+    'guests:giftsPageDescription': 'Your presence is our gift. But if you want to contribute to our honeymoon you can choose an amusing gift from the list below and it will be printed with your message and displayed on a big wall at the wedding banquet.  The cash amount you choose will be used to fund our honeymoon.  Thank you',
     'guests:tabCash': 'Cadeaux',
     'guests:cashGifts': 'Cadeaux',
     'guests:cashGiftsDesc': 'Si vous préférez faire un cadeau en espèces, vous pouvez choisir un montant fixe ou personnalisé. Votre générosité nous aidera à commencer notre nouvelle vie ensemble.',
@@ -519,6 +569,16 @@ const translations = {
     'guests:menuSelection': 'Menüauswahl',
     'guests:menuSelectionDesc': 'Eure aktuelle Menüauswahl für unsere Hochzeit.',
     'guests:menuSelectionDesc2': 'Wählt eure bevorzugten Gerichte für unsere Hochzeit.',
+
+    // Summary Page
+    'guests:summaryPageTitle': 'Willkommen auf den Seiten von Iluminada & George',
+    'guests:summaryPageDescription': 'Hier findest du alle Informationen, die du benötigst, um zur Hochzeit zu kommen und sie zu genießen.',
+
+    // Party Page
+    'guests:partyPageTitle': 'Ihre Gruppe',
+    'guests:partyPageDescription': 'Verwaltung Ihres Gruppenmitglieds und ihrer speziellen Bedürfnisse.',
+
+    // Events Page
     'guests:eventsPageTitle': 'RSVP zu den Hochzeitsveranstaltungen unten',
     'guests:eventsPageDescription': 'Wir freuen uns sehr, euch bei unserer Hochzeit dabei zu haben. Hier sind die Details aller Veranstaltungen, die stattfinden werden. Bitte wählt euren Namen bei jeder Veranstaltung im Abschnitt Who\'s Attending aus. So können wir alles vorbereiten, damit ihr eine großartige Zeit habt.',
     'guests:eventAgenda': 'Veranstaltungsprogramm',
@@ -536,6 +596,10 @@ const translations = {
     'guests:pending': 'Ausstehend',
     'guests:event': 'Veranstaltung',
     'guests:reserved': 'Reserviert',
+
+    // Menu Page
+    'guests:menuPageTitle': 'Menüauswahl',
+    'guests:menuPageDescription': 'Wählt eure bevorzugten Gerichte für unsere Hochzeit.',
     'guests:currentSelection': 'Eure aktuelle Auswahl',
     'guests:starter': 'Vorspeise:',
     'guests:mainCourse': 'Hauptgang:',
@@ -569,6 +633,8 @@ const translations = {
     'common:home': 'Startseite',
   
     // Gifts
+    'guests:giftsPageTitle': 'Gifts list',
+    'guests:giftsPageDescription': 'Your presence is our gift. But if you want to contribute to our honeymoon you can choose an amusing gift from the list below and it will be printed with your message and displayed on a big wall at the wedding banquet.  The cash amount you choose will be used to fund our honeymoon.  Thank you',
     'guests:tabCash': 'Geschenke',
     'guests:cashGifts': 'Geldgeschenke',
     'guests:cashGiftsDesc': 'Wenn ihr uns lieber ein Geldgeschenk machen möchtet, könnt ihr einen festen oder eigenen Betrag wählen. Eure Großzügigkeit hilft uns, unser gemeinsames Leben zu beginnen.',

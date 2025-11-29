@@ -64,7 +64,16 @@
       
       <!-- Content of the Summary tab -->
       <div id="summaryContent-tab" class="tab-content active">
-        <div class="summary-grid">
+          <div class="intro-card">
+            <h2 class="card-title">
+              <div data-i18n="guests:summaryPageTitle">${translate('guests:summaryPageTitle')}</div>
+            </h2>
+            <p class="card-description">
+              <div data-i18n="guests:summaryPageDescription">${translate('guests:summaryPageDescription')}</div>
+            </p>
+          </div>
+      
+          <div class="summary-grid">
           <!-- Summary Section (Left) - dynamically loaded -->
           <section id="summaryContent" class="summary-card summary-left-panel">
             <h2><i class="fas fa-clipboard-list"></i> <span data-i18n="guests:yourSummary">Your Summary</span></h2>
