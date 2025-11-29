@@ -1902,10 +1902,6 @@ document.addEventListener('DOMContentLoaded', async () => {
      document.addEventListener('keydown', handleEscape);
    };
 
-   // Load messages content
-   async function loadMessagesContent() {
-   }
-
    // Configure the messages form
    const messagesForm = document.getElementById('messagesForm');
    if (messagesForm) {
@@ -2782,7 +2778,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (targetTab === 'summaryContent') {
         console.log("loading summary content");
         loadSummaryContent();
-        loadMessagesContent();
       }
 
     });
@@ -2831,7 +2826,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       loadGiftsContent();
     } else if (tabName === 'summaryContent') {
       loadSummaryContent();
-      loadMessagesContent();
     }
   }
 

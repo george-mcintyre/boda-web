@@ -5,6 +5,8 @@ class CommentsSystem {
         this.nextCursor = null;
         this.currentUser = this.getCurrentUser();
         this.isAdmin = this.checkIfAdmin();
+        this.partyMembers = [];
+        this.selectedPartyMemberName = '';
         this.injectStyles();
         this.init();
     }
@@ -12,6 +14,7 @@ class CommentsSystem {
     // Initialize the system
     init() {
         this.loadComments();
+        this.loadPartyMembers();
         this.setupEventListeners();
         this.updateCharCount();
     }
@@ -47,6 +50,7 @@ class CommentsSystem {
     setupEventListeners() {
         const commentForm = document.getElementById('commentForm');
         const commentInput = document.getElementById('newComment');
+        const postingAsSelect = document.getElementById('postingAsSelect');
 
         if (commentForm) {
             commentForm.addEventListener('submit', (e) => {
@@ -59,6 +63,83 @@ class CommentsSystem {
             commentInput.addEventListener('input', () => {
                 this.updateCharCount();
             });
+        }
+
+        if (postingAsSelect) {
+            postingAsSelect.addEventListener('change', (e) => {
+                this.selectedPartyMemberName = e.target.value;
+                localStorage.setItem('selectedPartyMemberName', this.selectedPartyMemberName);
+            });
+        }
+    }
+
+    // Load party members for the dropdown
+    async loadPartyMembers() {
+        try {
+            const token = localStorage.getItem('token') || '';
+            const response = await fetch('/api/guest/party', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.ok) {
+                const partyMembers = await response.json();
+                this.partyMembers = partyMembers;
+                this.populatePartyMemberDropdown();
+            } else {
+                console.error('Failed to load party members:', response.status);
+                this.partyMembers = [];
+                this.populatePartyMemberDropdown();
+            }
+        } catch (error) {
+            console.error('Error loading party members:', error);
+            this.partyMembers = [];
+            this.populatePartyMemberDropdown();
+        }
+    }
+
+    // Populate the party member dropdown
+    populatePartyMemberDropdown() {
+        const postingAsSelect = document.getElementById('postingAsSelect');
+        if (!postingAsSelect) return;
+
+        // Clear existing options
+        postingAsSelect.innerHTML = '';
+
+        // Add default option
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select party member...';
+        postingAsSelect.appendChild(defaultOption);
+
+        // Add party member options
+        this.partyMembers.forEach(member => {
+            const option = document.createElement('option');
+            option.value = member.name;
+            option.textContent = member.name;
+            if (member.primary) {
+                option.textContent += ' (Primary)';
+            }
+            postingAsSelect.appendChild(option);
+        });
+
+        // Restore previously selected value
+        const savedSelection = localStorage.getItem('selectedPartyMemberName') || '';
+        if (savedSelection && this.partyMembers.some(m => m.name === savedSelection)) {
+            postingAsSelect.value = savedSelection;
+            this.selectedPartyMemberName = savedSelection;
+        } else {
+            // Default to primary member or first member
+            const primaryMember = this.partyMembers.find(m => m.primary);
+            const fallbackMember = this.partyMembers[0];
+            const defaultMember = primaryMember || fallbackMember;
+            if (defaultMember) {
+                postingAsSelect.value = defaultMember.name;
+                this.selectedPartyMemberName = defaultMember.name;
+                localStorage.setItem('selectedPartyMemberName', this.selectedPartyMemberName);
+            }
         }
     }
 
@@ -216,9 +297,16 @@ class CommentsSystem {
     async addComment() {
         const commentInput = document.getElementById('newComment');
         const body = commentInput.value.trim();
+        const postingAsSelect = document.getElementById('postingAsSelect');
+        const authorName = postingAsSelect ? postingAsSelect.value : '';
 
         if (!body) {
             this.showToast('Please write a comment.', 'error');
+            return;
+        }
+
+        if (!authorName) {
+            this.showToast('Please select who is posting the comment.', 'error');
             return;
         }
 
@@ -235,7 +323,10 @@ class CommentsSystem {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ body })
+                body: JSON.stringify({ 
+                    body,
+                    authorName: authorName 
+                })
             });
 
             if (response.ok) {

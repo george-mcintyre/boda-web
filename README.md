@@ -1318,36 +1318,7 @@ Update feature toggles.
 
 ---
 
-## 4. Legacy Routes
-
-For backward compatibility, the following legacy routes still exist:
-
-### 4.1 Guest Legacy Routes
-
-#### `GET /api/invitado` 
-Legacy Spanish route for guest profile. Same as `/api/guest/profile`.
-
-#### `GET /api/messages`
-Public list of messages (using guest endpoint for backwards compatibility).
-
-#### `POST /api/messages`
-Guests can create messages.
-
-#### `POST /api/messages/:id/reaction`
-Guests can toggle a reaction on a message.
-
-#### `GET /api/event`
-Public agenda endpoint with language negotiation.
-
-#### `GET /api/events`
-Simple event admin endpoints.
-
-#### `POST /api/events`
-Create events (admin only).
-
----
-
-## 5. Global Conventions
+## 4. Global Conventions
 
 - **Auth**:  
   `Authorization: Bearer <jwt>`

@@ -101,12 +101,13 @@ async function listAdminMessages(req, res, next) {
 // Guest: create a message
 async function createGuestMessage(req, res, next) {
   try {
-    const { body } = req.body || {};
+    const { body, authorName } = req.body || {};
     if (!body || typeof body !== 'string') {
       return res.status(400).json({ error: 'Content is required' });
     }
     
-    const name = req.user?.name || req.user?.name || 'Guest';
+    // Use the provided authorName if available, otherwise fall back to user name
+    const name = authorName || req.user?.name || req.user?.name || 'Guest';
     const email = req.user?.email || '';
     
     const message = await Message.create({ 
