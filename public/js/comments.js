@@ -7,16 +7,26 @@ class CommentsSystem {
         this.isAdmin = this.checkIfAdmin();
         this.partyMembers = [];
         this.selectedPartyMemberName = '';
+        this.initialized = false;
         this.injectStyles();
         this.init();
     }
 
     // Initialize the system
     init() {
+        // Check if comments section is visible (respects messagesEnabled setting)
+        const commentsSection = document.querySelector('.comments-card');
+        if (!commentsSection || commentsSection.style.display === 'none') {
+            console.log('Comments section is hidden, skipping initialization');
+            this.initialized = false;
+            return;
+        }
+        
         this.loadComments();
         this.loadPartyMembers();
         this.setupEventListeners();
         this.updateCharCount();
+        this.initialized = true;
     }
 
     // Get current user from localStorage
@@ -532,6 +542,21 @@ let commentsSystem;
 
 document.addEventListener('DOMContentLoaded', () => {
     commentsSystem = new CommentsSystem();
+    
+    // Re-initialize when settings change (for when messagesEnabled is toggled)
+    // This handles the case when admin enables/disables messages
+    const checkAndReinitComments = () => {
+        const commentsSection = document.querySelector('.comments-card');
+        if (commentsSection && commentsSystem) {
+            const isVisible = commentsSection.style.display !== 'none';
+            if (isVisible && !commentsSystem.initialized) {
+                commentsSystem.init();
+            }
+        }
+    };
+    
+    // Check on window focus (settings might have changed)
+    window.addEventListener('focus', checkAndReinitComments);
 });
 
 // Make available globally for use in other scripts

@@ -111,6 +111,25 @@ function applySettingsVisibility(settings) {
         }
     }
     
+    // Comments section - only show if messagesEnabled is true
+    const commentsSection = document.querySelector('.comments-card');
+    if (commentsSection) {
+        if (settings.messagesEnabled) {
+            commentsSection.style.display = '';
+            // Initialize comments system if messages are enabled and comments system exists
+            if (window.commentsSystem) {
+                // Refresh comments when becoming visible
+                setTimeout(() => {
+                    if (typeof window.commentsSystem.loadComments === 'function') {
+                        window.commentsSystem.loadComments();
+                    }
+                }, 100);
+            }
+        } else {
+            commentsSection.style.display = 'none';
+        }
+    }
+    
     // If current active tab is now hidden, switch to summary
     const activeTab = document.querySelector('.tab-btn.active');
     if (activeTab && (activeTab.style.display === 'none' || activeTab.classList.contains('disabled'))) {
