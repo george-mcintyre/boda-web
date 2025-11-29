@@ -35,7 +35,6 @@
 </main>
   <script src="js/i18n.js"></script>
   <script src="js/auth-check.js"></script>
-  <script src="js/login.js"></script>
   <script>
       // Additional check for login page - redirect if already logged in as guest
       document.addEventListener('DOMContentLoaded', function() {
@@ -43,6 +42,11 @@
               console.log('Guest already logged in, redirecting to dashboard');
               window.location.href = 'guests.html';
           }
+          updateDocumentDirection();
+          updatePageContent();
+          updateLanguageSelector();
+          updateFormatting();
+
       });
   </script>
 </body>

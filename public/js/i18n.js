@@ -1,21 +1,21 @@
 // Static translations
 const translations = {
   en: {
+    'common:days': 'Days',
+    'common:hours': 'Hours',
+    'common:minutes': 'Minutes',
+    'common:seconds': 'Seconds',
+    'common:login': 'Login',
+
     'wedding:title': 'Iluminada & George',
     'wedding:subtitle': 'We\'re getting married!',
     'wedding:date': 'June 6th, 2026 • Marbella, Spain',
-    'wedding:hero.title': 'We invite you to celebrate our love!',
     'wedding:hero.description': 'Iluminada and George are getting married on the beach in Marbella this June, and we’re so happy to share it with you. Expect sun, sea and lots of laughter.',
     'wedding:hero.description2': 'This site is your wedding hub. Log in with your RSVP email to confirm your party, choose your menu, see the schedule, view our gift list and chat with other guests.',
 
     'wedding:guestZone.title': 'Guest Zone',
     'wedding:guestZone.description': 'Here you can manage all the details of your participation in our wedding.',
-    'common:days': 'Days',
-    'common:hours': 'Hours',
-    'common:minutes': 'Minutes',
-    'common:seconds': 'Seconds',
 
-    'common:login': 'Login',
     'login:pageTitle': 'Guest access - Wedding',
     'login:header': 'Guest access',
     'login:home': 'Home',
@@ -170,16 +170,19 @@ const translations = {
 
   },
   es: {
+    'common:days': 'Días',
+    'common:hours': 'Horas',
+    'common:minutes': 'Minutos',
+    'common:seconds': 'Segundos',
+
     'wedding:title': 'Iluminada & George',
     'wedding:subtitle': 'Nos casamos!',
     'wedding:date': '6 de Junio, 2026 • Marbella, Spain',
     'wedding:hero.description': 'Iluminada y George se casan en la playa de Marbella este junio y nos hace muy felices poder compartirlo con vosotros. Sol, mar y muchas risas.',
     'wedding:hero.description2': 'Esta web es vuestro centro de boda. Inicia sesión con el correo del RSVP para confirmar tu grupo, elegir el menú, ver el programa, revisar la lista de regalos y chatear con otros invitados.',
 
-    'common:days': 'Días',
-    'common:hours': 'Horas',
-    'common:minutes': 'Minutos',
-    'common:seconds': 'Segundos',
+    'wedding:guestZone.title': 'Zona de Invitados',
+    'wedding:guestZone.description': 'Aquí puedes gestionar todos los detalles de tu participación en nuestra boda.',
 
     'common:login': 'Iniciar sesión',
     'login:pageTitle': 'Acceso guests - Boda',
@@ -326,10 +329,14 @@ const translations = {
 
   },
   fr: {
+    'common:days': 'Jours',
+    'common:hours': 'Heures',
+    'common:minutes': 'Minutes',
+    'common:seconds': 'Secondes',
+
     'wedding:title': 'Iluminada & George',
     'wedding:subtitle': 'On se marie!',
     'wedding:date': '6 Juin 2026 • Marbella, Spain',
-    'wedding:hero.title': 'Nous vous invitons à célébrer notre amour !',
     'wedding:hero.description': 'Iluminada et George se marient sur la plage de Marbella en juin et nous sommes ravis de partager ce moment avec vous. Soleil, mer et beaucoup de rires.',
     'wedding:hero.description2': 'Ce site est votre espace mariage. Connectez-vous avec l’e-mail de votre RSVP pour confirmer votre groupe, choisir votre menu, voir le programme, consulter la liste de cadeaux et discuter avec les autres invités.',
     'wedding:ceremony.title': 'Cérémonie',
@@ -348,10 +355,6 @@ const translations = {
 
     'wedding:guestZone.title': 'Zone des Invités',
     'wedding:guestZone.description': 'Ici vous pouvez gérer tous les détails de votre participation à notre mariage.',
-    'common:days': 'Jours',
-    'common:hours': 'Heures',
-    'common:minutes': 'Minutes',
-    'common:seconds': 'Secondes',
 
     'common:login': 'Se connecter',
     'login:pageTitle': 'Accès Invités',
@@ -515,7 +518,6 @@ const translations = {
     'wedding:title': 'Iluminada & George',
     'wedding:subtitle': 'Wir heiraten!',
     'wedding:date': '6. Juni 2026 • Marbella, Spanien',
-    'wedding:hero.title': 'Wir laden euch ein, unsere Liebe zu feiern!',
     'wedding:hero.description': 'Iluminada und George heiraten im Juni am Strand von Marbella und wir freuen uns sehr, das mit euch zu teilen. Sonne, Meer und viele Momente zum Lachen.',
     'wedding:hero.description2': 'Diese Seite ist euer Hochzeitsportal. Meldet euch mit der RSVP-E-Mail an, um eure Gruppe zu bestätigen, euer Menü zu wählen, den Ablauf zu sehen, die Geschenkliste anzuschauen und mit anderen Gästen zu chatten.',
   
