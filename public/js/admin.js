@@ -1361,11 +1361,29 @@
         </td>
       </tr>`;
     }).join('');
+    
+    // Calculate Grand Total
+    const totalAvailable = (gifts||[]).reduce((sum, gift) => sum + (parseInt(gift.available) || 0), 0);
+    const totalValue = (gifts||[]).reduce((sum, gift) => sum + ((parseInt(gift.available) || 0) * (parseInt(gift.amount) || 0)), 0);
+    
+    // Add Grand Total row
+    const grandTotalRow = `
+      <tr style="background-color: #f8f9fa; font-weight: bold; border-top: 2px solid #dee2e6;">
+        <td>Grand Total</td>
+        <td>The available cards x price</td>
+        <td></td>
+        <td>${totalAvailable}</td>
+        <td>€${totalValue}</td>
+        <td>0</td>
+        <td></td>
+      </tr>`;
+    
+    const allRows = rows + grandTotalRow;
       
     content.innerHTML = renderTable({
       title:'Gift List', 
       columns:['Name','Description','Image','Available','Price','Purchased','Actions']
-    }, rows, `<button id="addGift" class="admin-action"><i class="fas fa-plus"></i> Add</button>`);
+    }, allRows, `<button id="addGift" class="admin-action"><i class="fas fa-plus"></i> Add</button>`);
     
     const tbody = content.querySelector('tbody');
     tbody.addEventListener('click', async (e)=>{
