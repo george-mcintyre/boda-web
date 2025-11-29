@@ -587,6 +587,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       menuContent.innerHTML = html;
 
+      // Translate the newly loaded content
+      if (typeof updatePageContent === 'function') {
+        updatePageContent();
+      }
+
       // Initialize drag and drop functionality
       initMenuDragDrop();
 
@@ -613,6 +618,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           </button>
         </div>
       `;
+      
+      // Even on error, try to translate any remaining content
+      if (typeof updatePageContent === 'function') {
+        updatePageContent();
+      }
     }
   }
 
@@ -1483,6 +1493,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Update DOM
       eventsContent.innerHTML = html;
       
+      // Translate the newly loaded content
+      if (typeof updatePageContent === 'function') {
+        updatePageContent();
+      }
+      
       // Initialize maps after DOM update
       if (mapsToInitialize.length > 0) {
         setTimeout(() => {
@@ -1506,6 +1521,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           </button>
         </div>
       `;
+      
+      // Even on error, try to translate any remaining content
+      if (typeof updatePageContent === 'function') {
+        updatePageContent();
+      }
     }
   }
   
@@ -1811,6 +1831,11 @@ document.addEventListener('DOMContentLoaded', async () => {
          window.history.replaceState({}, document.title, window.location.pathname);
        }
        
+      // Translate the newly loaded content
+      if (typeof updatePageContent === 'function') {
+        updatePageContent();
+      }
+      
      } catch (err) {
        console.error('Error loading gifts:', err);
        giftsContent.innerHTML = `
@@ -1824,6 +1849,10 @@ document.addEventListener('DOMContentLoaded', async () => {
            </button>
          </div>
        `;
+       // Even on error, try to translate any remaining content
+       if (typeof updatePageContent === 'function') {
+         updatePageContent();
+       }
      }
    }
    
@@ -2350,6 +2379,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         select.addEventListener('change', markPartyAsUnsaved);
       });
       
+      // Translate the newly loaded content
+      if (typeof updatePageContent === 'function') {
+        updatePageContent();
+      }
+      
       console.log('Party content loaded successfully');
       
     } catch (err) {
@@ -2365,6 +2399,10 @@ document.addEventListener('DOMContentLoaded', async () => {
           </button>
         </div>
       `;
+      // Even on error, try to translate any remaining content
+      if (typeof updatePageContent === 'function') {
+        updatePageContent();
+      }
     }
   }
   
@@ -3186,6 +3224,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Update the DOM
       summaryContent.innerHTML = html;
       
+      // Translate the newly loaded content
+      if (typeof updatePageContent === 'function') {
+        updatePageContent();
+      }
+      
     } catch (error) {
       console.error('Error loading summary:', error);
       summaryContent.innerHTML = `
@@ -3199,6 +3242,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           </button>
         </div>
       `;
+      
+      // Even on error, try to translate any remaining content
+      if (typeof updatePageContent === 'function') {
+        updatePageContent();
+      }
     }
 
     // Re-apply settings visibility to control summary sections
