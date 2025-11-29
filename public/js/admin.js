@@ -2266,12 +2266,17 @@
           `;
         } else {
           parts.forEach(part => {
+            // Determine if course has selectable options or is fixed
+            const selectionIcon = part.selectionRequired === true 
+              ? '<i class="fas fa-list" title="Selectable - Guests must choose one option" style="color: #007bff; margin-left: 8px;"></i>'
+              : '<i class="fas fa-check" title="Fixed - All options will be provided" style="color: #28a745; margin-left: 8px;"></i>';
+            
             menuContent += `
               <div class="menu-course-card" data-id="${part.id}">
                 <div class="menu-course-header">
                   <div class="course-title-section">
                     <h5>${part.label}</h5>
-                    ${part.selectionIcon || ''}
+                    ${selectionIcon}
                   </div>
                   <div class="menu-course-actions">
                     <button class="admin-action" onclick="editMenuCourseOption('${part.id}')" title="Add Option">
