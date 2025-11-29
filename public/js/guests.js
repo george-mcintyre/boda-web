@@ -1177,7 +1177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           attendanceItemsHtml = partyMembers.map(member => {
             const isAttending = attendanceLookup[member.id] ? attendanceLookup[member.id][eventId] === true : false;
             return `
-              <div class="attendance-item">
+              <div class="attendance-item" onclick="saveEventChoices()" style="cursor: pointer;">
                 <label class="attendance-label">
                   <input type="checkbox" class="attendance-checkbox" data-event-id="${eventId}" data-member-id="${member.id}" ${isAttending ? 'checked' : ''}>
                   <span class="member-name">${escapeHtml(member.name)}</span>
@@ -1287,16 +1287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </div>
         `;
       });
-      
-      // Save button
-      html += `
-        <div class="action-container">
-          <button type="button" id="saveEventChoicesBtn" class="btn-base btn-primary btn-lg">
-            <i class="fas fa-save"></i>
-            Save Attendance Choices
-          </button>
-        </div>
-      `;
+
       
       html += '</div>'; // Close events-container
       
@@ -1311,12 +1302,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           });
         }, 150);
       }
-      
-      // Attach save button event listener
-      const saveButton = document.getElementById('saveEventChoicesBtn');
-      if (saveButton) {
-        saveButton.addEventListener('click', saveEventChoices);
-      }
+
       
     } catch (error) {
       console.error('Error loading events:', error);
@@ -1336,14 +1322,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Make loadEventsContent globally accessible for retry button
   window.loadEventsContent = loadEventsContent;
+  
+  // Make saveEventChoices globally accessible for onclick handlers
+  window.saveEventChoices = saveEventChoices;
    
   // Function to save event attendance choices
    async function saveEventChoices() {
      const saveBtn = document.getElementById('saveEventChoicesBtn');
-     if (saveBtn) {
-       saveBtn.disabled = true;
-       saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-     }
      
      try {
        // Collect all attendance checkboxes
