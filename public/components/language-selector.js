@@ -187,7 +187,6 @@ class LanguageSelector {
         this.options.onLanguageChange(lang);
       }
       
-      console.log(`Language changed to: ${lang}`);
       return true;
     } catch (error) {
       console.error(`Error changing language: ${error.message}`);
@@ -230,7 +229,7 @@ class LanguageSelector {
     options.forEach(option => {
       option.removeEventListener('click', this.changeLanguage);
     });
-    
+
     // Clear container
     this.container.innerHTML = '';
   }

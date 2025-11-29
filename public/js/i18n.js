@@ -58,6 +58,8 @@ const translations = {
     'guests:menuSelection': 'Menu Selection',
     'guests:menuSelectionDesc': 'Your current menu selection for our wedding.',
     'guests:menuSelectionDesc2': 'Choose your preferred dishes for our wedding.',
+    'guests:eventsPageTitle': 'RSVP to the Wedding Events below',
+    'guests:eventsPageDescription': 'We are thrilled to have to have you join us for the wedding. Here are the details of all the events that will be taking place. Please select your name in each event in the Who\'s Attending section. That way we can prepare everything for you to have a great time.',
     'guests:eventAgenda': 'Event Agenda',
     'guests:eventAgendaDesc': 'Your attendance confirmations for our wedding events.',
     'guests:eventAgendaDesc2': 'Confirm your attendance to each of our wedding events.',
@@ -195,6 +197,8 @@ const translations = {
     'guests:menuSelection': 'Selección de Menú',
     'guests:menuSelectionDesc': 'Tu selección actual de menú para nuestra boda.',
     'guests:menuSelectionDesc2': 'Elige tus platos preferidos para nuestra boda.',
+    'guests:eventsPageTitle': 'RSVP a los Eventos de la Boda a continuación',
+    'guests:eventsPageDescription': 'Estamos emocionados de tenerte con nosotros en la boda. Aquí están los detalles de todos los eventos que tendrán lugar. Por favor selecciona tu nombre en cada evento en la sección Who\'s Attending. Así podemos preparar todo para que tengas un gran tiempo.',
     'guests:eventAgenda': 'Agenda de Eventos',
     'guests:eventAgendaDesc': 'Tus confirmaciones de asistencia a los eventos de nuestra boda.',
     'guests:eventAgendaDesc2': 'Confirma tu asistencia a cada uno de los eventos de nuestra boda.',
@@ -363,6 +367,8 @@ const translations = {
     'guests:menuSelection': 'Sélection du Menu',
     'guests:menuSelectionDesc': 'Votre sélection actuelle de menu pour notre mariage.',
     'guests:menuSelectionDesc2': 'Choisissez vos plats préférés pour notre mariage.',
+    'guests:eventsPageTitle': 'RSVP aux Événements de Mariage ci-dessous',
+    'guests:eventsPageDescription': 'Nous sommes ravis de vous avoir avec nous pour le mariage. Voici les détails de tous les événements qui auront lieu. Veuillez sélectionner votre nom dans chaque événement dans la section Who\'s Attending. Ainsi nous pouvons préparer tout pour que vous.passiez un excellent moment.',
     'guests:eventAgenda': 'Agenda des Événements',
     'guests:eventAgendaDesc': 'Vos confirmations de présence pour les événements de notre mariage.',
     'guests:eventAgendaDesc2': 'Confirmez votre présence à chacun des événements de notre mariage.',
@@ -513,6 +519,8 @@ const translations = {
     'guests:menuSelection': 'Menüauswahl',
     'guests:menuSelectionDesc': 'Eure aktuelle Menüauswahl für unsere Hochzeit.',
     'guests:menuSelectionDesc2': 'Wählt eure bevorzugten Gerichte für unsere Hochzeit.',
+    'guests:eventsPageTitle': 'RSVP zu den Hochzeitsveranstaltungen unten',
+    'guests:eventsPageDescription': 'Wir freuen uns sehr, euch bei unserer Hochzeit dabei zu haben. Hier sind die Details aller Veranstaltungen, die stattfinden werden. Bitte wählt euren Namen bei jeder Veranstaltung im Abschnitt Who\'s Attending aus. So können wir alles vorbereiten, damit ihr eine großartige Zeit habt.',
     'guests:eventAgenda': 'Veranstaltungsprogramm',
     'guests:eventAgendaDesc': 'Eure Teilnahmebestätigungen für unsere Hochzeitsveranstaltungen.',
     'guests:eventAgendaDesc2': 'Bestätigt eure Teilnahme an unseren Hochzeitsveranstaltungen.',
@@ -770,7 +778,7 @@ function detectAndSetBrowserLanguage() {
 
 function updateFormatting() {
   try {
-    // Formatear números
+    // Formatting numbers
     const priceElement = document.getElementById('formatted-price');
     const percentageElement = document.getElementById('formatted-percentage');
     
@@ -788,7 +796,7 @@ function updateFormatting() {
       }).format(0.855);
     }
     
-    // Formatear fechas
+    // Formatting dates
     const dateElement = document.getElementById('formatted-date');
     const timeElement = document.getElementById('formatted-time');
     const now = new Date();
@@ -808,7 +816,7 @@ function updateFormatting() {
       }).format(now);
     }
     
-    // Formatear moneda
+    // Formatting currency
     const currencyElement = document.getElementById('formatted-currency');
     if (currencyElement) {
       const currency = currentLanguage === 'en' ? 'USD' : 'EUR';

@@ -1271,6 +1271,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Build complete HTML output
       let html = '<div class="events-container">';
       
+      html += `
+        <div class="rsvp-intro-card">
+          <h2 class="rsvp-card-title">
+            <i class="fas fa-calendar-check"></i>
+            <div data-i18n="guests:eventsPageTitle">${translate('guests:eventsPageTitle')}</div>
+          </h2>
+          <p class="rsvp-card-description">
+            <div data-i18n="guests:eventsPageDescription">${translate('guests:eventsPageDescription')}</div>
+          </p>
+        </div>
+      `;
+      
       Object.entries(eventsByDate).forEach(([dateKey, dateEvents]) => {
         // Build all event cards for this date
         const eventCardsHtml = dateEvents.map(event => buildEventCard(event)).join('');
