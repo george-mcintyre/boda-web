@@ -2702,34 +2702,34 @@
     
     content.innerHTML = `
       <div class="admin-content">
-        <h3><i class="fas fa-cog"></i> Settings</h3>
+        <h3><i class="fas fa-cog"></i> <div data-i18n="admin:settings.title">${translate('admin:settings.title')}</div></h3>
         
         <!-- Feature Toggles -->
         <div class="settings-section">
-          <h4><i class="fas fa-toggle-on"></i> Feature Toggles</h4>
-          <p style="color:#666;margin-bottom:20px;">Control which features are available to guests</p>
+          <h4><i class="fas fa-toggle-on"></i> <div data-i18n="admin:settings.featureToggles">${translate('admin:settings.featureToggles')}</div></h4>
+          <p style="color:#666;margin-bottom:20px;"><div data-i18n="admin:settings.featureTogglesDescription">${translate('admin:settings.featureTogglesDescription')}</div></p>
           
           <div class="feature-toggles-grid">
             ${[
-              { key: 'guestsEnabled', label: 'Enable Guest Area', icon: 'fa-users', desc: 'Allow guests to login and manage guests in their party' },
-              { key: 'eventsEnabled', label: 'Show Wedding Events', icon: 'fa-calendar-alt', desc: 'Show the wedding event calendar and allow guests to confirm their attendance' },
-              { key: 'menuEnabled', label: 'Menu', icon: 'fa-utensils', desc: 'Show Guest Menu selection and Preferences' },
-              { key: 'messagesEnabled', label: 'Messages', icon: 'fa-comments', desc: 'Show Messages' },
-              { key: 'giftsEnabled', label: 'Gifts', icon: 'fa-gift', desc: 'Show Gift Registry' }
+              { key: 'guestsEnabled', label: 'admin:settings.enableGuestArea', icon: 'fa-users', desc: 'admin:settings.enableGuestAreaDesc' },
+              { key: 'eventsEnabled', label: 'admin:settings.showWeddingEvents', icon: 'fa-calendar-alt', desc: 'admin:settings.showWeddingEventsDesc' },
+              { key: 'menuEnabled', label: 'admin:settings.menu', icon: 'fa-utensils', desc: 'admin:settings.menuDesc' },
+              { key: 'messagesEnabled', label: 'admin:settings.messages', icon: 'fa-comments', desc: 'admin:settings.messagesDesc' },
+              { key: 'giftsEnabled', label: 'admin:settings.gifts', icon: 'fa-gift', desc: 'admin:settings.giftsDesc' }
             ].map(feature => `
               <div class="feature-toggle-card ${settings[feature.key] ? 'enabled' : 'disabled'}">
                 <div class="feature-toggle-header">
                   <i class="fas ${feature.icon}"></i>
-                  <h5>${feature.label}</h5>
+                  <h5><div data-i18n="${feature.label}">${translate(feature.label)}</div></h5>
                   <div class="toggle-switch">
                     <input type="checkbox" id="toggle-${feature.key}" ${settings[feature.key] ? 'checked' : ''}>
                     <label for="toggle-${feature.key}" onclick="updateFeatureToggle('${feature.key}', !document.getElementById('toggle-${feature.key}').checked)"></label>
                   </div>
                 </div>
-                <p class="feature-desc">${feature.desc}</p>
+                <p class="feature-desc"><div data-i18n="${feature.desc}">${translate(feature.desc)}</div></p>
                 <div class="feature-status">
                   <span class="status-badge ${settings[feature.key] ? 'active' : 'inactive'}">
-                    ${settings[feature.key] ? 'Enabled' : 'Disabled'}
+                    <span data-i18n="admin:settings.${settings[feature.key] ? 'enabled' : 'disabled'}">${translate('admin:settings.' + (settings[feature.key] ? 'enabled' : 'disabled'))}</span>
                   </span>
                 </div>
               </div>

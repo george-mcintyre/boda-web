@@ -342,6 +342,23 @@ const translations = {
     'admin:gifts.priceOption.200': '€200',
     'admin:gifts.priceOption.500': '€500',
 
+    // Admin Settings Section
+    'admin:settings.title': 'Settings',
+    'admin:settings.featureToggles': 'Feature Toggles',
+    'admin:settings.featureTogglesDescription': 'Control which features are available to guests',
+    'admin:settings.enableGuestArea': 'Enable Guest Area',
+    'admin:settings.enableGuestAreaDesc': 'Allow guests to login and manage guests in their party',
+    'admin:settings.showWeddingEvents': 'Show Wedding Events',
+    'admin:settings.showWeddingEventsDesc': 'Show the wedding event calendar and allow guests to confirm their attendance',
+    'admin:settings.menu': 'Menu',
+    'admin:settings.menuDesc': 'Show Guest Menu selection and Preferences',
+    'admin:settings.messages': 'Messages',
+    'admin:settings.messagesDesc': 'Show Messages',
+    'admin:settings.gifts': 'Gifts',
+    'admin:settings.giftsDesc': 'Show Gift Registry',
+    'admin:settings.enabled': 'Enabled',
+    'admin:settings.disabled': 'Disabled',
+
     // Admin Party Management Section
     'admin:party.title': 'Manage Party: ',
     'admin:party.description': 'Manage party members for this guest',
@@ -1036,7 +1053,24 @@ const translations = {
     'admin:gifts.priceOption.50': '€50',
     'admin:gifts.priceOption.100': '€100',
     'admin:gifts.priceOption.200': '€200',
-    'admin:gifts.priceOption.500': '€500'
+    'admin:gifts.priceOption.500': '€500',
+
+    // Admin Settings Section
+    'admin:settings.title': 'Configuración',
+    'admin:settings.featureToggles': 'Interruptores de Funciones',
+    'admin:settings.featureTogglesDescription': 'Controla qué funciones están disponibles para los invitados',
+    'admin:settings.enableGuestArea': 'Habilitar Área de Invitados',
+    'admin:settings.enableGuestAreaDesc': 'Permitir que los invitados inicien sesión y gestionen a los invitados de su grupo',
+    'admin:settings.showWeddingEvents': 'Mostrar Eventos de la Boda',
+    'admin:settings.showWeddingEventsDesc': 'Mostrar el calendario de eventos de la boda y permitir que los invitados confirmen su asistencia',
+    'admin:settings.menu': 'Menú',
+    'admin:settings.menuDesc': 'Mostrar Selección de Menú de Invitados y Preferencias',
+    'admin:settings.messages': 'Mensajes',
+    'admin:settings.messagesDesc': 'Mostrar Mensajes',
+    'admin:settings.gifts': 'Regalos',
+    'admin:settings.giftsDesc': 'Mostrar Lista de Regalos',
+    'admin:settings.enabled': 'Habilitado',
+    'admin:settings.disabled': 'Deshabilitado',
 
   },
   fr: {
@@ -1560,7 +1594,24 @@ const translations = {
     'admin:gifts.priceOption.50': '€50',
     'admin:gifts.priceOption.100': '€100',
     'admin:gifts.priceOption.200': '€200',
-    'admin:gifts.priceOption.500': '€500'
+    'admin:gifts.priceOption.500': '€500',
+
+    // Admin Settings Section
+    'admin:settings.title': 'Paramètres',
+    'admin:settings.featureToggles': 'Interrupteurs de Fonctionnalités',
+    'admin:settings.featureTogglesDescription': 'Contrôlez quelles fonctionnalités sont disponibles pour les invités',
+    'admin:settings.enableGuestArea': 'Activer la Zone Invités',
+    'admin:settings.enableGuestAreaDesc': 'Permettre aux invités de se connecter et de gérer les invités de leur groupe',
+    'admin:settings.showWeddingEvents': 'Afficher les Événements du Mariage',
+    'admin:settings.showWeddingEventsDesc': 'Afficher le calendrier des événements du mariage et permettre aux invités de confirmer leur présence',
+    'admin:settings.menu': 'Menu',
+    'admin:settings.menuDesc': 'Afficher la Sélection de Menu Invités et Préférences',
+    'admin:settings.messages': 'Messages',
+    'admin:settings.messagesDesc': 'Afficher les Messages',
+    'admin:settings.gifts': 'Cadeaux',
+    'admin:settings.giftsDesc': 'Afficher la Liste de Cadeaux',
+    'admin:settings.enabled': 'Activé',
+    'admin:settings.disabled': 'Désactivé',
   },
   de: {
     'wedding:title': 'Iluminada & George',
@@ -2064,7 +2115,24 @@ const translations = {
     'admin:gifts.priceOption.50': '€50',
     'admin:gifts.priceOption.100': '€100',
     'admin:gifts.priceOption.200': '€200',
-    'admin:gifts.priceOption.500': '€500'
+    'admin:gifts.priceOption.500': '€500',
+
+    // Admin Settings Section
+    'admin:settings.title': 'Einstellungen',
+    'admin:settings.featureToggles': 'Funktionsschalter',
+    'admin:settings.featureTogglesDescription': 'Steuern Sie, welche Funktionen für Gäste verfügbar sind',
+    'admin:settings.enableGuestArea': 'Gästebereich aktivieren',
+    'admin:settings.enableGuestAreaDesc': 'Gästen ermöglichen, sich anzumelden und Gäste in ihrer Gruppe zu verwalten',
+    'admin:settings.showWeddingEvents': 'Hochzeitsveranstaltungen anzeigen',
+    'admin:settings.showWeddingEventsDesc': 'Den Veranstaltungskalender der Hochzeit anzeigen und Gästen ermöglichen, ihre Teilnahme zu bestätigen',
+    'admin:settings.menu': 'Menü',
+    'admin:settings.menuDesc': 'Gästemenü-Auswahl und Präferenzen anzeigen',
+    'admin:settings.messages': 'Nachrichten',
+    'admin:settings.messagesDesc': 'Nachrichten anzeigen',
+    'admin:settings.gifts': 'Geschenke',
+    'admin:settings.giftsDesc': 'Geschenkliste anzeigen',
+    'admin:settings.enabled': 'Aktiviert',
+    'admin:settings.disabled': 'Deaktiviert',
   },
     
 
