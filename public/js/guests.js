@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     menuContent.innerHTML = `
       <div class="loading-state">
         <i class="fas fa-spinner fa-spin fa-3x"></i>
-        <p>Loading menu...</p>
+        <p><div data-i18n="guests:menuLoading">Loading menu...</div></p>
       </div>
     `;
     
@@ -301,10 +301,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         menuContent.innerHTML = `
         <div class="error-state">
           <i class="fas fa-exclamation-triangle"></i>
-          <h3>Error Loading Menu</h3>
-          <p>Unable to load menu data. Please try again later.</p>
+          <h3><div data-i18n="guests:menuErrorTitle">Error Loading Menu</div></h3>
+          <p><div data-i18n="guests:menuErrorMessage">Unable to load menu data. Please try again later.</div></p>
           <button class="btn-retry" onclick="loadMenuSelections()">
-            <i class="fas fa-redo"></i> Retry
+            <i class="fas fa-redo"></i> <div data-i18n="guests:retry">Retry</div>
           </button>
         </div>
         `;
@@ -317,10 +317,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Group courses by type (starter, main, dessert, drinks)
       const courseGroups = {
-        starter: { label: 'Starters', icon: 'fa-seedling', courses: [] },
-        main: { label: 'Main Courses', icon: 'fa-drumstick-bite', courses: [] },
-        dessert: { label: 'Desserts', icon: 'fa-ice-cream', courses: [] },
-        drinks: { label: 'Drinks', icon: 'fa-cocktail', courses: [] }
+        starter: { label: 'guests:courseGroupStarters', icon: 'fa-seedling', courses: [] },
+        main: { label: 'guests:courseGroupMainCourses', icon: 'fa-drumstick-bite', courses: [] },
+        dessert: { label: 'guests:courseGroupDesserts', icon: 'fa-ice-cream', courses: [] },
+        drinks: { label: 'guests:courseGroupDrinks', icon: 'fa-cocktail', courses: [] }
       };
 
       menuData.forEach(course => {
@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="menu-course-group" data-group="${groupKey}">
             <div class="course-group-header">
               <i class="fas ${group.icon}"></i>
-              <h3>${escapeHtml(group.label)}</h3>
+              <h3><div data-i18n="${group.label}">${translate(group.label)}</div></h3>
             </div>
             <div class="course-group-content">
         `;
@@ -406,7 +406,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="card" data-course-id="${course.id}" data-selectable="${isSelectable}">
               <div class="card-header">
                 <h4>${escapeHtml(course.label)}</h4>
-                ${isSelectable ? '<span class="badge badge-warning"><i class="fas fa-hand-pointer"></i> Selection Required</span>' : '<span class="badge badge-secondary"><i class="fas fa-info-circle"></i> Info Only</span>'}
+                ${isSelectable ? '<span class="badge badge-warning"><i class="fas fa-hand-pointer"></i> <div data-i18n="guests:selectionRequired">Selection Required</div></span>' : '<span class="badge badge-secondary"><i class="fas fa-info-circle"></i> <div data-i18n="guests:infoOnly">Info Only</div></span>'}
               </div>
               <div class="card-content">
           `;
@@ -463,8 +463,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${isSelectable ? `
                   <div class="option-selection-panel" data-option-id="${option.id}" data-course-id="${course.id}">
                     <div class="selection-panel-header">
-                      <span class="panel-label"><i class="fas fa-users"></i> Who's having this?</span>
-                      <span class="member-count">${membersForOption.length} selected</span>
+                      <span class="panel-label"><i class="fas fa-users"></i> <div data-i18n="guests:whosHavingThis">Who's having this?</div></span>
+                      <span class="member-count">${membersForOption.length} <div data-i18n="guests:selectedCount">selected</div></span>
                     </div>
                     <div class="member-drop-zone" data-option-id="${option.id}" data-course-id="${course.id}">
                       ${membersForOption.map(member => `
@@ -507,9 +507,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="special-requests-section">
           <div class="special-requests-header">
             <i class="fas fa-exclamation-triangle"></i>
-            <h3>Dietary Requirements & Special Requests</h3>
+            <h3><div data-i18n="guests:dietaryRequirementsTitle">Dietary Requirements & Special Requests</div></h3>
           </div>
-          <p class="special-requests-description">Please let us know about any dietary requirements or allergies for each guest.</p>
+          <p class="special-requests-description"><div data-i18n="guests:dietaryRequirementsDescription">Please let us know about any dietary requirements or allergies for each guest.</div></p>
           <div class="special-requests-cards">
       `;
 
@@ -519,11 +519,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const selectedRequests = Array.isArray(memberRequests.specialRequest) ? memberRequests.specialRequest : [];
         
         const dietaryOptions = [
-          { name: 'vegetarian', label: 'Vegetarian', icon: 'fa-leaf' },
-          { name: 'lactose-intolerant', label: 'Lactose Intolerant', icon: 'fa-cheese' },
-          { name: 'gluten-intolerant', label: 'Gluten Intolerant', icon: 'fa-bread-slice' },
-          { name: 'nut-allergy', label: 'Nut Allergy', icon: 'fa-seedling' },
-          { name: 'other', label: 'Other', icon: 'fa-question-circle' }
+          { name: 'vegetarian', label: 'guests:dietaryVegetarian', icon: 'fa-leaf' },
+          { name: 'lactose-intolerant', label: 'guests:dietaryLactoseIntolerant', icon: 'fa-cheese' },
+          { name: 'gluten-intolerant', label: 'guests:dietaryGlutenIntolerant', icon: 'fa-bread-slice' },
+          { name: 'nut-allergy', label: 'guests:dietaryNutAllergy', icon: 'fa-seedling' },
+          { name: 'other', label: 'guests:dietaryOther', icon: 'fa-question-circle' }
         ];
 
         html += `
@@ -547,13 +547,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                       ${isSelected ? 'checked' : ''}
                       onchange="updateDietaryCheckbox(this)">
                     <i class="fas ${opt.icon}"></i>
-                    <span>${opt.label}</span>
+                    <span><div data-i18n="${opt.label}">${translate(opt.label)}</div></span>
                   </label>
                 `;
               }).join('')}
             </div>
             <div class="special-request-detail">
-              <label for="special-detail-${member.id}">Additional details or specific requirements:</label>
+              <label for="special-detail-${member.id}"><div data-i18n="guests:additionalDetailsLabel">Additional details or specific requirements:</div></label>
               <textarea
                 id="special-detail-${member.id}"
                 name="special-detail-${member.id}"
@@ -575,7 +575,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="action-container">
           <button type="button" id="saveMenuChoicesBtn" class="btn-base btn-primary btn-lg">
             <i class="fas fa-save"></i>
-            Save Menu Selections
+            <div data-i18n="guests:saveMenuSelections">Save Menu Selections</div>
           </button>
         </div>
       `;
@@ -608,10 +608,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       menuContent.innerHTML = `
         <div class="error-state">
           <i class="fas fa-exclamation-triangle"></i>
-          <h3>Error Loading Menu</h3>
-          <p>There was a problem loading the menu. Please try again.</p>
+          <h3><div data-i18n="guests:menuErrorTitle">Error Loading Menu</div></h3>
+          <p><div data-i18n="guests:menuErrorMessage2">There was a problem loading the menu. Please try again.</div></p>
           <button class="btn-retry" onclick="loadMenuSelections()">
-            <i class="fas fa-redo"></i> Retry
+            <i class="fas fa-redo"></i> <div data-i18n="guests:retry">Retry</div>
           </button>
         </div>
       `;
@@ -2297,7 +2297,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                       ${isSelected ? 'checked' : ''}
                       onchange="updatePartyDietaryCheckbox(this)">
                     <i class="fas ${opt.icon}"></i>
-                    <span>${opt.label}</span>
+                    <span><div data-i18n="${opt.label}">${translate(opt.label)}</div></span>
                   </label>
                 `;
               }).join('')}
