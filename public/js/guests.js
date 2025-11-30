@@ -1599,7 +1599,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      giftsContent.innerHTML = `
        <div class="loading-state">
          <i class="fas fa-spinner fa-spin fa-3x"></i>
-         <p>Loading gifts...</p>
+         <p><span data-i18n="guests:giftsLoading">${translate('guests:giftsLoading')}</span></p>
        </div>
      `;
      
@@ -1669,13 +1669,14 @@ document.addEventListener('DOMContentLoaded', async () => {
            <div class="gifts-thank-you-section">
              <div class="thank-you-header">
                <i class="fas fa-heart"></i>
-               <h3>Thank You for Your Generosity!</h3>
-               <p>We are so grateful for your wonderful gifts</p>
+               <h3><span data-i18n="guests:giftsThankYouTitle">${translate('guests:giftsThankYouTitle')}</span></h3>
+               <p><span data-i18n="guests:giftsThankYouMessage">${translate('guests:giftsThankYouMessage')}</span></p>
              </div>
              <div class="donated-gifts-grid">
          `;
          
          giftChoices.forEach(choice => {
+           const donatedOnText = translate('rich:guests:giftsDonatedOn').replace('{{date}}', formatDate(choice.date));
            html += `
              <div class="donated-gift-card" style="background-image: url('${escapeHtml(choice.giftImageUrl)}');">
                <div class="donated-gift-overlay">
@@ -1684,7 +1685,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                    <div class="donated-gift-price">€${choice.giftAmount}</div>
                    <div class="donated-gift-date">
                      <i class="fas fa-calendar-check"></i>
-                     Donated on ${formatDate(choice.date)}
+                     <span data-i18n="rich:guests:giftsDonatedOn" data-i18n-options='{"date": "${formatDate(choice.date)}"}'>${donatedOnText}</span>
                    </div>
                    ${choice.message ? `
                      <div class="donated-gift-message">
@@ -1709,8 +1710,8 @@ document.addEventListener('DOMContentLoaded', async () => {
          <div class="gifts-available-section">
            <div class="available-gifts-header">
              <i class="fas fa-gift"></i>
-             <h3>Gift Registry</h3>
-             <p>Choose from our carefully selected gifts</p>
+             <h3><span data-i18n="guests:giftsRegistryTitle">${translate('guests:giftsRegistryTitle')}</span></h3>
+             <p><span data-i18n="guests:giftsRegistrySubtitle">${translate('guests:giftsRegistrySubtitle')}</span></p>
            </div>
            <div class="gift-cards-grid">
        `;
@@ -1719,8 +1720,8 @@ document.addEventListener('DOMContentLoaded', async () => {
          html += `
            <div class="empty-state">
              <i class="fas fa-inbox"></i>
-             <h4>No gifts available</h4>
-             <p>Please check back later for our gift registry.</p>
+             <h4><span data-i18n="guests:giftsNoAvailable">${translate('guests:giftsNoAvailable')}</span></h4>
+             <p><span data-i18n="guests:giftsNoAvailableDescription">${translate('guests:giftsNoAvailableDescription')}</span></p>
            </div>
          `;
        } else {
@@ -1739,20 +1740,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                  <p class="gift-card-description">${escapeHtml(gift.description)}</p>
                  <div class="gift-card-stock">
                    ${isAvailable
-                     ? `<span class="stock-available"><i class="fas fa-check-circle"></i> ${gift.stock} available</span>`
-                     : `<span class="stock-sold-out"><i class="fas fa-times-circle"></i> Sold Out</span>`
+                     ? `<span class="stock-available"><i class="fas fa-check-circle"></i> ${gift.stock} <span data-i18n="guests:giftsAvailable">${translate('guests:giftsAvailable')}</span></span>`
+                     : `<span class="stock-sold-out"><i class="fas fa-times-circle"></i> <span data-i18n="guests:giftsSoldOut">${translate('guests:giftsSoldOut')}</span></span>`
                    }
                  </div>
                  <div class="action-container">
                    ${isAvailable ? `
                      <button class="btn-base btn-primary btn-md" onclick="purchaseGift('${gift.id}', '${escapeHtml(gift.title).replace(/'/g, "\\'")}', ${gift.amount})">
                        <i class="fas fa-credit-card"></i>
-                       Buy Gift
+                       <span data-i18n="guests:giftsBuyGift">${translate('guests:giftsBuyGift')}</span>
                      </button>
                    ` : `
                      <button class="btn-disabled" disabled>
                        <i class="fas fa-ban"></i>
-                       Sold Out
+                       <span data-i18n="guests:giftsSoldOut">${translate('guests:giftsSoldOut')}</span>
                      </button>
                    `}
                  </div>
@@ -1775,13 +1776,13 @@ document.addEventListener('DOMContentLoaded', async () => {
        const urlParams = new URLSearchParams(window.location.search);
        const paymentStatus = urlParams.get('payment');
        if (paymentStatus === 'success') {
-         showToast('Thank you for your gift! Your payment was successful.', 'success');
+         showToast(translate('guests:giftsPaymentSuccess'), 'success');
          // Clean up URL
          window.history.replaceState({}, document.title, window.location.pathname);
          // Reload to show updated gift choices
          setTimeout(() => loadGiftsContent(), 1000);
        } else if (paymentStatus === 'cancelled') {
-         showToast('Payment was cancelled.', 'error');
+         showToast(translate('guests:giftsPaymentCancelled'), 'error');
          // Clean up URL
          window.history.replaceState({}, document.title, window.location.pathname);
        }
@@ -1796,11 +1797,11 @@ document.addEventListener('DOMContentLoaded', async () => {
        giftsContent.innerHTML = `
          <div class="error-state">
            <i class="fas fa-exclamation-triangle"></i>
-           <h3>Error Loading Gifts</h3>
-           <p>There was a problem loading the gifts. Please try again.</p>
+           <h3><span data-i18n="guests:giftsErrorLoading">${translate('guests:giftsErrorLoading')}</span></h3>
+           <p><span data-i18n="guests:giftsErrorLoadingDescription">${translate('guests:giftsErrorLoadingDescription')}</span></p>
            <button class="btn-retry" onclick="loadGiftsContent()">
              <i class="fas fa-redo"></i>
-             Retry
+             <span data-i18n="guests:giftsRetry">${translate('guests:giftsRetry')}</span>
            </button>
          </div>
        `;
@@ -1823,24 +1824,24 @@ document.addEventListener('DOMContentLoaded', async () => {
        <div class="gift-purchase-dialog">
          <div class="gift-purchase-header">
            <i class="fas fa-gift"></i>
-           <h3>Purchase Gift</h3>
+           <h3><span data-i18n="guests:giftsPurchaseTitle">${translate('guests:giftsPurchaseTitle')}</span></h3>
          </div>
          <div class="gift-purchase-content">
-           <p>You're about to purchase:</p>
+           <p><span data-i18n="guests:giftsPurchaseAbout">${translate('guests:giftsPurchaseAbout')}</span></p>
            <div class="gift-purchase-summary">
              <strong>${giftTitle}</strong>
              <span class="gift-purchase-amount">€${giftAmount}</span>
            </div>
            <div class="gift-message-input">
-             <label for="giftMessage">Add a personal message (optional):</label>
-             <textarea id="giftMessage" placeholder="Leave a lovely message for the couple..." rows="3"></textarea>
+             <label for="giftMessage"><span data-i18n="guests:giftsPurchaseMessageLabel">${translate('guests:giftsPurchaseMessageLabel')}</span></label>
+             <textarea id="giftMessage" placeholder="${translate('guests:giftsPurchaseMessagePlaceholder')}" data-i18n-placeholder="guests:giftsPurchaseMessagePlaceholder" rows="3"></textarea>
            </div>
          </div>
          <div class="action-container">
-           <button class="btn-base btn-outline btn-md btn-cancel-purchase">Cancel</button>
+           <button class="btn-base btn-outline btn-md btn-cancel-purchase"><span data-i18n="guests:giftsPurchaseCancel">${translate('guests:giftsPurchaseCancel')}</span></button>
            <button class="btn-base btn-primary btn-md btn-confirm-purchase">
              <i class="fas fa-credit-card"></i>
-             Proceed to Payment
+             <span data-i18n="guests:giftsPurchaseProceed">${translate('guests:giftsPurchaseProceed')}</span>
            </button>
          </div>
        </div>
@@ -1862,7 +1863,7 @@ document.addEventListener('DOMContentLoaded', async () => {
        
        // Show loading state
        confirmBtn.disabled = true;
-       confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+       confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="guests:giftsPurchaseProcessing">' + translate('guests:giftsPurchaseProcessing') + '</span>';
        
        try {
          const response = await fetch('/api/guest/create-payment-session', {
@@ -1880,15 +1881,15 @@ document.addEventListener('DOMContentLoaded', async () => {
            // Redirect to Stripe checkout
            window.location.href = data.checkoutUrl;
          } else {
-           showToast(data.error || 'Error processing payment', 'error');
+           showToast(data.error || translate('guests:giftsPaymentError'), 'error');
            confirmBtn.disabled = false;
-           confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Payment';
+           confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> <span data-i18n="guests:giftsPurchaseProceed">' + translate('guests:giftsPurchaseProceed') + '</span>';
          }
        } catch (err) {
          console.error('Error creating payment session:', err);
-         showToast('Error connecting to payment service', 'error');
+         showToast(translate('guests:giftsPaymentServiceError'), 'error');
          confirmBtn.disabled = false;
-         confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> Proceed to Payment';
+         confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> <span data-i18n="guests:giftsPurchaseProceed">' + translate('guests:giftsPurchaseProceed') + '</span>';
        }
      });
      
