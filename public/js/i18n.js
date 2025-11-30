@@ -2163,6 +2163,53 @@ function translateWithVars(key, vars = {}) {
   return translation;
 }
 
+// Global function to localise strings or LocalizedString objects
+function localise(textOrLocalizedString, lang = currentLanguage) {
+  // If it's a regular string, return it as-is
+  if (typeof textOrLocalizedString === 'string') {
+    return textOrLocalizedString;
+  }
+  
+  // If it's a LocalizedString (Map), get the appropriate translation
+  if (textOrLocalizedString instanceof Map || 
+      (typeof textOrLocalizedString === 'object' && textOrLocalizedString !== null)) {
+    
+    // Try to get the translation for the current language
+    const currentTranslation = textOrLocalizedString.get ? 
+      textOrLocalizedString.get(lang) : 
+      textOrLocalizedString[lang];
+    
+    // If current language translation exists and is not empty, return it
+    if (currentTranslation && currentTranslation.trim() !== '') {
+      return currentTranslation;
+    }
+    
+    // Otherwise, find the first non-empty string
+    if (textOrLocalizedString instanceof Map) {
+      for (const value of textOrLocalizedString.values()) {
+        if (value && value.trim() !== '') {
+          return value;
+        }
+      }
+    } else {
+      // Handle as plain object
+      for (const key in textOrLocalizedString) {
+        if (textOrLocalizedString.hasOwnProperty(key) && 
+            textOrLocalizedString[key] && 
+            textOrLocalizedString[key].trim() !== '') {
+          return textOrLocalizedString[key];
+        }
+      }
+    }
+    
+    // If all translations are empty or missing, return empty string
+    return '';
+  }
+  
+  // Fallback for any other type
+  return String(textOrLocalizedString || '');
+}
+
 
 function updatePageContent() {
   document.querySelectorAll('[data-i18n]').forEach(element => {
