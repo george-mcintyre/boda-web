@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div class="member-chip" draggable="true" data-member-id="${member.id}" data-member-name="${escapeHtml(member.name)}">
                           <i class="fas fa-user"></i>
                           <span>${escapeHtml(member.name)}</span>
-                          ${member.primary ? '<span class="badge badge-primary" data-i18n="common:primary">Primary</span>' : ''}
+                          ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
                         </div>
                       `).join('')}
                     </div>
@@ -534,7 +534,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="card-header">
               <i class="fas fa-user"></i>
               <h4>${escapeHtml(member.name)}</h4>
-              ${member.primary ? '<span class="badge badge-primary" data-i18n="common:primary">Primary</span>' : ''}
+              ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
             </div>
             <div class="card-content">
               ${dietaryOptions.map(opt => {
@@ -1369,7 +1369,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <label class="attendance-label">
                   <input type="checkbox" class="attendance-checkbox" data-event-id="${eventId}" data-member-id="${member.id}" ${isAttending ? 'checked' : ''}>
                   <span class="member-name">${escapeHtml(member.name)}</span>
-                  ${member.primary ? '<span class="badge badge-primary" data-i18n="common:primary">Primary</span>' : ''}
+                  ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
                   ${member.adult === false ? '<span class="badge badge-info">Child</span>' : ''}
                 </label>
               </div>
@@ -2284,7 +2284,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="party-dietary-card-header">
               <i class="fas fa-user"></i>
               <h4>${escapeHtml(member.name)}</h4>
-              ${member.primary ? '<span class="badge badge-primary" data-i18n="common:primary">Primary</span>' : ''}
+              ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
             </div>
             <div class="dietary-options">
               ${dietaryOptions.map(opt => {
@@ -3051,7 +3051,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <i class="fas fa-user"></i>
                 ${escapeHtml(member.name)}
               </span>
-              ${member.primary ? '<span class="badge badge-primary" data-i18n="common:primary">Primary</span>' : ''}
+              ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
               ${member.adult === false ? '<span class="badge badge-info">Child</span>' : ''}
             </div>
           `;
@@ -3131,7 +3131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="menu-member-header">
                 <i class="fas fa-user"></i>
                 <span class="menu-member-name">${escapeHtml(member.name)}</span>
-                ${member.primary ? '<span class="badge badge-primary" data-i18n="common:primary">Primary</span>' : ''}
+                ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
               </div>
               <div class="menu-choices-list">
           `;

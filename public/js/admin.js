@@ -1171,7 +1171,7 @@
             <h4><i class="fas fa-user"></i> Primary Guest</h4>
             <div class="primary-guest-info">
               <strong>${primaryGuest ? primaryGuest.name : 'Unknown'}</strong> 
-              <span class="badge badge-primary" data-i18n="common:primary">Primary</span>
+              <span class="badge badge-primary" data-i18n="common:primary">${member.primary ? translate('common:primary') : ''}</span>
               <span class="badge ${primaryGuest && primaryGuest.adult === false ? 'badge-info' : 'badge-secondary'}">
                 ${primaryGuest && primaryGuest.adult === false ? 'Child' : 'Adult'}
               </span>
