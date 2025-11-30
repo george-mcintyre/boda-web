@@ -2517,7 +2517,8 @@
             
             if (!r.ok) {
               const errorData = await r.json().catch(() => ({}));
-              throw new Error(errorData.error || `Failed to ${courseId ? 'update' : 'create'} course`);
+              const action = courseId ? 'update' : 'create';
+              throw new Error(errorData.error || translateWithVars(`admin:menu.error.${action}Course`));
             }
             
             close();
@@ -2657,7 +2658,8 @@
             
             if (!r.ok) {
               const errorData = await r.json().catch(() => ({}));
-              throw new Error(errorData.error || `Failed to ${optionId ? 'update' : 'create'} course option`);
+              const action = optionId ? 'update' : 'create';
+              throw new Error(errorData.error || translateWithVars(`admin:menu.error.${action}CourseOption`));
             }
             
             close();

@@ -509,6 +509,12 @@ const translations = {
     'admin:image.fileSizeLimit': 'File size must be less than 50MB',
     'admin:image.errorReading': 'Error reading file',
 
+    // Admin Menu Error Messages
+    'admin:menu.error.createCourse': 'Failed to create course',
+    'admin:menu.error.updateCourse': 'Failed to update course',
+    'admin:menu.error.createCourseOption': 'Failed to create course option',
+    'admin:menu.error.updateCourseOption': 'Failed to update course option',
+
     'adminLogin:pageTitle': 'Admin Login - Wedding of Iluminada & George',
     'adminLogin:header': 'Admin Login',
     'adminLogin:home': 'Home',
@@ -997,6 +1003,12 @@ const translations = {
     'admin:image.pleaseSelectValid': 'Por favor selecciona un archivo de imagen válido',
     'admin:image.fileSizeLimit': 'El tamaño del archivo debe ser menor a 50MB',
     'admin:image.errorReading': 'Error al leer el archivo',
+
+    // Admin Menu Error Messages
+    'admin:menu.error.createCourse': 'Error al crear curso',
+    'admin:menu.error.updateCourse': 'Error al actualizar curso',
+    'admin:menu.error.createCourseOption': 'Error al crear opción del curso',
+    'admin:menu.error.updateCourseOption': 'Error al actualizar opción del curso',
 
     // Admin Gifts Section
     'admin:gifts.title': 'Lista de Regalos',
@@ -1516,6 +1528,12 @@ const translations = {
     'admin:image.fileSizeLimit': 'La taille du fichier doit être inférieure à 50MB',
     'admin:image.errorReading': 'Erreur de lecture du fichier',
 
+    // Admin Menu Error Messages
+    'admin:menu.error.createCourse': 'Échec de la création du plat',
+    'admin:menu.error.updateCourse': 'Échec de la mise à jour du plat',
+    'admin:menu.error.createCourseOption': 'Échec de la création de l\'option du plat',
+    'admin:menu.error.updateCourseOption': 'Échec de la mise à jour de l\'option du plat',
+
     // Admin Gifts Section
     'admin:gifts.title': 'Liste de Cadeaux',
     'admin:gifts.add': 'Ajouter',
@@ -2013,6 +2031,12 @@ const translations = {
     'admin:image.pleaseSelectValid': 'Bitte wählen Sie eine gültige Bilddatei aus',
     'admin:image.fileSizeLimit': 'Dateigröße muss kleiner als 50MB sein',
     'admin:image.errorReading': 'Fehler beim Lesen der Datei',
+
+    // Admin Menu Error Messages
+    'admin:menu.error.createCourse': 'Fehler beim Erstellen des Gangs',
+    'admin:menu.error.updateCourse': 'Fehler beim Aktualisieren des Gangs',
+    'admin:menu.error.createCourseOption': 'Fehler beim Erstellen der Gang-Option',
+    'admin:menu.error.updateCourseOption': 'Fehler beim Aktualisieren der Gang-Option',
 
     // Admin Gifts Section
     'admin:gifts.title': 'Geschenkliste',
