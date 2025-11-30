@@ -1569,57 +1569,21 @@ document.addEventListener('DOMContentLoaded', async () => {
        });
        
        if (response.ok) {
-         showToast('Attendance choices saved successfully!', 'success');
+         showToast('<div data-i18n="guests:eventsAttendanceSavedSuccess">'+ translate('guests:eventsAttendanceSavedSuccess') +'</div>', 'success');
        } else {
          const data = await response.json();
-         showToast(data.error || 'Error saving attendance choices', 'error');
+         showToast('<div data-i18n="guests:eventsAttendanceSavedError">'+ (data.error || translate('guests:eventsAttendanceSavedError')) + '</div>', 'error');
        }
      } catch (err) {
        console.error('Error saving event choices:', err);
-       showToast('Error saving attendance choices', 'error');
+       showToast('<div data-i18n="guests:eventsAttendanceSavedError">'+ translate('guests:eventsAttendanceSavedError') +'</div>', 'error');
      } finally {
        if (saveBtn) {
          saveBtn.disabled = false;
-         saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Attendance Choices';
+         saveBtn.innerHTML = '<i class="fas fa-save"></i> <div data-i18n="guests:eventsSaveAttendanceChoices">'+ translate('guests:eventsSaveAttendanceChoices') +'</div>';
        }
      }
    }
-
-   // Global function to confirm events
-   window.confirmEventAttendance = async (eventoId, confirmar) => {
-     try {
-       const res = await fetch('/api/event/confirm', {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-           'Authorization': token
-         },
-         body: JSON.stringify({ eventoId, confirmar })
-       });
-       
-       const data = await res.json();
-       if (res.ok) {
-         showToast(data.mensaje, 'success');
-         setTimeout(() => {
-           cargarContenidoAgenda(); // Recargar la event
-           cargarStatusAgenda(); // Actualizar el status en la pestaña resumen
-         }, 1000);
-       } else {
-         // Verificar si es un error de bloqueo
-         if (res.status === 403) {
-           showToast(`La event está bloqueada: ${data.error}`, 'error');
-           // Recargar la event para mostrar el estado de bloqueo
-           setTimeout(() => {
-             cargarContenidoAgenda();
-           }, 1000);
-         } else {
-           showToast(data.error || 'Error al confirmar el evento.', 'error');
-         }
-       }
-     } catch (err) {
-       showToast('Error de conexión al confirmar el evento.', 'error');
-     }
-   };
 
    // Function to load the gifts content in the gifts tab
   async function loadGiftsContent() {
