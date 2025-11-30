@@ -1174,7 +1174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     eventsContent.innerHTML = `
       <div class="loading-state">
         <i class="fas fa-spinner fa-spin fa-3x"></i>
-        <p>Loading events...</p>
+        <p><div data-i18n="guests:eventsLoading">${translate('guests:eventsLoading')}</div></p>
       </div>
     `;
     
@@ -1224,8 +1224,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         eventsContent.innerHTML = `
           <div class="empty-state">
             <i class="fas fa-calendar-times"></i>
-            <h3>No Events Available</h3>
-            <p>There are no events scheduled yet. Please check back later.</p>
+            <h3><div data-i18n="guests:eventsNoEvents">No Events Available</div></h3>
+            <p><div data-i18n="guests:eventsNoEventsDescription">There are no events scheduled yet. Please check back later.</div></p>
           </div>
         `;
         return;
@@ -1345,7 +1345,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           
           subEventsHtml = `
             <div class="sub-events-timeline">
-              <h4><i class="fas fa-list-ul"></i> Schedule</h4>
+              <h4><i class="fas fa-list-ul"></i> <div data-i18n="guests:eventsSchedule">Schedule</div></h4>
               ${subEventItems}
             </div>
           `;
@@ -1362,13 +1362,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <input type="checkbox" class="attendance-checkbox" data-event-id="${eventId}" data-member-id="${member.id}" ${isAttending ? 'checked' : ''}>
                   <span class="member-name">${escapeHtml(member.name)}</span>
                   ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
-                  ${member.adult === false ? '<span class="badge badge-info">Child</span>' : ''}
+                  ${member.adult === false ? '<span class="badge badge-info"><div data-i18n="guests:childBadge">Child</div></span>' : ''}
                 </label>
               </div>
             `;
           }).join('');
         } else {
-          attendanceItemsHtml = '<p class="no-members">No party members found.</p>';
+          attendanceItemsHtml = '<p class="no-members"><div data-i18n="guests:eventsNoPartyMembers">No party members found.</div></p>';
         }
         
         // Build Google Maps link
@@ -1389,7 +1389,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div id="${mapContainerId}" class="event-map"></div>
             <div class="event-actions">
               <a class="btn-ver-mapa" href="${mapsUrl}" target="_blank" rel="noopener">
-                <i class="fas fa-map"></i> View on Map
+                <i class="fas fa-map"></i> <div data-i18n="guests:eventsViewOnMap">View on Map</div>
               </a>
             </div>
           </div>
@@ -1437,7 +1437,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="event-attendance">
                 <h5 class="attendance-title">
                   <i class="fas fa-users"></i>
-                  Who's Attending?
+                  <div data-i18n="guests:eventsWhosAttending">Who's Attending?</div>
                 </h5>
                 <div class="attendance-list">
                   ${attendanceItemsHtml}
@@ -1505,11 +1505,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       eventsContent.innerHTML = `
         <div class="error-state">
           <i class="fas fa-exclamation-triangle"></i>
-          <h3>Error Loading Events</h3>
-          <p>There was a problem loading the events. Please try again.</p>
+          <h3><div data-i18n="guests:eventsErrorTitle">Error Loading Events</div></h3>
+          <p><div data-i18n="guests:eventsErrorMessage">There was a problem loading the events. Please try again.</div></p>
           <button class="btn-retry" onclick="loadEventsContent()">
-            <i class="fas fa-redo"></i>
-            Retry
+            <i class="fas fa-redo"></i> <div data-i18n="guests:retry">Retry</div>
           </button>
         </div>
       `;
