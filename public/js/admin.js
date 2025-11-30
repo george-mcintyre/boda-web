@@ -13,7 +13,7 @@
 
   // Show loading placeholder
   function setLoading(msg){
-    content.innerHTML = `<div class="admin-loading"><i class="fas fa-spinner fa-spin"></i><p>${msg||'Loading...'}</p></div>`;
+    content.innerHTML = `<div class="admin-loading"><i class="fas fa-spinner fa-spin"></i><p >${msg||'Loading...'}</p></div>`;
   }
 
   // Simple logger/notification (can be replaced with UI toasts)
@@ -906,7 +906,7 @@
   // ========== Guests ==========
   async function showGuests(){
     activate('guests');
-    setLoading('Loading guests...');
+    setLoading(translate('guests:loadingGuests'));
     try {
       // Use pagination for large guest lists
       let url = '/api/admin/guests';
@@ -1065,7 +1065,7 @@
               return;
             }
             
-            setLoading('Uploading guests...');
+            setLoading(translate('admin:uploadingGuests'));
             
             const r = await api('/api/admin/guests/bulk-upload', {
               method: 'POST',
@@ -1117,7 +1117,7 @@
   // ========== Party Management ==========
   async function showPartyManager(guestId, guestName){
     activate('guests');
-    setLoading('Loading party members...');
+    setLoading(translate('admin:loadingPartyMembers'));
     
     try {
       // Load current party members
@@ -1313,7 +1313,7 @@
   // ========== Gift list ==========
   async function showGifts(){
     activate('gifts');
-    setLoading('Loading gift list...');
+    setLoading(translate('admin:loadingGiftList'));
     
     // Load gifts 
     const giftsRes = await api('/api/admin/gifts');
@@ -1646,7 +1646,7 @@
 
   async function showMessages(){
     activate('messages');
-    setLoading('Loading messages...');
+    setLoading(translate('admin:loadingMessages'));
 
     try {
       const res = await api('/api/admin/messages');
@@ -1766,7 +1766,7 @@
   // ========== Event schedule ==========
   async function showEvent(){
     activate('event');
-    setLoading('Loading event schedule...');
+    setLoading(translate('admin:loadingEventSchedule'));
     const res = await api('/api/admin/events');
     const data = res.ok ? await res.json() : [];
     
@@ -2217,7 +2217,7 @@
   // ========== Menu management ==========
   async function showMenu(){
     activate('menu');
-    setLoading('Loading Courses...');
+    setLoading(translate('admin:loadingCourses'));
     
     try {
       const res = await api('/api/admin/courseData');
@@ -2648,7 +2648,7 @@
   // ========== Settings ==========
   async function showSettings(){
     activate('configuration');
-    setLoading('Loading settings...');
+    setLoading(translate('admin:loadingSettings'));
     
     // Load both feature toggles and event blocking settings
     const [settingsRes, blockedRes] = await Promise.all([
@@ -2787,7 +2787,7 @@
       case 'menu': return showMenu();
       case 'configuration': return showSettings();
       default:
-        setLoading('Loading...');
+        setLoading(translate('admin:loading'));
     }
   }
 
