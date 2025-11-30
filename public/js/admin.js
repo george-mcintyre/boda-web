@@ -2086,13 +2086,13 @@
         width:min(800px,95vw);max-height:90vh;overflow:auto;
       ">
         <div style="padding:22px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
-          <h3 style="margin:0;color:#333;">Manage Sub-events: ${event.name}</h3>
-          <button id="closeSubEvents" class="admin-action" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:8px;">Close</button>
+          <h3 style="margin:0;color:#333;"><div data-i18n="admin:subEvents.manageTitle">${translateWithVars('admin:subEvents.manageTitle', { eventName: event.name })}</div></h3>
+          <button id="closeSubEvents" class="admin-action" style="background:#6c757d;color:#fff;border:none;padding:8px 12px;border-radius:8px;"><div data-i18n="admin:subEvents.close">${translate('admin:subEvents.close')}</div></button>
         </div>
         <div style="padding:18px 24px;">
           <div style="margin-bottom:20px;">
             <button id="addSubEvent" class="admin-action">
-              <i class="fas fa-plus"></i> Add Sub-event
+              <i class="fas fa-plus"></i> <div data-i18n="admin:subEvents.addSubEvent">${translate('admin:subEvents.addSubEvent')}</div>
             </button>
           </div>
           <div id="subEventsList">
@@ -2115,7 +2115,7 @@
                   </button>
                 </div>
               </div>
-            `).join('') : '<p style="text-align:center;color:#999;padding:20px;">No sub-events yet</p>'}
+            `).join('') : '<p style="text-align:center;color:#999;padding:20px;"><div data-i18n="admin:subEvents.noSubEvents">' + translate('admin:subEvents.noSubEvents') + '</div></p>'}
           </div>
         </div>
       </div>
@@ -2144,7 +2144,7 @@
       if (action === 'edit-sub') {
         openSubEventForm(event, subEvents[index], modal, index);
       } else if (action === 'del-sub') {
-        if (confirm('Delete this sub-event?')) {
+        if (confirm(translate('admin:subEvents.deleteConfirm'))) {
           const updatedSubEvents = subEvents.filter((_, i) => i !== index);
           updateEventSubEvents(event.id, updatedSubEvents, modal);
         }
@@ -2160,20 +2160,20 @@
     const defaultEndTime = extractTimeFromISO(event.end) || '23:59';
     
     openFormModal({
-      title: isNew ? 'Add Sub-event' : 'Edit Sub-event',
-      submitText: isNew ? 'Add' : 'Save',
+      title: isNew ? `<div data-i18n="admin:subEvents.addTitle">${translate('admin:subEvents.addTitle')}</div>` : `<div data-i18n="admin:subEvents.editTitle">${translate('admin:subEvents.editTitle')}</div>`,
+      submitText: isNew ? `<div data-i18n="admin:subEvents.add">${translate('admin:subEvents.add')}</div>` : `<div data-i18n="admin:subEvents.save">${translate('admin:subEvents.save')}</div>`,
       fields: [
-        { name:'name', label:'Name', required:true, help:'e.g. Welcome Cocktails' },
-        { name:'date', label:'Date', type:'date', required:true, default: defaultDate },
-        { name:'startTime', label:'Start Time', type:'time', required:true, default: defaultStartTime },
-        { name:'endTime', label:'End Time', type:'time', required:true, default: defaultEndTime },
-        { name:'description', label:'Description', type:'textarea', rows: 3, help:'e.g. Enjoy cocktails and hor d\'oeuvres by the fountain while meeting other attendees' },
-        { name:'icon', label:'Icon', type:'select', required:true, 
+        { name:'name', label: translate('admin:subEvents.field.name'), required:true, help: translate('admin:subEvents.field.nameHelp') },
+        { name:'date', label: translate('admin:subEvents.field.date'), type:'date', required:true, default: defaultDate },
+        { name:'startTime', label: translate('admin:subEvents.field.startTime'), type:'time', required:true, default: defaultStartTime },
+        { name:'endTime', label: translate('admin:subEvents.field.endTime'), type:'time', required:true, default: defaultEndTime },
+        { name:'description', label: translate('admin:subEvents.field.description'), type:'textarea', rows: 3, help: translate('admin:subEvents.field.descriptionHelp') },
+        { name:'icon', label: translate('admin:subEvents.field.icon'), type:'select', required:true, 
           options: [
-            { value: 'ceremony', label: 'Ceremony' },
-            { value: 'cocktails', label: 'Cocktails' },
-            { value: 'reception', label: 'Reception' },
-            { value: 'dancing', label: 'Dancing' }
+            { value: 'ceremony', label: translate('admin:subEvents.option.ceremony') },
+            { value: 'cocktails', label: translate('admin:subEvents.option.cocktails') },
+            { value: 'reception', label: translate('admin:subEvents.option.reception') },
+            { value: 'dancing', label: translate('admin:subEvents.option.dancing') }
           ]
         }
       ],
