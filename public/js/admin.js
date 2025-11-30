@@ -2280,16 +2280,16 @@
       };
       
       const courseNames = {
-        starter: 'Starters',
-        main: 'Main Courses',
-        dessert: 'Desserts',
-        drinks: 'Drinks'
+        starter: translate('admin:menu.courseType.starter'),
+        main: translate('admin:menu.courseType.main'),
+        dessert: translate('admin:menu.courseType.dessert'),
+        drinks: translate('admin:menu.courseType.drinks')
       };
       
       let menuContent = `
         <div class="admin-content">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <h3 style="margin:0;">Menu Management</h3>
+            <h3 style="margin:0;"><div data-i18n="admin:menu.title">${translate('admin:menu.title')}</div></h3>
           </div>
           
           <div class="menu-overview">
@@ -2302,9 +2302,9 @@
           <div class="course-section">
             <div class="course-header">
               <i class="fas ${courseIcons[courseType]}"></i>
-              <h4>${courseNames[courseType]}</h4>
+              <h4><div data-i18n="admin:menu.courseType.${courseType}">${courseNames[courseType]}</div></h4>
               <span class="count-badge">${parts.length}</span>
-              <button class="admin-action" onclick="openAddMenuForm('${courseType}')" title="${courseNames[courseType].slice(0, -1)}">
+              <button class="admin-action" onclick="openAddMenuForm('${courseType}')" title="${translate('admin:menu.addCourse')}">
                 <i class="fas fa-plus"></i>
               </button>
             </div>
@@ -2314,7 +2314,7 @@
         if (parts.length === 0) {
           menuContent += `
             <div class="empty-course">
-              <p>No ${courseNames[courseType].toLowerCase()} defined yet.</p>
+              <p><div data-i18n="admin:menu.emptyCourse">${translateWithVars('admin:menu.emptyCourse', { courseType: courseNames[courseType].toLowerCase() })}</div></p>
             </div>
           `;
         } else {
@@ -2362,7 +2362,7 @@
                       </button>
                     </div>
                   `).join('')}
-                  ${(part.options || []).length === 0 ? '<p class="no-options">No options defined</p>' : ''}
+                  ${(part.options || []).length === 0 ? '<p class="no-options"><div data-i18n="admin:menu.noOptionsDefined">' + translate('admin:menu.noOptionsDefined') + '</div></p>' : ''}
                 </div>
               </div>
             `;
@@ -2394,10 +2394,10 @@
         <div class="admin-content">
           <div class="error-message">
             <i class="fas fa-exclamation-triangle"></i>
-            <h3>Error Loading Menu</h3>
-            <p>Failed to load menu: ${e.message}</p>
+            <h3><div data-i18n="admin:menu.errorLoading">${translate('admin:menu.errorLoading')}</div></h3>
+            <p>${translateWithVars('admin:menu.failedToLoad', { error: e.message })}</p>
             <button onclick="showMenu()" class="btn-retry">
-              <i class="fas fa-redo"></i> Retry
+              <i class="fas fa-redo"></i> <div data-i18n="admin:menu.retry">${translate('admin:menu.retry')}</div>
             </button>
           </div>
         </div>`;
@@ -2418,32 +2418,32 @@
   };
   
   window.deleteMenuCourse = async function(courseId) {
-    if (!confirm('Delete this menu part? This will remove all its options.')) return;
+    if (!confirm(translate('admin:menu.confirmDelete'))) return;
     
     try {
       const r = await api(`/api/admin/courseData/${courseId}`, { method: 'DELETE' });
       if (r.ok) {
         showMenu();
       } else {
-        notify('Error deleting menu part', 'error');
+        notify(translate('admin:menu.errorDeleting'), 'error');
       }
     } catch (error) {
-      notify('Error deleting menu part: ' + error.message, 'error');
+      notify(translateWithVars('admin:menu.errorDeleting', { error: error.message }), 'error');
     }
   };
 
   window.deleteMenuCourseOption = async function(courseId, optionId) {
-    if (!confirm('Delete this menu option?')) return;
+    if (!confirm(translate('admin:menu.confirmDeleteOption'))) return;
     
     try {
       const r = await api(`/api/admin/courseData/${courseId}/options/${optionId}`, { method: 'DELETE' });
       if (r.ok) {
         showMenu();
       } else {
-        notify('Error deleting menu option', 'error');
+        notify(translate('admin:menu.errorDeletingOption'), 'error');
       }
     } catch (error) {
-      notify('Error deleting menu option: ' + error.message, 'error');
+      notify(translateWithVars('admin:menu.errorDeletingOption', { error: error.message }), 'error');
     }
   };
 
@@ -2469,27 +2469,27 @@
       const isEditing = !!existingData;
       
       openFormModal({
-        title: isEditing ? 'Edit Course' : 'Add Course',
-        submitText: isEditing ? 'Save' : 'Add',
+        title: isEditing ? `<div data-i18n="admin:menu.editCourse">${translate('admin:menu.editCourse')}</div>` : `<div data-i18n="admin:menu.addCourse">${translate('admin:menu.addCourse')}</div>`,
+        submitText: isEditing ? `<span data-i18n="admin:menu.save">${translate('admin:menu.save')}</span>` : `<span data-i18n="admin:menu.add">${translate('admin:menu.add')}</span>`,
         fields: [
           { 
             name: 'course', 
-            label: 'Course Type', 
+            label: translate('admin:menu.field.courseType'), 
             type: 'select', 
             required: true,
             options: [
-              { value: 'starter', label: 'Starter' },
-              { value: 'main', label: 'Main Course' },
-              { value: 'dessert', label: 'Dessert' },
-              { value: 'drinks', label: 'Drinks' }
+              { value: 'starter', label: translate('admin:menu.option.starter') },
+              { value: 'main', label: translate('admin:menu.option.main') },
+              { value: 'dessert', label: translate('admin:menu.option.dessert') },
+              { value: 'drinks', label: translate('admin:menu.option.drinks') }
             ]
           },
-          { name: 'label', label: 'Course Label', required: true, help: 'e.g. "Appetizers", "Main Dish", "Desserts"' },
-          { name: 'selectionRequired', label: 'Selection Required', type: 'select', 
-            help: 'If enabled, guests must select one option. If disabled, all options will be provided.',
+          { name: 'label', label: translate('admin:menu.field.courseLabel'), required: true, help: translate('admin:menu.field.courseLabelHelp') },
+          { name: 'selectionRequired', label: translate('admin:menu.field.selectionRequired'), type: 'select', 
+            help: translate('admin:menu.field.helpSelectionRequired'),
             options: [
-              { value: 'true', label: 'Yes - Guests must choose one option' },
-              { value: 'false', label: 'No - All options will be provided' }
+              { value: 'true', label: translate('admin:menu.option.yes') },
+              { value: 'false', label: translate('admin:menu.option.no') }
             ]
           },
         ],
@@ -2562,20 +2562,20 @@
       const showCurrentImage = isEditing && currentImageUrl;
       
       openFormModal({
-        title: isEditing ? 'Edit Course Option' : 'Add Course Option',
-        submitText: isEditing ? 'Save' : 'Add',
+        title: isEditing ? `<div data-i18n="admin:menu.editCourseOption">${translate('admin:menu.editCourseOption')}</div>` : `<div data-i18n="admin:menu.addCourseOption">${translate('admin:menu.addCourseOption')}</div>`,
+        submitText: isEditing ? `<span data-i18n="admin:menu.save">${translate('admin:menu.save')}</span>` : `<span data-i18n="admin:menu.add">${translate('admin:menu.add')}</span>`,
         showCurrentImage: showCurrentImage,
         currentImageUrl: currentImageUrl,
         fields: [
-          { name: 'label', label: 'Option', required: true, help: 'e.g. Cream of Mushroom Soup' },
-          { name: 'image', label: 'Image', type: 'file', help: 'Upload menu option image (will be stored in database)' },
-          { name: 'description', label: 'Option Description', required: false, help: 'e.g. A delicate blend of cream, mushrooms, and garlic' },
+          { name: 'label', label: translate('admin:menu.field.option'), required: true, help: translate('admin:menu.field.optionHelp') },
+          { name: 'image', label: translate('admin:menu.field.image'), type: 'file', help: translate('admin:menu.field.imageHelp') },
+          { name: 'description', label: translate('admin:menu.field.optionDescription'), required: false, help: translate('admin:menu.field.optionDescriptionHelp') },
           // Special Dietary Indicators
-          { name: 'isVegetarian', label: 'Vegetarian', type: 'checkbox', help: 'This option is suitable for vegetarians' },
-          { name: 'containsAllergens', label: 'Contains Allergens', type: 'checkbox', help: 'This option contains allergens - please check ingredient list' },
-          { name: 'containsLactose', label: 'Contains Lactose', type: 'checkbox', help: 'This option contains lactose/dairy products' },
-          { name: 'isSpicy', label: 'Spicy', type: 'checkbox', help: 'This option contains spicy ingredients' },
-          { name: 'containsNuts', label: 'Contains Nuts', type: 'checkbox', help: 'This option may contain nuts' },
+          { name: 'isVegetarian', label: translate('admin:menu.field.isVegetarian'), type: 'checkbox', help: translate('admin:menu.field.helpVegetarian') },
+          { name: 'containsAllergens', label: translate('admin:menu.field.containsAllergens'), type: 'checkbox', help: translate('admin:menu.field.helpAllergens') },
+          { name: 'containsLactose', label: translate('admin:menu.field.containsLactose'), type: 'checkbox', help: translate('admin:menu.field.helpLactose') },
+          { name: 'isSpicy', label: translate('admin:menu.field.isSpicy'), type: 'checkbox', help: translate('admin:menu.field.helpSpicy') },
+          { name: 'containsNuts', label: translate('admin:menu.field.containsNuts'), type: 'checkbox', help: translate('admin:menu.field.helpNuts') },
         ],
         initialValues: {
           label: existingData?.label || '',
