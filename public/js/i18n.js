@@ -9,6 +9,9 @@ const translations = {
     'common:footer': '© 2026 Boda de Iluminada &amp; George',
 
     'common:primary': 'Primary',
+    'common:saving': 'Saving...',
+    'common:menuSelectionsSaved': 'Menu selections saved successfully!',
+    'common:errorSavingMenuSelections': 'Error saving menu selections',
 
     'wedding:title': 'Iluminada & George',
     'wedding:subtitle': 'We\'re getting married!',
@@ -238,6 +241,12 @@ const translations = {
     'common:minutes': 'Minutos',
     'common:seconds': 'Segundos',
     'common:primary': 'Principal',
+    'common:saving': 'Guardando...',
+    'common:menuSelectionsSaved': '¡Selecciones de menú guardadas con éxito!',
+    'common:errorSavingMenuSelections': 'Error al guardar las selecciones de menú',
+    'common:saving': 'Guardando...',
+    'common:menuSelectionsSaved': '¡Selecciones de menú guardadas con éxito!',
+    'common:errorSavingMenuSelections': 'Error al guardar las selecciones de menú',
 
     'wedding:title': 'Iluminada & George',
     'wedding:subtitle': 'Nos casamos!',
@@ -438,6 +447,12 @@ const translations = {
     'common:minutes': 'Minutes',
     'common:seconds': 'Secondes',
     'common:primary': 'Principal',
+    'common:saving': 'Enregistrement...',
+    'common:menuSelectionsSaved': 'Sélection de menu enregistrée avec succès!',
+    'common:errorSavingMenuSelections': 'Erreur lors de l\'enregistrement des sélections de menu',
+    'common:saving': 'Guardando...',
+    'common:menuSelectionsSaved': '¡Selecciones de menú guardadas con éxito!',
+    'common:errorSavingMenuSelections': 'Error al guardar las selecciones de menú',
 
     'wedding:title': 'Iluminada & George',
     'wedding:subtitle': 'On se marie!',
@@ -666,6 +681,9 @@ const translations = {
     'common:minutes': 'Minuten',
     'common:seconds': 'Sekunden',
     'common:primary': 'Hauptgast',
+    'common:saving': 'Speichern...',
+    'common:menuSelectionsSaved': 'Menüauswahl erfolgreich gespeichert!',
+    'common:errorSavingMenuSelections': 'Fehler beim Speichern der Menüauswahl',
   
     'common:login': 'Anmelden',
     'login:pageTitle': 'Gastzugang – Hochzeit',

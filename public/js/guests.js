@@ -833,7 +833,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const saveBtn = document.getElementById('saveMenuChoicesBtn');
     if (saveBtn) {
       saveBtn.disabled = true;
-      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <div data-i18n="common:saving">'+ translate('common:saving') +'</div>';
     }
 
     try {
@@ -846,7 +846,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         // Skip invalid member IDs
         if (!memberId || memberId === 'null' || memberId === 'undefined') {
-          console.warn('Skipping chip with invalid memberId:', memberId);
           return;
         }
         
@@ -877,12 +876,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       // Collect special dietary requests for each member
-      document.querySelectorAll('.special-request-card').forEach(card => {
+      document.querySelectorAll('.party-dietary-card').forEach(card => {
         const memberId = card.dataset.memberId;
         
         // Skip invalid member IDs
         if (!memberId || memberId === 'null' || memberId === 'undefined') {
-          console.warn('Skipping special request card with invalid memberId:', memberId);
           return;
         }
         
@@ -925,9 +923,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         return isValid;
       });
       
-      // Log for debugging
-      console.log('Saving menu choices:', JSON.stringify({ choices: choicesArray }, null, 2));
-
       // Send to server
       const response = await fetch('/api/guest/menu-choices', {
         method: 'PUT',
@@ -939,23 +934,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (response.ok) {
-        showToast('Menu selections saved successfully!', 'success');
+        showToast('<div data-i18n="common:menuSelectionsSaved">'+ translate('common:menuSelectionsSaved') +'</div>', 'success');
         if (saveBtn) {
           saveBtn.classList.remove('unsaved');
-          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Menu Selections';
+          saveBtn.innerHTML = '<i class="fas fa-save"></i> <div data-i18n="guests:saveMenuSelections">'+ translate('guests:saveMenuSelections') +'</div>';
         }
       } else {
         const data = await response.json();
-        showToast(data.error || 'Error saving menu selections', 'error');
+        showToast('<div data-i18n="common:errorSavingMenuSelections">'+ (data.error || translate('common:errorSavingMenuSelections')) + '</div>', 'error');
       }
     } catch (err) {
       console.error('Error saving menu choices:', err);
-      showToast('Error saving menu selections', 'error');
+      showToast('<div data-i18n="common:errorSavingMenuSelections">'+ translate('common:errorSavingMenuSelections') +'</div>', 'error');
     } finally {
       if (saveBtn) {
         saveBtn.disabled = false;
         if (!saveBtn.classList.contains('unsaved')) {
-          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Menu Selections';
+          saveBtn.innerHTML = '<i class="fas fa-save"></i> <div data-i18n="guests:saveMenuSelections">'+ translate('guests:saveMenuSelections') +'</div>';
         }
       }
     }
