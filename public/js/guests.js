@@ -995,13 +995,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (response.ok) {
-        showToast('Menu selection saved successfully!', 'success');
+        showToast('<div data-i18n="common:menuSelectionSaved">'+ translate('common:menuSelectionSaved') +'</div>', 'success');
       } else {
-        showToast('Error saving menu selection', 'error');
+        showToast('<div data-i18n="common:errorSavingMenuSelection">'+ translate('common:errorSavingMenuSelection') +'</div>', 'error');
       }
     } catch (err) {
       console.error('Error saving menu selection:', err);
-      showToast('Error saving menu selection', 'error');
+      showToast('<div data-i18n="common:errorSavingMenuSelection">'+ translate('common:errorSavingMenuSelection') +'</div>', 'error');
     }
   };
 
@@ -1042,7 +1042,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (response.ok) {
-        showToast('Special request saved successfully!', 'success');
+        showToast('<div data-i18n="common:specialRequestSaved">'+ translate('common:specialRequestSaved') +'</div>', 'success');
         
         // Show/hide detail textarea based on selection
         const detailTextarea = document.querySelector(`textarea[name="special-request-detail-${partyGuestId}"]`);
@@ -1050,11 +1050,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           detailTextarea.style.display = specialRequest === 'other' ? 'block' : 'none';
         }
       } else {
-        showToast('Error saving special request', 'error');
+        showToast('<div data-i18n="common:errorSavingSpecialRequest">'+ translate('common:errorSavingSpecialRequest') +'</div>', 'error');
       }
     } catch (err) {
       console.error('Error saving special request:', err);
-      showToast('Error saving special request', 'error');
+      showToast('<div data-i18n="common:errorSavingSpecialRequest">'+ translate('common:errorSavingSpecialRequest') +'</div>', 'error');
     }
   };
 
@@ -1092,13 +1092,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (response.ok) {
-        showToast('Special request details saved successfully!', 'success');
+        showToast('<div data-i18n="common:specialRequestDetailsSaved">'+ translate('common:specialRequestDetailsSaved') +'</div>', 'success');
       } else {
-        showToast('Error saving special request details', 'error');
+        showToast('<div data-i18n="common:errorSavingSpecialRequestDetails">'+ translate('common:errorSavingSpecialRequestDetails') +'</div>', 'error');
       }
     } catch (err) {
       console.error('Error saving special request details:', err);
-      showToast('Error saving special request details', 'error');
+      showToast('<div data-i18n="common:errorSavingSpecialRequestDetails">'+ translate('common:errorSavingSpecialRequestDetails') +'</div>', 'error');
     }
   };
   
