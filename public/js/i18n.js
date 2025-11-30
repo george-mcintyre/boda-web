@@ -267,6 +267,16 @@ const translations = {
     'admin:loadingSettings': 'Loading settings...',
     'admin:footer': 'Admin panel',
 
+    // Admin Messages Section
+    'admin:messages.title': 'Messages Cleanup',
+    'admin:messages.subtitle': 'Delete any guest messages that are inappropriate or offensive',
+    'admin:messages.noMessages': 'No messages yet. Guests will appear here when they post comments.',
+    'admin:messages.loading': 'Loading messages...',
+    'admin:messages.errorTitle': 'Error Loading Messages',
+    'admin:messages.errorMessage': 'Failed to load messages: {{error}}',
+    'admin:messages.retry': 'Retry',
+    'admin:messages.delete': 'Delete',
+
     // Admin Guests Section
     'admin:guests.errorLoading': 'Failed to load guests',
     'admin:guests.adult': 'Adult',
@@ -638,6 +648,16 @@ const translations = {
     'admin:loadingCourses': 'Cargando cursos...',
     'admin:loadingSettings': 'Cargando configuración...',
     'admin:footer': 'Panel de administración',
+
+    // Admin Messages Section
+    'admin:messages.title': 'Limpieza de Mensajes',
+    'admin:messages.subtitle': 'Elimina cualquier mensaje de invitados que sea inapropiado u ofensivo',
+    'admin:messages.noMessages': 'Aún no hay mensajes. Los invitados aparecerán aquí cuando publiquen comentarios.',
+    'admin:messages.loading': 'Cargando mensajes...',
+    'admin:messages.errorTitle': 'Error al Cargar Mensajes',
+    'admin:messages.errorMessage': 'Error al cargar mensajes: {{error}}',
+    'admin:messages.retry': 'Reintentar',
+    'admin:messages.delete': 'Eliminar',
 
     // Admin Guests Section
     'admin:guests.errorLoading': 'Error al cargar invitados',
@@ -1012,6 +1032,16 @@ const translations = {
     'admin:loadingSettings': 'Chargement des paramètres...',
     'admin:footer': 'Panel d\'administration',
 
+    // Admin Messages Section
+    'admin:messages.title': 'Nettoyage des Messages',
+    'admin:messages.subtitle': 'Supprimez les messages d\'invités inappropriés ou offensants',
+    'admin:messages.noMessages': 'Aucun message pour le moment. Les invités apparaîtront ici quand ils publieront des commentaires.',
+    'admin:messages.loading': 'Chargement des messages...',
+    'admin:messages.errorTitle': 'Erreur de Chargement des Messages',
+    'admin:messages.errorMessage': 'Échec du chargement des messages : {{error}}',
+    'admin:messages.retry': 'Réessayer',
+    'admin:messages.delete': 'Supprimer',
+
     // Admin Guests Section
     'admin:guests.errorLoading': 'Échec du chargement des invités',
     'admin:guests.adult': 'Adulte',
@@ -1364,6 +1394,16 @@ const translations = {
     'admin:loadingCourses': 'Kurse werden geladen...',
     'admin:loadingSettings': 'Einstellungen werden geladen...',
     'admin:footer': 'Adminbereich',
+
+    // Admin Messages Section
+    'admin:messages.title': 'Nachrichten-Bereinigung',
+    'admin:messages.subtitle': 'Löschen Sie unangemessene oder anstößige Gästemeldungen',
+    'admin:messages.noMessages': 'Noch keine Nachrichten. Gäste erscheinen hier, wenn sie Kommentare veröffentlichen.',
+    'admin:messages.loading': 'Nachrichten werden geladen...',
+    'admin:messages.errorTitle': 'Fehler beim Laden der Nachrichten',
+    'admin:messages.errorMessage': 'Fehler beim Laden der Nachrichten: {{error}}',
+    'admin:messages.retry': 'Wiederholen',
+    'admin:messages.delete': 'Löschen',
 
     // Admin Guests Section
     'admin:guests.errorLoading': 'Fehler beim Laden der Gäste',

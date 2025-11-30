@@ -1685,8 +1685,8 @@
       content.innerHTML = `
         <div class="admin-content">
           <div class="messages-header">
-            <h3><i class="fas fa-comments"></i>Messages Cleanup</h3>
-            <p class="messages-subtitle">Delete any guest messages that are inappropriate or offensive</p>
+            <h3><i class="fas fa-comments"></i> <div data-i18n="admin:messages.title">${translate('admin:messages.title')}</div></h3>
+            <p class="messages-subtitle"><div data-i18n="admin:messages.subtitle">${translate('admin:messages.subtitle')}</div></p>
           </div>
           
           <!-- Messages list -->
@@ -1694,12 +1694,12 @@
             ${messages.length === 0 ? `
               <div class="no-messages">
                 <i class="fas fa-comments"></i>
-                <p>No messages yet. Guests will appear here when they post comments.</p>
+                <p><div data-i18n="admin:messages.noMessages">${translate('admin:messages.noMessages')}</div></p>
               </div>
             ` : ''}
             <div class="loading-messages">
               <i class="fas fa-spinner fa-spin"></i>
-              <span>Loading messages...</span>
+              <span><div data-i18n="admin:messages.loading">${translate('admin:messages.loading')}</div></span>
             </div>
           </div>
         </div>
@@ -1714,10 +1714,10 @@
         <div class="admin-content">
           <div class="error-message">
             <i class="fas fa-exclamation-triangle"></i>
-            <h3>Error Loading Messages</h3>
-            <p>Failed to load messages: ${error.message}</p>
+            <h3><div data-i18n="admin:messages.errorTitle">${translate('admin:messages.errorTitle')}</div></h3>
+            <p>${translateWithVars('admin:messages.errorMessage', { error: error.message })}</p>
             <button onclick="showMessages()" class="btn-retry">
-              <i class="fas fa-redo"></i> Retry
+              <i class="fas fa-redo"></i> <div data-i18n="admin:messages.retry">${translate('admin:messages.retry')}</div>
             </button>
           </div>
         </div>
@@ -1755,7 +1755,7 @@
           <div class="message-actions">
             <button class="admin-action danger" onclick="deleteMessage('${messageId}')" title="Delete message">
               <i class="fas fa-trash"></i>
-              Delete
+              <div data-i18n="admin:messages.delete">${translate('admin:messages.delete')}</div>
             </button>
           </div>
         </div>
