@@ -1,20 +1,25 @@
+// server/models/LocalizedString.js
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const LocalizedString = {
-  type: Map,
-  of: String,
-  default: () => new Map(),
-};
+// e.g. "mixed" during migrations, "map" for normal app use
+const mode = process.env.LOCALIZEDSTRING_SCHEMA_MODE || 'map';
 
+let LocalizedString;
 
-// models/common/localizedString.js FOR MIGRATION ONLY!!!
-// const mongoose = require('mongoose');
-// const { Schema } = mongoose;
-
-// const LocalizedString = {
-//   type: Schema.Types.Mixed,   // allows string OR object
-//   default: undefined,
-// };
+if (mode === 'mixed') {
+  // Relaxed type: accepts string *or* object
+  LocalizedString = {
+    type: Schema.Types.Mixed,
+    default: undefined,
+  };
+} else {
+  // Final type: proper LocalizedString as Map<String>
+  LocalizedString = {
+    type: Map,
+    of: String,
+    default: undefined,
+  };
+}
 
 module.exports = { LocalizedString };
