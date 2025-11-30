@@ -86,20 +86,19 @@
           <section class="summary-card comments-card">
             <div class="comments-header">
               <h2><i class="fas fa-comments"></i> <span data-i18n="guests:commentsTitle">Comments</span></h2>
-              <p class="comments-subtitle" data-i18n="guests:commentsSubtitle">Share your thoughts with other guests</p>
+              <p class="comments-subtitle" data-i18n="rich:guests:commentsSubtitle">Share your thoughts with other guests</p>
             </div>
             
             <!-- New comment form -->
             <div class="new-comment-form">
               <form id="commentForm">
-                <div class="comment-input-container">
+                <div class="comment-input-container" data-i18n="rich:guests:commentPlaceholder">
                   <textarea
                     id="newComment"
                     name="comment"
                     placeholder="Write your comment..."
                     rows="3"
                     maxlength="500"
-                    data-i18n-placeholder="guests:commentPlaceholder"
                   ></textarea>
                 </div>
                 <div class="comment-actions">
@@ -108,7 +107,7 @@
                   </div>
                   <div class="comment-posting-as">
                     <select id="postingAsSelect" class="posting-as-dropdown">
-                      <option value="">Loading party members...</option>
+                      <option data-i18n="guests:loadingPartyMembers">Loading party members...</option>
                     </select>
                   </div>
                   <button type="submit" class="comment-submit-btn">
@@ -135,7 +134,7 @@
       <div id="partyContent-tab" class="tab-content">
         <section id="partyContent">
           <h2><i class="fas fa-users"></i> <span data-i18n="guests:partyManagement">Party Management</span></h2>
-          <p class="section-description" data-i18n="guests:partyManagementDesc">
+          <p class="section-description" data-i18n="rich:guests:partyManagementDesc">
             Manage your wedding party members and their dietary requirements.
           </p>
           <div class="loading-party">
@@ -160,7 +159,7 @@
       <div id="giftsContent-tab" class="tab-content">
         <section id="giftsContent">
           <h2><i class="fas fa-money-bill-wave"></i> <span data-i18n="guests:giftsSelection">Gifts Selection</span></h2>
-          <p class="section-description" data-i18n="guests:giftsSelectionDesc">
+          <p class="section-description" data-i18n="rich:guests:giftsSelectionDesc">
             Choose your favorite gifts for our wedding celebrations.
           </p>
           <div id="giftsContent"></div>
@@ -171,7 +170,7 @@
       <div id="eventsContent-tab" class="tab-content">
         <section id="eventsContent">
           <h2><i class="fas fa-calendar-alt"></i> <span data-i18n="guests:eventsRSVP">RSVP</span></h2>
-          <p class="section-description" data-i18n="guests:eventsRSVPDesc">
+          <p class="section-description" data-i18n="rich:guests:eventsRSVPDesc">
             The celebrations will take place over three days: Friday, Saturday and Sunday. They kick off on Friday with a welcome dinner.   Saturday is a full day of activities including the wedding ceremony, the reception banquet, and dancing.   Sunday's activities include a farewell brunch.  Please confirm your attendance for which ever of these events you will be attending.
           </p>
           <div id="eventsContent"></div>
@@ -182,7 +181,7 @@
 
   <footer>
     <div class="footer-content">
-      <p>© 2026 Boda de Iluminada &amp; George</p>
+      <p data-i18n="common:footer">© 2026 Boda de Iluminada &amp; George</p>
   </div>
 </footer>
 

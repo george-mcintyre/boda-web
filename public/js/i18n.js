@@ -6,6 +6,7 @@ const translations = {
     'common:minutes': 'Minutes',
     'common:seconds': 'Seconds',
     'common:login': 'Login',
+    'common:footer': '© 2026 Boda de Iluminada &amp; George',
 
     'common:primary': 'Primary',
 
@@ -39,6 +40,8 @@ const translations = {
     'guests:menuSelection': 'Menu Selection',
     'guests:menuSelectionDesc': 'Your current menu selection for our wedding.',
     'guests:menuSelectionDesc2': 'Choose your preferred dishes for our wedding.',
+    'guests:tabParty': 'Party',
+    'guests:yourSummary': 'Your Summary',
 
     // Summary Page
     'guests:summaryPageTitle': 'Your guest area for Iluminada & George\'s wedding',
@@ -53,7 +56,7 @@ const translations = {
         or special dietary needs, confirm who will attend each of the wedding events, 
         choose your preferred courses and drinks for the banquet, send messages to other guests 
         and, if you wish, select a gift for us from the wedding registry.  
-        We\'re so happy to be celebrating this with you. 🤍
+        We\'re so happy to be celebrating this with you. ❤️
       </p>
     `,
     'guests:summaryYourParty': 'Your Party',
@@ -61,6 +64,15 @@ const translations = {
     'guests:summaryPerson': 'person',
     'guests:summaryRSVP': 'RSVP Summary',
     'guests:summaryMenuSelections': 'Menu Selections',
+
+    'guests:loadingPartyMembers': 'Loading party members...',
+    'guests:loadingComments': 'Loading comments...',
+    'guests:partyManagement': 'Party Management',
+    'rich:guests:partyManagementDesc': 'Manage your wedding party members and their dietary requirements.',
+    'guests:giftsSelection': 'Gifts Selection',
+    'rich:guests:giftsSelectionDesc': 'Choose your favorite gifts for our wedding celebrations.',
+    'guests:eventsRSVP': 'RSVP',
+    'rich:guests:eventsRSVPDesc': 'The celebrations will take place over three days: Friday, Saturday and Sunday. They kick off on Friday with a welcome dinner.   Saturday is a full day of activities including the wedding ceremony, the reception banquet, and dancing.   Sunday\'s activities include a farewell brunch.  Please confirm your attendance for which ever of these events you will be attending.',
 
     // Party Page
     'guests:partyPageTitle': 'Party Management',
@@ -103,10 +115,17 @@ const translations = {
     'guests:noGiftReservations': 'You haven\'t reserved any gifts from our list yet.',
     'guests:confirmAction': 'Confirm action',
     'guests:commentsTitle': 'Comments',
-    'guests:commentsSubtitle': 'Share your thoughts with other guests',
-    'guests:commentPlaceholder': 'Write your comment...',
+    'rich:guests:commentsSubtitle': 'Share your thoughts with other guests',
+    'rich:guests:commentPlaceholder': `
+      <textarea
+        id="newComment"
+        name="comment"
+        placeholder="Write your comment..."
+        rows="3"
+        maxlength="500"
+      ></textarea>
+     `,
     'guests:postComment': 'Post',
-    'guests:loadingComments': 'Loading comments...',
     'guests:noComments': 'No comments yet. Be the first to comment!',
     'guests:commentPosted': 'Comment posted successfully',
     'guests:commentDeleted': 'Comment deleted successfully',
@@ -290,8 +309,16 @@ const translations = {
     'guests:noGiftReservations': 'Aún no has reservado ningún regalo de nuestra lista.',
     'guests:confirmAction': 'Confirmar acción',
     'guests:commentsTitle': 'Comentarios',
-    'guests:commentsSubtitle': 'Comparte tus pensamientos con otros guests',
-    'guests:commentPlaceholder': 'Escribe tu comentario...',
+    'rich:guests:commentsSubtitle': 'Comparte tus pensamientos con otros guests',
+    'rich:guests:commentPlaceholder': `
+      <textarea
+        id="newComment"
+        name="comment"
+        placeholder="Escribe tu comentario..."
+        rows="3"
+        maxlength="500"
+      ></textarea>
+    `,
     'guests:postComment': 'Publicar',
     'guests:loadingComments': 'Cargando comentarios...',
     'guests:noComments': 'No hay comentarios aún. ¡Sé el primero en comentar!',
@@ -478,8 +505,16 @@ const translations = {
     'guests:noGiftReservations': 'Vous n\'avez pas encore réservé de cadeaux de notre liste.',
     'guests:confirmAction': 'Confirmer l\'action',
     'guests:commentsTitle': 'Commentaires',
-    'guests:commentsSubtitle': 'Partagez vos pensées avec d\'autres invités',
-    'guests:commentPlaceholder': 'Écrivez votre commentaire...',
+    'rich:guests:commentsSubtitle': 'Partagez vos pensées avec d\'autres invités',
+    'rich:guests:commentPlaceholder': `
+      <textarea
+        id="newComment"
+        name="comment"
+        placeholder="Ecrire tes commentaires..."
+        rows="3"
+        maxlength="500"
+      ></textarea>
+     `,
     'guests:postComment': 'Publier',
     'guests:loadingComments': 'Chargement des commentaires...',
     'guests:noComments': 'Aucun commentaire pour le moment. Soyez le premier à commenter !',
@@ -646,8 +681,16 @@ const translations = {
     'guests:noGiftReservations': 'Ihr habt noch keine Geschenke aus unserer Liste reserviert.',
     'guests:confirmAction': 'Aktion bestätigen',
     'guests:commentsTitle': 'Kommentare',
-    'guests:commentsSubtitle': 'Teilt eure Gedanken mit anderen Gästen',
-    'guests:commentPlaceholder': 'Schreibt euren Kommentar...',
+    'rich:guests:commentsSubtitle': 'Teilt eure Gedanken mit anderen Gästen',
+    'rich:guests:commentPlaceholder': `
+      <textarea
+        id="newComment"
+        name="comment"
+        placeholder="Schreibt euren Kommentar..."
+        rows="3"
+        maxlength="500"
+      ></textarea>
+    `,
     'guests:postComment': 'Veröffentlichen',
     'guests:loadingComments': 'Kommentare werden geladen...',
     'guests:noComments': 'Noch keine Kommentare. Seid die Ersten!',
