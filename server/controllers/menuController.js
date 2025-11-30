@@ -1,6 +1,7 @@
 const { MenuCourse, MenuChoice, Guest, Course, CourseOption, CourseOptionImage } = require('../models');
 const { formatCourseForApi, formatCourseOptionForApi } = require('../controllers/adminController');
 const { generateSelectionIconHTML, generateDietaryIconsHTML } = require('../utils/menuIcons');
+const { getLang, mergeLocalizedString, localize } = require('../utils/localized');
 
 // Helper to format menu part for API response
 function formatMenuCourseForApi(menuPart, index) {
@@ -23,6 +24,7 @@ function formatMenuCourseForApi(menuPart, index) {
 // List courses with options (for both admin and guest interfaces)
 async function listCourses(req, res, next) {
   try {
+    const lang = getLang(req);
     const courses = await Course.find({}).sort({ course: 1, createdAt: 1 });
     const menuData = [];
     
@@ -34,7 +36,7 @@ async function listCourses(req, res, next) {
       menuData.push({
         id: course._id.toString(),
         course: course.course,
-        label: course.label,
+        label: localize(course.label, lang),
         selectionRequired: course.selectionRequired !== undefined ? course.selectionRequired : true,
         options: options.map(option => {
           const formattedOption = formatCourseOptionForApi(option);
@@ -53,12 +55,19 @@ async function listCourses(req, res, next) {
 
 async function createCourse(req, res, next) {
   try {
+    const lang = getLang(req);
     const { course, label, selectionRequired } = req.body;
-    const newCourse = await Course.create({ 
-      course, 
-      label, 
-      selectionRequired: selectionRequired !== undefined ? selectionRequired : true 
+
+    const newCourse = new Course({
+      course,
+      selectionRequired:
+        selectionRequired !== undefined ? selectionRequired : true,
     });
+
+    // Localised label: one language at a time
+    newCourse.label = mergeLocalizedString(undefined, label, lang);
+
+    await newCourse.save();
     res.status(201).json(formatCourseForApi(newCourse));
   } catch (e) {
     next(e);
@@ -67,20 +76,33 @@ async function createCourse(req, res, next) {
 
 async function updateCourse(req, res, next) {
   try {
+    const lang = getLang(req);
     const { id } = req.params;
     const { course, label, selectionRequired } = req.body;
-    
-    const updateData = {};
-    if (course) updateData.course = course;
-    if (label) updateData.label = label;
-    if (selectionRequired !== undefined) updateData.selectionRequired = selectionRequired;
-    
-    const updatedCourse = await Course.findByIdAndUpdate(id, updateData, { new: true });
-    res.json(formatCourseForApi(updatedCourse));
+
+    const existing = await Course.findById(id);
+    if (!existing) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    // Non-localised bits
+    if (course !== undefined) {
+      existing.course = course;
+    }
+    if (selectionRequired !== undefined) {
+      existing.selectionRequired = selectionRequired;
+    }
+
+    // Localised label
+    existing.label = mergeLocalizedString(existing.label, label, lang);
+
+    await existing.save();
+    res.json(formatCourseForApi(existing));
   } catch (e) {
     next(e);
   }
 }
+
 
 async function deleteCourse(req, res, next) {
   try {
@@ -95,6 +117,7 @@ async function deleteCourse(req, res, next) {
 // Admin: get course options (for admin interface)
 async function listCourseOptions(req, res, next) {
   try {
+    const lang = getLang(req);
     const { courseId } = req.params;
     
     // Verify course exists
@@ -106,7 +129,7 @@ async function listCourseOptions(req, res, next) {
     const options = await CourseOption.find({ courseId })
       .populate('image')
       .sort({ createdAt: 1 });
-    const formatted = options.map(option => formatCourseOptionForApi(option));
+    const formatted = options.map(option => formatCourseOptionForApi(option, lang));
     res.json(formatted);
   } catch (e) { 
     next(e); 
@@ -116,23 +139,26 @@ async function listCourseOptions(req, res, next) {
 // Admin: get specific course option by ID (for editing)
 async function getCourseOptionById(req, res, next) {
   try {
+    const lang = getLang(req);
     const { courseId, optionId } = req.params;
-    
+
     // Verify course exists
     const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ error: 'Course not found' });
     }
-    
+
     const option = await CourseOption.findOne({ _id: optionId, courseId })
       .populate('image');
     if (!option) {
       return res.status(404).json({ error: 'Course option not found' });
     }
-    
-    res.json(formatCourseOptionForApi(option));
-  } catch (e) { 
-    next(e); 
+
+    // If your formatCourseOptionForApi already handles LocalizedString → string
+    // based on some lang, you can extend it. For now we just pass the doc through.
+    res.json(formatCourseOptionForApi(option, lang));
+  } catch (e) {
+    next(e);
   }
 }
 
@@ -271,89 +297,76 @@ async function updateGuestCourseOption(req, res, next) {
   }
 }
 
+// Admin: create course option (one language at a time)
 async function createCourseOption(req, res, next) {
   try {
+    const lang = getLang(req);
     const { courseId } = req.params;
-    const { label, image, description, isVegetarian, containsAllergens, containsLactose, isSpicy, containsNuts } = req.body;
+    const {
+      label,
+      description,
+      image, // or other non-localised fields like price, etc.
+      ...rest
+    } = req.body;
 
-    // Verify course exists
+    // Verify course exists (optional but nice)
     const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ error: 'Course not found' });
     }
-    
-    if (!label) {
-      return res.status(400).json({ error: 'Label is required' });
-    }
-    
-    // Handle image reference
-    let imageRef = undefined;
-    if (image && image.imageId) {
-      // New format - reference to uploaded image
-      imageRef = image.imageId;
-    } else if (typeof image === 'string' && image.length === 24 && /^[0-9a-fA-F]{24}$/.test(image)) {
-      // ObjectId string
-      imageRef = image;
-    }
-    
-    const option = await CourseOption.create({
+
+    const option = new CourseOption({
       courseId,
-      label,
-      image: imageRef || null,
-      description: description || null,
-      isVegetarian: isVegetarian || false,
-      containsAllergens: containsAllergens || false,
-      containsLactose: containsLactose || false,
-      isSpicy: isSpicy || false,
-      containsNuts: containsNuts || false
+      ...rest,
     });
-    
-    // Populate image for response
-    const populatedOption = await CourseOption.findById(option._id).populate('image');
-    res.status(201).json(formatCourseOptionForApi(populatedOption));
-  } catch (e) { 
-    next(e); 
+
+    // Localised fields
+    option.label = mergeLocalizedString(undefined, label, lang);
+    option.description = mergeLocalizedString(undefined, description, lang);
+
+    // Non-localised image or other props if needed
+    if (image !== undefined) {
+      option.image = image;
+    }
+
+    await option.save();
+    res.status(201).json(formatCourseOptionForApi(option));
+  } catch (e) {
+    next(e);
   }
 }
 
+// Admin: update course option
 async function updateCourseOption(req, res, next) {
   try {
-    const { optionId } = req.params;
-    const { label, image, description, isVegetarian, containsAllergens, containsLactose, isSpicy, containsNuts } = req.body;
-    
-    // Handle image reference
-    let imageRef = undefined;
-    if (image !== undefined) {
-      if (!image) {
-        // Image explicitly set to null/empty, remove it
-        imageRef = undefined;
-      } else if (image.imageId) {
-        // New format - reference to uploaded image
-        imageRef = image.imageId;
-      } else if (typeof image === 'string' && image.length === 24 && /^[0-9a-fA-F]{24}$/.test(image)) {
-        // ObjectId string
-        imageRef = image;
-      }
-    }
-    
-    const updateData = {};
-    if (label) updateData.label = label;
-    if (imageRef !== undefined) updateData.image = imageRef;
-    if (description !== undefined) updateData.description = description;
-    if (isVegetarian !== undefined) updateData.isVegetarian = isVegetarian;
-    if (containsAllergens !== undefined) updateData.containsAllergens = containsAllergens;
-    if (containsLactose !== undefined) updateData.containsLactose = containsLactose;
-    if (isSpicy !== undefined) updateData.isSpicy = isSpicy;
-    if (containsNuts !== undefined) updateData.containsNuts = containsNuts;
-    
-    const option = await CourseOption.findByIdAndUpdate(optionId, updateData, { new: true })
-      .populate('image');
+    const lang = getLang(req);
+    const { courseId, optionId } = req.params;
+    const {
+      label,
+      description,
+      image,
+      ...rest
+    } = req.body;
+
+    const option = await CourseOption.findOne({ _id: optionId, courseId });
     if (!option) {
       return res.status(404).json({ error: 'Course option not found' });
     }
+
+    // Non-localised stuff
+    Object.assign(option, rest);
+    if (image !== undefined) {
+      option.image = image;
+    }
+
+    // Localised fields: merge per-language
+    option.label = mergeLocalizedString(option.label, label, lang);
+    option.description = mergeLocalizedString(option.description, description, lang);
+
+    await option.save();
     res.json(formatCourseOptionForApi(option));
-  } catch (e) { 
-    next(e); 
+  } catch (e) {
+    next(e);
   }
 }
 

@@ -1,23 +1,10 @@
 const { Config, Gift, Event, GiftChoice, Course, CourseOption, CourseOptionImage } = require('../models');
 const { getAvailableGiftCardImages } = require('../utils/imageUtils');
 const { generateDietaryIconsHTML, generateSelectionIconHTML } = require('../utils/menuIcons');
+const { mergeLocalizedString, localize, getLang } = require('../utils/localized');
 
 // Format event for API response according to README specification
-function formatEventForApi(event) {
-  // Helper function to extract string value from either Map or plain object
-  const getStringValue = (value) => {
-    if (!value) return null;
-    if (typeof value === 'string') return value;
-    if (typeof value === 'object') {
-      // Handle Map objects (newer format)
-      if (typeof value.get === 'function') {
-        return value.get('en') || value.get('es') || value.get('default') || '';
-      }
-      // Handle plain objects (legacy format)
-      return value.en || value.es || value.default || '';
-    }
-    return null;
-  };
+function formatEventForApi(event, lang) {
 
   // Format image data for display
   let imageData = null;
@@ -41,7 +28,7 @@ function formatEventForApi(event) {
 
   return {
     id: event._id.toString(),
-    name: event.name,
+    name: localize(event.name, lang),
     date: event.date ? event.date.toISOString() : null,
     end: event.end ? event.end.toISOString() : null,
     locationAddress: event.locationAddress || '',
@@ -49,14 +36,14 @@ function formatEventForApi(event) {
     locationLongitude: event.locationLongitude || null,
     // Legacy location field for backward compatibility
     location: event.location || event.locationAddress || '',
-    title: getStringValue(event.title),
-    description: getStringValue(event.description),
+    title: localize(event.title, lang),
+    description: localize(event.description, lang),
     image: imageData,
     sub_events: (event.sub_events || []).map(sub => ({
-      name: sub.name,
+      name: localize(sub.name, lang),
       date: sub.date ? sub.date.toISOString() : null,
       end: sub.end ? sub.end.toISOString() : null,
-      description: sub.description || null,
+      description: localize(sub.description, lang) || null,
       icon: sub.icon
     }))
   };
@@ -92,13 +79,14 @@ async function getGiftCardImages(req, res, next) {
 
 // ========== Events (MongoDB-backed CRUD) ==========
 async function listEventsAdmin(req, res, next) {
+  const lang = getLang(req);
   try {
     const events = await Event.find({})
       .sort({ date: 1, order: 1, createdAt: 1 })
       .populate('image')
       .lean();
     
-    const items = events.map(formatEventForApi);
+    const items = events.map(event => formatEventForApi(event, lang));
     res.json(items);
   } catch (e) { next(e); }
 }
@@ -116,93 +104,135 @@ async function createEventsItem(req, res, next) {
       // Legacy URL-based image
       imageRef = image;
     }
-    
-    const event = await Event.create({
-      name,
+
+    const event = new Event({
       date: date ? new Date(date) : null,
       end: end ? new Date(end) : null,
       location,
       locationAddress: locationAddress || location || '',
-      locationLatitude: locationLatitude ? parseFloat(locationLatitude) : null,
-      locationLongitude: locationLongitude ? parseFloat(locationLongitude) : null,
-      title: toLocalizedString(title),
-      description: toLocalizedString(description),
+      locationLatitude:
+        locationLatitude !== undefined && locationLatitude !== null && locationLatitude !== ''
+          ? parseFloat(locationLatitude)
+          : null,
+      locationLongitude:
+        locationLongitude !== undefined && locationLongitude !== null && locationLongitude !== ''
+          ? parseFloat(locationLongitude)
+          : null,
       image: imageRef,
-      sub_events: (sub_events || []).map(sub => ({
-        name: sub.name,
-        date: sub.date ? new Date(sub.date) : null,
-        end: sub.end ? new Date(sub.end) : null,
-        description: sub.description, // Keep sub-event description as plain string
-        icon: sub.icon
-      }))
     });
 
+    // Localised fields (one language at a time)
+    event.name = mergeLocalizedString(undefined, name, lang);
+    event.title = mergeLocalizedString(undefined, title, lang);
+    event.description = mergeLocalizedString(undefined, description, lang);
+
+    // Sub-events: also LocalizedString for name/description
+    event.sub_events = (sub_events || []).map(sub => ({
+      name: mergeLocalizedString(undefined, sub.name, lang),
+      date: sub.date ? new Date(sub.date) : null,
+      end: sub.end ? new Date(sub.end) : null,
+      description: mergeLocalizedString(undefined, sub.description, lang),
+      icon: sub.icon,
+    }));
+
+    await event.save();
     res.status(201).json(formatEventForApi(event));
-  } catch (e) { next(e); }
+  } catch (e) {
+    next(e);
+  }
 }
 
 async function updateEventsItem(req, res, next) {
   try {
+    const lang = getLang(req);
     const { id } = req.params;
-    const { name, date, end, location, locationAddress, locationLatitude, locationLongitude, title, description, image, sub_events } = req.body;
 
-    // Convert strings to localized maps if needed
-    const convertToMap = (value) => {
-      if (!value) return undefined;
-      if (typeof value === 'string') return { en: value };
-      if (typeof value === 'object') return value;
-      return undefined;
-    };
+    const {
+      name,
+      date,
+      end,
+      location,
+      locationAddress,
+      locationLatitude,
+      locationLongitude,
+      title,
+      description,
+      image,
+      sub_events,
+    } = req.body;
 
-    // Handle image reference
-    let imageRef = undefined;
-    if (image !== undefined) {
-      if (!image) {
-        // Image explicitly set to null/empty, remove it
-        imageRef = undefined;
-      } else if (image.imageId) {
-        // New format - reference to uploaded image
-        imageRef = image.imageId;
-      } else if (typeof image === 'string' && image.startsWith('/')) {
-        // Legacy URL-based image
-        imageRef = image;
-      }
-    }
-
-    const updateData = {
-      ...(name && { name }),
-      ...(date && { date: new Date(date) }),
-      ...(end && { end: new Date(end) }),
-      ...(location && { location }),
-      ...(locationAddress && { locationAddress }),
-      ...(locationLatitude && { locationLatitude: parseFloat(locationLatitude) }),
-      ...(locationLongitude && { locationLongitude: parseFloat(locationLongitude) }),
-      ...(title && { title: convertToMap(title) }),
-      ...(description && { description: convertToMap(description) }),
-      ...(sub_events && { 
-        sub_events: sub_events.map(sub => ({
-          name: sub.name,
-          date: sub.date ? new Date(sub.date) : null,
-          end: sub.end ? new Date(sub.end) : null,
-          description: sub.description, // Keep sub-event description as plain string
-          icon: sub.icon
-        }))
-      })
-    };
-
-    // Add image reference to update if provided
-    if (imageRef !== undefined) {
-      updateData.image = imageRef;
-    }
-
-    const event = await Event.findByIdAndUpdate(id, updateData, { new: true });
-
+    const event = await Event.findById(id);
     if (!event) return res.status(404).json({ error: 'Event not found' });
 
-    res.json(formatEventForApi(event));
-  } catch (e) { next(e); }
-}
+    // Non-localised scalars
+    if (date !== undefined) {
+      event.date = date ? new Date(date) : null;
+    }
+    if (end !== undefined) {
+      event.end = end ? new Date(end) : null;
+    }
+    if (location !== undefined) {
+      event.location = location;
+    }
+    if (locationAddress !== undefined) {
+      event.locationAddress = locationAddress;
+    }
+    if (locationLatitude !== undefined) {
+      event.locationLatitude =
+        locationLatitude !== null && locationLatitude !== ''
+          ? parseFloat(locationLatitude)
+          : null;
+    }
+    if (locationLongitude !== undefined) {
+      event.locationLongitude =
+        locationLongitude !== null && locationLongitude !== ''
+          ? parseFloat(locationLongitude)
+          : null;
+    }
 
+    // Image
+    if (image !== undefined) {
+      let imageRef = undefined;
+      if (!image) {
+        imageRef = undefined; // explicit clear
+      } else if (image.imageId) {
+        imageRef = image.imageId;
+      } else if (typeof image === 'string' && image.startsWith('/')) {
+        imageRef = image;
+      }
+      event.image = imageRef;
+    }
+
+    // Localised fields
+    event.name = mergeLocalizedString(event.name, name, lang);
+    event.title = mergeLocalizedString(event.title, title, lang);
+    event.description = mergeLocalizedString(event.description, description, lang);
+
+    // Sub-events: keep existing other languages, update current lang
+    if (Array.isArray(sub_events)) {
+      const existingSubs = Array.isArray(event.sub_events) ? event.sub_events : [];
+
+      event.sub_events = sub_events.map((sub, idx) => {
+        const existing = existingSubs[idx] || {};
+        const base = existing.toObject ? existing.toObject() : existing;
+
+        return {
+          ...base,
+          name: mergeLocalizedString(base.name, sub.name, lang),
+          description: mergeLocalizedString(base.description, sub.description, lang),
+          date: sub.date !== undefined ? (sub.date ? new Date(sub.date) : null) : base.date ?? null,
+          end: sub.end !== undefined ? (sub.end ? new Date(sub.end) : null) : base.end ?? null,
+          icon: sub.icon !== undefined ? sub.icon : base.icon,
+        };
+      });
+    }
+
+    await event.save();
+    res.json(formatEventForApi(event));
+  } catch (e) {
+    next(e);
+  }
+}
 async function deleteEventsItem(req, res, next) {
   try {
     const { id } = req.params;
@@ -226,7 +256,7 @@ function formatCourseForApi(course) {
 }
 
 // Format course option for API response
-function formatCourseOptionForApi(option) {
+function formatCourseOptionForApi(option, lang) {
   // Format image data for display
   let imageData = null;
   if (option.image && option.image.data) {
@@ -247,9 +277,9 @@ function formatCourseOptionForApi(option) {
   return {
     id: option._id.toString(),
     courseId: option.courseId.toString(),
-    label: option.label,
+    label: localize(option.label, lang),
     image: imageData,
-    description: option.description || null,
+    description: localize(option.description, lang) || null,
     // Special Dietary Indicators
     isVegetarian: option.isVegetarian || false,
     containsAllergens: option.containsAllergens || false,
@@ -258,118 +288,6 @@ function formatCourseOptionForApi(option) {
     containsNuts: option.containsNuts || false,
     dietaryIcons: generateDietaryIconsHTML(option)
   };
-}
-
-// Course CRUD operations (mimicking guest management)
-async function listCourses(req, res, next) {
-  try {
-    const courses = await Course.find({}).sort({ course: 1, createdAt: 1 });
-    const formatted = courses.map(course => formatCourseForApi(course));
-    res.json(formatted);
-  } catch (e) { 
-    next(e); 
-  }
-}
-
-async function createCourse(req, res, next) {
-  try {
-    const { course, label, selectionRequired } = req.body;
-    
-    // Validate required fields
-    if (!course || !['starter', 'main', 'dessert', 'drinks'].includes(course)) {
-      return res.status(400).json({ error: 'Valid course (starter, main, dessert, drinks) is required' });
-    }
-    
-    if (!label) {
-      return res.status(400).json({ error: 'Label is required' });
-    }
-    
-    const newCourse = await Course.create({ 
-      course, 
-      label, 
-      selectionRequired: selectionRequired !== undefined ? selectionRequired : true 
-    });
-    res.status(201).json(formatCourseForApi(newCourse));
-  } catch (e) { 
-    next(e); 
-  }
-}
-
-async function getCourse(req, res, next) {
-  try {
-    const course = await Course.findById(req.params.id);
-    if (!course) {
-      return res.status(404).json({ error: 'Course not found' });
-    }
-    res.json(formatCourseForApi(course));
-  } catch (e) { 
-    next(e); 
-  }
-}
-
-async function updateCourse(req, res, next) {
-  try {
-    const { id } = req.params;
-    const { course, label, selectionRequired } = req.body;
-    
-    const updateData = {};
-    if (course && ['starter', 'main', 'dessert', 'drinks'].includes(course)) {
-      updateData.course = course;
-    }
-    if (label) {
-      updateData.label = label;
-    }
-    if (selectionRequired !== undefined) {
-      updateData.selectionRequired = selectionRequired;
-    }
-    
-    const updatedCourse = await Course.findByIdAndUpdate(id, updateData, { new: true });
-    if (!updatedCourse) {
-      return res.status(404).json({ error: 'Course not found' });
-    }
-    res.json(formatCourseForApi(updatedCourse));
-  } catch (e) { 
-    next(e); 
-  }
-}
-
-async function deleteCourse(req, res, next) {
-  try {
-    const { id } = req.params;
-    
-    // Check if course has options
-    const optionCount = await CourseOption.countDocuments({ courseId: id });
-    if (optionCount > 0) {
-      return res.status(400).json({ error: 'Cannot delete course with existing options. Delete options first.' });
-    }
-    
-    const course = await Course.findByIdAndDelete(id);
-    if (!course) {
-      return res.status(404).json({ error: 'Course not found' });
-    }
-    res.json({ status: 'ok' });
-  } catch (e) { 
-    next(e); 
-  }
-}
-
-// Course Options management (mimicking party management)
-async function getCourseOptions(req, res, next) {
-  try {
-    const { courseId } = req.params;
-    
-    // Verify course exists
-    const course = await Course.findById(courseId);
-    if (!course) {
-      return res.status(404).json({ error: 'Course not found' });
-    }
-    
-    const options = await CourseOption.find({ courseId }).sort({ createdAt: 1 });
-    const formatted = options.map(option => formatCourseOptionForApi(option));
-    res.json(formatted);
-  } catch (e) { 
-    next(e); 
-  }
 }
 
 // ========== Settings: Agenda bloqueo (MongoDB) ==========
@@ -411,18 +329,6 @@ async function setBlockedEvent(req, res, next) {
     obj.otherOptions.event.blocked = true;
     obj.otherOptions.event.reason = reason;
     obj.otherOptions.event.blockedAt = obj.otherOptions.event.blockedAt || now;
-    await Config.updateOne({ _id: cfg._id }, { $set: { otherOptions: obj.otherOptions } });
-    res.json(obj);
-  } catch (e) { next(e); }
-}
-
-async function clearBlockedEvent(req, res, next) {
-  try {
-    const cfg = await getConfigDoc();
-    const obj = ensureEventInConfig(cfg.toObject());
-    obj.otherOptions.event.blocked = false;
-    obj.otherOptions.event.reason = '';
-    obj.otherOptions.event.blockedAt = null;
     await Config.updateOne({ _id: cfg._id }, { $set: { otherOptions: obj.otherOptions } });
     res.json(obj);
   } catch (e) { next(e); }
@@ -471,6 +377,7 @@ async function updateSettings(req, res, next) {
 
 // ========== Gift Cards (MongoDB CRUD) ==========
 async function listGifts(req, res, next) {
+    const lang = getLang(req);
     try {
         const gifts = await Gift.find()
             .populate('image')
@@ -510,9 +417,8 @@ async function listGifts(req, res, next) {
 
             return {
                 id: gift._id.toString(),
-                name: gift.title, // Using 'name' as per requirements
-                title: gift.title,
-                description: gift.description,
+                title: localize(gift.title, lang),
+                description: localize(gift.description, lang),
                 amount: gift.amount,
                 available: gift.available,
                 purchased: purchaseCountMap[gift._id.toString()] || 0,
@@ -526,71 +432,72 @@ async function listGifts(req, res, next) {
 }
 
 async function createGift(req, res, next) {
-    try {
-        const { name, title, description, amount, available, image } = req.body;
+  try {
+    const lang = getLang(req);
+    const { title, description, amount, available, image } = req.body;
 
-        // Validate required fields
-        if (!title && !name) {
-            return res.status(400).json({ error: 'Name/title is required' });
-        }
+    // Validate required fields
+    if (!title) {
+        return res.status(400).json({ error: 'title is required' });
+    }
 
-        if (!description) {
-            return res.status(400).json({ error: 'Description is required' });
-        }
+    if (!description) {
+        return res.status(400).json({ error: 'Description is required' });
+    }
 
-        if (!amount || ![25, 50, 100, 200, 500].includes(parseInt(amount))) {
-            return res.status(400).json({ error: 'Valid amount (€25, €50, €100, €200, or €500) is required' });
-        }
+    if (!amount || ![25, 50, 100, 200, 500].includes(parseInt(amount))) {
+        return res.status(400).json({ error: 'Valid amount (€25, €50, €100, €200, or €500) is required' });
+    }
 
-        if (available === undefined || available < 0) {
-            return res.status(400).json({ error: 'Valid number available is required' });
-        }
+    if (available === undefined || available < 0) {
+        return res.status(400).json({ error: 'Valid number available is required' });
+    }
 
-        // Handle image reference
-        let imageRef = undefined;
-        if (image && image.imageId) {
-            // reference to uploaded image
-            imageRef = image.imageId;
-        } else {
-            return res.status(400).json({ error: 'Valid image is required' });
-        }
+    // Handle image reference
+    let imageRef = undefined;
+    if (image && image.imageId) {
+        // reference to uploaded image
+        imageRef = image.imageId;
+    } else {
+        return res.status(400).json({ error: 'Valid image is required' });
+    }
 
-        const gift = await Gift.create({
-            title: title || name,
-            description,
-            amount: parseInt(amount),
-            available: parseInt(available),
-            image: imageRef
-        });
+    const gift = await Gift.create({
+        title: mergeLocalizedString(undefined, title, lang),
+        description: mergeLocalizedString(undefined, description, lang),
+        amount: parseInt(amount),
+        available: parseInt(available),
+        image: imageRef
+    });
 
-        // Populate image for response
-        const populatedGift = await Gift.findById(gift._id).populate('image').lean();
+    // Populate image for response
+    const populatedGift = await Gift.findById(gift._id).populate('image').lean();
 
-        // Format image data for display
-        let imageData = null;
-        if (populatedGift.image && populatedGift.image.data) {
-            const base64Data = populatedGift.image.data.toString('base64');
-            imageData = `data:${populatedGift.image.contentType};base64,${base64Data}`;
-        }
+    // Format image data for display
+    let imageData = null;
+    if (populatedGift.image && populatedGift.image.data) {
+        const base64Data = populatedGift.image.data.toString('base64');
+        imageData = `data:${populatedGift.image.contentType};base64,${base64Data}`;
+    }
 
-        res.status(201).json({
-            id: gift._id.toString(),
-            name: gift.title,
-            title: gift.title,
-            description: gift.description,
-            amount: gift.amount,
-            available: gift.available,
-            purchased: 0,
-            image: imageData,
-            priceDisplay: `€${gift.amount}`
-        });
-    } catch (e) { next(e); }
+    res.status(201).json({
+        id: gift._id.toString(),
+        title: localize(gift.title, lang),
+        description: localize(gift.description, lang),
+        amount: gift.amount,
+        available: gift.available,
+        purchased: 0,
+        image: imageData,
+        priceDisplay: `€${gift.amount}`
+    });
+  } catch (e) { next(e); }
 }
 
 async function updateGift(req, res, next) {
-    try {
+  try {
+        const lang = getLang(req);
         const { id } = req.params;
-        const { name, title, description, amount, available, image } = req.body;
+        const { title, description, amount, available, image } = req.body;
 
         // Validate amount if provided
         if (amount && ![25, 50, 100, 200, 500].includes(parseInt(amount))) {
@@ -609,14 +516,16 @@ async function updateGift(req, res, next) {
             }
         }
 
-        const updateData = {};
-        if (title || name) updateData.title = title || name;
-        if (description !== undefined) updateData.description = description;
-        if (amount !== undefined) updateData.amount = parseInt(amount);
-        if (available !== undefined) updateData.available = parseInt(available);
-        if (imageRef !== undefined) updateData.image = imageRef;
+        const gift = await Gift.findById(id);
+        if (!gift) return res.status(404).json({ error: 'Gift not found' });
 
-        const gift = await Gift.findByIdAndUpdate(id, updateData, { new: true }).populate('image');
+        if (title !== undefined) gift.title = mergeLocalizedString(gift.title, title, lang);
+        if (description !== undefined) gift.description = mergeLocalizedString(gift.description, description, lang);
+        if (amount !== undefined) gift.amount = parseInt(amount);
+        if (available !== undefined) gift.available = parseInt(available);
+        if (imageRef !== undefined) gift.image = imageRef;
+
+        await gift.save();
 
         if (!gift) return res.status(404).json({ error: 'Gift not found' });
 
@@ -635,9 +544,8 @@ async function updateGift(req, res, next) {
 
         res.json({
             id: gift._id.toString(),
-            name: gift.title,
-            title: gift.title,
-            description: gift.description,
+            title: localize(gift.title, lang),
+            description: localize(gift.description, lang),
             amount: gift.amount,
             available: gift.available,
             purchased: purchaseCount,

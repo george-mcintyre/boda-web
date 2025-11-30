@@ -882,9 +882,9 @@ Same schema as `GET /api/guest/menu`:
 ]
 ```
 
-#### `POST /api/admin/courseData`
+#### `POST /api/admin/courseData?lang=en`
 
-Create a new menu course.
+Create a new menu course for the specified language.
 
 **Request body**
 ```json

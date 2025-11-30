@@ -1,9 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const { Event, EventChoice } = require('../models');
+const { localize, getLang, mergeLocalizedString } = require('../utils/localized');
 
 // Format event for API response according to README specification
-function formatEventForApi(event) {
+function formatEventForApi(event, lang = 'en') {
   // Format image data for display
   let imageData = null;
   if (event.image && event.image.data) {
@@ -23,7 +24,7 @@ function formatEventForApi(event) {
 
   return {
     id: event._id.toString(),
-    name: event.name,
+    name: localize(event.name, lang),
     date: event.date ? event.date.toISOString() : null,
     end: event.end ? event.end.toISOString() : null,
     locationAddress: event.locationAddress || '',
@@ -31,14 +32,14 @@ function formatEventForApi(event) {
     locationLongitude: event.locationLongitude || null,
     // Legacy location field for backward compatibility
     location: event.location || event.locationAddress || '',
-    title: event.title ? (typeof event.title === 'string' ? event.title : (event.title.get ? event.title.get('en') || event.title.get('es') : event.title.en || event.title.es || '')) : null,
-    description: event.description ? (typeof event.description === 'string' ? event.description : (event.description.get ? event.description.get('en') || event.description.get('es') : event.description.en || event.description.es || '')) : null,
+    title: event.title ? localize(event.title, lang) : null,
+    description: event.description ? localize(event.description, lang) : null,
     image: imageData,
     sub_events: (event.sub_events || []).map(sub => ({
-      name: sub.name,
+      name: localize(sub.name, lang),
       date: sub.date ? sub.date.toISOString() : null,
       end: sub.end ? sub.end.toISOString() : null,
-      description: sub.description || null,
+      description: localize(sub.description, lang) || null,
       icon: sub.icon
     }))
   };
@@ -47,9 +48,10 @@ function formatEventForApi(event) {
 // Guest: List events
 async function listEvents(req, res, next) {
   try {
+    const lang = getLang(req);
     // Populate image to get the actual image data for base64 conversion
     const events = await Event.find({}).sort({ date: 1, order: 1, createdAt: 1 }).populate('image');
-    const items = events.map(formatEventForApi);
+    const items = events.map(event => formatEventForApi(event, lang));
     res.json(items);
   } catch (e) {
     next(e);
@@ -106,9 +108,10 @@ async function updateEventChoices(req, res, next) {
 // Admin: List all events
 async function listEventsAdmin(req, res, next) {
   try {
+    const lang = getLang(req);
     // Populate image to get the actual image data for base64 conversion
     const events = await Event.find({}).sort({ date: 1, order: 1, createdAt: 1 }).populate('image');
-    const items = events.map(formatEventForApi);
+    const items = events.map(event => formatEventForApi(event, lang));
     res.json(items);
   } catch (e) {
     next(e);
@@ -118,40 +121,29 @@ async function listEventsAdmin(req, res, next) {
 // Admin: Create new event
 async function createEvent(req, res, next) {
   try {
+    const lang = getLang(req);
     const { name, date, end, location, locationAddress, locationLatitude, locationLongitude, title, description, image, sub_events } = req.body;
-    
-    console.log('Received event data:', {
-      name,
-      date,
-      location,
-      locationAddress,
-      locationLatitude,
-      locationLongitude,
-      title,
-      description
-    });
-    
+        
     const event = await Event.create({
-      name,
+      name: mergeLocalizedString(undefined, name, lang),
       date: date ? new Date(date) : null,
       end: end ? new Date(end) : null,
       location: location || locationAddress || '',
       locationAddress: locationAddress || location || '',
       locationLatitude: locationLatitude ? parseFloat(locationLatitude) : null,
       locationLongitude: locationLongitude ? parseFloat(locationLongitude) : null,
-      title,
-      description,
+      title: mergeLocalizedString(undefined, title, lang),
+      description: mergeLocalizedString(undefined, description, lang),
       image,
       sub_events: (sub_events || []).map(sub => ({
-        name: sub.name,
+        name: mergeLocalizedString(undefined, sub.name, lang),
         date: sub.date ? new Date(sub.date) : null,
         end: sub.end ? new Date(sub.end) : null,
-        description: sub.description,
+        description: mergeLocalizedString(undefined, sub.description, lang),
         icon: sub.icon
       }))
     });
 
-    console.log('Created event:', event);
     res.status(201).json(formatEventForApi(event));
   } catch (e) {
     next(e);
@@ -165,22 +157,22 @@ async function updateEvent(req, res, next) {
     const { name, date, end, location, locationAddress, locationLatitude, locationLongitude, title, description, image, sub_events } = req.body;
 
     const event = await Event.findByIdAndUpdate(id, {
-      ...(name && { name }),
+      ...(name && { name: mergeLocalizedString(undefined, name, lang) }),
       ...(date && { date: new Date(date) }),
       ...(end && { end: new Date(end) }),
       ...(location && { location }),
       ...(locationAddress && { locationAddress }),
       ...(locationLatitude && { locationLatitude: parseFloat(locationLatitude) }),
       ...(locationLongitude && { locationLongitude: parseFloat(locationLongitude) }),
-      ...(title && { title }),
-      ...(description && { description }),
+      ...(title && { title: mergeLocalizedString(undefined, title, lang) }),
+      ...(description && { description: mergeLocalizedString(undefined, description, lang) }),
       ...(image && { image }),
       ...(sub_events && { 
         sub_events: sub_events.map(sub => ({
-          name: sub.name,
+          name: mergeLocalizedString(undefined, sub.name, lang),
           date: sub.date ? new Date(sub.date) : null,
           end: sub.end ? new Date(sub.end) : null,
-          description: sub.description,
+          description: mergeLocalizedString(undefined, sub.description, lang),
           icon: sub.icon
         }))
       })
@@ -188,7 +180,7 @@ async function updateEvent(req, res, next) {
 
     if (!event) return res.status(404).json({ error: 'Event not found' });
 
-    res.json(formatEventForApi(event));
+    res.json(formatEventForApi(event, lang));
   } catch (e) {
     next(e);
   }

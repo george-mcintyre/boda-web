@@ -1335,7 +1335,7 @@
     setLoading(translate('admin:loadingGiftList'));
     
     // Load gifts 
-    const giftsRes = await api('/api/admin/gifts');
+    const giftsRes = await api(`/api/admin/gifts?lang=${getUserLanguage()}`);
     const gifts = giftsRes.ok ? await giftsRes.json() : [];
     
     const rows = (gifts||[]).map(it => {
@@ -1366,7 +1366,7 @@
       
       return `
       <tr>
-        <td>${it.name || it.title || ''}</td>
+        <td>${it.title || ''}</td>
         <td>${it.description || ''}</td>
         <td>
           ${imageUrl ? `<img src="${imageUrl}" alt="Gift card" style="width: 40px; height: 25px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;"><div data-i18n="admin:gifts.noImage">${translate('admin:gifts.noImage')}</div></span>` : '<span style="color: #999;"><div data-i18n="admin:gifts.noImage">' + translate('admin:gifts.noImage') + '</div></span>'}
@@ -1402,7 +1402,7 @@
     content.innerHTML = renderTable({
       title: `<div data-i18n="admin:gifts.title">${translate('admin:gifts.title')}</div>`, 
       columns:[
-        `<div data-i18n="admin:gifts.table.name">${translate('admin:gifts.table.name')}</div>`,
+        `<div data-i18n="admin:gifts.table.title">${translate('admin:gifts.table.title')}</div>`,
         `<div data-i18n="admin:gifts.table.description">${translate('admin:gifts.table.description')}</div>`,
         `<div data-i18n="admin:gifts.table.image">${translate('admin:gifts.table.image')}</div>`,
         `<div data-i18n="admin:gifts.table.available">${translate('admin:gifts.table.available')}</div>`,
@@ -1460,7 +1460,7 @@
           showCurrentImage: showCurrentImage,
           currentImageUrl: imageUrl,
           fields: [
-            { name:'name', label: translate('admin:gifts.field.name'), required:true },
+            { name:'title', label: translate('admin:gifts.field.title'), required:true },
             { name:'description', label: translate('admin:gifts.field.description'), type:'textarea', required:true },
             { name:'image', label: translate('admin:gifts.field.image'), type:'file', help: translate('admin:gifts.field.imageHelp') },
             { name:'imagePreview', label:'Preview', type:'imagePreview' },
@@ -1476,7 +1476,7 @@
             }
           ],
           initialValues: {
-            name: current.name || current.title || '',
+            title: current.title || '',
             description: current.description || '',
             available: current.available,
             amount: String(current.amount)
@@ -1530,14 +1530,14 @@
               }
               
               const giftData = {
-                name: values.name,
+                title: values.title,
                 description: values.description,
                 available: parseInt(values.available),
                 amount: parseInt(values.amount),
                 image: imageReference
               };
               
-              const r = await api(`/api/admin/gifts/${id}`, { 
+              const r = await api(`/api/admin/gifts/${id}?lang=${getUserLanguage()}`, { 
                 method:'PUT', 
                 headers:{'Content-Type':'application/json'}, 
                 body: JSON.stringify(giftData)
@@ -1561,7 +1561,7 @@
         title: `<div data-i18n="admin:gifts.add">${translate('admin:gifts.add')}</div>`, 
         submitText: `<span data-i18n="admin:gifts.add">${translate('admin:gifts.add')}</span>`,
         fields: [
-          { name:'name', label: translate('admin:gifts.field.name'), required:true },
+          { name:'title', label: translate('admin:gifts.field.title'), required:true },
           { name:'description', label: translate('admin:gifts.field.description'), type:'textarea', required:true },
           { name:'image', label: translate('admin:gifts.field.image'), type:'file', required:true, help: translate('admin:gifts.field.imageHelp') },
           { name:'imagePreview', label:'Preview', type:'imagePreview' },
@@ -1599,14 +1599,14 @@
             }
             
             const giftData = {
-              name: values.name,
+              title: values.title,
               description: values.description,
               available: parseInt(values.available),
               amount: parseInt(values.amount),
               image: imageReference
             };
             
-            const r = await api('/api/admin/gifts', { 
+            const r = await api(`/api/admin/gifts?lang=${getUserLanguage()}`, { 
               method:'POST', 
               headers:{'Content-Type':'application/json'}, 
               body: JSON.stringify(giftData)
@@ -1794,7 +1794,7 @@
   async function showEvent(){
     activate('event');
     setLoading(translate('admin:loadingEventSchedule'));
-    const res = await api('/api/admin/events');
+    const res = await api(`/api/admin/events?lang=${getUserLanguage()}`);
     const data = res.ok ? await res.json() : [];
     
     // Helper function to get image URL
@@ -2050,7 +2050,7 @@
             image: imageReference
           };
           
-          const url = isNew ? '/api/admin/events' : `/api/admin/events/${event.id}`;
+          const url = isNew ? '/api/admin/events?lang=${getUserLanguage()}' : `/api/admin/events/${event.id}?lang=${getUserLanguage()}`;
           const method = isNew ? 'POST' : 'PUT';
           
           const r = await api(url, { 
@@ -2224,7 +2224,7 @@
   // Update event sub-events
   async function updateEventSubEvents(eventId, subEvents, modal) {
     try {
-      const r = await api(`/api/admin/events/${eventId}`, {
+      const r = await api(`/api/admin/events/${eventId}?lang=${getUserLanguage()}`, {
         method: 'PUT',
         headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ sub_events: subEvents })
@@ -2255,7 +2255,7 @@
     setLoading(translate('admin:loadingCourses'));
     
     try {
-      const res = await api('/api/admin/courseData');
+      const res = await api(`/api/admin/courseData?lang=${getUserLanguage()}`);
       const data = res.ok ? await res.json() : [];
       
       // Group by course type for better organization
@@ -2454,7 +2454,7 @@
     const loadExistingData = async () => {
       if (courseId) {
         try {
-          const res = await api('/api/admin/courseData');
+          const res = await api(`/api/admin/courseData?lang=${getUserLanguage()}`);
           if (res.ok) {
             const data = await res.json();
             existingData = data.find(part => part.id === courseId) || null;
@@ -2506,7 +2506,7 @@
               selectionRequired: values.selectionRequired === 'true'
             };
             
-            const url = courseId ? `/api/admin/courseData/${courseId}` : '/api/admin/courseData';
+            const url = courseId ? `/api/admin/courseData/${courseId}?lang=${getUserLanguage()}` : `/api/admin/courseData?lang=${getUserLanguage()}`;
             const method = courseId ? 'PUT' : 'POST';
             
             const r = await api(url, { 
@@ -2544,7 +2544,7 @@
     const loadExistingData = async () => {
       if (optionId) {
         try {
-          const res = await api(`/api/admin/courseData/${courseId}/options/${optionId}`);
+          const res = await api(`/api/admin/courseData/${courseId}/options/${optionId}?lang=${getUserLanguage()}`);
           if (res.ok) {
             const data = await res.json();
             existingData = data;
@@ -2647,7 +2647,7 @@
               containsNuts: values.containsNuts || false
             };
             
-            const url = optionId ? `/api/admin/courseData/${courseId}/options/${optionId}` : `/api/admin/courseData/${courseId}/options`;
+            const url = optionId ? `/api/admin/courseData/${courseId}/options/${optionId}?lang=${getUserLanguage()}` : `/api/admin/courseData/${courseId}/options?lang=${getUserLanguage()}`;
             const method = optionId ? 'PUT' : 'POST';
             
             const r = await api(url, { 

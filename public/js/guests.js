@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           method: 'GET',
           headers: { 'Authorization': token }
         }),
-        fetch('/api/guest/menu', {
+        fetch(`/api/guest/menu?lang=${currentLanguage}`, {
           method: 'GET',
           headers: { 'Authorization': token }
         }),
@@ -1179,7 +1179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       // Fetch all required data in parallel
       const [eventsResponse, partyResponse, choicesResponse] = await Promise.all([
-        fetch('/api/guest/events', {
+        fetch(`/api/guest/events?lang=${currentLanguage}`, {
           method: 'GET',
           headers: { 'Authorization': token }
         }),
@@ -1605,7 +1605,7 @@ document.addEventListener('DOMContentLoaded', async () => {
            method: 'GET',
            headers: { 'Authorization': token }
          }),
-         fetch('/api/guest/gifts', {
+         fetch(`/api/guest/gifts?lang=${currentLanguage}`, {
            method: 'GET',
            headers: { 'Authorization': token }
          })
@@ -2858,7 +2858,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           method: 'GET',
           headers: { 'Authorization': token }
         }),
-        fetch('/api/guest/events', {
+        fetch(`/api/guest/events?lang=${currentLanguage}`, {
           method: 'GET',
           headers: { 'Authorization': token }
         }),
@@ -2866,7 +2866,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           method: 'GET',
           headers: { 'Authorization': token }
         }),
-        fetch('/api/guest/menu', {
+        fetch(`/api/guest/menu?lang=${currentLanguage}`, {
           method: 'GET',
           headers: { 'Authorization': token }
         }),

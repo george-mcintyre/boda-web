@@ -2,6 +2,7 @@ const guestService = require('../services/guestService');
 const { Guest, Gift, GiftChoice } = require('../models');
 const stripe = require('../config/stripe');
 const { APP_URL } = require('../config/env');
+const { getLang, localize } = require('../utils/localized');
 
 async function getMe(req, res, next) {
   try {
@@ -186,6 +187,7 @@ async function bulkUpload(req, res, next) {
 
 // ========== Guest Gift Functions ==========
 async function getGifts(req, res, next) {
+  const lang = getLang(req);
   try {
     // Sort by amount (price) ascending as per requirements
     const gifts = await Gift.find().sort({ amount: 1 }).lean();
@@ -204,6 +206,8 @@ async function getGifts(req, res, next) {
     });
     
     const items = gifts.map(gift => {
+      const title = localize(gift.title, lang);
+      const description = localize(gift.description, lang);
       const purchased = purchaseCountMap[gift._id.toString()] || 0;
       const stock = gift.available - purchased;
       
@@ -221,9 +225,8 @@ async function getGifts(req, res, next) {
       
       return {
         id: gift._id.toString(),
-        name: gift.title,
-        title: gift.title,
-        description: gift.description,
+        title: title,
+        description: description,
         amount: gift.amount,
         available: gift.available,
         purchased: purchased,
@@ -251,22 +254,14 @@ async function getGiftChoices(req, res, next) {
       const gift = choice.giftId;
       
       // Generate image URL for the gift
-      let imageUrl;
-      if (gift && typeof gift.image === 'number') {
-        imageUrl = `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`;
-      } else if (gift && gift.image) {
-        // ObjectId reference - use the guest gift image endpoint
-        imageUrl = `/api/guest/gifts/${gift._id}/image`;
-      } else {
-        imageUrl = `/assets/images/gift-cards/image_01.jpg`;
-      }
+      let imageUrl = `/api/guest/gifts/${gift._id}/image`;
       
       return {
         id: choice._id.toString(),
-        giftId: gift ? gift._id.toString() : null,
-        giftTitle: gift ? gift.title : 'Unknown Gift',
-        giftAmount: gift ? gift.amount : 0,
-        giftDescription: gift ? gift.description : '',
+        giftId: gift._id.toString(),
+        giftTitle: localize(gift.title, lang),
+        giftAmount: gift.amount,
+        giftDescription: localize(gift.description, lang),
         giftImageUrl: imageUrl,
         date: choice.date.toISOString(),
         message: choice.message
