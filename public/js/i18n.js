@@ -7,6 +7,7 @@ const translations = {
     'common:seconds': 'Seconds',
     'common:login': 'Login',
     'common:footer': '© 2026 Boda de Iluminada &amp; George',
+    'common:noEmail': 'no email',
 
     'common:primary': 'Primary',
     'common:saving': 'Saving...',
@@ -18,7 +19,9 @@ const translations = {
     'common:errorSavingSpecialRequest': 'Error saving special request',
     'common:specialRequestDetailsSaved': 'Special request details saved successfully!',
     'common:errorSavingSpecialRequestDetails': 'Error saving special request details',
-
+    'common:People': 'people',
+    'common:Person': 'person',
+ 
     'wedding:title': 'Iluminada & George',
     'wedding:subtitle': 'We\'re getting married!',
     'wedding:date': 'June 6th, 2026 • Marbella, Spain',
@@ -69,8 +72,6 @@ const translations = {
       </p>
     `,
     'guests:summaryYourParty': 'Your Party',
-    'guests:summaryPeople': 'people',
-    'guests:summaryPerson': 'person',
     'guests:summaryRSVP': 'RSVP Summary',
     'guests:summaryMenuSelections': 'Menu Selections',
 
@@ -266,6 +267,43 @@ const translations = {
     'admin:loadingSettings': 'Loading settings...',
     'admin:footer': 'Admin panel',
 
+    // Admin Guests Section
+    'admin:guests.errorLoading': 'Failed to load guests',
+    'admin:guests.adult': 'Adult',
+    'admin:guests.child': 'Child',
+    'admin:guests.totalGuests': 'Total Guests',
+    'admin:guests.acrossParties': 'Across {{count}} {{partyWord}}',
+    'admin:guests.addGuest': 'Add Guest',
+    'admin:guests.bulkUploadCsv': 'Bulk Upload CSV',
+    'admin:guests.table.name': 'Name',
+    'admin:guests.table.email': 'Email',
+    'admin:guests.table.ageCategory': 'Age Category',
+    'admin:guests.table.partySize': 'Party Size',
+    'admin:guests.table.actions': 'Actions',
+    'admin:guests.confirmDelete': 'Delete this guest and their entire party?',
+    'admin:guests.editTitle': 'Edit guest',
+    'admin:guests.addTitle': 'Add guest',
+    'admin:guests.save': 'Save',
+    'admin:guests.add': 'Add',
+    'admin:guests.field.name': 'Name',
+    'admin:guests.field.email': 'Email',
+    'admin:guests.field.ageCategory': 'Age Category',
+    'admin:guests.option.adult': 'Adult (18+)',
+    'admin:guests.option.child': 'Child (Under 18)',
+    'admin:guests.csv.noValidGuests': 'No valid guests found in CSV file',
+    'admin:guests.csv.uploadCount': 'Upload {{count}} guests?',
+    'admin:guests.csv.preview': 'Preview:',
+    'admin:guests.csv.more': '... and {{count}} more',
+    'admin:guests.csv.uploadComplete': 'Upload complete!',
+    'admin:guests.csv.successCreated': 'Successfully created: {{count}}',
+    'admin:guests.csv.skippedDuplicates': 'Skipped (duplicates/empty): {{count}}',
+    'admin:guests.csv.errors': 'Errors: {{count}}',
+    'admin:guests.csv.firstError': 'First error: {{error}}',
+    'admin:guests.csv.uploadingError': 'Error uploading CSV: {{error}}',
+    'admin:guests.error.title': 'Error Loading Guests',
+    'admin:guests.error.failed': 'Failed to load guests: {{error}}',
+    'admin:guests.retry': 'Retry',
+
     'adminLogin:pageTitle': 'Admin Login - Wedding of Iluminada & George',
     'adminLogin:header': 'Admin Login',
     'adminLogin:home': 'Home',
@@ -351,8 +389,8 @@ const translations = {
     'rich:guests:summaryPageDescription': 'Aquí encontrarás toda la información que necesitas para llegar y disfrutar de la boda.',
 
     'guests:summaryYourParty': 'Tu Grupo',
-    'guests:summaryPeople': 'personas',
-    'guests:summaryPerson': 'persona',
+    'common:People': 'personas',
+    'common:Person': 'persona',
     'guests:summaryRSVP': 'Resumen de RSVP',
     'guests:summaryMenuSelections': 'Selecciones de Menú',
 
@@ -539,7 +577,44 @@ const translations = {
     'admin:loadingEventSchedule': 'Cargando agenda de eventos...',
     'admin:loadingCourses': 'Cargando cursos...',
     'admin:loadingSettings': 'Cargando configuración...',
-    'admin:footer': 'Panel de administración'
+    'admin:footer': 'Panel de administración',
+
+    // Admin Guests Section
+    'admin:guests.errorLoading': 'Error al cargar invitados',
+    'admin:guests.adult': 'Adulto',
+    'admin:guests.child': 'Niño',
+    'admin:guests.totalGuests': 'Total de Invitados',
+    'admin:guests.acrossParties': 'Sobre {{count}} {{partyWord}}',
+    'admin:guests.addGuest': 'Añadir Invitado',
+    'admin:guests.bulkUploadCsv': 'Carga Masiva CSV',
+    'admin:guests.table.name': 'Nombre',
+    'admin:guests.table.email': 'Email',
+    'admin:guests.table.ageCategory': 'Mayor',
+    'admin:guests.table.partySize': 'Tamaño del Grupo',
+    'admin:guests.table.actions': 'Acciones',
+    'admin:guests.confirmDelete': '¿Eliminar este invitado y todo su grupo?',
+    'admin:guests.editTitle': 'Editar invitado',
+    'admin:guests.addTitle': 'Añadir invitado',
+    'admin:guests.save': 'Guardar',
+    'admin:guests.add': 'Añadir',
+    'admin:guests.field.name': 'Nombre',
+    'admin:guests.field.email': 'Email',
+    'admin:guests.field.ageCategory': 'Categoría de Edad',
+    'admin:guests.option.adult': 'Adulto (18+)',
+    'admin:guests.option.child': 'Niño (Menos de 18)',
+    'admin:guests.csv.noValidGuests': 'No se encontraron invitados válidos en el archivo CSV',
+    'admin:guests.csv.uploadCount': '¿Subir {{count}} invitados?',
+    'admin:guests.csv.preview': 'Vista previa:',
+    'admin:guests.csv.more': '... y {{count}} más',
+    'admin:guests.csv.uploadComplete': '¡Subida completa!',
+    'admin:guests.csv.successCreated': 'Creados exitosamente: {{count}}',
+    'admin:guests.csv.skippedDuplicates': 'Omitidos (duplicados/vacíos): {{count}}',
+    'admin:guests.csv.errors': 'Errores: {{count}}',
+    'admin:guests.csv.firstError': 'Primer error: {{error}}',
+    'admin:guests.csv.uploadingError': 'Error al subir CSV: {{error}}',
+    'admin:guests.error.title': 'Error al Cargar Invitados',
+    'admin:guests.error.failed': 'Error al cargar invitados: {{error}}',
+    'admin:guests.retry': 'Reintentar'
 
   },
   fr: {
@@ -815,7 +890,44 @@ const translations = {
     'admin:loadingEventSchedule': 'Chargement de l\'agenda des événements...',
     'admin:loadingCourses': 'Chargement des cours...',
     'admin:loadingSettings': 'Chargement des paramètres...',
-    'admin:footer': 'Panel d\'administration'
+    'admin:footer': 'Panel d\'administration',
+
+    // Admin Guests Section
+    'admin:guests.errorLoading': 'Échec du chargement des invités',
+    'admin:guests.adult': 'Adulte',
+    'admin:guests.child': 'Enfant',
+    'admin:guests.totalGuests': 'Total Invités',
+    'admin:guests.acrossParties': 'À travers {{count}} {{partyWord}}',
+    'admin:guests.addGuest': 'Ajouter Invité',
+    'admin:guests.bulkUploadCsv': 'Téléchargement en Masse CSV',
+    'admin:guests.table.name': 'Nom',
+    'admin:guests.table.email': 'Email',
+    'admin:guests.table.ageCategory': 'Catégorie d\'Âge',
+    'admin:guests.table.partySize': 'Taille du Groupe',
+    'admin:guests.table.actions': 'Actions',
+    'admin:guests.confirmDelete': 'Supprimer cet invité et tout son groupe ?',
+    'admin:guests.editTitle': 'Modifier invité',
+    'admin:guests.addTitle': 'Ajouter invité',
+    'admin:guests.save': 'Enregistrer',
+    'admin:guests.add': 'Ajouter',
+    'admin:guests.field.name': 'Nom',
+    'admin:guests.field.email': 'Email',
+    'admin:guests.field.ageCategory': 'Catégorie d\'Âge',
+    'admin:guests.option.adult': 'Adulte (18+)',
+    'admin:guests.option.child': 'Enfant (Moins de 18)',
+    'admin:guests.csv.noValidGuests': 'Aucun invité valide trouvé dans le fichier CSV',
+    'admin:guests.csv.uploadCount': 'Téléverser {{count}} invités ?',
+    'admin:guests.csv.preview': 'Aperçu :',
+    'admin:guests.csv.more': '... et {{count}} de plus',
+    'admin:guests.csv.uploadComplete': 'Téléversement terminé !',
+    'admin:guests.csv.successCreated': 'Créés avec succès : {{count}}',
+    'admin:guests.csv.skippedDuplicates': 'Ignorés (doublons/vides) : {{count}}',
+    'admin:guests.csv.errors': 'Erreurs : {{count}}',
+    'admin:guests.csv.firstError': 'Première erreur : {{error}}',
+    'admin:guests.csv.uploadingError': 'Erreur lors du téléversement CSV : {{error}}',
+    'admin:guests.error.title': 'Erreur de Chargement des Invités',
+    'admin:guests.error.failed': 'Échec du chargement des invités : {{error}}',
+    'admin:guests.retry': 'Réessayer'
   },
   de: {
     'wedding:title': 'Iluminada & George',
@@ -1071,7 +1183,44 @@ const translations = {
     'admin:loadingEventSchedule': 'Veranstaltungen werden geladen...',
     'admin:loadingCourses': 'Kurse werden geladen...',
     'admin:loadingSettings': 'Einstellungen werden geladen...',
-    'admin:footer': 'Adminbereich'
+    'admin:footer': 'Adminbereich',
+
+    // Admin Guests Section
+    'admin:guests.errorLoading': 'Fehler beim Laden der Gäste',
+    'admin:guests.adult': 'Erwachsener',
+    'admin:guests.child': 'Kind',
+    'admin:guests.totalGuests': 'Gäste Insgesamt',
+    'admin:guests.acrossParties': 'Über {{count}} {{partyWord}}',
+    'admin:guests.addGuest': 'Gast Hinzufügen',
+    'admin:guests.bulkUploadCsv': 'Massen-Upload CSV',
+    'admin:guests.table.name': 'Name',
+    'admin:guests.table.email': 'E-Mail',
+    'admin:guests.table.ageCategory': 'Alterskategorie',
+    'admin:guests.table.partySize': 'Gruppengröße',
+    'admin:guests.table.actions': 'Aktionen',
+    'admin:guests.confirmDelete': 'Diesen Gast und seine gesamte Gruppe löschen?',
+    'admin:guests.editTitle': 'Gast bearbeiten',
+    'admin:guests.addTitle': 'Gast hinzufügen',
+    'admin:guests.save': 'Speichern',
+    'admin:guests.add': 'Hinzufügen',
+    'admin:guests.field.name': 'Name',
+    'admin:guests.field.email': 'E-Mail',
+    'admin:guests.field.ageCategory': 'Alterskategorie',
+    'admin:guests.option.adult': 'Erwachsener (18+)',
+    'admin:guests.option.child': 'Kind (Unter 18)',
+    'admin:guests.csv.noValidGuests': 'Keine gültigen Gäste in CSV-Datei gefunden',
+    'admin:guests.csv.uploadCount': '{{count}} Gäste hochladen?',
+    'admin:guests.csv.preview': 'Vorschau:',
+    'admin:guests.csv.more': '... und {{count}} weitere',
+    'admin:guests.csv.uploadComplete': 'Upload abgeschlossen!',
+    'admin:guests.csv.successCreated': 'Erfolgreich erstellt: {{count}}',
+    'admin:guests.csv.skippedDuplicates': 'Übersprungen (Duplikate/leer): {{count}}',
+    'admin:guests.csv.errors': 'Fehler: {{count}}',
+    'admin:guests.csv.firstError': 'Erster Fehler: {{error}}',
+    'admin:guests.csv.uploadingError': 'Fehler beim CSV-Upload: {{error}}',
+    'admin:guests.error.title': 'Fehler beim Laden der Gäste',
+    'admin:guests.error.failed': 'Fehler beim Laden der Gäste: {{error}}',
+    'admin:guests.retry': 'Wiederholen'
   },
     
 
@@ -1092,6 +1241,16 @@ function translate(key, lang = currentLanguage) {
   const translation = translations[lang]?.[key];
   return translation || key;
 }
+
+// Translation helper function for variable substitution
+function translateWithVars(key, vars = {}) {
+  let translation = translate(key);
+  for (const [varName, varValue] of Object.entries(vars)) {
+    translation = translation.replace(new RegExp(`{{${varName}}}`, 'g'), varValue);
+  }
+  return translation;
+}
+
 
 function updatePageContent() {
   document.querySelectorAll('[data-i18n]').forEach(element => {

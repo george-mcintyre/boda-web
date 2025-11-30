@@ -2993,7 +2993,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <h3 class="summary-section-title clickable" onclick="switchToTab('partyContent')" style="cursor: pointer;">
             <i class="fas fa-users"></i>
             <div data-i18n="guests:summaryYourParty">Your Party</div>
-            ( ${partyMembers.length} <div data-i18n="${partyMembers.length === 1 ? 'guests:summaryPerson' : 'guests:summaryPeople'}">Person</div>)
+            ( ${partyMembers.length} <div data-i18n="${partyMembers.length === 1 ? 'common:Person' : 'common:People'}">Person</div>)
             <i class="fas fa-arrow-right section-nav-arrow"></i>
           </h3>
           <div class="party-members-list">

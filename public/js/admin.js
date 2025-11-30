@@ -911,7 +911,7 @@
       // Use pagination for large guest lists
       let url = '/api/admin/guests';
       const res = await api(url);
-      if (!res.ok) throw new Error('Failed to load guests');
+      if (!res.ok) throw new Error(translate('admin:guests.errorLoading'));
       const data = await res.json();
       
       // Handle both paginated and non-paginated responses
@@ -924,7 +924,9 @@
         <tr>
           <td>${g.name || ''}</td>
           <td>${g.email || ''}</td>
-          <td>${g.adult !== false ? 'Adult' : 'Child'}</td>
+          <td><div class="badge badge-info" data-i18n="admin:guests.${g.adult !== false ? 'adult' : 'child'}">
+          ${g.adult !== false ? translate('admin:guests.adult') : translate('admin:guests.child')}
+          </div></td>
           <td>${g.partySize || 1}</td>
           <td>
             <button class="btn btn-info" data-action="manage-party" data-id="${g.id || g._id}" title="Manage Party">
@@ -943,17 +945,30 @@
         <div class="admin-content">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <div class="guest-summary" style="background:#f8f9fa;padding:15px;border-radius:8px;margin-top:15px;border-left:4px solid #28a745;">
-              <h4 style="margin:0 0 8px 0;color:#28a745;"><i class="fas fa-users"></i> Total Guests: ${totalGuests}</h4>
-              <p style="margin:0;color:#666;font-size:0.9em;">Across ${guests.length} part${guests.length !== 1 ? 'ies' : 'y'}</p>
+              <h4 style="margin:0 0 8px 0;color:#28a745;"><i class="fas fa-users"></i>
+              <span data-i18n="admin:guests.totalGuests">
+                ${translate('admin:guests.totalGuests')}
+              </span>: ${totalGuests}</h4>
+              <p style="margin:0;color:#666;font-size:0.9em;">
+                ${translateWithVars('admin:guests.acrossParties', { count: guests.length, partyWord: guests.length !== 1 ? 'parties' : 'party' })}
+              </p>
             </div>
             <div>
-              <button id="addGuest" class="btn btn-success"><i class="fas fa-user-plus"></i> Add Guest</button>
-              <button id="bulkUploadGuests" class="btn btn-info" style="margin-left:8px;"><i class="fas fa-file-upload"></i> Bulk Upload CSV</button>
+              <button id="addGuest" class="btn btn-success"><i class="fas fa-user-plus"></i> 
+              <span data-i18n="admin:guests.addGuest">${translate('admin:guests.addGuest')}</span></button>
+              <button id="bulkUploadGuests" class="btn btn-info" style="margin-left:8px;"><i class="fas fa-file-upload"></i> 
+              <span data-i18n="admin:guests.bulkUploadCsv">${translate('admin:guests.bulkUploadCsv')}</span></button>
             </div>
           </div>
           <div class="table-container">
             <table class="data-table">
-              <thead><tr>${['Name','Email','Age Category','Party Size','Actions'].map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+              <thead><tr>
+                <th><div data-i18n="admin:guests.table.name">${translate('admin:guests.table.name')}</div></th>
+                <th><div data-i18n="admin:guests.table.email">${translate('admin:guests.table.email')}</div></th>
+                <th><div data-i18n="admin:guests.table.ageCategory">${translate('admin:guests.table.ageCategory')}</div></th>
+                <th><div data-i18n="admin:guests.table.partySize">${translate('admin:guests.table.partySize')}</div></th>
+                <th><div data-i18n="admin:guests.table.actions">${translate('admin:guests.table.actions')}</div></th>
+              </tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </div>
@@ -966,19 +981,19 @@
         const current = guests.find(x => String(x.id || x._id) === String(id)) || {};
         
         if (action==='del'){
-          if (!confirm('Delete this guest and their entire party?')) return;
+          if (!confirm(translate('admin:guests.confirmDelete'))) return;
           const r = await api(`/api/admin/guests/${id}`, { method:'DELETE' });
           if (r.ok) showGuests(); else notify('Error deleting guest', 'error');
         } else if (action==='edit'){
           openFormModal({
-            title: 'Edit guest',
-            submitText: 'Save',
+            title: translate('admin:guests.editTitle'),
+            submitText: translate('admin:guests.save'),
             fields: [
-              { name:'name', label:'Name', required:true },
-              { name:'email', label:'Email', type:'email', required:true },
-              { name:'adult', label:'Age Category', type:'select', options:[
-                { value: 'true', label: 'Adult (18+)' },
-                { value: 'false', label: 'Child (Under 18)' }
+              { name:'name', label:translate('admin:guests.field.name'), required:true },
+              { name:'email', label:translate('admin:guests.field.email'), type:'email', required:true },
+              { name:'adult', label:translate('admin:guests.field.ageCategory'), type:'select', options:[
+                { value: 'true', label: translate('admin:guests.option.adult') },
+                { value: 'false', label: translate('admin:guests.option.child') }
               ], required:true }
             ],
             initialValues: {
@@ -1009,14 +1024,14 @@
       
       content.querySelector('#addGuest').addEventListener('click', async ()=>{
         openFormModal({
-          title: 'Add guest',
-          submitText: 'Add',
+          title: translate('admin:guests.addTitle'),
+          submitText: translate('admin:guests.add'),
           fields: [
-            { name:'name', label:'Name', required:true },
-            { name:'email', label:'Email', type:'email', required:true },
-            { name:'adult', label:'Age Category', type:'select', options:[
-              { value: 'true', label: 'Adult (18+)' },
-              { value: 'false', label: 'Child (Under 18)' }
+            { name:'name', label:translate('admin:guests.field.name'), required:true },
+            { name:'email', label:translate('admin:guests.field.email'), type:'email', required:true },
+            { name:'adult', label:translate('admin:guests.field.ageCategory'), type:'select', options:[
+              { value: 'true', label: translate('admin:guests.option.adult') },
+              { value: 'false', label: translate('admin:guests.option.child') }
             ], required:true, default: 'true' }
           ],
           onSubmit: async (values, close) => {
@@ -1051,7 +1066,7 @@
             const guests = parseCSV(text);
             
             if (guests.length === 0) {
-              notify('No valid guests found in CSV file', 'error');
+              notify(translate('admin:guests.csv.noValidGuests'), 'error');
               return;
             }
             
@@ -1059,9 +1074,9 @@
             const preview = guests.slice(0, 5).map(g => 
               `${g.name} (${g.email || 'no email'})`
             ).join('\n');
-            const more = guests.length > 5 ? `\n... and ${guests.length - 5} more` : '';
+            const more = guests.length > 5 ? `\n${translate('admin:guests.csv.more', { count: guests.length - 5 })}` : '';
             
-            if (!confirm(`Upload ${guests.length} guests?\n\nPreview:\n${preview}${more}`)) {
+            if (!confirm(`${translateWithVars('admin:guests.csv.uploadCount', { count: guests.length })}\n\n${translate('admin:guests.csv.preview')}\n${preview}${more}`)) {
               return;
             }
             
@@ -1078,19 +1093,19 @@
             const results = await r.json();
             
             // Show results
-            let message = `Upload complete!\n\n`;
-            message += `✓ Successfully created: ${results.success.length}\n`;
-            message += `⊘ Skipped (duplicates/empty): ${results.skipped.length}\n`;
-            message += `✗ Errors: ${results.errors.length}`;
+            let message = `${translate('admin:guests.csv.uploadComplete')}\n\n`;
+            message += `✓ ${translateWithVars('admin:guests.csv.successCreated', { count: results.success.length })}\n`;
+            message += `⊘ ${translateWithVars('admin:guests.csv.skippedDuplicates', { count: results.skipped.length })}\n`;
+            message += `✗ ${translateWithVars('admin:guests.csv.errors', { count: results.errors.length })}`;
             
             if (results.errors.length > 0) {
-              message += `\n\nFirst error: ${results.errors[0].error}`;
+              message += `\n\n${translateWithVars('admin:guests.csv.firstError', { error: results.errors[0].error })}`;
             }
             
             alert(message);
             showGuests();
           } catch (err) {
-            notify('Error uploading CSV: ' + err.message, 'error');
+            notify(translateWithVars('admin:guests.csv.uploadingError', { error: err.message }), 'error');
             console.error('CSV upload error:', err);
           }
         };
@@ -1098,16 +1113,19 @@
       });
     } catch(e){ 
       console.error('Error loading guests:', e); 
-      notify('Error loading guests: ' + e.message, 'error'); 
+      notify(translateWithVars('admin:guests.error.failed', { error: e.message }), 'error'); 
       content.innerHTML = `
         <div class="admin-content">
-          <h3>Guests</h3>
+          <h3><div data-i18n="admin:tab.guests">
+          ${translate('admin:tab.guests')}</div></h3>
           <div class="error-message">
             <i class="fas fa-exclamation-triangle"></i>
-            <h3>Error Loading Guests</h3>
-            <p>Failed to load guests: ${e.message}</p>
+            <h3><div data-i18n="admin:guests.error.title">
+            ${translate('admin:guests.error.title')}</div></h3>
+            <p>${translateWithVars('admin:guests.error.failed', { error: e.message })}</p>
             <button onclick="showGuests()" class="btn btn-primary">
-              <i class="fas fa-redo"></i> Retry
+              <i class="fas fa-redo"></i> <div data-i18n="admin:guests.retry">
+              ${translate('admin:guests.retry')}</div>
             </button>
           </div>
         </div>`;
@@ -2803,6 +2821,13 @@
   
   const savedPage = localStorage.getItem('adminPage') || 'guests';
 
+    // Initialize
+    console.log('Initializing admin page');
+    updateDocumentDirection();
+    updatePageContent();
+    updateLanguageSelector();
+    updateFormatting();
+    
   // Default
   showTab(savedPage);
 })();
