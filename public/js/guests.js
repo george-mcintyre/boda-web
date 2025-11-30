@@ -164,15 +164,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'login.html';
     return;
   }
-
-  console.log('DOM loaded, initializing i18n system...');
   
   // Initialize settings-based visibility
   await initializeSettingsVisibility();
   
   // Refresh settings when window regains focus (in case admin changed settings)
   window.addEventListener('focus', async () => {
-    console.log('Window focused, refreshing settings...');
     await initializeSettingsVisibility();
   });
 
