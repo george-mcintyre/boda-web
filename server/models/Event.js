@@ -16,7 +16,7 @@ const subEventSchema = new Schema({
 
 
 const eventSchema = new Schema({
-  name: { type: String, required: true },            // Event name
+  name: { ...LocalizedString, required: true },            // Event name
   date: { type: Date, required: true },              // Start date/time
   end: { type: Date },                               // End date/time
   

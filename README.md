@@ -457,16 +457,16 @@ List menu courses (starters, mains, desserts, etc.) and options (onion soup, sal
   {
     "id": "string",
     "course": "starter | main | dessert | drinks",
-    "label": "string",
+    "label": { "en": "Main", "es": "Plato Principal" },
     "selectionRequired": true,
     "selectionIcon": "string",
     "options": [
       {
         "id": "string",
         "courseId": "string",
-        "label": "string",
+        "label": { "en": "Beef Steak", "es": "Ternera" },
         "image": "string | null",
-        "description": "string | null",
+        "description": { "en": "Grilled Steak", "es": "Ternera a la plancha" },
         "isVegetarian": false,
         "containsAllergens": false,
         "containsLactose": false,
@@ -868,14 +868,14 @@ Same schema as `GET /api/guest/menu`:
   {
     "id": "string",
     "course": "starter | main | dessert | drinks",
-    "label": "string",
+    "label": { "en": "Main", "es": "Plato Principal" },
     "selectionRequired": true,
     "options": [
       {
         "id": "string",
-        "label": "string",
+        "label": { "en": "Beef Steak", "es": "Ternera" },
         "image": "string",
-        "description": "string | null"
+        "description": { "en": "Grilled Steak", "es": "Ternera a la plancha" },
       }
     ]
   }
