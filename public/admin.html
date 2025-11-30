@@ -109,8 +109,6 @@
       leafletScript.crossOrigin = '';
       
       leafletScript.onload = () => {
-        console.log('Leaflet script loaded correctly');
-        // Load admin script after Leaflet is loaded
         const adminScript = document.createElement('script');
         adminScript.src = 'js/admin.js';
         adminScript.onload = () => {

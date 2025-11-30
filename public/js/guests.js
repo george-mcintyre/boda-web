@@ -267,7 +267,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load and menu selections - New unified menu layout with drag-drop support
   async function loadMenuSelections() {
-    console.log('Loading menu selections...');
     const menuContent = document.getElementById('menuContent');
 
     if (!menuContent) return;
@@ -601,7 +600,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         saveBtn.addEventListener('click', saveAllMenuChoices);
       }
 
-      console.log('Menu selections loaded successfully');
 
     } catch (err) {
       console.error('Error loading menu selections:', err);
@@ -1214,9 +1212,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       if (choicesResponse.ok) {
         eventChoices = await choicesResponse.json();
-      } else {
-        // Event choices may not exist yet - not an error
-        console.log('No event choices found (may be first time)');
       }
       
       // Handle no events case
@@ -1224,8 +1219,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         eventsContent.innerHTML = `
           <div class="empty-state">
             <i class="fas fa-calendar-times"></i>
-            <h3><div data-i18n="guests:eventsNoEvents">No Events Available</div></h3>
-            <p><div data-i18n="guests:eventsNoEventsDescription">There are no events scheduled yet. Please check back later.</div></p>
+            <h3><div data-i18n="guests:eventsNoEvents">${translate('guests:eventsNoEvents')}</div></h3>
+            <p><div data-i18n="guests:eventsNoEventsDescription">${translate('guests:eventsNoEventsDescription')}</div></p>
           </div>
         `;
         return;

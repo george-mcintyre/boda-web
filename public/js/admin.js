@@ -522,8 +522,6 @@
         return;
       }
       
-      console.log('Creating preview for file:', file.name, file.type, file.size);
-      
       // Create and show preview
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -869,7 +867,6 @@
     if (additionalOptions.showCurrentImage && additionalOptions.currentImageUrl) {
       const previewContainer = modal.querySelector('#image-preview-container');
       if (previewContainer) {
-        console.log('Populating existing image preview:', additionalOptions.currentImageUrl);
         previewContainer.innerHTML = `
           <div style="text-align:center;">
             <img src="${additionalOptions.currentImageUrl}" alt="Current gift card image" style="max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
@@ -1372,7 +1369,7 @@
         <td>${it.name || it.title || ''}</td>
         <td>${it.description || ''}</td>
         <td>
-          ${imageUrl ? `<img src="${imageUrl}" alt="Gift card" style="width: 40px; height: 25px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;">No image</span>` : '<span style="color: #999;">No image</span>'}
+          ${imageUrl ? `<img src="${imageUrl}" alt="Gift card" style="width: 40px; height: 25px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;"><div data-i18n="admin:gifts.noImage">${translate('admin:gifts.noImage')}</div></span>` : '<span style="color: #999;"><div data-i18n="admin:gifts.noImage">' + translate('admin:gifts.noImage') + '</div></span>'}
         </td>
         <td>${it.available}</td>
         <td>€${it.amount}</td>
@@ -1391,21 +1388,29 @@
     // Add Grand Total row
     const grandTotalRow = `
       <tr style="background-color: #f8f9fa; font-weight: bold; border-top: 2px solid #dee2e6;">
-        <td>Grand Total</td>
-        <td>The available cards x price</td>
+        <td><div data-i18n="admin:gifts.grandTotal">${translate('admin:gifts.grandTotal')}</div></td>
+        <td><div data-i18n="admin:gifts.grandTotalDescription">${translate('admin:gifts.grandTotalDescription')}</div></td>
         <td></td>
-        <td>${totalAvailable}</td>
-        <td>€${totalValue}</td>
-        <td>0</td>
+        <td><div data-i18n="admin:gifts.data.totalAvailable">${totalAvailable}</div></td>
+        <td><div data-i18n="admin:gifts.data.totalValue">€${totalValue}</div></td>
+        <td><div data-i18n="admin:gifts.data.totalPurchased">0</div></td>
         <td></td>
       </tr>`;
     
     const allRows = rows + grandTotalRow;
       
     content.innerHTML = renderTable({
-      title:'Gift List', 
-      columns:['Name','Description','Image','Available','Price','Purchased','Actions']
-    }, allRows, `<button id="addGift" class="admin-action"><i class="fas fa-plus"></i> Add</button>`);
+      title: `<div data-i18n="admin:gifts.title">${translate('admin:gifts.title')}</div>`, 
+      columns:[
+        `<div data-i18n="admin:gifts.table.name">${translate('admin:gifts.table.name')}</div>`,
+        `<div data-i18n="admin:gifts.table.description">${translate('admin:gifts.table.description')}</div>`,
+        `<div data-i18n="admin:gifts.table.image">${translate('admin:gifts.table.image')}</div>`,
+        `<div data-i18n="admin:gifts.table.available">${translate('admin:gifts.table.available')}</div>`,
+        `<div data-i18n="admin:gifts.table.price">${translate('admin:gifts.table.price')}</div>`,
+        `<div data-i18n="admin:gifts.table.purchased">${translate('admin:gifts.table.purchased')}</div>`,
+        `<div data-i18n="admin:gifts.table.actions">${translate('admin:gifts.table.actions')}</div>`
+      ]
+    }, allRows, `<button id="addGift" class="admin-action"><i class="fas fa-plus"></i> <span data-i18n="admin:gifts.add">${translate('admin:gifts.add')}</span></button>`);
     
     const tbody = content.querySelector('tbody');
     tbody.addEventListener('click', async (e)=>{
@@ -1415,7 +1420,7 @@
       const current = (gifts||[]).find(x => String(x.id) === String(id)) || {};
       
       if (action === 'del'){
-        if (!confirm('Delete this gift?')) return;
+        if (!confirm(translate('admin:gifts.deleteConfirm'))) return;
         const r = await api(`/api/admin/gifts/${id}`, { method:'DELETE' }); 
         if (r.ok) showGifts(); else notify('Error deleting gift','error');
       } else if (action === 'edit'){
@@ -1450,23 +1455,23 @@
         const showCurrentImage = !!(current.image && imageUrl);
 
         openFormModal({
-          title: 'Edit gift', 
-          submitText: 'Save',
+          title: `<div data-i18n="admin:gifts.edit">${translate('admin:gifts.edit')}</div>`, 
+          submitText: `<span data-i18n="admin:gifts.save">${translate('admin:gifts.save')}</span>`,
           showCurrentImage: showCurrentImage,
           currentImageUrl: imageUrl,
           fields: [
-            { name:'name', label:'Name', required:true },
-            { name:'description', label:'Description', type:'textarea', required:true },
-            { name:'image', label:'Image', type:'file', help: 'Upload gift card image (will be stored in database)' },
+            { name:'name', label: translate('admin:gifts.field.name'), required:true },
+            { name:'description', label: translate('admin:gifts.field.description'), type:'textarea', required:true },
+            { name:'image', label: translate('admin:gifts.field.image'), type:'file', help: translate('admin:gifts.field.imageHelp') },
             { name:'imagePreview', label:'Preview', type:'imagePreview' },
-            { name:'available', label:'Number Available', type:'number', min:'0', required:true },
-            { name:'amount', label:'Price', type:'select', required:true,
+            { name:'available', label: translate('admin:gifts.field.available'), type:'number', min:'0', required:true },
+            { name:'amount', label: translate('admin:gifts.field.price'), type:'select', required:true,
               options: [
-                { value: '25', label: '€25' },
-                { value: '50', label: '€50' },
-                { value: '100', label: '€100' },
-                { value: '200', label: '€200' },
-                { value: '500', label: '€500' }
+                { value: '25', label: translate('admin:gifts.priceOption.25') },
+                { value: '50', label: translate('admin:gifts.priceOption.50') },
+                { value: '100', label: translate('admin:gifts.priceOption.100') },
+                { value: '200', label: translate('admin:gifts.priceOption.200') },
+                { value: '500', label: translate('admin:gifts.priceOption.500') }
               ]
             }
           ],
@@ -1553,21 +1558,21 @@
     
     content.querySelector('#addGift').addEventListener('click', async ()=>{
       openFormModal({
-        title: 'Add gift', 
-        submitText: 'Add',
+        title: `<div data-i18n="admin:gifts.add">${translate('admin:gifts.add')}</div>`, 
+        submitText: `<span data-i18n="admin:gifts.add">${translate('admin:gifts.add')}</span>`,
         fields: [
-          { name:'name', label:'Name', required:true },
-          { name:'description', label:'Description', type:'textarea', required:true },
-          { name:'image', label:'Image', type:'file', required:true, help: 'Upload gift card image (will be stored in database)' },
+          { name:'name', label: translate('admin:gifts.field.name'), required:true },
+          { name:'description', label: translate('admin:gifts.field.description'), type:'textarea', required:true },
+          { name:'image', label: translate('admin:gifts.field.image'), type:'file', required:true, help: translate('admin:gifts.field.imageHelp') },
           { name:'imagePreview', label:'Preview', type:'imagePreview' },
-          { name:'available', label:'Number Available', type:'number', min:'0', required:true },
-          { name:'amount', label:'Price', type:'select', required:true,
+          { name:'available', label: translate('admin:gifts.field.available'), type:'number', min:'0', required:true },
+          { name:'amount', label: translate('admin:gifts.field.price'), type:'select', required:true,
             options: [
-              { value: '25', label: '€25' },
-              { value: '50', label: '€50' },
-              { value: '100', label: '€100' },
-              { value: '200', label: '€200' },
-              { value: '500', label: '€500' }
+              { value: '25', label: translate('admin:gifts.priceOption.25') },
+              { value: '50', label: translate('admin:gifts.priceOption.50') },
+              { value: '100', label: translate('admin:gifts.priceOption.100') },
+              { value: '200', label: translate('admin:gifts.priceOption.200') },
+              { value: '500', label: translate('admin:gifts.priceOption.500') }
             ]
           }
         ],
