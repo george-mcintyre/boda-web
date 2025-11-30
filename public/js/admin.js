@@ -1140,7 +1140,7 @@
     try {
       // Load current party members
       const res = await api(`/api/admin/guests/${guestId}/party`);
-      if (!res.ok) throw new Error('Failed to load party members');
+      if (!res.ok) throw new Error(translate('admin:party.error.loadFailed'));
       const partyMembers = await res.json();
       
       // Separate primary guest from party members
@@ -1150,7 +1150,7 @@
       const partyRows = party.map((member, index) => `
         <tr>
           <td>${member.name || ''}</td>
-          <td>${member.adult ? 'Adult' : 'Child'}</td>
+          <td><div data-i18n="admin:party.${member.adult ? 'adult' : 'child'}" class="badge badge-info">${translate('admin:party.' + (member.adult ? 'adult' : 'child'))}</div></td>
           <td>
             <button class="admin-action" data-action="edit-member" data-index="${index}" data-id="${member.id || ''}">
               <i class="fas fa-edit"></i>
@@ -1164,43 +1164,47 @@
       const partyTable = party.length > 0 ? `
         <div class="table-container">
           <table class="data-table">
-            <thead><tr><th>Name</th><th>Age Group</th><th>Actions</th></tr></thead>
+            <thead><tr>
+              <th><div data-i18n="admin:party.table.name">${translate('admin:party.table.name')}</div></th>
+              <th><div data-i18n="admin:party.table.ageGroup">${translate('admin:party.table.ageGroup')}</div></th>
+              <th><div data-i18n="admin:party.table.actions">${translate('admin:party.table.actions')}</div></th>
+            </tr></thead>
             <tbody>${partyRows}</tbody>
           </table>
         </div>` : `
         <div class="no-party-members">
           <i class="fas fa-users" style="font-size: 2em; color: #ccc; margin-bottom: 10px;"></i>
-          <p>No party members added yet.</p>
+          <p><div data-i18n="admin:party.noMembers">${translate('admin:party.noMembers')}</div></p>
         </div>`;
       
       content.innerHTML = `
         <div class="admin-content">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
             <div>
-              <h3 style="margin:0;">Manage Party: ${guestName}</h3>
-              <p style="margin:5px 0 0 0;color:#666;">Manage party members for this guest</p>
+              <h3 style="margin:0;"><span data-i18n="admin:party.title">${translate('admin:party.title')}</span>${guestName}</h3>
+              <p style="margin:5px 0 0 0;color:#666;"><div data-i18n="admin:party.description">${translate('admin:party.description')}</div></p>
             </div>
             <button id="backToGuests" class="admin-action">
-              <i class="fas fa-arrow-left"></i> Back to Guests
+              <i class="fas fa-arrow-left"></i> <div data-i18n="admin:party.backToGuests">${translate('admin:party.backToGuests')}</div>
             </button>
           </div>
           
           <div class="party-section">
-            <h4><i class="fas fa-user"></i> Primary Guest</h4>
+            <h4><i class="fas fa-user"></i> <div data-i18n="admin:party.primaryGuest">${translate('admin:party.primaryGuest')}</div></h4>
             <div class="primary-guest-info">
-              <strong>${primaryGuest ? primaryGuest.name : 'Unknown'}</strong> 
+              <strong>${primaryGuest ? primaryGuest.name : translate('admin:party.unknown')}</strong> 
               <span class="badge badge-primary" data-i18n="common:primary">${primaryGuest ? translate('common:primary') : ''}</span>
               <span class="badge ${primaryGuest && primaryGuest.adult === false ? 'badge-info' : 'badge-secondary'}">
-                ${primaryGuest && primaryGuest.adult === false ? 'Child' : 'Adult'}
+                <div data-i18n="admin:party.${primaryGuest && primaryGuest.adult === false ? 'child' : 'adult'}">${translate('admin:party.' + (primaryGuest && primaryGuest.adult === false ? 'child' : 'adult'))}</div>
               </span>
             </div>
           </div>
           
           <div class="party-section">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;">
-              <h4><i class="fas fa-users"></i> Party Members</h4>
+              <h4><i class="fas fa-users"></i> <div data-i18n="admin:party.partyMembers">${translate('admin:party.partyMembers')}</div></h4>
               <button id="addPartyMember" class="admin-action">
-                <i class="fas fa-user-plus"></i> Add Member
+                <i class="fas fa-user-plus"></i> <div data-i18n="admin:party.addMember">${translate('admin:party.addMember')}</div>
               </button>
             </div>
             ${partyTable}
@@ -1213,13 +1217,13 @@
       // Add party member
       document.getElementById('addPartyMember').addEventListener('click', ()=>{
         openFormModal({
-          title: 'Add Party Member',
-          submitText: 'Add',
+          title: translate('admin:party.addModalTitle'),
+          submitText: translate('admin:party.add'),
           fields: [
-            { name:'name', label:'Name', required:true },
-            { name:'adult', label:'Age Group', type:'select', options:[
-              { value: 'true', label: 'Adult (18+)' },
-              { value: 'false', label: 'Child (Under 18)' }
+            { name:'name', label:translate('admin:party.field.name'), required:true },
+            { name:'adult', label:translate('admin:party.field.ageGroup'), type:'select', options:[
+              { value: 'true', label: translate('admin:party.option.adult') },
+              { value: 'false', label: translate('admin:party.option.child') }
             ], required:true }
           ],
           onSubmit: async (values, close) => {
@@ -1236,7 +1240,7 @@
               body: JSON.stringify(updatedParty)
             });
             
-            if (!r.ok) throw new Error('Failed to add party member');
+            if (!r.ok) throw new Error(translate('admin:party.error.addFailed'));
             close();
             showPartyManager(guestId, guestName);
           }
@@ -1252,7 +1256,7 @@
           const index = parseInt(btn.dataset.index);
           
           if (action==='remove-member'){
-            if (!confirm('Remove this party member?')) return;
+            if (!confirm(translate('admin:party.confirmRemove'))) return;
             
             const updatedParty = party.filter((_, i) => i !== index);
             const r = await api(`/api/admin/guests/${guestId}/party`, { 
@@ -1261,18 +1265,18 @@
               body: JSON.stringify(updatedParty)
             });
             
-            if (!r.ok) throw new Error('Failed to remove party member');
+            if (!r.ok) throw new Error(translate('admin:party.error.removeFailed'));
             showPartyManager(guestId, guestName);
           } else if (action==='edit-member'){
             const member = party[index];
             openFormModal({
-              title: 'Edit Party Member',
-              submitText: 'Save',
+              title: translate('admin:party.editModalTitle'),
+              submitText: translate('admin:party.save'),
               fields: [
-                { name:'name', label:'Name', required:true },
-                { name:'adult', label:'Age Group', type:'select', options:[
-                  { value: 'true', label: 'Adult (18+)' },
-                  { value: 'false', label: 'Child (Under 18)' }
+                { name:'name', label:translate('admin:party.field.name'), required:true },
+                { name:'adult', label:translate('admin:party.field.ageGroup'), type:'select', options:[
+                  { value: 'true', label: translate('admin:party.option.adult') },
+                  { value: 'false', label: translate('admin:party.option.child') }
                 ], required:true }
               ],
               initialValues: {
@@ -1295,7 +1299,7 @@
                   body: JSON.stringify(updatedParty)
                 });
                 
-                if (!r.ok) throw new Error('Failed to update party member');
+                if (!r.ok) throw new Error(translate('admin:party.error.updateFailed'));
                 close();
                 showPartyManager(guestId, guestName);
               }
@@ -1306,21 +1310,21 @@
       
     } catch(e){ 
       console.error('Error loading party:', e); 
-      notify('Error loading party members: ' + e.message, 'error'); 
+      notify(translateWithVars('admin:party.error.loadingError', { error: e.message }), 'error'); 
       content.innerHTML = `
         <div class="admin-content">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-            <h3>Manage Party: ${guestName}</h3>
+            <h3><div data-i18n="admin:party.title">${translateWithVars('admin:party.title', { guestName: guestName })}</div></h3>
             <button id="backToGuests" class="admin-action">
-              <i class="fas fa-arrow-left"></i> Back to Guests
+              <i class="fas fa-arrow-left"></i> <div data-i18n="admin:party.backToGuests">${translate('admin:party.backToGuests')}</div>
             </button>
           </div>
           <div class="error-message">
             <i class="fas fa-exclamation-triangle"></i>
-            <h3>Error Loading Party</h3>
-            <p>Failed to load party members: ${e.message}</p>
+            <h3><div data-i18n="admin:party.error.title">${translate('admin:party.error.title')}</div></h3>
+            <p>${translateWithVars('admin:party.error.failed', { error: e.message })}</p>
             <button onclick="showPartyManager('${guestId}', '${guestName}')" class="btn-retry">
-              <i class="fas fa-redo"></i> Retry
+              <i class="fas fa-redo"></i> <div data-i18n="admin:party.retry">${translate('admin:party.retry')}</div>
             </button>
           </div>
         </div>`;
