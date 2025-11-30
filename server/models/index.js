@@ -1,5 +1,6 @@
 module.exports = {
   Admin: require('./Admin'),
+  LocalizedString: require('./LocalizedString'),
   Guest: require('./Guest'),
   Event: require('./Event'),
   EventImage: require('./EventImage'),
@@ -7,8 +8,8 @@ module.exports = {
   Message: require('./Message'),
   Course: require('./Course'),
   CourseOption: require('./CourseOption'),
-  MenuChoice: require('./MenuChoice'),
   CourseOptionImage: require('./CourseOptionImage'),
+  MenuChoice: require('./MenuChoice'),
   Gift: require('./Gift'),
   GiftImage: require('./GiftImage'),
   GiftChoice: require('./GiftChoice'),

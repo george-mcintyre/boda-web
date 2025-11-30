@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const { LocalizedString } = require('./LocalizedString');
 
 const courseOptionSchema = new Schema({
   courseId: { 
@@ -6,12 +7,12 @@ const courseOptionSchema = new Schema({
     ref: 'Course', 
     required: true 
   },
-  label: { type: String, required: true },
+  label: { ...LocalizedString, required: true },
   image: { 
     type: Schema.Types.ObjectId,
     ref: 'CourseOptionImage'
   },
-  description: { type: String, default: null },
+  description: { ...LocalizedString, default: null },
   // Special Dietary Indicators
   isVegetarian: { type: Boolean, default: false },
   containsAllergens: { type: Boolean, default: false },

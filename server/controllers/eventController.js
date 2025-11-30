@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const { Event, EventChoice } = require('../models');
-const { localizeEvent } = require('../utils/i18n');
 
 // Format event for API response according to README specification
 function formatEventForApi(event) {

@@ -1,11 +1,12 @@
 const { Schema, model } = require('mongoose');
+const { LocalizedString } = require('./LocalizedString');
 
 // Sub-event schema for events within events
 const subEventSchema = new Schema({
-  name: { type: String, required: true },
+  name: { ...LocalizedString, required: true },
   date: { type: Date, required: true },
   end: { type: Date },
-  description: { type: String },
+  description: { ...LocalizedString },
   icon: { 
     type: String, 
     enum: ['ceremony', 'cocktails', 'reception', 'dancing'],
@@ -13,11 +14,8 @@ const subEventSchema = new Schema({
   }
 }, { _id: false });
 
-// Generic localized string as a Map of language code → text
-const LocalizedString = { type: Map, of: String, default: undefined };
 
 const eventSchema = new Schema({
-  // Core timing (following README specification)
   name: { type: String, required: true },            // Event name
   date: { type: Date, required: true },              // Start date/time
   end: { type: Date },                               // End date/time

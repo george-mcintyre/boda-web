@@ -170,11 +170,6 @@ Seeding behavior:
   - Cash gift cards: `cash-gift-cards.json`.
   - Config: `config.json`.
 
-Schema compatibility notes:
-- Guests: Spanish fields like `name`, `estado`/`asistencia`, `acompañantes`, `menuEspecial` and `notas` are mapped to the new schema fields (`name`, `status`, `companions`, `specialMenu`, `message`).
-- Events: Localized strings are mapped; dates from `fecha` are parsed; `hora` goes into `time`.
-- Messages: `mensaje` → `content`; reactions map preserved; `fecha` mapped to timestamps.
-
 ## 🌐 Frontend
 - When calling authenticated endpoints, send the header: `Authorization: Bearer <token>`.
 - Static files are served from `public/`.

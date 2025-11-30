@@ -2164,7 +2164,7 @@ function translateWithVars(key, vars = {}) {
 }
 
 // Global function to localise strings or LocalizedString objects
-function localise(textOrLocalizedString, lang = currentLanguage) {
+function localize(textOrLocalizedString, lang = currentLanguage) {
   // If it's a regular string, return it as-is
   if (typeof textOrLocalizedString === 'string') {
     return textOrLocalizedString;
@@ -2210,6 +2210,14 @@ function localise(textOrLocalizedString, lang = currentLanguage) {
   return String(textOrLocalizedString || '');
 }
 
+function toLocalizedString(value, lang = currentLanguage) {
+  if (!value) return {};
+  if (typeof value === 'string') {
+    return { [lang]: value };
+  }
+  // Already a LocalizedString-ish object
+  return value;
+}
 
 function updatePageContent() {
   document.querySelectorAll('[data-i18n]').forEach(element => {

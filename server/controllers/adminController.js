@@ -1,4 +1,4 @@
-const { Message, Config, Gift, Event, GiftChoice, Course, CourseOption, CourseOptionImage, GiftImage } = require('../models');
+const { Config, Gift, Event, GiftChoice, Course, CourseOption, CourseOptionImage } = require('../models');
 const { getAvailableGiftCardImages } = require('../utils/imageUtils');
 const { generateDietaryIconsHTML, generateSelectionIconHTML } = require('../utils/menuIcons');
 
@@ -107,14 +107,6 @@ async function createEventsItem(req, res, next) {
   try {
     const { name, date, end, location, locationAddress, locationLatitude, locationLongitude, title, description, image, sub_events } = req.body;
     
-    // Convert strings to localized maps if needed
-    const convertToMap = (value) => {
-      if (!value) return undefined;
-      if (typeof value === 'string') return { en: value };
-      if (typeof value === 'object') return value;
-      return undefined;
-    };
-
     // Handle image reference
     let imageRef = undefined;
     if (image && image.imageId) {
@@ -133,8 +125,8 @@ async function createEventsItem(req, res, next) {
       locationAddress: locationAddress || location || '',
       locationLatitude: locationLatitude ? parseFloat(locationLatitude) : null,
       locationLongitude: locationLongitude ? parseFloat(locationLongitude) : null,
-      title: convertToMap(title),
-      description: convertToMap(description),
+      title: toLocalizedString(title),
+      description: toLocalizedString(description),
       image: imageRef,
       sub_events: (sub_events || []).map(sub => ({
         name: sub.name,
@@ -227,7 +219,7 @@ function formatCourseForApi(course) {
   return {
     id: course._id.toString(),
     course: course.course,
-    label: course.label,
+    label: localize(course.label),
     selectionRequired: course.selectionRequired !== undefined ? course.selectionRequired : true,
     selectionIcon: generateSelectionIconHTML(course)
   };
