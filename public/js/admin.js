@@ -1840,7 +1840,7 @@
         <td>${formatTime(ev.end) || ''}</td>
         <td>${ev.title || ''}</td>
         <td>
-          ${imageUrl ? `<img src="${imageUrl}" alt="Event image" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;">No image</span>` : '<span style="color: #999;">No image</span>'}
+          ${imageUrl ? `<img src="${imageUrl}" alt="Event image" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;"><div data-i18n="admin:events.noImage">${translate('admin:events.noImage')}</div></span>` : '<span style="color: #999;"><div data-i18n="admin:events.noImage">' + translate('admin:events.noImage') + '</div></span>'}
         </td>
         <td>
           <button class="admin-action" data-action="edit-subevents" data-id="${ev.id}" title="Edit Sub-events">
@@ -1857,9 +1857,17 @@
     }).join('');
     
     content.innerHTML = renderTable({
-      title:'Event Schedule', 
-      columns:['Name','Date','Start Time','End Time','Title','Image','Actions']
-    }, rows, `<button id="addEvent" class="admin-action"><i class="fas fa-plus"></i> Add Event</button>`);
+      title: `<div data-i18n="admin:events.title">${translate('admin:events.title')}</div>`, 
+      columns:[
+        `<div data-i18n="admin:events.table.name">${translate('admin:events.table.name')}</div>`,
+        `<div data-i18n="admin:events.table.date">${translate('admin:events.table.date')}</div>`,
+        `<div data-i18n="admin:events.table.startTime">${translate('admin:events.table.startTime')}</div>`,
+        `<div data-i18n="admin:events.table.endTime">${translate('admin:events.table.endTime')}</div>`,
+        `<div data-i18n="admin:events.table.title">${translate('admin:events.table.title')}</div>`,
+        `<div data-i18n="admin:events.table.image">${translate('admin:events.table.image')}</div>`,
+        `<div data-i18n="admin:events.table.actions">${translate('admin:events.table.actions')}</div>`
+      ]
+    }, rows, `<button id="addEvent" class="admin-action"><i class="fas fa-plus"></i> <span data-i18n="admin:events.addEvent">${translate('admin:events.addEvent')}</span></button>`);
     
     const tbody = content.querySelector('tbody');
     tbody.addEventListener('click', async (e)=>{
@@ -1869,9 +1877,9 @@
       const current = (data||[]).find(x => String(x.id) === String(id)) || {};
       
       if (action==='del'){
-        if (!confirm('Delete this event?')) return;
+        if (!confirm(translate('admin:events.confirmDelete'))) return;
         const r = await api(`/api/admin/events/${id}`, { method:'DELETE' }); 
-        if (r.ok) showEvent(); else notify('Error deleting event', 'error');
+        if (r.ok) showEvent(); else notify(translate('admin:events.errorDeleting'), 'error');
       } else if (action==='edit'){
         openEventForm(current, false);
       } else if (action==='edit-subevents'){
@@ -1923,20 +1931,20 @@
     const showCurrentImage = !isNew && currentImageUrl;
     
     openFormModal({
-      title: isNew ? 'Add Event' : 'Edit Event',
-      submitText: isNew ? 'Add' : 'Save',
+      title: isNew ? `<div data-i18n="admin:events.modal.addTitle">${translate('admin:events.modal.addTitle')}</div>` : `<div data-i18n="admin:events.modal.editTitle">${translate('admin:events.modal.editTitle')}</div>`,
+      submitText: isNew ? `<span data-i18n="admin:events.add">${translate('admin:events.add')}</span>` : `<span data-i18n="admin:events.save">${translate('admin:events.save')}</span>`,
       showCurrentImage: showCurrentImage,
       currentImageUrl: currentImageUrl,
       fields: [
-        { name:'name', label:'Name', required:true, help:'e.g. Wedding Ceremony' },
-        { name:'date', label:'Date', type:'date', required:true, help:'Event date (Spain locale)' },
-        { name:'startTime', label:'Start Time', type:'time', required:true, help:'Start time (24h format)' },
-        { name:'endDate', label:'End Date', type:'date', help:'End date (optional, for events that span multiple days)' },
-        { name:'endTime', label:'End Time', type:'time', help:'End time (24h format, can be next day if end date is set)' },
-        { name:'location', label:'Location', type:'location', required:true, help:'Use map tool to select precise location' },
-        { name:'title', label:'Title', help:'e.g. Oyana Beach Restaurant' },
-        { name:'description', label:'Description', type:'textarea', rows: 3, help:'Event description or additional details' },
-        { name:'image', label:'Image', type:'file', help:'Upload event image (will be stored in database)' }
+        { name:'name', label: translate('admin:events.field.name'), required:true, help: translate('admin:events.field.nameHelp') },
+        { name:'date', label: translate('admin:events.field.date'), type:'date', required:true, help: translate('admin:events.field.dateHelp') },
+        { name:'startTime', label: translate('admin:events.field.startTime'), type:'time', required:true, help: translate('admin:events.field.startTimeHelp') },
+        { name:'endDate', label: translate('admin:events.field.endDate'), type:'date', help: translate('admin:events.field.endDateHelp') },
+        { name:'endTime', label: translate('admin:events.field.endTime'), type:'time', help: translate('admin:events.field.endTimeHelp') },
+        { name:'location', label: translate('admin:events.field.location'), type:'location', required:true, help: translate('admin:events.field.locationHelp') },
+        { name:'title', label: translate('admin:events.field.title'), help: translate('admin:events.field.titleHelp') },
+        { name:'description', label: translate('admin:events.field.description'), type:'textarea', rows: 3, help: translate('admin:events.field.descriptionHelp') },
+        { name:'image', label: translate('admin:events.field.image'), type:'file', help: translate('admin:events.field.imageHelp') }
       ],
       initialValues: {
         name: event.name || '',
@@ -2051,7 +2059,7 @@
             body: JSON.stringify(eventData)
           });
           
-          if (!r.ok) throw new Error(isNew ? 'Failed to create event' : 'Failed to update event');
+          if (!r.ok) throw new Error(isNew ? translate('admin:events.error.create') : translate('admin:events.error.update'));
           
           close();
           showEvent();
