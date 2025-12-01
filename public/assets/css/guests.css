@@ -1396,9 +1396,11 @@ main.main-content-full {
 }
 
 .event-day {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--gray-100);
+  overflow: hidden;
   width: 100% !important;
   max-width: 100% !important;
 }
@@ -1411,9 +1413,9 @@ main.main-content-full {
   align-items: center;
   gap: 12px;
   font-size: 1.3em;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  margin-bottom: 20px;
+  border-radius: 0;
+  box-shadow: none;
+  margin-bottom: 0;
 }
 
 .day-title i {
@@ -1428,6 +1430,7 @@ main.main-content-full {
 }
 
 .day-events {
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 25px;
