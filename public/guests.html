@@ -4,192 +4,198 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-i18n="guests:title">Guests Zone - Iluminada & George</title>
-  <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml"/>
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/wedding.css">
   <link rel="stylesheet" href="assets/css/guests.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <!-- Leaflet CSS for maps -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
   <!-- Leaflet JS for maps -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+          integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </head>
 <body>
-  <!-- Sticky Navbar -->
-  <nav class="navbar">
-    <div class="container">
-      <div class="header-left">
-        <h1 data-i18n="guests:welcomeTitle"><i class="fas fa-user"></i> Guests Zone</h1>
-        <span id="guestNameDisplay" class="guest-name-display" style="display: none;"></span>
-      </div>
-      <div class="header-actions" aria-label="Top-right actions">
-        <!-- Language Selector Component -->
-        <div data-auto-init="language-selector" class="language-selector"></div>
-        <a href="index.html" class="home-link">
-          <i class="fas fa-home" aria-hidden="true"></i>
-          <span data-i18n="common:home">Home</span>
-        </a>
-        <button onclick="logoutGuest()" class="logout-btn">
-          <i class="fas fa-sign-out-alt"></i>
-          <span data-i18n="guests:logout">Logout</span>
-      </div>
+<!-- Sticky Navbar -->
+<nav class="navbar">
+  <div class="container">
+    <div class="header-left">
+      <h1 data-i18n="guests:welcomeTitle"><i class="fas fa-user"></i> Guests Zone</h1>
+      <span id="guestNameDisplay" class="guest-name-display" style="display: none;"></span>
     </div>
-  </nav>
-  <!-- <section class="guest-zone"></section> -->
+    <div class="header-actions" aria-label="Top-right actions">
+      <!-- Language Selector Component -->
+      <div data-auto-init="language-selector" class="language-selector"></div>
+      <a href="index.html" class="home-link">
+        <i class="fas fa-home" aria-hidden="true"></i>
+        <span data-i18n="common:home">Home</span>
+      </a>
+      <button onclick="logoutGuest()" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i>
+        <span data-i18n="guests:logout">Logout</span>
+    </div>
+  </div>
+</nav>
+<!-- <section class="guest-zone"></section> -->
 
-  <main class="with-background">
-    <div class="tabs-container-full">
-      <div class="tabs-header">
-        <button class="tab-btn active" data-tab="summaryContent">
-          <i class="fas fa-chart-bar"></i>
-          <span data-i18n="guests:tabSummary">Summary</span>
-        </button>
-        <button class="tab-btn" data-tab="partyContent">
-          <i class="fas fa-users"></i>
-          <span data-i18n="guests:tabParty">Party</span>
-        </button>
-        <button class="tab-btn" data-tab="eventsContent">
-          <i class="fas fa-calendar-alt"></i>
-          <span data-i18n="guests:tabRSVP">RSVP</span>
-        </button>
-        <button class="tab-btn" data-tab="menuContent">
-          <i class="fas fa-utensils"></i>
-          <span data-i18n="guests:tabMenu">Menu</span>
-        </button>
-        <button class="tab-btn" data-tab="giftsContent">
-          <i class="fas fa-money-bill-wave"></i>
-          <span data-i18n="guests:tabCash">Gifts</span>
-        </button>
+<main class="with-background">
+  <div class="tabs-container-full">
+    <div class="tabs-header">
+      <button class="tab-btn active" data-tab="summaryContent">
+        <i class="fas fa-chart-bar"></i>
+        <span data-i18n="guests:tabSummary">Summary</span>
+      </button>
+      <button class="tab-btn" data-tab="partyContent">
+        <i class="fas fa-users"></i>
+        <span data-i18n="guests:tabParty">Party</span>
+      </button>
+      <button class="tab-btn" data-tab="eventsContent">
+        <i class="fas fa-calendar-alt"></i>
+        <span data-i18n="guests:tabRSVP">RSVP</span>
+      </button>
+      <button class="tab-btn" data-tab="menuContent">
+        <i class="fas fa-utensils"></i>
+        <span data-i18n="guests:tabMenu">Menu</span>
+      </button>
+      <button class="tab-btn" data-tab="giftsContent">
+        <i class="fas fa-money-bill-wave"></i>
+        <span data-i18n="guests:tabCash">Gifts</span>
+      </button>
+    </div>
+
+    <!-- Content of the Summary tab -->
+    <div id="summaryContent-tab" class="tab-content active">
+      <div class="intro-card intro-section">
+        <h2 class="card-title">
+          <div data-i18n="guests:summaryPageTitle"></div>
+        </h2>
+        <p class="card-description">
+        <div data-i18n="rich:guests:summaryPageDescription"></div>
+        </p>
       </div>
-      
-      <!-- Content of the Summary tab -->
-      <div id="summaryContent-tab" class="tab-content active">
-          <div class="intro-card">
-            <h2 class="card-title">
-              <div data-i18n="guests:summaryPageTitle"></div>
-            </h2>
-            <p class="card-description">
-              <div data-i18n="rich:guests:summaryPageDescription"></div>
-            </p>
+
+      <div class="summary-grid">
+        <!-- Summary Section (Left) - dynamically loaded -->
+        <section id="summaryContent" class="summary-card summary-left-panel">
+          <h2><i class="fas fa-clipboard-list"></i> <span data-i18n="guests:yourSummary">Your Summary</span></h2>
+          <div class="loading-summary">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <p data-i18n="guests:loadingSummary">Loading summary...</p>
           </div>
-      
-          <div class="summary-grid">
-          <!-- Summary Section (Left) - dynamically loaded -->
-          <section id="summaryContent" class="summary-card summary-left-panel">
-            <h2><i class="fas fa-clipboard-list"></i> <span data-i18n="guests:yourSummary">Your Summary</span></h2>
-            <div class="loading-summary">
-              <i class="fas fa-spinner fa-spin fa-2x"></i>
-              <p data-i18n="guests:loadingSummary">Loading summary...</p>
-            </div>
-          </section>
-          
-          <!-- Comments Card Section (Right) -->
-          <section class="summary-card comments-card">
-            <div class="comments-header">
-              <h2><i class="fas fa-comments"></i> <span data-i18n="guests:commentsTitle">Comments</span></h2>
-              <p class="comments-subtitle" data-i18n="rich:guests:commentsSubtitle">Share your thoughts with other guests</p>
-            </div>
-            
-            <!-- New comment form -->
-            <div class="new-comment-form">
-              <form id="commentForm">
-                <div class="comment-input-container" data-i18n="rich:guests:commentPlaceholder">
+        </section>
+
+        <!-- Comments Card Section (Right) -->
+        <section class="summary-card comments-card">
+          <div class="comments-header">
+            <h2><i class="fas fa-comments"></i> <span data-i18n="guests:commentsTitle">Comments</span></h2>
+            <p class="comments-subtitle" data-i18n="rich:guests:commentsSubtitle">Share your thoughts with other
+              guests</p>
+          </div>
+
+          <!-- New comment form -->
+          <div class="new-comment-form">
+            <form id="commentForm">
+              <div class="comment-input-container" data-i18n="rich:guests:commentPlaceholder">
                   <textarea
-                    id="newComment"
-                    name="comment"
-                    placeholder="Write your comment..."
-                    rows="3"
-                    maxlength="500"
+                      id="newComment"
+                      name="comment"
+                      placeholder="Write your comment..."
+                      rows="3"
+                      maxlength="500"
                   ></textarea>
-                </div>
-                <div class="comment-actions">
-                  <div class="char-count-container">
-                    <span class="char-count">0/500</span>
-                  </div>
-                  <div class="comment-posting-as">
-                    <select id="postingAsSelect" class="posting-as-dropdown">
-                      <option data-i18n="guests:loadingPartyMembers">Loading party members...</option>
-                    </select>
-                  </div>
-                  <button type="submit" class="comment-submit-btn">
-                    <i class="fas fa-paper-plane"></i>
-                    <span data-i18n="guests:postComment">Post</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-            
-            <!-- Comments list -->
-            <div class="comments-list" id="commentsList">
-              <!-- Comments will be loaded dynamically here -->
-              <div class="loading-comments">
-                <i class="fas fa-spinner fa-spin"></i>
-                <span data-i18n="guests:loadingComments">Loading comments...</span>
               </div>
+              <div class="comment-actions">
+                <div class="char-count-container">
+                  <span class="char-count">0/500</span>
+                </div>
+                <div class="comment-posting-as">
+                  <select id="postingAsSelect" class="posting-as-dropdown">
+                    <option data-i18n="guests:loadingPartyMembers">Loading party members...</option>
+                  </select>
+                </div>
+                <button type="submit" class="comment-submit-btn">
+                  <i class="fas fa-paper-plane"></i>
+                  <span data-i18n="guests:postComment">Post</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Comments list -->
+          <div class="comments-list" id="commentsList">
+            <!-- Comments will be loaded dynamically here -->
+            <div class="loading-comments">
+              <i class="fas fa-spinner fa-spin"></i>
+              <span data-i18n="guests:loadingComments">Loading comments...</span>
             </div>
-          </section>
-        </div>
-      </div>
-      
-      <!-- Content of the Party tab -->
-      <div id="partyContent-tab" class="tab-content">
-        <section id="partyContent">
-          <h2><i class="fas fa-users"></i> <span data-i18n="guests:partyManagement">Party Management</span></h2>
-          <p class="section-description" data-i18n="rich:guests:partyManagementDesc">
-            Manage your wedding party members and their dietary requirements.
-          </p>
-          <div class="loading-party">
-            <i class="fas fa-spinner fa-spin fa-3x"></i>
-            <p data-i18n="guests:loadingParty">Loading party...</p>
           </div>
         </section>
       </div>
-      
-      <!-- Content of the Menu tab -->
-      <div id="menuContent-tab" class="tab-content">
-        <section id="menuContent">
-          <h2><i class="fas fa-utensils"></i> <span data-i18n="guests:menuSelection">Menu Selection</span></h2>
-          <p class="section-description" data-i18n="guests:menuSelectionDesc2">
-            Choose your favorite dishes for our wedding celebrations.
-          </p>
-          <div id="menuContent"></div>
-        </section>
-      </div>
-      
-      <!-- Content of the Gifts tab -->
-      <div id="giftsContent-tab" class="tab-content">
-        <section id="giftsContent">
-          <h2><i class="fas fa-money-bill-wave"></i> <span data-i18n="guests:giftsSelection">Gifts Selection</span></h2>
-          <p class="section-description" data-i18n="rich:guests:giftsSelectionDesc">
-            Choose your favorite gifts for our wedding celebrations.
-          </p>
-          <div id="giftsContent"></div>
-        </section>
-      </div>
-      
-      <!-- Content of the RSVP tab -->
-      <div id="eventsContent-tab" class="tab-content">
-        <section id="eventsContent">
-          <h2><i class="fas fa-calendar-alt"></i> <span data-i18n="guests:eventsRSVP">RSVP</span></h2>
-          <p class="section-description" data-i18n="rich:guests:eventsRSVPDesc">
-            The celebrations will take place over three days: Friday, Saturday and Sunday. They kick off on Friday with a welcome dinner.   Saturday is a full day of activities including the wedding ceremony, the reception banquet, and dancing.   Sunday's activities include a farewell brunch.  Please confirm your attendance for which ever of these events you will be attending.
-          </p>
-          <div id="eventsContent"></div>
-        </section>
-      </div>
     </div>
-  </main>
 
-  <footer>
-    <div class="footer-content">
-      <p data-i18n="common:footer">© 2026 Boda de Iluminada &amp; George</p>
+    <!-- Content of the Party tab -->
+    <div id="partyContent-tab" class="tab-content">
+      <section id="partyContent">
+        <h2><i class="fas fa-users"></i> <span data-i18n="guests:partyManagement">Party Management</span></h2>
+        <p class="section-description" data-i18n="rich:guests:partyManagementDesc">
+          Manage your wedding party members and their dietary requirements.
+        </p>
+        <div class="loading-party">
+          <i class="fas fa-spinner fa-spin fa-3x"></i>
+          <p data-i18n="guests:loadingParty">Loading party...</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Content of the Menu tab -->
+    <div id="menuContent-tab" class="tab-content">
+      <section id="menuContent">
+        <h2><i class="fas fa-utensils"></i> <span data-i18n="guests:menuSelection">Menu Selection</span></h2>
+        <p class="section-description" data-i18n="guests:menuSelectionDesc2">
+          Choose your favorite dishes for our wedding celebrations.
+        </p>
+        <div id="menuContent"></div>
+      </section>
+    </div>
+
+    <!-- Content of the Gifts tab -->
+    <div id="giftsContent-tab" class="tab-content">
+      <section id="giftsContent">
+        <h2><i class="fas fa-money-bill-wave"></i> <span data-i18n="guests:giftsSelection">Gifts Selection</span></h2>
+        <p class="section-description" data-i18n="rich:guests:giftsSelectionDesc">
+          Choose your favorite gifts for our wedding celebrations.
+        </p>
+        <div id="giftsContent"></div>
+      </section>
+    </div>
+
+    <!-- Content of the RSVP tab -->
+    <div id="eventsContent-tab" class="tab-content">
+      <section id="eventsContent">
+        <h2><i class="fas fa-calendar-alt"></i> <span data-i18n="guests:eventsRSVP">RSVP</span></h2>
+        <p class="section-description" data-i18n="rich:guests:eventsRSVPDesc">
+          The celebrations will take place over three days: Friday, Saturday and Sunday. They kick off on Friday with a
+          welcome dinner. Saturday is a full day of activities including the wedding ceremony, the reception banquet,
+          and dancing. Sunday's activities include a farewell brunch. Please confirm your attendance for which ever of
+          these events you will be attending.
+        </p>
+        <div id="eventsContent"></div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-content">
+    <p data-i18n="common:footer">© 2026 Boda de Iluminada &amp; George</p>
   </div>
 </footer>
 
-  <script src="js/comments.js"></script>
-  <script src="js/i18n.js"></script>
-  <script src="https://js.stripe.com/v3/"></script>
-  <script src="js/guests.js"></script>
-  <script src="components/language-selector.js"></script>
+<script src="js/comments.js"></script>
+<script src="js/i18n.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="js/guests.js"></script>
+<script src="components/language-selector.js"></script>
 </body>
 </html>

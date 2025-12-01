@@ -1405,13 +1405,18 @@ main.main-content-full {
 
 .day-title {
   color: var(--primary-color);
+  background: var(--light-bg-transparent);
   font-size: 1.3em;
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0;
   padding-bottom: 10px;
+  border: 1px solid var(--accent-color);
   border-bottom: 2px solid var(--accent-color);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  padding: 25px;
+  margin-bottom: 20px;
 }
 
 .day-events {
@@ -2029,6 +2034,18 @@ main.main-content-full {
   align-items: center;
   gap: 5px;
 }
+/* ========================================
+   INTRO SECTION COMPONENTS
+   ======================================== */
+.intro-section {
+  background: var(--light-bg-transparent);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--gray-100);
+  padding: 25px;
+  margin-bottom: 20px;
+}
+
 
 /* ========================================
    SUMMARY SECTION COMPONENTS

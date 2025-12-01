@@ -5,110 +5,123 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title data-i18n="wedding:title">Iluminada & George</title>
   <meta name="description" content="Celebra con nosotros nuestro día especial" data-i18n="wedding:hero.description">
-  <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml"/>
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/wedding.css">
   <link rel="stylesheet" href="assets/css/home.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
   </style>
 </head>
 <body class="wedding-landing-active">
-  <!-- Sticky Navbar -->
-  <nav class="navbar">
-    <div class="container">
-      <div class="pepe-top-actions">
-        <div class="header-actions" aria-label="Top-right actions">
-          <!-- Language Selector Component -->
-          <div data-auto-init="language-selector" class="language-selector"></div>
-          <!-- Login buttons -->
-          <div class="login-access-icon">
-            <a href="login.html" class="guests-access-btn" title="Guest Access" aria-label="Guest Access" data-action="guest-login">
-              <i class="fas fa-user" aria-hidden="true"></i>
-            </a>
-          </div>
-          <div class="login-access-icon">
-            <a href="/admin-login.html" class="guests-access-btn" title="Administrator Access" aria-label="Administrator Access" data-action="admin-login">
-              <i class="fas fa-cog" aria-hidden="true"></i>
-            </a>
-          </div>
+<!-- Sticky Navbar -->
+<nav class="navbar">
+  <div class="container">
+    <div class="pepe-top-actions">
+      <div class="header-actions" aria-label="Top-right actions">
+        <!-- Language Selector Component -->
+        <div data-auto-init="language-selector" class="language-selector"></div>
+        <!-- Login buttons -->
+        <div class="login-access-icon">
+          <a href="login.html" class="guests-access-btn" title="Guest Access" aria-label="Guest Access"
+             data-action="guest-login">
+            <i class="fas fa-user" aria-hidden="true"></i>
+          </a>
+        </div>
+        <div class="login-access-icon">
+          <a href="/admin-login.html" class="guests-access-btn" title="Administrator Access"
+             aria-label="Administrator Access" data-action="admin-login">
+            <i class="fas fa-cog" aria-hidden="true"></i>
+          </a>
         </div>
       </div>
     </div>
-  </nav>
+  </div>
+</nav>
 
-  <!-- Wedding Landing -->
-  <div class="wedding-landing">
-    <div class="container">
-      <section class="pepe-hero">
-        <!-- Left section -->
-        <div class="pepe-left">
-          <h2 data-i18n="wedding:title">We’re getting married</h2>
-          <h1 data-i18n="wedding:subtitle">We’re getting married</h1>
-          <h2 class="date" data-i18n="wedding:date">June 6, 2026 • Marbella, Spain</h2>
-          <div class="countdown-container">
-            <div class="countdown-item">
-              <span class="countdown-number" id="days">00</span>
-              <span class="countdown-label" data-i18n="common:days">Days</span>
-            </div>
-            <div class="countdown-item">
-              <span class="countdown-number" id="hours">00</span>
-              <span class="countdown-label" data-i18n="common:hours">Hours</span>
-            </div>
-            <div class="countdown-item">
-              <span class="countdown-number" id="minutes">00</span>
-              <span class="countdown-label" data-i18n="common:minutes">Minutes</span>
-            </div>
-            <div class="countdown-item">
-              <span class="countdown-number" id="seconds">00</span>
-              <span class="countdown-label" data-i18n="common:seconds">Seconds</span>
-            </div>
+<!-- Wedding Landing -->
+<div class="wedding-landing">
+  <div class="container">
+    <section class="pepe-hero">
+      <!-- Left section -->
+      <div class="pepe-left">
+        <h2 data-i18n="wedding:title">We’re getting married</h2>
+        <h1 data-i18n="wedding:subtitle">We’re getting married</h1>
+        <h2 class="date" data-i18n="wedding:date">June 6, 2026 • Marbella, Spain</h2>
+        <div class="countdown-container">
+          <div class="countdown-item">
+            <span class="countdown-number" id="days">00</span>
+            <span class="countdown-label" data-i18n="common:days">Days</span>
           </div>
-  
-          <p class="lede" data-i18n="wedding:hero.description">Iluminada and George are tying the knot on the beach in Marbella this June ...</p>
-          <p class="lede" data-i18n="wedding:hero.description2">This website will be your hub for everything wedding-related ...</p>
-          <div class="cta-row">
-            <a class="btn" href="login.html" data-action="guest-login" data-i18n="wedding:guestZone.title"><i class="fas fa-heart"></i> Guest zone</a>
+          <div class="countdown-item">
+            <span class="countdown-number" id="hours">00</span>
+            <span class="countdown-label" data-i18n="common:hours">Hours</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-number" id="minutes">00</span>
+            <span class="countdown-label" data-i18n="common:minutes">Minutes</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-number" id="seconds">00</span>
+            <span class="countdown-label" data-i18n="common:seconds">Seconds</span>
           </div>
         </div>
-        <!-- Right section -->
-        <div class="pepe-right">
-          <!-- Stack Gallery -->
-          <div class="stack-section">
-            <div class="stack-gallery wow-stack mobile-overlay">
-              <div class="stack-viewport">
-                <div class="stack-inner">
-                  <!-- Stack Cards -->
-                  <div class="stack-card"><img src="assets/images/home.png" alt="Home" loading="eager"></div>
-                  <div class="stack-card"><img src="assets/images/kiss.png" alt="Kiss" loading="lazy"></div>
-                  <div class="stack-card"><img src="assets/images/celebrate.png" alt="Celebrate" loading="lazy"></div>
-                  <div class="stack-card"><img src="assets/images/reception.png" alt="Reception" loading="lazy"></div>
-                </div>
+
+        <p class="lede" data-i18n="wedding:hero.description">Iluminada and George are tying the knot on the beach in
+          Marbella this June ...</p>
+        <p class="lede" data-i18n="wedding:hero.description2">This website will be your hub for everything
+          wedding-related ...</p>
+        <div class="cta-row">
+          <a class="btn" href="login.html" data-action="guest-login" data-i18n="wedding:guestZone.title"><i
+              class="fas fa-heart"></i> Guest zone</a>
+        </div>
+      </div>
+      <!-- Right section -->
+      <div class="pepe-right">
+        <!-- Stack Gallery -->
+        <div class="stack-section">
+          <div class="stack-gallery wow-stack mobile-overlay">
+            <div class="stack-viewport">
+              <div class="stack-inner">
+                <!-- Stack Cards -->
+                <div class="stack-card"><img src="assets/images/home.png" alt="Home" loading="eager"></div>
+                <div class="stack-card"><img src="assets/images/kiss.png" alt="Kiss" loading="lazy"></div>
+                <div class="stack-card"><img src="assets/images/celebrate.png" alt="Celebrate" loading="lazy"></div>
+                <div class="stack-card"><img src="assets/images/reception.png" alt="Reception" loading="lazy"></div>
               </div>
             </div>
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+    </section>
   </div>
+</div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="js/i18n.js"></script>
-  <script src="js/home.js"></script>
-  </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
-  <script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="js/i18n.js"></script>
+<script src="js/home.js"></script>
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+<script>
     // Initialize WOW.js with Animate.css v4 compatibility
     if (window.WOW) {
-      window._wowInstance = new WOW({ boxClass: 'wow', animateClass: 'animate__animated', offset: 0, mobile: true, live: false });
-      window._wowInstance.init();
+        window._wowInstance = new WOW({
+            boxClass: 'wow',
+            animateClass: 'animate__animated',
+            offset: 0,
+            mobile: true,
+            live: false
+        });
+        window._wowInstance.init();
     }
-  </script>
+</script>
 
 
-  <script src="js/stack-gallery.js"></script>
-  <script src="js/auth-check.js"></script>
-  <script src="components/language-selector.js"></script>
+<script src="js/stack-gallery.js"></script>
+<script src="js/auth-check.js"></script>
+<script src="components/language-selector.js"></script>
 </body>
 </html>

@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       let html = '<div class="unified-menu-container">';
 
       html += `
-      <div class="intro-card">
+      <div class="intro-card intro-section">
         <h2 class="card-title">
           <div data-i18n="guests:menuPageTitle">${translate('guests:menuPageTitle')}</div>
         </h2>
@@ -1447,7 +1447,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       let html = '<div class="events-container">';
       
       html += `
-        <div class="intro-card">
+        <div class="intro-card intro-section">
           <h2 class="card-title">
             <div data-i18n="guests:eventsPageTitle">${translate('guests:eventsPageTitle')}</div>
           </h2>
@@ -1648,7 +1648,7 @@ document.addEventListener('DOMContentLoaded', async () => {
        let html = '<div class="gifts-container">';
 
        html += `
-       <div class="intro-card">
+       <div class="intro-card intro-section">
          <h2 class="card-title">
            <div data-i18n="guests:giftsPageTitle">${translate('guests:giftsPageTitle')}</div>
          </h2>
@@ -2108,8 +2108,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Build HTML
       let html = '<div class="party-management-container">';
       html += `
-        <div class="intro-card">
-          <h2 class="card-title">
+        <div class="intro-card intro-section">
+          <h2 class="card-title ">
             <div data-i18n="guests:partyPageTitle">${translate('guests:partyPageTitle')}</div>
           </h2>
           <p class="card-description">
