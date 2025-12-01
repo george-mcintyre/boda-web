@@ -1463,10 +1463,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         html += `
           <div class="event-day">
-            <h3 class="day-title">
+            <div class="day-title">
               <i class="fas fa-calendar-day"></i>
-              ${dateKey}
-            </h3>
+              <h3>${dateKey}</h3>
+            </div>
             <div class="day-events">
               ${eventCardsHtml}
             </div>

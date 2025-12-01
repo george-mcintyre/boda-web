@@ -1404,19 +1404,27 @@ main.main-content-full {
 }
 
 .day-title {
-  color: var(--primary-color);
-  background: var(--light-bg-transparent);
-  font-size: 1.3em;
+  background: var(--gradient-primary);
+  color: var(--white);
+  padding: 15px 25px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding-bottom: 10px;
-  border: 1px solid var(--accent-color);
-  border-bottom: 2px solid var(--accent-color);
+  gap: 12px;
+  font-size: 1.3em;
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
-  padding: 25px;
   margin-bottom: 20px;
+}
+
+.day-title i {
+  font-size: 1.5em;
+  opacity: 0.9;
+}
+
+.day-title h3 {
+  margin: 0;
+  font-size: 1.3em;
+  font-weight: 600;
 }
 
 .day-events {
