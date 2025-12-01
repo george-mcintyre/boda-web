@@ -109,7 +109,7 @@ body.wedding-landing-active .navbar .container {
   gap: 8px;
   padding: 8px 12px;
   height: 40px;
-  background: linear-gradient(180deg, #c7a27a, #b78d61);
+  background: linear-gradient(180deg,var(--primary-color), var(--secondary-color));
   border: 1px solid rgba(199, 162, 122, 0.3);
   border-radius: 8px;
   color: white;
@@ -204,7 +204,7 @@ body.wedding-landing-active .navbar .container {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
-  color: var(--pepe-accent);
+  color: var(--primary-color);
   font-size: 18px;
   text-decoration: none;
   transition: all var(--transition-normal);
@@ -325,7 +325,7 @@ footer {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: var(--pepe-accent-2);
+  background: var(--primary-color);
   color: var(--text-light);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -340,7 +340,7 @@ footer {
   box-shadow: var(--shadow-md);
 }
 .logout-btn {
-  background: var(--danger-color);
+  background: var(--secondary-color);
   color: white;
 }
 .logout-btn:hover {

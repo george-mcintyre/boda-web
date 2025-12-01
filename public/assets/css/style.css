@@ -284,6 +284,11 @@ a:hover {
   overflow: hidden;
 }
 
+.btn-base {
+  border: none;
+  border-radius: var(--radius-round);
+}
+
 .btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);

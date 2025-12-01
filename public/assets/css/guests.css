@@ -971,7 +971,7 @@ main.main-content-full {
 .party-management-container {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 10px;
 }
 
 .party-members-management {
@@ -2054,7 +2054,7 @@ main.main-content-full {
   box-shadow: var(--shadow-md);
   border: 1px solid var(--gray-100);
   padding: 25px;
-  margin-bottom: 20px;
+  margin: var(--spacing-xxxl) 0;
 }
 
 

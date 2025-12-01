@@ -138,7 +138,7 @@ body.wedding-landing-active footer { display: none !important; }
 .wedding-landing .btn {
   appearance: none;
   border: none;
-  background: linear-gradient(180deg, var(--pepe-accent), #b78d61);
+  background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
   color: #fff;
   padding: 12px 18px;
   border-radius: 999px;
