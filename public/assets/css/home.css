@@ -339,7 +339,7 @@ body.wedding-landing-active footer { display: none !important; }
     margin-right: 0 !important;
     width: 100% !important;
     /* Ensure the div takes full height from below header to bottom */
-    min-height: calc(100vh - 60px); /* Adjust 60px based on navbar height */
+    /*min-height: calc(100vh - 60px);  Adjust 60px based on navbar height */
     /* Center all content within the left pane */
     text-align: center;
   }
