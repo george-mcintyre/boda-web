@@ -2849,5 +2849,12 @@
     
   // Default
   showTab(savedPage);
+
+  window.addEventListener('languageChanged', (event) => {
+    const newLanguage = event.detail.language;
+    const savedPage = localStorage.getItem('adminPage') || 'guests';
+    showTab(savedPage);
+    console.log('Content refreshed for language:', newLanguage);
+  });
 })();
 

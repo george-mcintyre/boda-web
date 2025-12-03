@@ -54,7 +54,7 @@
   
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, rgb(190, 190, 190) 0%, #000000 100%);
-  --gradient-secondary: linear-gradient(135deg, #b1958f 0%, #c3b8b4 100%);
+  --gradient-secondary: linear-gradient(135deg, #f8edec 0%, #FFFFFF 100%);
   --gradient-accent: linear-gradient(135deg, #d5d5d5 0%, #f1e2d5 100%);
   --gradient-primary-action: linear-gradient(135deg, #334122 0%, #2c2f1f 100%);
   
@@ -318,7 +318,7 @@ a:hover {
 }
 
 .btn-secondary {
-  background: var(--gradient-secondary);
+  background: var(--gradient-primary);
   color: var(--white);
 }
 
