@@ -1725,7 +1725,7 @@ document.addEventListener('DOMContentLoaded', async () => {
        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="guests:giftsPurchaseProcessing">' + translate('guests:giftsPurchaseProcessing') + '</span>';
        
        try {
-         const response = await fetch('/api/guest/create-payment-session', {
+         const response = await fetch(`/api/guest/create-payment-session?lang=${currentLanguage}`, {
            method: 'POST',
            headers: {
              'Content-Type': 'application/json',
@@ -1854,7 +1854,7 @@ document.addEventListener('DOMContentLoaded', async () => {
      try {
        const message = prompt('Leave a message with your gift (optional):');
        
-       const res = await fetch('/api/invitado/create-payment-session', {
+       const res = await fetch(`/api/guest/create-payment-session?lang=${currentLanguage}`, {
          method: 'POST',
          headers: {
            'Content-Type': 'application/json',

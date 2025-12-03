@@ -225,8 +225,8 @@ async function getGifts(req, res, next) {
       
       return {
         id: gift._id.toString(),
-        title: title,
-        description: description,
+        title: String(title),
+        description: String(description),
         amount: gift.amount,
         available: gift.available,
         purchased: purchased,
@@ -274,62 +274,92 @@ async function getGiftChoices(req, res, next) {
 
 async function createPaymentSession(req, res, next) {
   try {
+    const lang = getLang(req);                // <- same as getGifts()
     const { giftId, message } = req.body;
+
     const me = await guestService.getByEmail(req.user.email);
     if (!me) return res.status(404).json({ error: 'Guest not found' });
 
-    const gift = await Gift.findById(giftId);
+    const gift = await Gift.findById(giftId).lean();
     if (!gift || !gift.enabled) {
       return res.status(404).json({ error: 'Gift not found or not available' });
     }
-    
-    // Check stock availability
+
+    // Stock check (same logic as before)
     const purchaseCount = await GiftChoice.countDocuments({ giftId: gift._id });
     const stock = gift.available - purchaseCount;
     if (stock <= 0) {
       return res.status(400).json({ error: 'Gift is out of stock' });
     }
 
-    // Determine base URL for redirects
+    // Localised title/description – IMPORTANT: turn into plain strings
+    const title = String(localize(gift.title, lang));
+    const descRaw = localize(gift.description, lang);
+    const description = String(
+      descRaw || `Wedding gift: ${title}`
+    );
+
+    // Same image URL rules as getGifts()
+    let imagePath;
+    if (typeof gift.image === 'number') {
+      imagePath = `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`;
+    } else if (gift.image) {
+      imagePath = `/api/guest/gifts/${gift._id.toString()}/image`;
+    } else {
+      imagePath = `/assets/images/gift-cards/image_01.jpg`;
+    }
+
+    // Stripe needs ABSOLUTE URLs for images + redirects
     const baseUrlFromReq = `${req.protocol}://${req.get('host')}`;
     const baseUrl =
       typeof APP_URL === 'string' && APP_URL.trim().length > 0
         ? APP_URL
         : baseUrlFromReq;
-    
-    // Create Stripe checkout session
+    const imageUrl = `${baseUrl}${imagePath}`;
+
+    const safeMessage = typeof message === 'string' ? message : '';
+
     const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
       payment_method_types: ['card'],
+
       line_items: [
         {
           price_data: {
             currency: 'eur',
+            unit_amount: gift.amount * 100,     // € → cents
             product_data: {
-              name: String(gift.title),
-              description: String(
-                gift.description || `Wedding gift: ${gift.title}`
-              ),
+              name: title,                      // e.g. “Honeymoon Accommodation”
+              description,                     // localised description
+              images: [imageUrl],              // same visual as your card
             },
-            unit_amount: gift.amount * 100, // Stripe uses cents
           },
           quantity: 1,
         },
       ],
-      mode: 'payment',
+
       success_url: `${baseUrl}/guests.html?tab=gifts&payment=success&giftId=${giftId}`,
       cancel_url: `${baseUrl}/guests.html?tab=gifts&payment=cancelled`,
+
+      customer_email: me.email,
+
+      // So you can rebuild the “donated gifts” cards after payment
       metadata: {
-        giftId: giftId,
+        giftId: gift._id.toString(),
+        giftTitle: title,
+        giftAmount: String(gift.amount),
+        giftImageUrl: imageUrl,
         guestId: me._id.toString(),
         guestEmail: me.email,
-        guestName: me.name,
-        message: typeof message === 'string' ? message : ''
+        guestName: me.name || '',
+        message: safeMessage,
+        lang,
       },
-      customer_email: me.email,
     });
 
     res.json({ checkoutUrl: session.url, sessionId: session.id });
   } catch (e) {
+    console.error('Stripe session creation error:', e);
     next(e);
   }
 }
