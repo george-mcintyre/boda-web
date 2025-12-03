@@ -463,7 +463,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <div class="option-selection-panel" data-option-id="${option.id}" data-course-id="${course.id}">
                     <div class="selection-panel-header">
                       <span class="panel-label"><i class="fas fa-users"></i> <div data-i18n="guests:whosHavingThis">Who's having this?</div></span>
-                      <span class="member-count">${membersForOption.length} <div data-i18n="guests:selectedCount">selected</div></span>
+                      <span class="member-count">${membersForOption.length} <span data-i18n="guests:selectedCount">${translate("guests:selectedCount")}</span></span>
                     </div>
                     <div class="member-drop-zone" data-option-id="${option.id}" data-course-id="${course.id}">
                       ${membersForOption.map(member => `
@@ -518,19 +518,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const selectedRequests = Array.isArray(memberRequests.specialRequest) ? memberRequests.specialRequest : [];
         
         const dietaryOptions = [
-          { name: 'vegetarian', label: 'guests:dietaryVegetarian', icon: 'fa-leaf' },
-          { name: 'lactose-intolerant', label: 'guests:dietaryLactoseIntolerant', icon: 'fa-cheese' },
-          { name: 'gluten-intolerant', label: 'guests:dietaryGlutenIntolerant', icon: 'fa-bread-slice' },
-          { name: 'nut-allergy', label: 'guests:dietaryNutAllergy', icon: 'fa-seedling' },
-          { name: 'other', label: 'guests:dietaryOther', icon: 'fa-question-circle' }
+          { name: 'vegetarian', label: 'Vegetarian', icon: 'fa-leaf' },
+          { name: 'lactose-intolerant', label: 'Lactose Intolerant', icon: 'fa-cheese' },
+          { name: 'gluten-intolerant', label: 'Gluten Intolerant', icon: 'fa-bread-slice' },
+          { name: 'nut-allergy', label: 'Nut Allergy', icon: 'fa-seedling' },
+          { name: 'other', label: 'Other', icon: 'fa-question-circle' }
         ];
 
         html += `
           <div class="card" data-member-id="${member.id}">
             <div class="card-header">
-              <i class="fas fa-user"></i>
-              <h4>${escapeHtml(member.name)}</h4>
-              ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:party.primary\">${member.primary ? translate('common:party.primary') : ''}</span>" : ''}
+              <h4>
+                <i class="fas fa-user"></i>
+                ${escapeHtml(member.name)}
+                ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:party.primary\">${member.primary ? translate('common:party.primary') : ''}</span>" : ''}
+              </h4>
             </div>
             <div class="card-content">
               ${dietaryOptions.map(opt => {
@@ -546,7 +548,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                       ${isSelected ? 'checked' : ''}
                       onchange="updateDietaryCheckbox(this)">
                     <i class="fas ${opt.icon}"></i>
-                    <span><div data-i18n="guests:dietary${opt.label}">${translate("guests:dietary" + opt.label)}</div></span>
+                    <span data-i18n="guests:dietary${opt.label}">${translate("guests:dietary" + opt.label)}</span>
                   </label>
                 `;
               }).join('')}
@@ -574,7 +576,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="action-container">
           <button type="button" id="saveMenuChoicesBtn" class="btn-base btn-primary btn-lg">
             <i class="fas fa-save"></i>
-            <div data-i18n="guests:saveMenuSelections">Save Menu Selections</div>
+            <span data-i18n="guests:saveMenuSelections">${translate("guests:saveMenuSelections")}</span>
           </button>
         </div>
       `;
@@ -799,7 +801,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (panel) {
         const countSpan = panel.querySelector('.member-count');
         if (countSpan) {
-          countSpan.textContent = `${count} selected`;
+          countSpan.textContent = `${count} ${translate("guests:selectedCount")}`;
         }
       }
     });
@@ -809,7 +811,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const saveBtn = document.getElementById('saveMenuChoicesBtn');
     if (saveBtn && !saveBtn.classList.contains('unsaved')) {
       saveBtn.classList.add('unsaved');
-      saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Menu Selections *';
+      saveBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="guests:saveMenuSelections">${translate("guests:saveMenuSelections")}</span> *`;
     }
   }
 
@@ -932,23 +934,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (response.ok) {
-        showToast('<div data-i18n="common:menu.selections.saved">'+ translate('common:menu.selections.saved') +'</div>', 'success');
+        showToast(`<div data-i18n="common:menu.selections.saved">${translate('common:menu.selections.saved')}</div>`, 'success');
         if (saveBtn) {
           saveBtn.classList.remove('unsaved');
-          saveBtn.innerHTML = '<i class="fas fa-save"></i> <div data-i18n="guests:saveMenuSelections">'+ translate('guests:saveMenuSelections') +'</div>';
+          saveBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="guests:saveMenuSelections">${translate('guests:saveMenuSelections')}</span>`;
         }
       } else {
         const data = await response.json();
-        showToast('<div data-i18n="common:error.saving.menu.selections">'+ (data.error || translate('common:error.saving.menu.selections')) + '</div>', 'error');
+        showToast(`<div data-i18n="common:error.saving.menu.selections">${(data.error || translate('common:error.saving.menu.selections'))}</div>`, 'error');
       }
     } catch (err) {
       console.error('Error saving menu choices:', err);
-      showToast('<div data-i18n="common:error.saving.menu.selections">'+ translate('common:error.saving.menu.selections') +'</div>', 'error');
+      showToast(`<div data-i18n="common:error.saving.menu.selections">${translate('common:error.saving.menu.selections')}</div>`, 'error');
     } finally {
       if (saveBtn) {
         saveBtn.disabled = false;
         if (!saveBtn.classList.contains('unsaved')) {
-          saveBtn.innerHTML = '<i class="fas fa-save"></i> <div data-i18n="guests:saveMenuSelections">'+ translate('guests:saveMenuSelections') +'</div>';
+          saveBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="guests:saveMenuSelections">${translate('guests:saveMenuSelections')}</span>`;
         }
       }
     }
