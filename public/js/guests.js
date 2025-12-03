@@ -4,8 +4,23 @@ let settingsCache = null;
 let settingsCacheTimestamp = 0;
 const SETTINGS_CACHE_DURATION = 300000; // 5 minutes
 
+// Check if an admin is logged in
+function isAdminLoggedIn() {
+  const token = localStorage.getItem('adminToken');
+  return !!token && token.trim() !== '';
+}
+
 // Fetch application settings (same logic as auth-check.js)
 async function fetchSettings() {
+    if (isAdminLoggedIn()) {
+      return {
+        guestsEnabled: true,
+        eventsEnabled: true,
+        menuEnabled: true,
+        messagesEnabled: true,
+        giftsEnabled: true
+      };
+    }
     try {
         // Check if we have cached settings that are still valid
         const now = Date.now();
@@ -157,17 +172,8 @@ async function initializeSettingsVisibility() {
     }
 }
 
-// Configurar event listeners
+// Configure event listeners
 document.addEventListener('DOMContentLoaded', async () => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    window.location.href = 'login.html';
-    return;
-  }
-  
-  // Initialize settings-based visibility
-  await initializeSettingsVisibility();
-  
   // Refresh settings when window regains focus (in case admin changed settings)
   window.addEventListener('focus', async () => {
     await initializeSettingsVisibility();
@@ -966,9 +972,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Make loadMenuSelections globally accessible for retry button
-  window.loadMenuSelections = loadMenuSelections;
-
   // Helper function to initialize a map for an event
   function initEventMap(mapContainerId, lat, lng) {
     try {
@@ -1378,506 +1381,465 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
   }
-  
-  // Make loadEventsContent globally accessible for retry button
-  window.loadEventsContent = loadEventsContent;
-  
-  // Make saveEventChoices globally accessible for onclick handlers
-  window.saveEventChoices = saveEventChoices;
    
-  // Function to save event attendance choices
-   async function saveEventChoices() {
-     const saveBtn = document.getElementById('saveEventChoicesBtn');
-     
-     try {
-       // Collect all attendance checkboxes
-       const checkboxes = document.querySelectorAll('.attendance-checkbox');
-       
-       // Build the partyChoices structure
-       const partyChoicesMap = {};
-       
-       checkboxes.forEach(checkbox => {
-         const eventId = checkbox.dataset.eventId;
-         const memberId = checkbox.dataset.memberId;
-         const attending = checkbox.checked;
-         
-         if (!partyChoicesMap[memberId]) {
-           partyChoicesMap[memberId] = {
-             partyGuestId: memberId,
-             choices: []
-           };
-         }
-         
-         partyChoicesMap[memberId].choices.push({
-           eventId: eventId,
-           attending: attending
-         });
-       });
-       
-       // Convert to array
-       const partyChoices = Object.values(partyChoicesMap);
-       
-       // Send to server
-       const response = await fetch('/api/guest/event-choices', {
-         method: 'PUT',
-         headers: {
-           'Content-Type': 'application/json',
-           'Authorization': token
-         },
-         body: JSON.stringify(partyChoices)
-       });
-       
-       if (response.ok) {
-         showToast('<div data-i18n="guests:eventsAttendanceSavedSuccess">'+ translate('guests:eventsAttendanceSavedSuccess') +'</div>', 'success');
-       } else {
-         const data = await response.json();
-         showToast('<div data-i18n="guests:eventsAttendanceSavedError">'+ (data.error || translate('guests:eventsAttendanceSavedError')) + '</div>', 'error');
-       }
-     } catch (err) {
-       console.error('Error saving event choices:', err);
-       showToast('<div data-i18n="guests:eventsAttendanceSavedError">'+ translate('guests:eventsAttendanceSavedError') +'</div>', 'error');
-     } finally {
-       if (saveBtn) {
-         saveBtn.disabled = false;
-         saveBtn.innerHTML = '<i class="fas fa-save"></i> <div data-i18n="guests:eventsSaveAttendanceChoices">'+ translate('guests:eventsSaveAttendanceChoices') +'</div>';
-       }
-     }
-   }
+// Function to save event attendance choices
+  async function saveEventChoices() {
+    const saveBtn = document.getElementById('saveEventChoicesBtn');
+    
+    try {
+      // Collect all attendance checkboxes
+      const checkboxes = document.querySelectorAll('.attendance-checkbox');
+      
+      // Build the partyChoices structure
+      const partyChoicesMap = {};
+      
+      checkboxes.forEach(checkbox => {
+        const eventId = checkbox.dataset.eventId;
+        const memberId = checkbox.dataset.memberId;
+        const attending = checkbox.checked;
+        
+        if (!partyChoicesMap[memberId]) {
+          partyChoicesMap[memberId] = {
+            partyGuestId: memberId,
+            choices: []
+          };
+        }
+        
+        partyChoicesMap[memberId].choices.push({
+          eventId: eventId,
+          attending: attending
+        });
+      });
+      
+      // Convert to array
+      const partyChoices = Object.values(partyChoicesMap);
+      
+      // Send to server
+      const response = await fetch('/api/guest/event-choices', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify(partyChoices)
+      });
+      
+      if (response.ok) {
+        showToast('<div data-i18n="guests:eventsAttendanceSavedSuccess">'+ translate('guests:eventsAttendanceSavedSuccess') +'</div>', 'success');
+      } else {
+        const data = await response.json();
+        showToast('<div data-i18n="guests:eventsAttendanceSavedError">'+ (data.error || translate('guests:eventsAttendanceSavedError')) + '</div>', 'error');
+      }
+    } catch (err) {
+      console.error('Error saving event choices:', err);
+      showToast('<div data-i18n="guests:eventsAttendanceSavedError">'+ translate('guests:eventsAttendanceSavedError') +'</div>', 'error');
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> <div data-i18n="guests:eventsSaveAttendanceChoices">'+ translate('guests:eventsSaveAttendanceChoices') +'</div>';
+      }
+    }
+  }
 
-   // Function to load the gifts content in the gifts tab
+  // Function to load the gifts content in the gifts tab
   async function loadGiftsContent() {
-     console.log("loading gifts content");
-     const giftsContent = document.getElementById('giftsContent');
-     
-     if (!giftsContent) {
-       console.error('Gifts content container not found');
-       return;
-     }
-     
-     // Show loading state
-     giftsContent.innerHTML = `
-       <div class="loading-state">
-         <i class="fas fa-spinner fa-spin fa-3x"></i>
-         <p><span data-i18n="guests:giftsLoading">${translate('guests:giftsLoading')}</span></p>
-       </div>
-     `;
-     
-     try {
-       // Fetch gift choices (donations) and available gifts in parallel
-       const [giftChoicesRes, giftsRes] = await Promise.all([
-         fetch('/api/guest/gift-choices', {
-           method: 'GET',
-           headers: { 'Authorization': token }
-         }),
-         fetch(`/api/guest/gifts?lang=${currentLanguage}`, {
-           method: 'GET',
-           headers: { 'Authorization': token }
-         })
-       ]);
-       
-       let giftChoices = [];
-       let gifts = [];
-       
-       if (giftChoicesRes.ok) {
-         giftChoices = await giftChoicesRes.json();
-       }
-       
-       if (!giftsRes.ok) {
-         throw new Error('Failed to load gifts');
-       }
-       gifts = await giftsRes.json();
-       
-       // Helper to escape HTML
-       const escapeHtml = (str) => {
-         if (!str) return '';
-         return String(str)
-           .replace(/&/g, '&amp;')
-           .replace(/</g, '&lt;')
-           .replace(/>/g, '&gt;')
-           .replace(/"/g, '&quot;')
-           .replace(/'/g, '&#039;');
-       };
-       
-       // Format date helper
-       const formatDate = (dateString) => {
-         if (!dateString) return '';
-         const date = new Date(dateString);
-         return date.toLocaleDateString(currentLanguage || 'en-GB', {
-           day: 'numeric',
-           month: 'long',
-           year: 'numeric'
-         });
-       };
-       
-       let html = '<div class="gifts-container">';
+    console.log("loading gifts content");
+    const giftsContent = document.getElementById('giftsContent');
+    
+    if (!giftsContent) {
+      console.error('Gifts content container not found');
+      return;
+    }
+    
+    // Show loading state
+    giftsContent.innerHTML = `
+      <div class="loading-state">
+        <i class="fas fa-spinner fa-spin fa-3x"></i>
+        <p><span data-i18n="guests:giftsLoading">${translate('guests:giftsLoading')}</span></p>
+      </div>
+    `;
+    
+    try {
+      // Fetch gift choices (donations) and available gifts in parallel
+      const [giftChoicesRes, giftsRes] = await Promise.all([
+        fetch('/api/guest/gift-choices', {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        }),
+        fetch(`/api/guest/gifts?lang=${currentLanguage}`, {
+          method: 'GET',
+          headers: { 'Authorization': token }
+        })
+      ]);
+      
+      let giftChoices = [];
+      let gifts = [];
+      
+      if (giftChoicesRes.ok) {
+        giftChoices = await giftChoicesRes.json();
+      }
+      
+      if (!giftsRes.ok) {
+        throw new Error('Failed to load gifts');
+      }
+      gifts = await giftsRes.json();
+      
+      // Helper to escape HTML
+      const escapeHtml = (str) => {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      };
+      
+      // Format date helper
+      const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString(currentLanguage || 'en-GB', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric'
+        });
+      };
+      
+      let html = '<div class="gifts-container">';
 
-       html += `
-       <div class="intro-card intro-section">
-         <h2 class="card-title">
-           <div data-i18n="guests:giftsPageTitle">${translate('guests:giftsPageTitle')}</div>
-         </h2>
-         <p class="card-description">
-           <div data-i18n="guests:giftsPageDescription">${translate('guests:giftsPageDescription')}</div>
-         </p>
-       </div>
-     `;
-             
-       // ========== Section 1: Thank You Section (if there are donated gifts) ==========
-       if (giftChoices.length > 0) {
-         html += `
-           <div class="gifts-thank-you-section">
-             <div class="thank-you-header">
-               <i class="fas fa-heart"></i>
-               <h3><span data-i18n="guests:giftsThankYouTitle">${translate('guests:giftsThankYouTitle')}</span></h3>
-               <p><span data-i18n="guests:giftsThankYouMessage">${translate('guests:giftsThankYouMessage')}</span></p>
-             </div>
-             <div class="donated-gifts-grid">
-         `;
-         
-         giftChoices.forEach(choice => {
-           const donatedOnText = translate('rich:guests:giftsDonatedOn').replace('{{date}}', formatDate(choice.date));
-           html += `
-             <div class="donated-gift-card" style="background-image: url('${escapeHtml(choice.giftImageUrl)}');">
-               <div class="donated-gift-overlay">
-                 <div class="donated-gift-content">
-                   <h4 class="donated-gift-title">${escapeHtml(choice.giftTitle)}</h4>
-                   <div class="donated-gift-price">€${choice.giftAmount}</div>
-                   <div class="donated-gift-date">
-                     <i class="fas fa-calendar-check"></i>
-                     <span data-i18n="rich:guests:giftsDonatedOn" data-i18n-options='{"date": "${formatDate(choice.date)}"}'>${donatedOnText}</span>
-                   </div>
-                   ${choice.message ? `
-                     <div class="donated-gift-message">
-                       <i class="fas fa-quote-left"></i>
-                       ${escapeHtml(choice.message)}
-                     </div>
-                   ` : ''}
-                 </div>
-               </div>
-             </div>
-           `;
-         });
-         
-         html += `
-             </div>
-           </div>
-         `;
-       }
-       
-       // ========== Section 2: Available Gifts Grid ==========
-       html += `
-         <div class="gifts-available-section">
-           <div class="available-gifts-header">
-             <i class="fas fa-gift"></i>
-             <h3><span data-i18n="guests:giftsRegistryTitle">${translate('guests:giftsRegistryTitle')}</span></h3>
-             <p><span data-i18n="guests:giftsRegistrySubtitle">${translate('guests:giftsRegistrySubtitle')}</span></p>
-           </div>
-           <div class="gift-cards-grid">
-       `;
-       
-       if (gifts.length === 0) {
-         html += `
-           <div class="empty-state">
-             <i class="fas fa-inbox"></i>
-             <h4><span data-i18n="guests:giftsNoAvailable">${translate('guests:giftsNoAvailable')}</span></h4>
-             <p><span data-i18n="guests:giftsNoAvailableDescription">${translate('guests:giftsNoAvailableDescription')}</span></p>
-           </div>
-         `;
-       } else {
-         gifts.forEach(gift => {
-           const isAvailable = gift.stock > 0;
-           
-           html += `
-             <div class="card gift-credit-card ${!isAvailable ? 'sold-out' : ''}" data-gift-id="${gift.id}">
-               <div class="gift-card-image-section" style="background-image: url('${escapeHtml(gift.imageUrl)}');">
-                 <div class="gift-card-image-overlay">
-                   <h4 class="gift-card-title">${escapeHtml(gift.title)}</h4>
-                   <div class="gift-card-price">${escapeHtml(gift.priceDisplay)}</div>
-                 </div>
-               </div>
-               <div class="gift-card-details">
-                 <p class="gift-card-description">${gift.description}</p>
-                 <div class="gift-card-stock">
-                   ${isAvailable
-                     ? `<span class="stock-available"><i class="fas fa-check-circle"></i> ${gift.stock} <span data-i18n="guests:giftsAvailable">${translate('guests:giftsAvailable')}</span></span>`
-                     : `<span class="stock-sold-out"><i class="fas fa-times-circle"></i> <span data-i18n="guests:giftsSoldOut">${translate('guests:giftsSoldOut')}</span></span>`
-                   }
-                 </div>
-                 <div class="action-container">
-                   ${isAvailable ? `
-                     <button class="btn-base btn-primary btn-sm" onclick="purchaseGift('${gift.id}', '${escapeHtml(gift.title).replace(/'/g, "\\'")}', ${gift.amount})">
-                       <i class="fas fa-credit-card"></i>
-                       <span data-i18n="guests:giftsBuyGift">${translate('guests:giftsBuyGift')}</span>
-                     </button>
-                   ` : `
-                     <button class="btn-disabled" disabled>
-                       <i class="fas fa-ban"></i>
-                       <span data-i18n="guests:giftsSoldOut">${translate('guests:giftsSoldOut')}</span>
-                     </button>
-                   `}
-                 </div>
-               </div>
-             </div>
-           `;
-         });
-       }
-       
-       html += `
-           </div>
-         </div>
-       `;
-       
-       html += '</div>'; // Close gifts-container
-       
-       giftsContent.innerHTML = html;
-       
-       // Check for payment success/cancel in URL
-       const urlParams = new URLSearchParams(window.location.search);
-       const paymentStatus = urlParams.get('payment');
-       if (paymentStatus === 'success') {
-         showToast(translate('guests:giftsPaymentSuccess'), 'success');
-         // Clean up URL
-         window.history.replaceState({}, document.title, window.location.pathname);
-         // Reload to show updated gift choices
-         setTimeout(() => loadGiftsContent(), 1000);
-       } else if (paymentStatus === 'cancelled') {
-         showToast(translate('guests:giftsPaymentCancelled'), 'error');
-         // Clean up URL
-         window.history.replaceState({}, document.title, window.location.pathname);
-       }
-       
-      // Translate the newly loaded content
+      html += `
+      <div class="intro-card intro-section">
+        <h2 class="card-title">
+          <div data-i18n="guests:giftsPageTitle">${translate('guests:giftsPageTitle')}</div>
+        </h2>
+        <p class="card-description">
+          <div data-i18n="guests:giftsPageDescription">${translate('guests:giftsPageDescription')}</div>
+        </p>
+      </div>
+    `;
+            
+      // ========== Section 1: Thank You Section (if there are donated gifts) ==========
+      if (giftChoices.length > 0) {
+        html += `
+          <div class="gifts-thank-you-section">
+            <div class="thank-you-header">
+              <i class="fas fa-heart"></i>
+              <h3><span data-i18n="guests:giftsThankYouTitle">${translate('guests:giftsThankYouTitle')}</span></h3>
+              <p><span data-i18n="guests:giftsThankYouMessage">${translate('guests:giftsThankYouMessage')}</span></p>
+            </div>
+            <div class="donated-gifts-grid">
+        `;
+        
+        giftChoices.forEach(choice => {
+          const donatedOnText = translate('rich:guests:giftsDonatedOn').replace('{{date}}', formatDate(choice.date));
+          html += `
+            <div class="donated-gift-card" style="background-image: url('${escapeHtml(choice.giftImageUrl)}');">
+              <div class="donated-gift-overlay">
+                <div class="donated-gift-content">
+                  <h4 class="donated-gift-title">${escapeHtml(choice.giftTitle)}</h4>
+                  <div class="donated-gift-price">€${choice.giftAmount}</div>
+                  <div class="donated-gift-date">
+                    <i class="fas fa-calendar-check"></i>
+                    <span data-i18n="rich:guests:giftsDonatedOn" data-i18n-options='{"date": "${formatDate(choice.date)}"}'>${donatedOnText}</span>
+                  </div>
+                  ${choice.message ? `
+                    <div class="donated-gift-message">
+                      <i class="fas fa-quote-left"></i>
+                      ${escapeHtml(choice.message)}
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        });
+        
+        html += `
+            </div>
+          </div>
+        `;
+      }
+      
+      // ========== Section 2: Available Gifts Grid ==========
+      html += `
+        <div class="gifts-available-section">
+          <div class="available-gifts-header">
+            <i class="fas fa-gift"></i>
+            <h3><span data-i18n="guests:giftsRegistryTitle">${translate('guests:giftsRegistryTitle')}</span></h3>
+            <p><span data-i18n="guests:giftsRegistrySubtitle">${translate('guests:giftsRegistrySubtitle')}</span></p>
+          </div>
+          <div class="gift-cards-grid">
+      `;
+      
+      if (gifts.length === 0) {
+        html += `
+          <div class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h4><span data-i18n="guests:giftsNoAvailable">${translate('guests:giftsNoAvailable')}</span></h4>
+            <p><span data-i18n="guests:giftsNoAvailableDescription">${translate('guests:giftsNoAvailableDescription')}</span></p>
+          </div>
+        `;
+      } else {
+        gifts.forEach(gift => {
+          const isAvailable = gift.stock > 0;
+          
+          html += `
+            <div class="card gift-credit-card ${!isAvailable ? 'sold-out' : ''}" data-gift-id="${gift.id}">
+              <div class="gift-card-image-section" style="background-image: url('${escapeHtml(gift.imageUrl)}');">
+                <div class="gift-card-image-overlay">
+                  <h4 class="gift-card-title">${escapeHtml(gift.title)}</h4>
+                  <div class="gift-card-price">${escapeHtml(gift.priceDisplay)}</div>
+                </div>
+              </div>
+              <div class="gift-card-details">
+                <p class="gift-card-description">${gift.description}</p>
+                <div class="gift-card-stock">
+                  ${isAvailable
+                    ? `<span class="stock-available"><i class="fas fa-check-circle"></i> ${gift.stock} <span data-i18n="guests:giftsAvailable">${translate('guests:giftsAvailable')}</span></span>`
+                    : `<span class="stock-sold-out"><i class="fas fa-times-circle"></i> <span data-i18n="guests:giftsSoldOut">${translate('guests:giftsSoldOut')}</span></span>`
+                  }
+                </div>
+                <div class="action-container">
+                  ${isAvailable ? `
+                    <button class="btn-base btn-primary btn-sm" onclick="purchaseGift('${gift.id}', '${escapeHtml(gift.title).replace(/'/g, "\\'")}', ${gift.amount})">
+                      <i class="fas fa-credit-card"></i>
+                      <span data-i18n="guests:giftsBuyGift">${translate('guests:giftsBuyGift')}</span>
+                    </button>
+                  ` : `
+                    <button class="btn-disabled" disabled>
+                      <i class="fas fa-ban"></i>
+                      <span data-i18n="guests:giftsSoldOut">${translate('guests:giftsSoldOut')}</span>
+                    </button>
+                  `}
+                </div>
+              </div>
+            </div>
+          `;
+        });
+      }
+      
+      html += `
+          </div>
+        </div>
+      `;
+      
+      html += '</div>'; // Close gifts-container
+      
+      giftsContent.innerHTML = html;
+      
+      // Check for payment success/cancel in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentStatus = urlParams.get('payment');
+      if (paymentStatus === 'success') {
+        showToast(translate('guests:giftsPaymentSuccess'), 'success');
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        // Reload to show updated gift choices
+        setTimeout(() => loadGiftsContent(), 1000);
+      } else if (paymentStatus === 'cancelled') {
+        showToast(translate('guests:giftsPaymentCancelled'), 'error');
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+      
+    // Translate the newly loaded content
+    if (typeof updatePageContent === 'function') {
+      updatePageContent();
+    }
+    
+    } catch (err) {
+      console.error('Error loading gifts:', err);
+      giftsContent.innerHTML = `
+        <div class="error-state">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3><span data-i18n="guests:giftsErrorLoading">${translate('guests:giftsErrorLoading')}</span></h3>
+          <p><span data-i18n="guests:giftsErrorLoadingDescription">${translate('guests:giftsErrorLoadingDescription')}</span></p>
+          <button class="btn-retry" onclick="loadGiftsContent()">
+            <i class="fas fa-redo"></i>
+            <span data-i18n="guests:giftsRetry">${translate('guests:giftsRetry')}</span>
+          </button>
+        </div>
+      `;
+      // Even on error, try to translate any remaining content
       if (typeof updatePageContent === 'function') {
         updatePageContent();
       }
+    }
+  }
+   
+  // Global function to purchase a gift
+  window.purchaseGift = async (giftId, giftTitle, giftAmount) => {
+    // Show a confirmation dialog with optional message
+    const overlay = document.createElement('div');
+    overlay.className = 'gift-purchase-overlay';
+    overlay.innerHTML = `
+      <div class="gift-purchase-dialog">
+        <div class="gift-purchase-header">
+          <i class="fas fa-gift"></i>
+          <h3><span data-i18n="guests:giftsPurchaseTitle">${translate('guests:giftsPurchaseTitle')}</span></h3>
+        </div>
+        <div class="gift-purchase-content">
+          <p><span data-i18n="guests:giftsPurchaseAbout">${translate('guests:giftsPurchaseAbout')}</span></p>
+          <div class="gift-purchase-summary">
+            <strong>${giftTitle}</strong>
+            <span class="gift-purchase-amount">€${giftAmount}</span>
+          </div>
+          <div class="gift-message-input">
+            <label for="giftMessage"><span data-i18n="guests:giftsPurchaseMessageLabel">${translate('guests:giftsPurchaseMessageLabel')}</span></label>
+            <textarea id="giftMessage" placeholder="${translate('guests:giftsPurchaseMessagePlaceholder')}" data-i18n-placeholder="guests:giftsPurchaseMessagePlaceholder" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="action-container">
+          <button class="btn-base btn-outline btn-sm btn-cancel-purchase"><span data-i18n="guests:giftsPurchaseCancel">${translate('guests:giftsPurchaseCancel')}</span></button>
+          <button class="btn-base btn-primary btn-sm btn-confirm-purchase">
+            <i class="fas fa-credit-card"></i>
+            <span data-i18n="guests:giftsPurchaseProceed">${translate('guests:giftsPurchaseProceed')}</span>
+          </button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(overlay);
+    setTimeout(() => overlay.classList.add('show'), 10);
+    
+    // Handle cancel
+    overlay.querySelector('.btn-cancel-purchase').addEventListener('click', () => {
+      overlay.classList.remove('show');
+      setTimeout(() => document.body.removeChild(overlay), 300);
+    });
+    
+    // Handle confirm
+    overlay.querySelector('.btn-confirm-purchase').addEventListener('click', async () => {
+      const message = document.getElementById('giftMessage').value.trim();
+      const confirmBtn = overlay.querySelector('.btn-confirm-purchase');
       
-     } catch (err) {
-       console.error('Error loading gifts:', err);
-       giftsContent.innerHTML = `
-         <div class="error-state">
-           <i class="fas fa-exclamation-triangle"></i>
-           <h3><span data-i18n="guests:giftsErrorLoading">${translate('guests:giftsErrorLoading')}</span></h3>
-           <p><span data-i18n="guests:giftsErrorLoadingDescription">${translate('guests:giftsErrorLoadingDescription')}</span></p>
-           <button class="btn-retry" onclick="loadGiftsContent()">
-             <i class="fas fa-redo"></i>
-             <span data-i18n="guests:giftsRetry">${translate('guests:giftsRetry')}</span>
-           </button>
-         </div>
-       `;
-       // Even on error, try to translate any remaining content
-       if (typeof updatePageContent === 'function') {
-         updatePageContent();
-       }
-     }
-   }
-   
-   // Make loadGiftsContent globally accessible
-   window.loadGiftsContent = loadGiftsContent;
-   
-   // Global function to purchase a gift
-   window.purchaseGift = async (giftId, giftTitle, giftAmount) => {
-     // Show a confirmation dialog with optional message
-     const overlay = document.createElement('div');
-     overlay.className = 'gift-purchase-overlay';
-     overlay.innerHTML = `
-       <div class="gift-purchase-dialog">
-         <div class="gift-purchase-header">
-           <i class="fas fa-gift"></i>
-           <h3><span data-i18n="guests:giftsPurchaseTitle">${translate('guests:giftsPurchaseTitle')}</span></h3>
-         </div>
-         <div class="gift-purchase-content">
-           <p><span data-i18n="guests:giftsPurchaseAbout">${translate('guests:giftsPurchaseAbout')}</span></p>
-           <div class="gift-purchase-summary">
-             <strong>${giftTitle}</strong>
-             <span class="gift-purchase-amount">€${giftAmount}</span>
-           </div>
-           <div class="gift-message-input">
-             <label for="giftMessage"><span data-i18n="guests:giftsPurchaseMessageLabel">${translate('guests:giftsPurchaseMessageLabel')}</span></label>
-             <textarea id="giftMessage" placeholder="${translate('guests:giftsPurchaseMessagePlaceholder')}" data-i18n-placeholder="guests:giftsPurchaseMessagePlaceholder" rows="3"></textarea>
-           </div>
-         </div>
-         <div class="action-container">
-           <button class="btn-base btn-outline btn-sm btn-cancel-purchase"><span data-i18n="guests:giftsPurchaseCancel">${translate('guests:giftsPurchaseCancel')}</span></button>
-           <button class="btn-base btn-primary btn-sm btn-confirm-purchase">
-             <i class="fas fa-credit-card"></i>
-             <span data-i18n="guests:giftsPurchaseProceed">${translate('guests:giftsPurchaseProceed')}</span>
-           </button>
-         </div>
-       </div>
-     `;
-     
-     document.body.appendChild(overlay);
-     setTimeout(() => overlay.classList.add('show'), 10);
-     
-     // Handle cancel
-     overlay.querySelector('.btn-cancel-purchase').addEventListener('click', () => {
-       overlay.classList.remove('show');
-       setTimeout(() => document.body.removeChild(overlay), 300);
-     });
-     
-     // Handle confirm
-     overlay.querySelector('.btn-confirm-purchase').addEventListener('click', async () => {
-       const message = document.getElementById('giftMessage').value.trim();
-       const confirmBtn = overlay.querySelector('.btn-confirm-purchase');
-       
-       // Show loading state
-       confirmBtn.disabled = true;
-       confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="guests:giftsPurchaseProcessing">' + translate('guests:giftsPurchaseProcessing') + '</span>';
-       
-       try {
-         const response = await fetch(`/api/guest/create-payment-session?lang=${currentLanguage}`, {
-           method: 'POST',
-           headers: {
-             'Content-Type': 'application/json',
-             'Authorization': token
-           },
-           body: JSON.stringify({ giftId, message })
-         });
-         
-         const data = await response.json();
-         
-         if (response.ok && data.checkoutUrl) {
-           // Redirect to Stripe checkout
-           window.location.href = data.checkoutUrl;
-         } else {
-           showToast(data.error || translate('guests:giftsPaymentError'), 'error');
-           confirmBtn.disabled = false;
-           confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> <span data-i18n="guests:giftsPurchaseProceed">' + translate('guests:giftsPurchaseProceed') + '</span>';
-         }
-       } catch (err) {
-         console.error('Error creating payment session:', err);
-         showToast(translate('guests:giftsPaymentServiceError'), 'error');
-         confirmBtn.disabled = false;
-         confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> <span data-i18n="guests:giftsPurchaseProceed">' + translate('guests:giftsPurchaseProceed') + '</span>';
-       }
-     });
-     
-     // Close on escape
-     const handleEscape = (e) => {
-       if (e.key === 'Escape') {
-         overlay.classList.remove('show');
-         setTimeout(() => document.body.removeChild(overlay), 300);
-         document.removeEventListener('keydown', handleEscape);
-       }
-     };
-     document.addEventListener('keydown', handleEscape);
-   };
+      // Show loading state
+      confirmBtn.disabled = true;
+      confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="guests:giftsPurchaseProcessing">' + translate('guests:giftsPurchaseProcessing') + '</span>';
+      
+      try {
+        const response = await fetch(`/api/guest/create-payment-session?lang=${currentLanguage}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': token
+          },
+          body: JSON.stringify({ giftId, message })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.checkoutUrl) {
+          // Redirect to Stripe checkout
+          window.location.href = data.checkoutUrl;
+        } else {
+          showToast(data.error || translate('guests:giftsPaymentError'), 'error');
+          confirmBtn.disabled = false;
+          confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> <span data-i18n="guests:giftsPurchaseProceed">' + translate('guests:giftsPurchaseProceed') + '</span>';
+        }
+      } catch (err) {
+        console.error('Error creating payment session:', err);
+        showToast(translate('guests:giftsPaymentServiceError'), 'error');
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> <span data-i18n="guests:giftsPurchaseProceed">' + translate('guests:giftsPurchaseProceed') + '</span>';
+      }
+    });
+    
+    // Close on escape
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        overlay.classList.remove('show');
+        setTimeout(() => document.body.removeChild(overlay), 300);
+        document.removeEventListener('keydown', handleEscape);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+  };
 
-   // Configure the messages form
-   const messagesForm = document.getElementById('messagesForm');
-   if (messagesForm) {
-     messagesForm.addEventListener('submit', async (e) => {
-       e.preventDefault();
-       const message = messagesForm.message.value.trim();
-       if (!message) return;
-       
-       try {
-         const res = await fetch('/api/messages', {
-           method: 'POST',
-           headers: {
-             'Content-Type': 'application/json',
-             'Authorization': `Bearer ${token}`
-           },
-           body: JSON.stringify({ mensaje })
-         });
-         const data = await res.json();
-         if (res.ok) {
-           showMessage('mensajeStatus', 'Mensaje enviado con éxito', 'success');
-           showToast('Mensaje enviado con éxito');
-           mensajeForm.reset();
-           cargarMensajes();
-         } else {
-           showMessage('mensajeStatus', data.error || 'Error al enviar el mensaje.', 'error');
-         }
-       } catch (err) {
-         showMessage('mensajeStatus', 'Error de conexión al enviar el mensaje.', 'error');
-       }
-     });
-   }
+  // Global function to reserve gifts
+  window.reserveGift = async (giftId) => {
+    try {
+      const res = await fetch('/api/regalos/reservar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ id: regaloId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        showToast(data.mensaje, 'success');
+        setTimeout(() => {
+          cargarContenidoRegalos(); // Recargar la lista de regalos
+          cargarStatusRegalos(); // Actualizar el status en la pestaña resumen
+        }, 1000);
+      } else {
+        showToast(data.error || 'Error al reservar el regalo.', 'error');
+      }
+    } catch (err) {
+      showToast('Error de conexión al reservar el regalo.', 'error');
+    }
+  };
 
-   // Global function to reserve gifts
-   window.reserveGift = async (giftId) => {
-     try {
-       const res = await fetch('/api/regalos/reservar', {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-           'Authorization': token
-         },
-         body: JSON.stringify({ id: regaloId })
-       });
-       
-       const data = await res.json();
-       if (res.ok) {
-         showToast(data.mensaje, 'success');
-         setTimeout(() => {
-           cargarContenidoRegalos(); // Recargar la lista de regalos
-           cargarStatusRegalos(); // Actualizar el status en la pestaña resumen
-         }, 1000);
-       } else {
-         showToast(data.error || 'Error al reservar el regalo.', 'error');
-       }
-     } catch (err) {
-       showToast('Error de conexión al reservar el regalo.', 'error');
-     }
-   };
+  // Global function to cancel gifts
+  window.cancelGift = async (giftId) => {
+    try {
+      const res = await fetch('/api/regalos/cancelar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ id: regaloId })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        showToast(data.mensaje, 'success');
+        setTimeout(() => {
+          cargarContenidoRegalos(); // Recargar la lista de regalos
+          cargarStatusRegalos(); // Actualizar el status en la pestaña resumen
+        }, 1000);
+      } else {
+        showToast(data.error || 'Error al cancelar el regalo.', 'error');
+      }
+    } catch (err) {
+      showToast('Error de conexión al cancelar el regalo.', 'error');
+    }
+  };
 
-   // Global function to cancel gifts
-   window.cancelGift = async (giftId) => {
-     try {
-       const res = await fetch('/api/regalos/cancelar', {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-           'Authorization': token
-         },
-         body: JSON.stringify({ id: regaloId })
-       });
-       
-       const data = await res.json();
-       if (res.ok) {
-         showToast(data.mensaje, 'success');
-         setTimeout(() => {
-           cargarContenidoRegalos(); // Recargar la lista de regalos
-           cargarStatusRegalos(); // Actualizar el status en la pestaña resumen
-         }, 1000);
-       } else {
-         showToast(data.error || 'Error al cancelar el regalo.', 'error');
-       }
-     } catch (err) {
-       showToast('Error de conexión al cancelar el regalo.', 'error');
-     }
-   };
-
-   // Global function to buy gifts
-   window.buyGift = async (giftId) => {
-     try {
-       const message = prompt('Leave a message with your gift (optional):');
-       
-       const res = await fetch(`/api/guest/create-payment-session?lang=${currentLanguage}`, {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-           'Authorization': token
-         },
-         body: JSON.stringify({ giftId, message })
-       });
-       
-       const data = await res.json();
-       if (res.ok) {
-         showToast('Gift added to cart! Redirecting to checkout...', 'success');
-         // Redirect to checkout (implement based on your payment system)
-         setTimeout(() => {
-           window.open(data.checkoutUrl, '_blank');
-           cargarContenidoRegalos(); // Recargar la lista de regalos
-         }, 1000);
-       } else {
-         showToast(data.error || 'Error al procesar el regalo.', 'error');
-       }
-     } catch (err) {
-       showToast('Error de conexión al procesar el regalo.', 'error');
-     }
-   };
+  // Global function to buy gifts
+  window.buyGift = async (giftId) => {
+    try {
+      const message = prompt('Leave a message with your gift (optional):');
+      
+      const res = await fetch(`/api/guest/create-payment-session?lang=${currentLanguage}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': token
+        },
+        body: JSON.stringify({ giftId, message })
+      });
+      
+      const data = await res.json();
+      if (res.ok) {
+        showToast('Gift added to cart! Redirecting to checkout...', 'success');
+        // Redirect to checkout (implement based on your payment system)
+        setTimeout(() => {
+          window.open(data.checkoutUrl, '_blank');
+          cargarContenidoRegalos(); // Recargar la lista de regalos
+        }, 1000);
+      } else {
+        showToast(data.error || 'Error al procesar el regalo.', 'error');
+      }
+    } catch (err) {
+      showToast('Error de conexión al procesar el regalo.', 'error');
+    }
+  };
 
    // Global logout function
   window.logoutGuest = () => {
@@ -1887,24 +1849,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.location.href = 'index.html';
   };
   
-  // Main function
-  try {
-    const response = await fetch('/api/guest/profile', {
-      method: 'GET',
-      headers: { 'Authorization': token }
-    });
-    const data = await response.json().catch(() => ({}));
-    if (response.ok) {
-      const name = data.name || data.name || 'guest';
-      console.log(`Welcome, ${name}!`);
-    } else {
-      localStorage.removeItem('token');
-      window.location.href = 'login.html';
-    }
-  } catch (err) {
-    console.error('Error connecting to the server.');
-  }
-
   /**
    * Load and display party content in the party tab
    * Allows managing party members (add/edit names, max 4 members)
@@ -2214,12 +2158,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
   
-  // Make loadPartyContent globally accessible
-  window.loadPartyContent = loadPartyContent;
-  
-  // Track new members to add (temporary IDs)
-  let newMemberCounter = 0;
-
   // 24-char hex, looks like a Mongo ObjectId
   function makeObjectIdLike() {
     const bytes = new Uint8Array(12); // 12 bytes = 24 hex chars
@@ -2587,63 +2525,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
   }
-
-  // Tabs functionality with settings-based access control
-  const tabButtons = document.querySelectorAll('.tab-btn');
-  const tabContents = document.querySelectorAll('.tab-content');
-
-  tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      const targetTab = button.getAttribute('data-tab');
-      
-      // Check if tab is disabled due to settings
-      if (button.style.display === 'none' || button.classList.contains('disabled')) {
-        const currentLang = localStorage.getItem('i18nextLng') || 'es';
-        const messages = {
-          en: 'This section is not yet enabled. Please check back later or contact the organizers for more information.',
-          es: 'Esta sección aún no está habilitada. Vuelve a consultar más tarde o contacta con los organizadores para más información.',
-          fr: 'Cette section n\'est pas encore activée. Veuillez vérifier plus tard ou contacter les organisateurs pour plus d\'informations.'
-        };
-        
-        showToast(messages[currentLang] || messages.es, 'info');
-        return;
-      }
-      
-      //Remove active class from all buttons and contents
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      tabContents.forEach(content => content.classList.remove('active'));
-
-      // Add active class to the clicked button and its content
-      button.classList.add('active');
-      document.getElementById(`${targetTab}-tab`).classList.add('active');
-      
-      // If the tab is party, load the party content
-      if (targetTab === 'partyContent') {
-        loadPartyContent();
-      }
-      
-      // If the tab is menu, load the menu content
-      if (targetTab === 'menuContent') {
-        loadMenuSelections();
-      }
-      
-      // If the tab is events (RSVP), load the events content
-      if (targetTab === 'eventsContent') {
-        loadEventsContent();
-      }
-      
-      // If the tab is gifts, load the gifts content
-      if (targetTab === 'giftsContent') {
-        loadGiftsContent();
-      }
-      
-      // If the tab is summary, reload all the status data
-      if (targetTab === 'summaryContent') {
-        loadSummaryContent();
-      }
-
-    });
-  });
 
   // Function to switch to a specific tab
   window.switchToTab = function(tabName) {
@@ -3067,9 +2948,157 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
   }
-  
-  // Make loadSummaryContent globally accessible
+
+  //////////////////////////////////////////////////////////////
+  // Main
+  //////////////////////////////////////////////////////////////
+
+  // If Admin then also log in as guest using same token
+  if (isAdminLoggedIn()) {
+    try {
+      const email = localStorage.getItem('adminEmail'); 
+      // See if a guest exists with the same email as the admin
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        // Save token and data in localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('name', data.name);
+        localStorage.setItem('email', data.email);
+      }
+    } catch (e) { }
+  }
+  const token = localStorage.getItem('token');
+
+  if (!token) {
+    window.location.href = 'login.html';
+    return;
+  }  
+
+  // Make globally accessible
+  window.loadMenuSelections = loadMenuSelections;
+  window.loadEventsContent  = loadEventsContent;
+  window.saveEventChoices   = saveEventChoices;
+  window.loadGiftsContent   = loadGiftsContent;
+  window.loadPartyContent   = loadPartyContent;
   window.loadSummaryContent = loadSummaryContent;
+
+  // Initialize settings-based visibility
+  await initializeSettingsVisibility();
+  
+     
+  // Configure the messages form
+  const messagesForm = document.getElementById('messagesForm');
+  if (messagesForm) {
+    messagesForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = messagesForm.message.value.trim();
+      if (!message) return;
+      
+      try {
+        const res = await fetch('/api/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ mensaje })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showMessage('mensajeStatus', 'Mensaje enviado con éxito', 'success');
+          showToast('Mensaje enviado con éxito');
+          mensajeForm.reset();
+          cargarMensajes();
+        } else {
+          showMessage('mensajeStatus', data.error || 'Error al enviar el mensaje.', 'error');
+        }
+      } catch (err) {
+        showMessage('mensajeStatus', 'Error de conexión al enviar el mensaje.', 'error');
+      }
+    });
+  }
+
+  try {
+    const response = await fetch('/api/guest/profile', {
+      method: 'GET',
+      headers: { 'Authorization': token }
+    });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok) {
+      const name = data.name || data.name || 'guest';
+      console.log(`Welcome, ${name}!`);
+    } else {
+      localStorage.removeItem('token');
+      window.location.href = 'login.html';
+    }
+  } catch (err) {
+    console.error('Error connecting to the server.');
+  }
+  
+  // Track new members to add (temporary IDs)
+  let newMemberCounter = 0;
+
+  // Tabs functionality with settings-based access control
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const targetTab = button.getAttribute('data-tab');
+      
+      // Check if tab is disabled due to settings
+      if (button.style.display === 'none' || button.classList.contains('disabled')) {
+        const currentLang = localStorage.getItem('i18nextLng') || 'es';
+        const messages = {
+          en: 'This section is not yet enabled. Please check back later or contact the organizers for more information.',
+          es: 'Esta sección aún no está habilitada. Vuelve a consultar más tarde o contacta con los organizadores para más información.',
+          fr: 'Cette section n\'est pas encore activée. Veuillez vérifier plus tard ou contacter les organisateurs pour plus d\'informations.'
+        };
+        
+        showToast(messages[currentLang] || messages.es, 'info');
+        return;
+      }
+      
+      //Remove active class from all buttons and contents
+      tabButtons.forEach(btn => btn.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+
+      // Add active class to the clicked button and its content
+      button.classList.add('active');
+      document.getElementById(`${targetTab}-tab`).classList.add('active');
+      
+      // If the tab is party, load the party content
+      if (targetTab === 'partyContent') {
+        loadPartyContent();
+      }
+      
+      // If the tab is menu, load the menu content
+      if (targetTab === 'menuContent') {
+        loadMenuSelections();
+      }
+      
+      // If the tab is events (RSVP), load the events content
+      if (targetTab === 'eventsContent') {
+        loadEventsContent();
+      }
+      
+      // If the tab is gifts, load the gifts content
+      if (targetTab === 'giftsContent') {
+        loadGiftsContent();
+      }
+      
+      // If the tab is summary, reload all the status data
+      if (targetTab === 'summaryContent') {
+        loadSummaryContent();
+      }
+
+    });
+  });
 
   // Load preferred language
   const savedLang = localStorage.getItem('i18nextLng');
@@ -3077,14 +3106,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentLanguage = savedLang;
   }
   
-    // Initialize
-    console.log('Initializing guests page');
-    updateDocumentDirection();
-    updatePageContent();
-    updateLanguageSelector();
-    updateFormatting();
+  // Initialize
+  console.log('Initializing guests page');
+  updateDocumentDirection();
+  updatePageContent();
+  updateLanguageSelector();
+  updateFormatting();
   
-    // Check which tab is active on page load and load its content
+  // Check which tab is active on page load and load its content
   const activeTab = document.querySelector('.tab-btn.active');
   if (activeTab) {
     const targetTab = activeTab.getAttribute('data-tab');

@@ -77,10 +77,7 @@ function isAdminLoggedIn() {
 
 // Redirect to appropriate dashboard based on login status
 function redirectToAppropriateDashboard() {
-    if (isAdminLoggedIn()) {
-        window.location.href = '/admin.html';
-        return true;
-    } else if (isGuestLoggedIn()) {
+    if (isAdminLoggedIn() || isGuestLoggedIn()) {
         window.location.href = 'guests.html';
         return true;
     }
