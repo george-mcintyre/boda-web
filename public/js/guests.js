@@ -379,6 +379,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `;
     
+      // Add save button
+      html += `
+        <div class="action-container">
+          <button type="button" id="saveMenuChoicesBtn" class="btn-base btn-primary btn-lg">
+            <i class="fas fa-save"></i>
+            <span data-i18n="guests:saveMenuSelections">${translate("guests:saveMenuSelections")}</span>
+          </button>
+        </div>
+      `;
+
       // Iterate through course groups
       const groupOrder = ['starter', 'main', 'dessert', 'drinks'];
       
