@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                       ${option.dietaryIcons ? `<span class="dietary-icons">${option.dietaryIcons}</span>` : ''}
                     </div>
                     ${option.description ? `
-                      <p class="option-description-text">${escapeHtml(option.description)}</p>
+                      <p class="option-description-text">${option.description}</p>
                     ` : ''}
                     <div class="dietary-badges">
                       ${option.isVegetarian ? '<span class="dietary-badge vegetarian"><i class="fas fa-leaf"></i> Vegetarian</span>' : ''}
@@ -1264,7 +1264,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               
               ${event.title && event.name !== event.title ? `<h4 class="event-venue-name">${escapeHtml(event.title)}</h4>` : ''}
               
-              ${event.description ? `<p class="event-description">${escapeHtml(event.description)}</p>` : ''}
+              ${event.description ? `<p class="event-description">${event.description}</p >` : ''}
               
               <div class="event-meta">
                 <div class="event-meta-item">
@@ -1586,7 +1586,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                  </div>
                </div>
                <div class="gift-card-details">
-                 <p class="gift-card-description">${escapeHtml(gift.description)}</p>
+                 <p class="gift-card-description">${gift.description}</p>
                  <div class="gift-card-stock">
                    ${isAvailable
                      ? `<span class="stock-available"><i class="fas fa-check-circle"></i> ${gift.stock} <span data-i18n="guests:giftsAvailable">${translate('guests:giftsAvailable')}</span></span>`
