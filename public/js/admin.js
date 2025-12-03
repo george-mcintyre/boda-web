@@ -2840,12 +2840,12 @@
   
   const savedPage = localStorage.getItem('adminPage') || 'guests';
 
-    // Initialize
-    console.log('Initializing admin page');
-    updateDocumentDirection();
-    updatePageContent();
-    updateLanguageSelector();
-    updateFormatting();
+  // Initialize
+  console.log('Initializing admin page');
+  updateDocumentDirection();
+  updatePageContent();
+  updateLanguageSelector();
+  updateFormatting();
     
   // Default
   showTab(savedPage);
