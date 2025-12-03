@@ -1192,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                   <i class="fas fa-clock"></i>
                   ${formatEventTime(subEvent.date)}${subEvent.end ? ' - ' + formatEventTime(subEvent.end) : ''}
                 </span>
-                ${subEvent.description ? `<span class="sub-event-description">${escapeHtml(subEvent.description)}</span>` : ''}
+                ${subEvent.description ? `<span class="sub-event-description">${subEvent.description}</span>` : ''}
               </div>
             </div>
           `).join('');
