@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Empty field visual validation
     if (!email) {
       emailInput.style.borderColor = '#a00';
-      showMessage(window.translate('login:enterEmail'), 'error');
+      showMessage(window.translate('login:enter.email'), 'error');
       return;
     } else {
       emailInput.style.borderColor = '';
@@ -53,15 +53,15 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('name', data.name);
         localStorage.setItem('email', data.email);
-        showMessage(window.translate('login:successRedirect'), 'success');
+        showMessage(window.translate('login:success.redirecting'), 'success');
         setTimeout(() => {
           window.location.href = 'guests.html';
         }, 800);
       } else {
-        showMessage(data.error || window.translate('login:emailNotFound'), 'error');
+        showMessage(data.error || window.translate('login:email.not.found'), 'error');
       }
     } catch (err) {
-      showMessage(window.translate('login:serverError'), 'error');
+      showMessage(window.translate('login:server.error'), 'error');
     }
   });
 });

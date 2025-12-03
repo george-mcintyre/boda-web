@@ -470,7 +470,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <div class="member-chip" draggable="true" data-member-id="${member.id}" data-member-name="${escapeHtml(member.name)}">
                           <i class="fas fa-user"></i>
                           <span>${escapeHtml(member.name)}</span>
-                          ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
+                          ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:party.primary\">${member.primary ? translate('common:party.primary') : ''}</span>" : ''}
                         </div>
                       `).join('')}
                     </div>
@@ -530,7 +530,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="card-header">
               <i class="fas fa-user"></i>
               <h4>${escapeHtml(member.name)}</h4>
-              ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
+              ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:party.primary\">${member.primary ? translate('common:party.primary') : ''}</span>" : ''}
             </div>
             <div class="card-content">
               ${dietaryOptions.map(opt => {
@@ -831,7 +831,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const saveBtn = document.getElementById('saveMenuChoicesBtn');
     if (saveBtn) {
       saveBtn.disabled = true;
-      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <div data-i18n="common:saving">'+ translate('common:saving') +'</div>';
+      saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <div data-i18n="common:menu.saving">'+ translate('common:menu.saving') +'</div>';
     }
 
     try {
@@ -932,18 +932,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (response.ok) {
-        showToast('<div data-i18n="common:menuSelectionsSaved">'+ translate('common:menuSelectionsSaved') +'</div>', 'success');
+        showToast('<div data-i18n="common:menu.selections.saved">'+ translate('common:menu.selections.saved') +'</div>', 'success');
         if (saveBtn) {
           saveBtn.classList.remove('unsaved');
           saveBtn.innerHTML = '<i class="fas fa-save"></i> <div data-i18n="guests:saveMenuSelections">'+ translate('guests:saveMenuSelections') +'</div>';
         }
       } else {
         const data = await response.json();
-        showToast('<div data-i18n="common:errorSavingMenuSelections">'+ (data.error || translate('common:errorSavingMenuSelections')) + '</div>', 'error');
+        showToast('<div data-i18n="common:error.saving.menu.selections">'+ (data.error || translate('common:error.saving.menu.selections')) + '</div>', 'error');
       }
     } catch (err) {
       console.error('Error saving menu choices:', err);
-      showToast('<div data-i18n="common:errorSavingMenuSelections">'+ translate('common:errorSavingMenuSelections') +'</div>', 'error');
+      showToast('<div data-i18n="common:error.saving.menu.selections">'+ translate('common:error.saving.menu.selections') +'</div>', 'error');
     } finally {
       if (saveBtn) {
         saveBtn.disabled = false;
@@ -993,13 +993,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (response.ok) {
-        showToast('<div data-i18n="common:menuSelectionSaved">'+ translate('common:menuSelectionSaved') +'</div>', 'success');
+        showToast('<div data-i18n="common:menu.selection.saved">'+ translate('common:menu.selection.saved') +'</div>', 'success');
       } else {
-        showToast('<div data-i18n="common:errorSavingMenuSelection">'+ translate('common:errorSavingMenuSelection') +'</div>', 'error');
+        showToast('<div data-i18n="common:error.saving.menu.selection">'+ translate('common:error.saving.menu.selection') +'</div>', 'error');
       }
     } catch (err) {
       console.error('Error saving menu selection:', err);
-      showToast('<div data-i18n="common:errorSavingMenuSelection">'+ translate('common:errorSavingMenuSelection') +'</div>', 'error');
+      showToast('<div data-i18n="common:error.saving.menu.selection">'+ translate('common:error.saving.menu.selection') +'</div>', 'error');
     }
   };
 
@@ -1040,7 +1040,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (response.ok) {
-        showToast('<div data-i18n="common:specialRequestSaved">'+ translate('common:specialRequestSaved') +'</div>', 'success');
+        showToast('<div data-i18n="common:menu.special.request.saved">'+ translate('common:menu.special.request.saved') +'</div>', 'success');
         
         // Show/hide detail textarea based on selection
         const detailTextarea = document.querySelector(`textarea[name="special-request-detail-${partyGuestId}"]`);
@@ -1048,11 +1048,11 @@ document.addEventListener('DOMContentLoaded', async () => {
           detailTextarea.style.display = specialRequest === 'other' ? 'block' : 'none';
         }
       } else {
-        showToast('<div data-i18n="common:errorSavingSpecialRequest">'+ translate('common:errorSavingSpecialRequest') +'</div>', 'error');
+        showToast('<div data-i18n="common:error.saving.special.request">'+ translate('common:error.saving.special.request') +'</div>', 'error');
       }
     } catch (err) {
       console.error('Error saving special request:', err);
-      showToast('<div data-i18n="common:errorSavingSpecialRequest">'+ translate('common:errorSavingSpecialRequest') +'</div>', 'error');
+      showToast('<div data-i18n="common:error.saving.special.request">'+ translate('common:error.saving.special.request') +'</div>', 'error');
     }
   };
 
@@ -1090,13 +1090,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       if (response.ok) {
-        showToast('<div data-i18n="common:specialRequestDetailsSaved">'+ translate('common:specialRequestDetailsSaved') +'</div>', 'success');
+        showToast('<div data-i18n="common:menu.special.request.details.saved">'+ translate('common:menu.special.request.details.saved') +'</div>', 'success');
       } else {
-        showToast('<div data-i18n="common:errorSavingSpecialRequestDetails">'+ translate('common:errorSavingSpecialRequestDetails') +'</div>', 'error');
+        showToast('<div data-i18n="common:error.saving.special.request.details">'+ translate('common:error.saving.special.request.details') +'</div>', 'error');
       }
     } catch (err) {
       console.error('Error saving special request details:', err);
-      showToast('<div data-i18n="common:errorSavingSpecialRequestDetails">'+ translate('common:errorSavingSpecialRequestDetails') +'</div>', 'error');
+      showToast('<div data-i18n="common:error.saving.special.request.details">'+ translate('common:error.saving.special.request.details') +'</div>', 'error');
     }
   };
   
@@ -1356,7 +1356,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <label class="attendance-label">
                   <input type="checkbox" class="attendance-checkbox" data-event-id="${eventId}" data-member-id="${member.id}" ${isAttending ? 'checked' : ''}>
                   <span class="member-name">${escapeHtml(member.name)}</span>
-                  ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
+                  ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:party.primary\">${member.primary ? translate('common:party.primary') : ''}</span>" : ''}
                   ${member.adult === false ? '<span class="badge badge-info"><div data-i18n="guests:childBadge">Child</div></span>' : ''}
                 </label>
               </div>
@@ -2105,10 +2105,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       html += `
         <div class="intro-card intro-section">
           <h2 class="card-title ">
-            <div data-i18n="guests:partyPageTitle">${translate('guests:partyPageTitle')}</div>
+            <div data-i18n="guests:party.page.title">${translate('guests:party.page.title')}</div>
           </h2>
           <p class="card-description">
-            <div data-i18n="guests:partyPageDescription">${translate('guests:partyPageDescription')}</div>
+            <div data-i18n="guests:party.page.description">${translate('guests:party.page.description')}</div>
           </p>
         </div>
       `;      
@@ -2118,7 +2118,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="party-members-management">
           <div class="party-members-header">
             <h3 data-i18n="rich:guests:partyMembersTitle">${translate("rich:guests:partyMembersTitle")}</h3>
-            <span class="party-count">${partyData.length} / ${maxPartySize} ${translate("common:members")}</span>
+            <span class="party-count">${partyData.length} / ${maxPartySize} ${translate("common:party.members")}</span>
           </div>
           <p class="party-description">
             ${translateWithVars("guests:partyDescription", { maxPartySize: maxPartySize })}
@@ -2133,13 +2133,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="card party-member-edit-card ${member.primary ? 'primary-member' : ''}" data-member-id="${member.id}" data-index="${index}" data-is-primary="${member.primary ? 'true' : 'false'}">
             <div class="member-edit-header">
               <span class="member-number">${index + 1}</span>
-              ${member.primary ? '<span class="primary-indicator"><i class="fas fa-star"></i> <div data-i18n="common:party.primaryGuest">Primary Guest</div></span>' : ''}
-              ${member.adult === false ? '<span class="child-indicator"><i class="fas fa-child"></i> <div data-i18n="common:child">Child</div></span>' : ''}
+              ${member.primary ? '<span class="primary-indicator"><i class="fas fa-star"></i> <div data-i18n="common:party.primary.guest">Primary Guest</div></span>' : ''}
+              ${member.adult === false ? '<span class="child-indicator"><i class="fas fa-child"></i> <div data-i18n="common:party.child">Child</div></span>' : ''}
             </div>
             <div class="member-edit-form">
               <div class="form-group">
                 <label for="member-name-${member.id}">
-                  <i class="fas fa-user"></i> <span data-i18n="common:name">${translate('common:name')}</span>
+                  <i class="fas fa-user"></i> <span data-i18n="common:party.name">${translate('common:party.name')}</span>
                 </label>
                 <input type="text"
                        id="member-name-${member.id}"
@@ -2151,14 +2151,14 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
               <div class="form-group">
                 <label for="member-age-${member.id}">
-                  <i class="fas fa-birthday-cake"></i> <span data-i18n="common:ageCategory">${translate('common:ageCategory')}</span>
+                  <i class="fas fa-birthday-cake"></i> <span data-i18n="common:party.age.category">${translate('common:party.age.category')}</span>
                 </label>
                 <select id="member-age-${member.id}"
                         class="form-control member-age-select"
                         data-member-id="${member.id}"
                         data-is-primary="${member.primary ? 'true' : 'false'}">
-                  <option value="adult" ${member.adult !== false ? 'selected' : ''}><div data-i18n="common:adult">${translate('common:adult')}</div></option>
-                  <option value="child" ${member.adult === false ? 'selected' : ''}><div data-i18n="common:child">${translate('common:child')}</div></option>
+                  <option value="adult" ${member.adult !== false ? 'selected' : ''}><div data-i18n="common:party.adult">${translate('common:party.adult')}</div></option>
+                  <option value="child" ${member.adult === false ? 'selected' : ''}><div data-i18n="common:party.child">${translate('common:party.child')}</div></option>
                 </select>
               </div>
               ${!member.primary ? `
@@ -2226,7 +2226,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             <div class="party-dietary-card-header">
               <i class="fas fa-user"></i>
               <h4>${escapeHtml(member.name)}</h4>
-              ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
+              ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:party.primary\">${member.primary ? translate('common:party.primary') : ''}</span>" : ''}
             </div>
             <div class="dietary-options">
               ${dietaryOptions.map(opt => {
@@ -2402,28 +2402,28 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="member-edit-form">
         <div class="form-group">
           <label for="member-name-${id}">
-            <i class="fas fa-user"></i> <span data-i18n="common:name">${translate('common:name')}</span>
+            <i class="fas fa-user"></i> <span data-i18n="common:party.name">${translate('common:party.name')}</span>
           </label>
           <input type="text"
                  id="member-name-${id}"
                  class="form-control member-name-input new-member-input"
                  data-member-id="${id}"
                  value=""
-                 placeholder="${translate('common:enterName')}"
+                 placeholder="${translate('common:enter.name')}"
                  autofocus>
         </div>
         <div class="form-group">
           <label for="member-age-${id}">
-            <i class="fas fa-birthday-cake"></i> <span data-i18n="common:ageCategory">${translate('common:ageCategory')}</span>
+            <i class="fas fa-birthday-cake"></i> <span data-i18n="common:party.age.category">${translate('common:party.age.category')}</span>
           </label>
           <select id="member-age-${id}"
                   class="form-control member-age-select new-member-age-select"
                   data-member-id="${id}">
-            <option value="adult" selected><span data-i18n="common:adult">${translate('common:adult')}</span></option>
-            <option value="child"><span data-i18n="common:child">${translate('common:child')}</span></option>
+            <option value="adult" selected><span data-i18n="common:party.adult">${translate('common:party.adult')}</span></option>
+            <option value="child"><span data-i18n="common:party.child">${translate('common:party.child')}</span></option>
           </select>
         </div>
-        <button type="button" class="btn-base btn-danger btn-sm" data-member-id="${id}" title="${translate('rich:common:removeMember')}">
+        <button type="button" class="btn-base btn-danger btn-sm" data-member-id="${id}" title="${translate('rich:common:party.remove.member')}">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
@@ -2480,7 +2480,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Confirm removal
     showConfirmDialog(
-      `${translateWithVars("guests:confirmRemoveMember", { memberName: memberName })}`,
+      `${translateWithVars("common:party.confirm.remove.member", { memberName: memberName })}`,
       async () => {
         card.remove();
         
@@ -2515,7 +2515,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const membersList = document.querySelector('.party-members-edit-list');
     if (countEl && membersList) {
       const count = membersList.querySelectorAll('.party-member-edit-card').length;
-      countEl.textContent = `${count} / 4 ${translate('common:members')}`;
+      countEl.textContent = `${count} / 4 ${translate('common:party.members')}`;
     }
   }
   
@@ -2976,7 +2976,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <h3 class="summary-section-title clickable" onclick="switchToTab('partyContent')" style="cursor: pointer;">
             <i class="fas fa-users"></i>
             <div data-i18n="guests:summaryYourParty">Your Party</div>
-            ( ${partyMembers.length} <div data-i18n="${partyMembers.length === 1 ? 'common:Person' : 'common:People'}">Person</div>)
+            ( ${partyMembers.length} <div data-i18n="${partyMembers.length === 1 ? 'common:person' : 'common:people'}">Person</div>)
             <i class="fas fa-arrow-right section-nav-arrow"></i>
           </h3>
           <div class="party-members-list">
@@ -2990,7 +2990,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <i class="fas fa-user"></i>
                 ${escapeHtml(member.name)}
               </span>
-              ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
+              ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:party.primary\">${member.primary ? translate('common:party.primary') : ''}</span>" : ''}
               ${member.adult === false ? '<span class="badge badge-info"><div data-i18n="guests:childBadge">Child</div></span>' : ''}
             </div>
           `;
@@ -3070,7 +3070,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               <div class="menu-member-header">
                 <i class="fas fa-user"></i>
                 <span class="menu-member-name">${escapeHtml(member.name)}</span>
-                ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
+                ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:party.primary\">${member.primary ? translate('common:party.primary') : ''}</span>" : ''}
               </div>
               <div class="menu-choices-list">
           `;

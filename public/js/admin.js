@@ -960,9 +960,9 @@
           <div class="table-container">
             <table class="data-table">
               <thead><tr>
-                <th><div data-i18n="common:name">${translate('common:name')}</div></th>
+                <th><div data-i18n="common:party.name">${translate('common:party.name')}</div></th>
                 <th><div data-i18n="admin:guests.table.email">${translate('admin:guests.table.email')}</div></th>
-                <th><div data-i18n="common:ageCategory">${translate('common:ageCategory')}</div></th>
+                <th><div data-i18n="common:party.age.category">${translate('common:party.age.category')}</div></th>
                 <th><div data-i18n="admin:guests.table.partySize">${translate('admin:guests.table.partySize')}</div></th>
                 <th><div data-i18n="admin:guests.table.actions">${translate('admin:guests.table.actions')}</div></th>
               </tr></thead>
@@ -1187,10 +1187,10 @@
           </div>
           
           <div class="party-section">
-            <h4><i class="fas fa-user"></i> <div data-i18n="common:party.primaryGuest">${translate('common:party.primaryGuest')}</div></h4>
+            <h4><i class="fas fa-user"></i> <div data-i18n="common:party.primary.guest">${translate('common:party.primary.guest')}</div></h4>
             <div class="primary-guest-info">
               <strong>${primaryGuest ? primaryGuest.name : translate('admin:party.unknown')}</strong> 
-              <span class="badge badge-primary" data-i18n="common:primary">${primaryGuest ? translate('common:primary') : ''}</span>
+              <span class="badge badge-primary" data-i18n="common:party.primary">${primaryGuest ? translate('common:party.primary') : ''}</span>
               <span class="badge ${primaryGuest && primaryGuest.adult === false ? 'badge-info' : 'badge-secondary'}">
                 <div data-i18n="admin:party.${primaryGuest && primaryGuest.adult === false ? 'child' : 'adult'}">${translate('admin:party.' + (primaryGuest && primaryGuest.adult === false ? 'child' : 'adult'))}</div>
               </span>

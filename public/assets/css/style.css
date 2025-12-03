@@ -313,7 +313,7 @@ a:hover {
 }
 
 .btn-primary:hover:not(:disabled) {
-  box-shadow: 0 6px 20px var(--success-color);
+  box-shadow: 0 6px 20px var(--primary-hover);
   background: var(--gradient-primary-action);
 }
 

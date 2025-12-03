@@ -130,7 +130,7 @@ class CommentsSystem {
             option.value = member.name;
             option.textContent = member.name;
             if (member.primary) {
-                option.textContent += ' (' + translate('common:primary') + ')';
+                option.textContent += ' (' + translate('common:party.primary') + ')';
             }
             postingAsSelect.appendChild(option);
         });
