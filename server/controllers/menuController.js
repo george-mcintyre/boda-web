@@ -283,8 +283,6 @@ async function updateGuestCourseOption(req, res, next) {
       specialRequestDetail: choice.specialRequestDetail || ''
     }));
 
-    console.log('DEBUG: partyChoicesToSave:', JSON.stringify(partyChoicesToSave, null, 2));
-    
     const menuChoice = await MenuChoice.findOneAndUpdate(
       { guestId },
       { partyChoices: partyChoicesToSave },

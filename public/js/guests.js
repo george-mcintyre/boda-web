@@ -221,8 +221,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           <h3 data-i18n="rich:common:confirmAction">${translate("rich:common:confirmAction")}</h3>
           <p>${message}</p> 
           <div class="form-actions">
-            <button class="btn-base btn-outline btn-md" data-i18n="rich:common:cancel">${translate("rich:common:cancel")}</button>
-            <button class="btn-base btn-primary btn-md" data-i18n="rich:common:confirm">${translate("rich:common:confirm")}</button>
+            <button class="btn-base btn-outline btn-sm" data-i18n="rich:common:cancel">${translate("rich:common:cancel")}</button>
+            <button class="btn-base btn-primary btn-sm" data-i18n="rich:common:confirm">${translate("rich:common:confirm")}</button>
           </div>
         </div>
       </div>
@@ -526,7 +526,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ];
 
         html += `
-          <div class="card" data-member-id="${member.id}">
+          <div class="card menu-dietary-card" data-member-id="${member.id}">
             <div class="card-header">
               <h4>
                 <i class="fas fa-user"></i>
@@ -615,7 +615,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           </button>
         </div>
       `;
-      
+
       // Even on error, try to translate any remaining content
       if (typeof updatePageContent === 'function') {
         updatePageContent();
@@ -876,7 +876,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
 
       // Collect special dietary requests for each member
-      document.querySelectorAll('.party-dietary-card').forEach(card => {
+      document.querySelectorAll('.menu-dietary-card').forEach(card => {
         const memberId = card.dataset.memberId;
         
         // Skip invalid member IDs
@@ -959,203 +959,60 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Make loadMenuSelections globally accessible for retry button
   window.loadMenuSelections = loadMenuSelections;
 
-  // Save menu selection function
-  window.saveMenuSelection = async (partyGuestId, courseId, optionId) => {
+  // Helper function to initialize a map for an event
+  function initEventMap(mapContainerId, lat, lng) {
     try {
-      const currentChoices = await fetch('/api/guest/menu-choices', {
-        method: 'GET',
-        headers: { 'Authorization': token }
-      }).then(res => res.json());
+      // Check f Leaflet is available
+      if (typeof L !== 'undefined') {
+        const mapContainer = document.getElementById(mapContainerId);
 
-      // Find or create choice for this party member
-      let memberChoices = currentChoices.find(choice => 
-        choice.partyGuestId === partyGuestId
-      );
+        if (mapContainer) {
+          const map = L.map(mapContainerId).setView([parseFloat(lat), parseFloat(lng)], 16);
 
-      if (!memberChoices) {
-        memberChoices = {
-          partyGuestId: partyGuestId,
-          choices: []
-        };
-        currentChoices.push(memberChoices);
-      }
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+          }).addTo(map);
 
-      // Remove existing choice for this course and add new one
-      memberChoices.choices = memberChoices.choices.filter(choice => choice.courseId !== courseId);
-      memberChoices.choices.push({ courseId, optionId });
+          L.marker([parseFloat(lat), parseFloat(lng)]).addTo(map);
 
-      // Update on server
-      const response = await fetch('/api/guest/menu-choices', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        },
-        body: JSON.stringify({ choices: currentChoices })
-      });
-
-      if (response.ok) {
-        showToast('<div data-i18n="common:menu.selection.saved">'+ translate('common:menu.selection.saved') +'</div>', 'success');
-      } else {
-        showToast('<div data-i18n="common:error.saving.menu.selection">'+ translate('common:error.saving.menu.selection') +'</div>', 'error');
-      }
-    } catch (err) {
-      console.error('Error saving menu selection:', err);
-      showToast('<div data-i18n="common:error.saving.menu.selection">'+ translate('common:error.saving.menu.selection') +'</div>', 'error');
-    }
-  };
-
-  // Save special request function
-  window.saveSpecialRequest = async (partyGuestId, specialRequest) => {
-    try {
-      const currentChoices = await fetch('/api/guest/menu-choices', {
-        method: 'GET',
-        headers: { 'Authorization': token }
-      }).then(res => res.json());
-
-      // Find or create choice for this party member
-      let memberChoices = currentChoices.find(choice => 
-        choice.partyGuestId === partyGuestId
-      );
-
-      if (!memberChoices) {
-        memberChoices = {
-          partyGuestId: partyGuestId,
-          choices: []
-        };
-        currentChoices.push(memberChoices);
-      }
-
-      memberChoices.specialRequest = specialRequest || null;
-      if (specialRequest !== 'other') {
-        memberChoices.specialRequestDetail = null;
-      }
-
-      // Update on server
-      const response = await fetch('/api/guest/menu-choices', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        },
-        body: JSON.stringify({ choices: currentChoices })
-      });
-
-      if (response.ok) {
-        showToast('<div data-i18n="common:menu.special.request.saved">'+ translate('common:menu.special.request.saved') +'</div>', 'success');
-        
-        // Show/hide detail textarea based on selection
-        const detailTextarea = document.querySelector(`textarea[name="special-request-detail-${partyGuestId}"]`);
-        if (detailTextarea) {
-          detailTextarea.style.display = specialRequest === 'other' ? 'block' : 'none';
+          // Fix map sizing issue when container is hidden
+          setTimeout(() => {
+            map.invalidateSize();
+          }, 100);
         }
       } else {
-        showToast('<div data-i18n="common:error.saving.special.request">'+ translate('common:error.saving.special.request') +'</div>', 'error');
+        // Fallback: Show a simple coordinate display with map link
+        const mapContainer = document.getElementById(mapContainerId);
+
+        if (mapContainer) {
+          mapContainer.innerHTML = `
+            <div style="width:100%;height:100%;background:linear-gradient(45deg,#f0f0f0,#e0e0e0);display:flex;align-items:center;justify-content:center;border-radius:8px;">
+              <div style="text-align:center;color:#666;">
+                <i class="fas fa-map-marker-alt" style="font-size:2em;color:#e74c3c;margin-bottom:10px;"></i>
+                <div>Location: ${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)}</div>
+                <small>Interactive map requires Leaflet.js</small>
+              </div>
+            </div>
+          `;
+        }
       }
-    } catch (err) {
-      console.error('Error saving special request:', err);
-      showToast('<div data-i18n="common:error.saving.special.request">'+ translate('common:error.saving.special.request') +'</div>', 'error');
+    } catch (error) {
+      console.error('Map initialization error:', error);
+      const mapContainer = document.getElementById(mapContainerId);
+
+      if (mapContainer) {
+        mapContainer.innerHTML = `
+          <div style="width:100%;height:100%;background:linear-gradient(45deg,#f0f0f0,#e0e0e0);display:flex;align-items:center;justify-content:center;border-radius:8px;">
+            <div style="text-align:center;color:#666;">
+              <i class="fas fa-map-marker-alt" style="font-size:2em;color:#e74c3c;margin-bottom:10px;"></i>
+              <div>Location: ${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)}</div>
+              <small>Open in Maps to view</small>
+            </div>
+          </div>
+        `;
+      }
     }
-  };
-
-  // Save special request detail function
-  window.saveSpecialRequestDetail = async (partyGuestId, specialRequestDetail) => {
-    try {
-      const currentChoices = await fetch('/api/guest/menu-choices', {
-        method: 'GET',
-        headers: { 'Authorization': token }
-      }).then(res => res.json());
-
-      // Find or create choice for this party member
-      let memberChoices = currentChoices.find(choice => 
-        choice.partyGuestId === partyGuestId
-      );
-
-      if (!memberChoices) {
-        memberChoices = {
-          partyGuestId: partyGuestId,
-          choices: []
-        };
-        currentChoices.push(memberChoices);
-      }
-
-      memberChoices.specialRequestDetail = specialRequestDetail || null;
-
-      // Update on server
-      const response = await fetch('/api/guest/menu-choices', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        },
-        body: JSON.stringify({ choices: currentChoices })
-      });
-
-      if (response.ok) {
-        showToast('<div data-i18n="common:menu.special.request.details.saved">'+ translate('common:menu.special.request.details.saved') +'</div>', 'success');
-      } else {
-        showToast('<div data-i18n="common:error.saving.special.request.details">'+ translate('common:error.saving.special.request.details') +'</div>', 'error');
-      }
-    } catch (err) {
-      console.error('Error saving special request details:', err);
-      showToast('<div data-i18n="common:error.saving.special.request.details">'+ translate('common:error.saving.special.request.details') +'</div>', 'error');
-    }
-  };
-  
-   // Helper function to initialize a map for an event
-   function initEventMap(mapContainerId, lat, lng) {
-     try {
-       // Check if Leaflet is available
-       if (typeof L !== 'undefined') {
-         const mapContainer = document.getElementById(mapContainerId);
-         
-         if (mapContainer) {
-           const map = L.map(mapContainerId).setView([parseFloat(lat), parseFloat(lng)], 16);
-           
-           L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-             attribution: '© OpenStreetMap contributors'
-           }).addTo(map);
-           
-           L.marker([parseFloat(lat), parseFloat(lng)]).addTo(map);
-           
-           // Fix map sizing issue when container is hidden
-           setTimeout(() => {
-             map.invalidateSize();
-           }, 100);
-         }
-       } else {
-         // Fallback: Show a simple coordinate display with map link
-         const mapContainer = document.getElementById(mapContainerId);
-         
-         if (mapContainer) {
-           mapContainer.innerHTML = `
-             <div style="width:100%;height:100%;background:linear-gradient(45deg,#f0f0f0,#e0e0e0);display:flex;align-items:center;justify-content:center;border-radius:8px;">
-               <div style="text-align:center;color:#666;">
-                 <i class="fas fa-map-marker-alt" style="font-size:2em;color:#e74c3c;margin-bottom:10px;"></i>
-                 <div>Location: ${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)}</div>
-                 <small>Interactive map requires Leaflet.js</small>
-               </div>
-             </div>
-           `;
-         }
-       }
-     } catch (error) {
-       console.error('Map initialization error:', error);
-       const mapContainer = document.getElementById(mapContainerId);
-       
-       if (mapContainer) {
-         mapContainer.innerHTML = `
-           <div style="width:100%;height:100%;background:linear-gradient(45deg,#f0f0f0,#e0e0e0);display:flex;align-items:center;justify-content:center;border-radius:8px;">
-             <div style="text-align:center;color:#666;">
-               <i class="fas fa-map-marker-alt" style="font-size:2em;color:#e74c3c;margin-bottom:10px;"></i>
-               <div>Location: ${parseFloat(lat).toFixed(4)}, ${parseFloat(lng).toFixed(4)}</div>
-               <small>Open in Maps to view</small>
-             </div>
-           </div>
-         `;
-       }
-     }
-   }
+  }
 
   /**
    * Load and display events content in the events tab
@@ -1738,7 +1595,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                  </div>
                  <div class="action-container">
                    ${isAvailable ? `
-                     <button class="btn-base btn-primary btn-md" onclick="purchaseGift('${gift.id}', '${escapeHtml(gift.title).replace(/'/g, "\\'")}', ${gift.amount})">
+                     <button class="btn-base btn-primary btn-sm" onclick="purchaseGift('${gift.id}', '${escapeHtml(gift.title).replace(/'/g, "\\'")}', ${gift.amount})">
                        <i class="fas fa-credit-card"></i>
                        <span data-i18n="guests:giftsBuyGift">${translate('guests:giftsBuyGift')}</span>
                      </button>
@@ -1830,8 +1687,8 @@ document.addEventListener('DOMContentLoaded', async () => {
            </div>
          </div>
          <div class="action-container">
-           <button class="btn-base btn-outline btn-md btn-cancel-purchase"><span data-i18n="guests:giftsPurchaseCancel">${translate('guests:giftsPurchaseCancel')}</span></button>
-           <button class="btn-base btn-primary btn-md btn-confirm-purchase">
+           <button class="btn-base btn-outline btn-sm btn-cancel-purchase"><span data-i18n="guests:giftsPurchaseCancel">${translate('guests:giftsPurchaseCancel')}</span></button>
+           <button class="btn-base btn-primary btn-sm btn-confirm-purchase">
              <i class="fas fa-credit-card"></i>
              <span data-i18n="guests:giftsPurchaseProceed">${translate('guests:giftsPurchaseProceed')}</span>
            </button>
@@ -2293,7 +2150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Save dietary button
       const saveDietaryBtn = document.getElementById('saveDietaryBtn');
       if (saveDietaryBtn) {
-        saveDietaryBtn.addEventListener('click', savePartyDietary);
+        saveDietaryBtn.addEventListener('click', savePartyDietaryChoices);
       }
       
       // Remove member buttons
@@ -2624,7 +2481,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   
   // Save party dietary requirements
-  async function savePartyDietary() {
+  async function savePartyDietaryChoices() {
     const saveBtn = document.getElementById('saveDietaryBtn');
     if (saveBtn) {
       saveBtn.disabled = true;
@@ -2674,7 +2531,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           };
           currentChoices.push(memberChoice);
         }
-        
+
+        console.log('Dietary choices for member:', memberChoice.specialRequest);
         memberChoice.specialRequest = selectedOptions;
         memberChoice.specialRequestDetail = specialRequestDetail;
       });
