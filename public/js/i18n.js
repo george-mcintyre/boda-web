@@ -41,11 +41,9 @@ const translations = {
     'wedding:hero.description2': 'This site is your wedding hub. Log in with your RSVP email to confirm your party, choose your menu, see the schedule, view our gift list and chat with other guests.',
 
     'wedding:guestZone.title': 'Guest Zone',
-    'wedding:guestZone.description': 'Here you can manage all the details of your participation in our wedding.',
 
     'login:pageTitle': 'Guest access - Wedding',
     'login:header': 'Guest access',
-    'login:home': 'Home',
     'login:emailLabel': 'Email:',
     'login:emailPlaceholder': 'Enter your email',
     'login:submit': 'Continue',
@@ -520,11 +518,9 @@ const translations = {
     'wedding:hero.description2': 'Este sitio es tu centro para la boda. Inicia sesión con el correo de tu RSVP para confirmar tu grupo, elegir tu menú, ver el programa, consultar nuestra lista de regalos y chatear con otros invitados.',
 
     'wedding:guestZone.title': 'Zona de invitados',
-    'wedding:guestZone.description': 'Aquí puedes gestionar todos los detalles de tu participación en nuestra boda.',
 
     'login:pageTitle': 'Acceso de invitados - Boda',
     'login:header': 'Acceso de invitados',
-    'login:home': 'Inicio',
     'login:emailLabel': 'Correo electrónico:',
     'login:emailPlaceholder': 'Introduce tu correo electrónico',
     'login:submit': 'Continuar',
