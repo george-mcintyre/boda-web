@@ -218,11 +218,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="confirm-dialog">
         <div class="confirm-content">
           <i class="fas fa-question-circle"></i>
-          <h3>Confirm action</h3>
-          <p>${message}</p>
+          <h3 data-i18n="rich:common:confirmAction">${translate("rich:common:confirmAction")}</h3>
+          <p>${message}</p> 
           <div class="form-actions">
-            <button class="btn-base btn-outline btn-md">cancel</button>
-            <button class="btn-base btn-primary btn-md">confirm</button>
+            <button class="btn-base btn-outline btn-md" data-i18n="rich:common:cancel">${translate("rich:common:cancel")}</button>
+            <button class="btn-base btn-primary btn-md" data-i18n="rich:common:confirm">${translate("rich:common:confirm")}</button>
           </div>
         </div>
       </div>
@@ -546,17 +546,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                       ${isSelected ? 'checked' : ''}
                       onchange="updateDietaryCheckbox(this)">
                     <i class="fas ${opt.icon}"></i>
-                    <span><div data-i18n="${opt.label}">${translate(opt.label)}</div></span>
+                    <span><div data-i18n="guests:dietary${opt.label}">${translate("guests:dietary" + opt.label)}</div></span>
                   </label>
                 `;
               }).join('')}
             </div>
             <div class="special-request-detail">
-              <label for="special-detail-${member.id}"><div data-i18n="guests:additionalDetailsLabel">Additional details or specific requirements:</div></label>
+              <label for="special-detail-${member.id}"><div data-i18n="guests:additionalDetailsLabel">${translate("guests:additionalDetailsLabel")}</div></label>
               <textarea
                 id="special-detail-${member.id}"
                 name="special-detail-${member.id}"
-                placeholder="Please describe any specific dietary needs, allergies, or special requirements..."
+                placeholder="${translate("guests:additionalDetailsPlaceholder")}"
                 rows="3"
               >${escapeHtml(memberRequests.specialRequestDetail || '')}</textarea>
             </div>
@@ -1257,7 +1257,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const formatEventDate = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-GB', {
+        return date.toLocaleDateString(currentLanguage || 'en-GB', {
           weekday: 'long',
           day: 'numeric',
           month: 'long',
@@ -1268,7 +1268,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const formatEventTime = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
-        return date.toLocaleTimeString('en-GB', {
+        return date.toLocaleTimeString(currentLanguage || 'en-GB', {
           hour: '2-digit',
           minute: '2-digit'
         });
@@ -1396,11 +1396,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="event-card-horizontal ${eventImage ? '' : 'no-image'}" data-event-id="${eventId}">
             ${imageHtml}
             <div class="event-details-card">
-              <div class="event-date-badge">
-                <i class="fas fa-calendar-alt"></i>
-                <span>${formatEventDate(event.date)}</span>
-              </div>
-              
               <div class="event-header">
                 <div class="event-icon">
                   <i class="fas ${getIconClass(event.name || event.title || '')}"></i>
@@ -1638,7 +1633,7 @@ document.addEventListener('DOMContentLoaded', async () => {
        const formatDate = (dateString) => {
          if (!dateString) return '';
          const date = new Date(dateString);
-         return date.toLocaleDateString('en-GB', {
+         return date.toLocaleDateString(currentLanguage || 'en-GB', {
            day: 'numeric',
            month: 'long',
            year: 'numeric'
@@ -2122,11 +2117,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       html += `
         <div class="party-members-management">
           <div class="party-members-header">
-            <h3><i class="fas fa-users"></i> Party Members</h3>
-            <span class="party-count">${partyData.length} / ${maxPartySize} members</span>
+            <h3 data-i18n="rich:guests:partyMembersTitle">${translate("rich:guests:partyMembersTitle")}</h3>
+            <span class="party-count">${partyData.length} / ${maxPartySize} ${translate("common:members")}</span>
           </div>
           <p class="party-description">
-            Your party includes everyone who will attend the wedding with you. You can add up to ${maxPartySize} party members including yourself.
+            ${translateWithVars("guests:partyDescription", { maxPartySize: maxPartySize })}
             ${!canAddMore ? '<strong>You have reached the maximum party size. Please contact the wedding administrators if you need to add more guests.</strong>' : ''}
           </p>
           <div class="party-members-edit-list">
@@ -2138,13 +2133,13 @@ document.addEventListener('DOMContentLoaded', async () => {
           <div class="card party-member-edit-card ${member.primary ? 'primary-member' : ''}" data-member-id="${member.id}" data-index="${index}" data-is-primary="${member.primary ? 'true' : 'false'}">
             <div class="member-edit-header">
               <span class="member-number">${index + 1}</span>
-              ${member.primary ? '<span class="primary-indicator"><i class="fas fa-star"></i> Primary Guest</span>' : ''}
-              ${member.adult === false ? '<span class="child-indicator"><i class="fas fa-child"></i> Child</span>' : ''}
+              ${member.primary ? '<span class="primary-indicator"><i class="fas fa-star"></i> <div data-i18n="common:party.primaryGuest">Primary Guest</div></span>' : ''}
+              ${member.adult === false ? '<span class="child-indicator"><i class="fas fa-child"></i> <div data-i18n="common:child">Child</div></span>' : ''}
             </div>
             <div class="member-edit-form">
               <div class="form-group">
                 <label for="member-name-${member.id}">
-                  <i class="fas fa-user"></i> Name
+                  <i class="fas fa-user"></i> <span data-i18n="common:name">${translate('common:name')}</span>
                 </label>
                 <input type="text"
                        id="member-name-${member.id}"
@@ -2156,14 +2151,14 @@ document.addEventListener('DOMContentLoaded', async () => {
               </div>
               <div class="form-group">
                 <label for="member-age-${member.id}">
-                  <i class="fas fa-birthday-cake"></i> Age Category
+                  <i class="fas fa-birthday-cake"></i> <span data-i18n="common:ageCategory">${translate('common:ageCategory')}</span>
                 </label>
                 <select id="member-age-${member.id}"
                         class="form-control member-age-select"
                         data-member-id="${member.id}"
                         data-is-primary="${member.primary ? 'true' : 'false'}">
-                  <option value="adult" ${member.adult !== false ? 'selected' : ''}>Adult (18+)</option>
-                  <option value="child" ${member.adult === false ? 'selected' : ''}>Child (Under 18)</option>
+                  <option value="adult" ${member.adult !== false ? 'selected' : ''}><div data-i18n="common:adult">${translate('common:adult')}</div></option>
+                  <option value="child" ${member.adult === false ? 'selected' : ''}><div data-i18n="common:child">${translate('common:child')}</div></option>
                 </select>
               </div>
               ${!member.primary ? `
@@ -2180,9 +2175,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (canAddMore) {
         html += `
           <div class="add-member-card">
-            <button type="button" id="addPartyMemberBtn" class="btn-base btn-secondary btn-md">
-              <i class="fas fa-plus-circle"></i>
-              <span>Add Party Member</span>
+            <button type="button" id="addPartyMemberBtn" class="btn-base btn-secondary btn-sm">
+              <span data-i18n="rich:guests:addPartyMember">${translate("rich:guests:addPartyMember")}</span>
             </button>
           </div>
         `;
@@ -2198,10 +2192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       html += `
           </div>
           <div class="action-container">
-            <button type="button" id="savePartyMembersBtn" class="btn-base btn-primary btn-lg">
-              <i class="fas fa-save"></i>
-              Save Party Members
-            </button>
+            <button type="button" id="savePartyMembersBtn" class="btn-base btn-primary btn-lg" data-i18n="rich:guests:savePartyMembers">${translate("rich:guests:savePartyMembers")}</button>
           </div>
         </div>
       `;
@@ -2210,10 +2201,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       html += `
         <div class="party-dietary-management">
           <div class="dietary-header">
-            <h3><i class="fas fa-utensils"></i> Dietary Requirements</h3>
+            <h3 data-i18n="rich:guests:dietaryRequirements">${translate("rich:guests:dietaryRequirements")}</h3>
           </div>
           <p class="dietary-description">
-            Please let us know about any dietary requirements or allergies for each party member.
+            ${translate("guests:dietaryDescription")}
           </p>
           <div class="party-dietary-cards">
       `;
@@ -2251,19 +2242,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                       ${isSelected ? 'checked' : ''}
                       onchange="updatePartyDietaryCheckbox(this)">
                     <i class="fas ${opt.icon}"></i>
-                    <span><div data-i18n="${opt.label}">${translate(opt.label)}</div></span>
+                    <span><div data-i18n="guests:dietary${opt.label}">${translate("guests:dietary" + opt.label)}</div></span>
                   </label>
                 `;
               }).join('')}
             </div>
             <div class="dietary-detail">
-              <label for="party-dietary-detail-${member.id}">Additional details or specific requirements:</label>
+              <label for="party-dietary-detail-${member.id}" data-i18n="guests:additionalDetailsLabel">${translate("guests:additionalDetailsLabel")}</label>
               <textarea
                 id="party-dietary-detail-${member.id}"
                 name="party-dietary-detail-${member.id}"
                 class="form-control dietary-detail-textarea"
                 data-member-id="${member.id}"
-                placeholder="Please describe any specific dietary needs, allergies, or special requirements..."
+                placeholder="${translate("guests:additionalDetailsPlaceholder")}"
                 rows="2"
               >${escapeHtml(memberDietary.specialRequestDetail || '')}</textarea>
             </div>
@@ -2274,10 +2265,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       html += `
           </div>
           <div class="action-container">
-            <button type="button" id="saveDietaryBtn" class="btn-base btn-primary btn-lg">
-              <i class="fas fa-save"></i>
-              Save Dietary Requirements
-            </button>
+            <button type="button" id="saveDietaryBtn" class="btn-base btn-primary btn-lg" data-i18n="rich:guests:saveDietaryRequirements"> ${translate("rich:guests:saveDietaryRequirements")} </button>
           </div>
         </div>
       `;
@@ -2409,33 +2397,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     newCard.innerHTML = `
       <div class="member-edit-header">
         <span class="member-number">${index + 1}</span>
-        <span class="new-member-indicator"><i class="fas fa-plus-circle"></i> New</span>
+        <span class="new-member-indicator" data-i18n="rich:common:new">${translate('rich:common:new')}</span>
       </div>
       <div class="member-edit-form">
         <div class="form-group">
           <label for="member-name-${id}">
-            <i class="fas fa-user"></i> Name
+            <i class="fas fa-user"></i> <span data-i18n="common:name">${translate('common:name')}</span>
           </label>
           <input type="text"
                  id="member-name-${id}"
                  class="form-control member-name-input new-member-input"
                  data-member-id="${id}"
                  value=""
-                 placeholder="Enter name..."
+                 placeholder="${translate('common:enterName')}"
                  autofocus>
         </div>
         <div class="form-group">
           <label for="member-age-${id}">
-            <i class="fas fa-birthday-cake"></i> Age Category
+            <i class="fas fa-birthday-cake"></i> <span data-i18n="common:ageCategory">${translate('common:ageCategory')}</span>
           </label>
           <select id="member-age-${id}"
                   class="form-control member-age-select new-member-age-select"
                   data-member-id="${id}">
-            <option value="adult" selected>Adult (18+)</option>
-            <option value="child">Child (Under 18)</option>
+            <option value="adult" selected><span data-i18n="common:adult">${translate('common:adult')}</span></option>
+            <option value="child"><span data-i18n="common:child">${translate('common:child')}</span></option>
           </select>
         </div>
-        <button type="button" class="btn-base btn-danger btn-sm" data-member-id="${id}" title="Remove member">
+        <button type="button" class="btn-base btn-danger btn-sm" data-member-id="${id}" title="${translate('rich:common:removeMember')}">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
@@ -2492,7 +2480,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Confirm removal
     showConfirmDialog(
-      `Are you sure you want to remove ${memberName} from your party?`,
+      `${translateWithVars("guests:confirmRemoveMember", { memberName: memberName })}`,
       async () => {
         card.remove();
         
@@ -2527,7 +2515,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const membersList = document.querySelector('.party-members-edit-list');
     if (countEl && membersList) {
       const count = membersList.querySelectorAll('.party-member-edit-card').length;
-      countEl.textContent = `${count} / 4 members`;
+      countEl.textContent = `${count} / 4 ${translate('common:members')}`;
     }
   }
   
@@ -2536,7 +2524,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const saveBtn = document.getElementById('savePartyMembersBtn');
     if (saveBtn && !saveBtn.classList.contains('unsaved')) {
       saveBtn.classList.add('unsaved');
-      saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Party Members *';
+      saveBtn.innerHTML = `<span data-i18n="rich:guests:savePartyMembers">${translate("rich:guests:savePartyMembers")}</span> *`;
     }
   }
   
@@ -2558,7 +2546,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const saveBtn = document.getElementById('saveDietaryBtn');
     if (saveBtn && !saveBtn.classList.contains('unsaved')) {
       saveBtn.classList.add('unsaved');
-      saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Dietary Requirements *';
+      saveBtn.innerHTML = `<span data-i18n="rich:guests:saveDietaryRequirements">${translate("rich:guests:saveDietaryRequirements")}</span> *`;
     }
   }
   
@@ -2609,25 +2597,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       
       if (response.ok) {
-        showToast('Party members saved successfully!', 'success');
+        showToast(translate('guests:partyMembersSaved'), 'success');
         if (saveBtn) {
           saveBtn.classList.remove('unsaved');
-          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Party Members';
+          saveBtn.innerHTML = `<span data-i18n="rich:guests:savePartyMembers">${translate("rich:guests:savePartyMembers")}</span>`;
         }
         // Reload to get updated IDs and refresh dietary cards
         loadPartyContent();
       } else {
         const data = await response.json();
-        showToast(data.error || 'Error saving party members', 'error');
+        showToast(data.error || translate('common:errorSavingPartyMembers'), 'error');
       }
     } catch (err) {
       console.error('Error saving party members:', err);
-      showToast('Error saving party members', 'error');
+      showToast(translate('common:errorSavingPartyMembers'), 'error');
     } finally {
       if (saveBtn) {
         saveBtn.disabled = false;
         if (!saveBtn.classList.contains('unsaved')) {
-          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Party Members';
+          saveBtn.innerHTML = `<span data-i18n="rich:guests:savePartyMembers">${translate("rich:guests:savePartyMembers")}</span>`;
         }
       }
     }
@@ -2708,23 +2696,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       
       if (response.ok) {
-        showToast('Dietary requirements saved successfully!', 'success');
+        showToast(translate('guests:dietaryRequirementsSaved'), 'success');
         if (saveBtn) {
           saveBtn.classList.remove('unsaved');
-          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Dietary Requirements';
+          saveBtn.innerHTML = `<div data-i18n="rich:guests:saveDietaryRequirements">${translate("rich:guests:saveDietaryRequirements")}</div>`;
         }
       } else {
         const data = await response.json();
-        showToast(data.error || 'Error saving dietary requirements', 'error');
+        showToast(data.error || translate('common:errorSavingDietaryRequirements'), 'error');
       }
     } catch (err) {
       console.error('Error saving dietary requirements:', err);
-      showToast('Error saving dietary requirements', 'error');
+      showToast(translate('common:errorSavingDietaryRequirements'), 'error');
     } finally {
       if (saveBtn) {
         saveBtn.disabled = false;
         if (!saveBtn.classList.contains('unsaved')) {
-          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Dietary Requirements';
+          saveBtn.innerHTML = `<div data-i18n="rich:guests:saveDietaryRequirements">${translate("rich:guests:saveDietaryRequirements")}</div>`;
         }
       }
     }
@@ -2910,7 +2898,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const formatEventDate = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-GB', {
+        return date.toLocaleDateString(currentLanguage || 'en-GB', {
           weekday: 'short',
           day: 'numeric',
           month: 'short'
@@ -2920,7 +2908,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const formatEventTime = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
-        return date.toLocaleTimeString('en-GB', {
+        return date.toLocaleTimeString(currentLanguage || 'en-GB', {
           hour: '2-digit',
           minute: '2-digit'
         });
@@ -2929,7 +2917,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const formatDate = (dateString) => {
         if (!dateString) return '';
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-GB', {
+        return date.toLocaleDateString(currentLanguage || 'en-GB', {
           day: 'numeric',
           month: 'long',
           year: 'numeric'
@@ -3003,7 +2991,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${escapeHtml(member.name)}
               </span>
               ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:primary\">${member.primary ? translate('common:primary') : ''}</span>" : ''}
-              ${member.adult === false ? '<span class="badge badge-info">Child</span>' : ''}
+              ${member.adult === false ? '<span class="badge badge-info"><div data-i18n="guests:childBadge">Child</div></span>' : ''}
             </div>
           `;
         });

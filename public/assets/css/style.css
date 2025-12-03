@@ -54,8 +54,9 @@
   
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, rgb(190, 190, 190) 0%, #000000 100%);
-  --gradient-secondary: linear-gradient(135deg, #f8edec 0%, #FFFFFF 100%);
+  --gradient-secondary: linear-gradient(135deg, #b1958f 0%, #c3b8b4 100%);
   --gradient-accent: linear-gradient(135deg, #d5d5d5 0%, #f1e2d5 100%);
+  --gradient-primary-action: linear-gradient(135deg, #334122 0%, #2c2f1f 100%);
   
   /* Spacing */
   --spacing-xs: 4px;
@@ -312,16 +313,18 @@ a:hover {
 }
 
 .btn-primary:hover:not(:disabled) {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 20px var(--success-color);
+  background: var(--gradient-primary-action);
 }
 
 .btn-secondary {
-  background: var(--gray-600);
+  background: var(--gradient-secondary);
   color: var(--white);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--gray-700);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  background: var(--gradient-primary);
 }
 
 .btn-success {
