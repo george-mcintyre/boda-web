@@ -41,7 +41,7 @@ module.exports = {
   // Stripe key is optional at boot. Specific features will error if missing at runtime.
   STRIPE_SECRET_KEY: optional('STRIPE_SECRET_KEY', ''),
   STRIPE_WEBHOOK_SECRET: optional('STRIPE_WEBHOOK_SECRET', ''),
-  APP_URL: optional('APP_URL', ''), // Base URL for callbacks (e.g., https://your-domain.com)
+  APP_URL: optional('APP_URL', ''), // Base URL for callbacks (e.g., https://iluminada-y-george.com), calculated automatically from the request headers if not set
   CORS_ORIGIN: process.env.CORS_ORIGIN || '*',
   // Dev HTTPS support (optional). If DEV_HTTPS=true and CERT/KEY are provided, server will also start HTTPS on HTTPS_PORT.
   DEV_HTTPS: String(process.env.DEV_HTTPS || '').toLowerCase() === 'true',

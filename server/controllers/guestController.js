@@ -291,7 +291,11 @@ async function createPaymentSession(req, res, next) {
     }
 
     // Determine base URL for redirects
-    const baseUrl = APP_URL || `${req.protocol}://${req.get('host')}`;
+    const baseUrlFromReq = `${req.protocol}://${req.get('host')}`;
+    const baseUrl =
+      typeof APP_URL === 'string' && APP_URL.trim().length > 0
+        ? APP_URL
+        : baseUrlFromReq;
     
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -301,8 +305,10 @@ async function createPaymentSession(req, res, next) {
           price_data: {
             currency: 'eur',
             product_data: {
-              name: gift.title,
-              description: gift.description || `Wedding gift: ${gift.title}`,
+              name: String(gift.title),
+              description: String(
+                gift.description || `Wedding gift: ${gift.title}`
+              ),
             },
             unit_amount: gift.amount * 100, // Stripe uses cents
           },
@@ -317,14 +323,13 @@ async function createPaymentSession(req, res, next) {
         guestId: me._id.toString(),
         guestEmail: me.email,
         guestName: me.name,
-        message: message || ''
+        message: typeof message === 'string' ? message : ''
       },
       customer_email: me.email,
     });
 
     res.json({ checkoutUrl: session.url, sessionId: session.id });
   } catch (e) {
-    console.error('Stripe session creation error:', e);
     next(e);
   }
 }

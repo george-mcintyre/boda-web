@@ -7,8 +7,12 @@ const routes = require('./api/routes');
 const { errorHandler } = require('./middleware/error');
 
 const app = express();
+
 app.use(cors({ origin: CORS_ORIGIN }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+
+// Stripe webhook raw body for signature verification
+app.post('/api/guest/stripe-webhook', express.raw({ type: 'application/json' }));
 
 // Security headers and CSP (allow current frontend patterns while avoiding eval)
 app.use(helmet({
