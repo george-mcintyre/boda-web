@@ -324,7 +324,10 @@ async function createCourseOption(req, res, next) {
 
     // Non-localised image or other props if needed
     if (image !== undefined) {
-      option.image = image;
+      // Handle image object format from frontend (e.g., { imageId: '...' })
+      if (typeof image === 'object' && image !== null && image.imageId) {
+        option.image = image.imageId;
+      }
     }
 
     await option.save();
@@ -354,7 +357,10 @@ async function updateCourseOption(req, res, next) {
     // Non-localised stuff
     Object.assign(option, rest);
     if (image !== undefined) {
-      option.image = image;
+      // Handle image object format from frontend (e.g., { imageId: '...' })
+      if (typeof image === 'object' && image !== null && image.imageId) {
+        option.image = image.imageId;
+      }
     }
 
     // Localised fields: merge per-language
