@@ -745,8 +745,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  let draggedChip = null;
-
   function handleDragStart(e) {
     draggedChip = this;
     this.classList.add('dragging');
@@ -1755,60 +1753,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     };
     document.addEventListener('keydown', handleEscape);
-  };
-
-  // Global function to reserve gifts
-  window.reserveGift = async (giftId) => {
-    try {
-      const res = await fetch('/api/regalos/reservar', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        },
-        body: JSON.stringify({ id: regaloId })
-      });
-      
-      const data = await res.json();
-      if (res.ok) {
-        showToast(data.mensaje, 'success');
-        setTimeout(() => {
-          cargarContenidoRegalos(); // Recargar la lista de regalos
-          cargarStatusRegalos(); // Actualizar el status en la pestaña resumen
-        }, 1000);
-      } else {
-        showToast(data.error || 'Error al reservar el regalo.', 'error');
-      }
-    } catch (err) {
-      showToast('Error de conexión al reservar el regalo.', 'error');
-    }
-  };
-
-  // Global function to cancel gifts
-  window.cancelGift = async (giftId) => {
-    try {
-      const res = await fetch('/api/regalos/cancelar', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token
-        },
-        body: JSON.stringify({ id: regaloId })
-      });
-      
-      const data = await res.json();
-      if (res.ok) {
-        showToast(data.mensaje, 'success');
-        setTimeout(() => {
-          cargarContenidoRegalos(); // Recargar la lista de regalos
-          cargarStatusRegalos(); // Actualizar el status en la pestaña resumen
-        }, 1000);
-      } else {
-        showToast(data.error || 'Error al cancelar el regalo.', 'error');
-      }
-    } catch (err) {
-      showToast('Error de conexión al cancelar el regalo.', 'error');
-    }
   };
 
   // Global function to buy gifts
@@ -2952,6 +2896,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   //////////////////////////////////////////////////////////////
   // Main
   //////////////////////////////////////////////////////////////
+
+  let draggedChip = null;
 
   // If Admin then also log in as guest using same token
   if (isAdminLoggedIn()) {
