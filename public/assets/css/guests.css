@@ -2313,6 +2313,114 @@ main.main-content-full {
   padding: 20px;
 }
 
+/* Payment Success Page */
+.payment-success-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-100);
+  padding: 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.payment-success-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--gradient-primary);
+}
+
+.success-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--success-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.success-icon i {
+  font-size: 2.5em;
+  color: var(--success-color);
+}
+
+.payment-success-card h1 {
+  margin: 0 0 15px 0;
+  color: var(--success-color);
+  font-size: 2em;
+  font-weight: 700;
+}
+
+.success-message {
+  color: var(--text-light);
+  font-size: 1.1em;
+  line-height: 1.6;
+  margin: 0 0 30px 0;
+}
+
+/* Payment Cancelled Page */
+.payment-cancelled-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gray-100);
+  padding: 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.payment-cancelled-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: var(--warning-color);
+}
+
+.cancelled-icon {
+  width: 80px;
+  height: 80px;
+  background: var(--warning-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.cancelled-icon i {
+  font-size: 2.5em;
+  color: var(--warning-color);
+}
+
+.payment-cancelled-card h1 {
+  margin: 0 0 15px 0;
+  color: var(--warning-color);
+  font-size: 2em;
+  font-weight: 700;
+}
+
+.cancelled-message {
+  color: var(--text-light);
+  font-size: 1.1em;
+  line-height: 1.6;
+  margin: 0 0 30px 0;
+}
+
 /* ========================================
    PULSE ANIMATION FOR UNSAVED CHANGES
    ======================================== */
@@ -2494,483 +2602,26 @@ main.main-content-full {
   }
 }
 
-/* ========================================
-   PAYMENT LANDING PAGES
-   ======================================== */
-.payment-landing-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-}
-
-/* Payment Success Page */
-.payment-success-card {
-  background: var(--white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--gray-100);
-  padding: 40px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.payment-success-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: var(--gradient-primary);
-}
-
-.success-icon {
-  width: 80px;
-  height: 80px;
-  background: var(--success-light);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  position: relative;
-  z-index: 1;
-}
-
-.success-icon i {
-  font-size: 2.5em;
-  color: var(--success-color);
-}
-
-.payment-success-card h1 {
-  margin: 0 0 15px 0;
-  color: var(--success-color);
-  font-size: 2em;
-  font-weight: 700;
-}
-
-.success-message {
-  color: var(--text-light);
-  font-size: 1.1em;
-  line-height: 1.6;
-  margin: 0 0 30px 0;
-}
-
-/* Payment Details */
-.payment-details {
-  background: var(--gray-50);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  margin: 20px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.detail-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--gray-100);
-}
-
-.detail-item:last-child {
-  border-bottom: none;
-}
-
-.detail-item .label {
-  font-weight: 600;
-  color: var(--text-dark);
-  font-size: 0.95em;
-}
-
-.detail-item .value {
-  color: var(--primary-color);
-  font-weight: 700;
-  font-size: 1.1em;
-}
-
-/* Action Buttons */
-.action-buttons {
-  display: flex;
-  gap: 15px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 30px;
-}
-
-.action-buttons .btn-base {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  border-radius: var(--radius-lg);
-  font-weight: 600;
-  text-decoration: none;
-  transition: all var(--transition-normal);
-  min-width: 160px;
-  justify-content: center;
-}
-
-.action-buttons .btn-primary {
-  background: var(--gradient-primary);
-  color: var(--white);
-  border: none;
-}
-
-.action-buttons .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.action-buttons .btn-outline {
-  background: transparent;
-  color: var(--primary-color);
-  border: 2px solid var(--primary-color);
-}
-
-.action-buttons .btn-outline:hover {
-  background: var(--primary-color);
-  color: var(--white);
-}
-
-.action-buttons .btn-secondary {
-  background: var(--gray-200);
-  color: var(--text-dark);
-  border: none;
-}
-
-.action-buttons .btn-secondary:hover {
-  background: var(--gray-300);
-}
-
-/* Thank You Card */
-.thank-you-card {
-  background: var(--white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--gray-100);
-  padding: 25px;
-}
-
-.thank-you-card .card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 15px;
-  color: var(--primary-color);
-}
-
-.thank-you-card .card-header i {
-  font-size: 1.5em;
-  color: var(--danger-color);
-}
-
-.thank-you-card .card-header h2 {
-  margin: 0;
-  font-size: 1.3em;
-  color: var(--text-dark);
-}
-
-.thank-you-card .card-content p {
-  margin: 0;
-  color: var(--text-light);
-  line-height: 1.6;
-}
-
-/* Payment Cancelled Page */
-.payment-cancelled-card {
-  background: var(--white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--gray-100);
-  padding: 40px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.payment-cancelled-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: var(--warning-color);
-}
-
-.cancelled-icon {
-  width: 80px;
-  height: 80px;
-  background: var(--warning-light);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  position: relative;
-  z-index: 1;
-}
-
-.cancelled-icon i {
-  font-size: 2.5em;
-  color: var(--warning-color);
-}
-
-.payment-cancelled-card h1 {
-  margin: 0 0 15px 0;
-  color: var(--warning-color);
-  font-size: 2em;
-  font-weight: 700;
-}
-
-.cancelled-message {
-  color: var(--text-light);
-  font-size: 1.1em;
-  line-height: 1.6;
-  margin: 0 0 30px 0;
-}
-
-/* Help Card */
-.help-card {
-  background: var(--white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--gray-100);
-  padding: 25px;
-}
-
-.help-card .card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 15px;
-  color: var(--primary-color);
-}
-
-.help-card .card-header i {
-  font-size: 1.5em;
-  color: var(--info-color);
-}
-
-.help-card .card-header h2 {
-  margin: 0;
-  font-size: 1.3em;
-  color: var(--text-dark);
-}
-
-.help-card .card-content p {
-  margin: 0 0 15px 0;
-  color: var(--text-light);
-  line-height: 1.6;
-}
-
-.help-links {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.help-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: var(--gray-50);
-  border-radius: var(--radius-lg);
-  text-decoration: none;
-  color: var(--primary-color);
-  font-weight: 500;
-  transition: all var(--transition-normal);
-  border: 1px solid var(--gray-100);
-}
-
-.help-link:hover {
-  background: var(--primary-color);
-  color: var(--white);
-  transform: translateY(-1px);
-}
-
-/* Payment Declined Page */
-.payment-declined-card {
-  background: var(--white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--gray-100);
-  padding: 40px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.payment-declined-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 5px;
-  background: var(--danger-color);
-}
-
-.declined-icon {
-  width: 80px;
-  height: 80px;
-  background: var(--danger-light);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px;
-  position: relative;
-  z-index: 1;
-}
-
-.declined-icon i {
-  font-size: 2.5em;
-  color: var(--danger-color);
-}
-
-.payment-declined-card h1 {
-  margin: 0 0 15px 0;
-  color: var(--danger-color);
-  font-size: 2em;
-  font-weight: 700;
-}
-
-.declined-message {
-  color: var(--text-light);
-  font-size: 1.1em;
-  line-height: 1.6;
-  margin: 0 0 30px 0;
-}
-
-/* Troubleshooting Card */
-.troubleshooting-card {
-  background: var(--white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--gray-100);
-  padding: 25px;
-}
-
-.troubleshooting-card .card-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 15px;
-  color: var(--primary-color);
-}
-
-.troubleshooting-card .card-header i {
-  font-size: 1.5em;
-  color: var(--secondary-color);
-}
-
-.troubleshooting-card .card-header h2 {
-  margin: 0;
-  font-size: 1.3em;
-  color: var(--text-dark);
-}
-
-.troubleshooting-card .card-content p {
-  margin: 0 0 15px 0;
-  color: var(--text-light);
-  line-height: 1.6;
-}
-
-.troubleshooting-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.troubleshooting-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px;
-  background: var(--gray-50);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--gray-100);
-  transition: all var(--transition-normal);
-}
-
-.troubleshooting-list li:hover {
-  background: var(--primary-color);
-  color: var(--white);
-  transform: translateY(-1px);
-}
-
-.troubleshooting-list li i {
-  color: var(--primary-color);
-  width: 20px;
-  flex-shrink: 0;
-  margin-top: 2px;
-  font-size: 1.1em;
-}
-
-.troubleshooting-list li:hover i {
-  color: var(--white);
-}
-
 /* Responsive Design for Payment Pages */
 @media (max-width: 768px) {
-  .payment-landing-container {
-    padding: 15px;
-    gap: 20px;
-  }
-  
   .payment-success-card,
-  .payment-cancelled-card,
-  .payment-declined-card {
+  .payment-cancelled-card {
     padding: 25px;
   }
   
   .success-icon,
-  .cancelled-icon,
-  .declined-icon {
+  .cancelled-icon {
     width: 60px;
     height: 60px;
   }
   
   .success-icon i,
-  .cancelled-icon i,
-  .declined-icon i {
+  .cancelled-icon i {
     font-size: 2em;
   }
   
   .payment-success-card h1,
-  .payment-cancelled-card h1,
-  .payment-declined-card h1 {
+  .payment-cancelled-card h1 {
     font-size: 1.6em;
-  }
-  
-  .action-buttons {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .action-buttons .btn-base {
-    min-width: auto;
-  }
-  
-  .help-links {
-    flex-direction: column;
-  }
-  
-  .troubleshooting-list li {
-    flex-direction: column;
-    text-align: center;
-    gap: 8px;
   }
 }

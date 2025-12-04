@@ -1537,12 +1537,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else if (paymentStatus === 'cancelled') {
         html += `
           <div class="payment-cancelled-card">
-            <div class="success-icon">
+            <div class="cancelled-icon">
               <i class="fas fa-times-circle"></i>
             </div>
           </div>
           <h1 data-i18n="guests:giftsPaymentCancelledTitle">${translate('guests:giftsPaymentCancelledTitle')}</h1>
-          <p class="success-message" data-i18n="guests:giftsPaymentCancelled">${translate('guests:giftsPaymentCancelled')}</p>
+          <p class="cancelled-message" data-i18n="guests:giftsPaymentCancelled">${translate('guests:giftsPaymentCancelled')}</p>
         `;
       }
 
