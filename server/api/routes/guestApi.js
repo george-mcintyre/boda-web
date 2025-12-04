@@ -74,8 +74,4 @@ router.get('/gifts/:giftId/image', async (req, res, next) => {
   }
 });
 
-// Stripe webhook (no auth - Stripe calls this directly)
-// Note: This needs raw body for signature verification, configured in app.js
-router.post('/stripe-webhook', guestCtrl.handleStripeWebhook);
-
 module.exports = router;

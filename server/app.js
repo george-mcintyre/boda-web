@@ -5,14 +5,21 @@ const helmet = require('helmet');
 const { CORS_ORIGIN } = require('./config/env');
 const routes = require('./api/routes');
 const { errorHandler } = require('./middleware/error');
+const guestCtrl = require('./controllers/guestController');
+ 
 
 const app = express();
 
 app.use(cors({ origin: CORS_ORIGIN }));
-app.use(express.json({ limit: '50mb' }));
 
-// Stripe webhook raw body for signature verification
-app.post('/api/guest/stripe-webhook', express.raw({ type: 'application/json' }));
+// 1. STRIPE WEBHOOK ROUTE (raw body, no JSON parser)
+app.post(
+  '/api/guest/stripe-webhook',
+  express.raw({ type: 'application/json' }),
+  guestCtrl.handleStripeWebhook
+);
+
+app.use(express.json({ limit: '50mb' }));
 
 // Security headers and CSP (allow current frontend patterns while avoiding eval)
 app.use(helmet({

@@ -331,8 +331,8 @@ async function createPaymentSession(req, res, next) {
         },
       ],
 
-      success_url: `${baseUrl}/guests.html?tab=gifts&payment=success&giftId=${giftId}`,
-      cancel_url: `${baseUrl}/guests.html?tab=gifts&payment=cancelled`,
+      success_url: `${baseUrl}/guests.html?tab=gifts&payment=success&giftId=${giftId}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${baseUrl}/guests.html?tab=gifts&payment=cancelled&session_id={CHECKOUT_SESSION_ID}`,
 
       customer_email: me.email,
 
@@ -365,40 +365,50 @@ async function handleStripeWebhook(req, res) {
   let event;
 
   try {
-    if (endpointSecret) {
-      event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
-    } else {
-      // For development without webhook secret
-      event = req.body;
+    if (!endpointSecret) {
+      return res.status(400).send('Webhook Error: SECRET NOT SET');
     }
+
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // Handle the checkout.session.completed event
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
-    
+
+    if (session.payment_status !== 'paid') {
+      return res.json({ received: true });
+    }
+
     try {
-      const { giftId, guestId, message } = session.metadata;
-      
-      // Create the gift choice record
+      const { giftId, guestId, message } = session.metadata || {};
+
+      const existing = await GiftChoice.findOne({ stripeSessionId: session.id });
+      if (existing) {
+        console.log('GiftChoice already exists for session', session.id);
+        return res.json({ received: true });
+      }
+
       await GiftChoice.create({
-        giftId: giftId,
-        guestId: guestId,
+        giftId,
+        guestId,
         message: message || null,
-        date: new Date()
+        date: new Date(),
+        stripeSessionId: session.id,
       });
-      
+
       console.log(`Gift choice created for guest ${guestId}, gift ${giftId}`);
     } catch (err) {
       console.error('Error creating gift choice after payment:', err);
+      return res.status(500).send('Webhook handler error');
     }
   }
 
   res.json({ received: true });
 }
+
 
 module.exports = {
   getMe,

@@ -1520,7 +1520,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         </p>
       </div>
     `;
-            
+
+      // If purchase has succeeded then show succeess message
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentStatus = urlParams.get('payment');
+      if (paymentStatus === 'success') {
+        html += `
+          <div class="payment-success-card">
+            <div class="success-icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <h1 data-i18n="guests:giftsPaymentSuccessTitle">${translate('guests:giftsPaymentSuccessTitle')}</h1>
+            <p class="success-message" data-i18n="guests:giftsPaymentSuccess">${translate('guests:giftsPaymentSuccess')}</p>
+          </div>
+        `;
+      } else if (paymentStatus === 'cancelled') {
+        html += `
+          <div class="payment-cancelled-card">
+            <div class="success-icon">
+              <i class="fas fa-times-circle"></i>
+            </div>
+          </div>
+          <h1 data-i18n="guests:giftsPaymentCancelledTitle">${translate('guests:giftsPaymentCancelledTitle')}</h1>
+          <p class="success-message" data-i18n="guests:giftsPaymentCancelled">${translate('guests:giftsPaymentCancelled')}</p>
+        `;
+      }
+
       // ========== Section 1: Thank You Section (if there are donated gifts) ==========
       if (giftChoices.length > 0) {
         html += `
@@ -1532,7 +1557,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <div class="donated-gifts-grid">
         `;
-        
+
         giftChoices.forEach(choice => {
           const donatedOnText = translate('rich:guests:giftsDonatedOn').replace('{{date}}', formatDate(choice.date));
           html += `
@@ -1556,7 +1581,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           `;
         });
-        
+
         html += `
             </div>
           </div>
@@ -1629,21 +1654,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       html += '</div>'; // Close gifts-container
       
       giftsContent.innerHTML = html;
-      
-      // Check for payment success/cancel in URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const paymentStatus = urlParams.get('payment');
-      if (paymentStatus === 'success') {
-        showToast(translate('guests:giftsPaymentSuccess'), 'success');
-        // Clean up URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-        // Reload to show updated gift choices
-        setTimeout(() => loadGiftsContent(), 1000);
-      } else if (paymentStatus === 'cancelled') {
-        showToast(translate('guests:giftsPaymentCancelled'), 'error');
-        // Clean up URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
       
     // Translate the newly loaded content
     if (typeof updatePageContent === 'function') {
@@ -3024,6 +3034,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const targetTab = activeTab.getAttribute('data-tab');
   const urlParams = new URLSearchParams(window.location.search);
   const urlTab = urlParams.get('tab');
-  switchToTab(urlTab || targetTab || 'summary', true)
+  switchToTab(urlTab || targetTab || 'summary', urlTab ? false : true)
 });
 
