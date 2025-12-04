@@ -53,10 +53,10 @@ async function fetchSettings() {
 // Apply settings-based visibility control
 function applySettingsVisibility(settings) {    
     // Control tabs-header visibility
-    const partyTab = document.querySelector('[data-tab="partyContent"]');
-    const eventsTab = document.querySelector('[data-tab="eventsContent"]');
-    const menuTab = document.querySelector('[data-tab="menuContent"]');
-    const giftsTab = document.querySelector('[data-tab="giftsContent"]');
+    const partyTab = document.querySelector('[data-tab="party"]');
+    const eventsTab = document.querySelector('[data-tab="events"]');
+    const menuTab = document.querySelector('[data-tab="menu"]');
+    const giftsTab = document.querySelector('[data-tab="gifts"]');
     
     // Party tab - disable if guestsEnabled is not true
     if (partyTab) {
@@ -146,7 +146,7 @@ function applySettingsVisibility(settings) {
     // If current active tab is now hidden, switch to summary
     const activeTab = document.querySelector('.tab-btn.active');
     if (activeTab && (activeTab.style.display === 'none' || activeTab.classList.contains('disabled'))) {
-        const summaryTab = document.querySelector('[data-tab="summaryContent"]');
+        const summaryTab = document.querySelector('[data-tab="summary"]');
         if (summaryTab) {
             summaryTab.click();
         }
@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Load and menu selections - New unified menu layout with drag-drop support
   async function loadMenuSelections() {
-    const menuContent = document.getElementById('menuContent');
+    const menuContent = document.getElementById('menu');
 
     if (!menuContent) return;
     
@@ -590,7 +590,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // Add save button
       html += `
         <div class="action-container">
-          <button type="button" id="saveMenuChoicesBtn" class="btn-base btn-primary btn-lg">
+          <button type="button" id="saveMenuChoicesBtnBelow" class="btn-base btn-primary btn-lg">
             <i class="fas fa-save"></i>
             <span data-i18n="guests:saveMenuSelections">${translate("guests:saveMenuSelections")}</span>
           </button>
@@ -613,7 +613,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       initImageZoom();
 
       // Attach save button handler
-      const saveBtn = document.getElementById('saveMenuChoicesBtn');
+      let saveBtn = document.getElementById('saveMenuChoicesBtn');
+      if (saveBtn) {
+        saveBtn.addEventListener('click', saveAllMenuChoices);
+      }
+      saveBtn = document.getElementById('saveMenuChoicesBtnBelow');
       if (saveBtn) {
         saveBtn.addEventListener('click', saveAllMenuChoices);
       }
@@ -844,6 +848,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Save all menu choices
   async function saveAllMenuChoices() {
+      console.log('Saving menu selections...');
     const saveBtn = document.getElementById('saveMenuChoicesBtn');
     if (saveBtn) {
       saveBtn.disabled = true;
@@ -1031,7 +1036,7 @@ document.addEventListener('DOMContentLoaded', async () => {
    * Creates event cards with attendance checkboxes for each party member
    */
   async function loadEventsContent() {
-    const eventsContent = document.getElementById('eventsContent');
+    const eventsContent = document.getElementById('events');
     
     if (!eventsContent) {
       console.error('Events content container not found');
@@ -1441,8 +1446,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Function to load the gifts content in the gifts tab
   async function loadGiftsContent() {
-    console.log("loading gifts content");
-    const giftsContent = document.getElementById('giftsContent');
+    const giftsContent = document.getElementById('gifts');
     
     if (!giftsContent) {
       console.error('Gifts content container not found');
@@ -1799,7 +1803,7 @@ document.addEventListener('DOMContentLoaded', async () => {
    * And managing dietary requirements for each member
    */
   async function loadPartyContent() {
-    const partyContent = document.getElementById('partyContent');
+    const partyContent = document.getElementById('party');
     
     if (!partyContent) {
       console.error('Party content container not found');
@@ -2079,9 +2083,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (typeof updatePageContent === 'function') {
         updatePageContent();
       }
-      
-      console.log('Party content loaded successfully');
-      
     } catch (err) {
       console.error('Error loading party content:', err);
       partyContent.innerHTML = `
@@ -2471,7 +2472,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Function to switch to a specific tab
-  window.switchToTab = function(tabName) {
+  window.switchToTab = function(tabName, updateUrl = true) {
+    console.log(`Switching to: ${tabName} tab in the Guests Zone` )
     // Find and check if target tab is accessible
     const targetButton = document.querySelector(`[data-tab="${tabName}"]`);
     if (!targetButton) return;
@@ -2503,23 +2505,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Load content for the specific tab
-    if (tabName === 'partyContent') {
+    if (tabName === 'party') {
       loadPartyContent();
-    } else if (tabName === 'menuContent') {
+    } else if (tabName === 'menu') {
       loadMenuSelections();
-    } else if (tabName === 'eventsContent') {
+    } else if (tabName === 'events') {
       loadEventsContent();
-    } else if (tabName === 'giftsContent') {
+    } else if (tabName === 'gifts') {
       loadGiftsContent();
-    } else if (tabName === 'summaryContent') {
+    } else if (tabName === 'summary') {
       loadSummaryContent();
     }
     updatePageContent();
+    
+    // Update URL for deep linking (unless it's the initial load)
+    if (updateUrl) {
+      updateUrlWithTab(tabName);
+    }
+  }
+
+  // Function to update URL with tab parameter for deep linking
+  function updateUrlWithTab(tabName) {
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tabName);
+    window.history.replaceState({}, '', url);
   }
 
   // Define loadSummaryContent function to load all summary data
   async function loadSummaryContent() {
-    const summaryContent = document.getElementById('summaryContent');
+    const summaryContent = document.getElementById('summary');
     
     if (!summaryContent) {
       console.error('Summary content container not found');
@@ -2668,7 +2682,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // ========== 1. Party Members Card ==========
       html += `
         <div class="summary-section party-members-section">
-          <h3 class="summary-section-title clickable" onclick="switchToTab('partyContent')" style="cursor: pointer;">
+          <h3 class="summary-section-title clickable" onclick="switchToTab('party')" style="cursor: pointer;">
             <i class="fas fa-users"></i>
             <div data-i18n="guests:summaryYourParty">Your Party</div>
             ( ${partyMembers.length} <div data-i18n="${partyMembers.length === 1 ? 'common:person' : 'common:people'}">Person</div>)
@@ -2702,7 +2716,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // ========== 2. RSVP Summary Card ==========
       html += `
         <div class="summary-section rsvp-summary-section">
-          <h3 class="summary-section-title clickable" onclick="switchToTab('eventsContent')" style="cursor: pointer;">
+          <h3 class="summary-section-title clickable" onclick="switchToTab('events')" style="cursor: pointer;">
             <i class="fas fa-calendar-check"></i>
             <div data-i18n="guests:summaryRSVP">RSVP Summary</div>
             <i class="fas fa-arrow-right section-nav-arrow"></i>
@@ -2749,7 +2763,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       // ========== 3. Menu Choices Summary Card ==========
       html += `
         <div class="summary-section menu-summary-section">
-          <h3 class="summary-section-title clickable" onclick="switchToTab('menuContent')" style="cursor: pointer;">
+          <h3 class="summary-section-title clickable" onclick="switchToTab('menu')" style="cursor: pointer;">
             <i class="fas fa-utensils"></i>
             <div data-i18n="guests:summaryMenuSelections">Menu Selections</div>
             <i class="fas fa-arrow-right section-nav-arrow"></i>
@@ -2820,7 +2834,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (giftChoices.length > 0) {
         html += `
           <div class="summary-section gifts-summary-section">
-            <h3 class="summary-section-title clickable" onclick="switchToTab('giftsContent')" style="cursor: pointer;">
+            <h3 class="summary-section-title clickable" onclick="switchToTab('gifts')" style="cursor: pointer;">
               <i class="fas fa-gift"></i>
               Your Gifts
               <i class="fas fa-arrow-right section-nav-arrow"></i>
@@ -2996,53 +3010,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   tabButtons.forEach(button => {
     button.addEventListener('click', () => {
       const targetTab = button.getAttribute('data-tab');
-      
-      // Check if tab is disabled due to settings
-      if (button.style.display === 'none' || button.classList.contains('disabled')) {
-        const currentLang = localStorage.getItem('i18nextLng') || 'es';
-        const messages = {
-          en: 'This section is not yet enabled. Please check back later or contact the organizers for more information.',
-          es: 'Esta sección aún no está habilitada. Vuelve a consultar más tarde o contacta con los organizadores para más información.',
-          fr: 'Cette section n\'est pas encore activée. Veuillez vérifier plus tard ou contacter les organisateurs pour plus d\'informations.'
-        };
-        
-        showToast(messages[currentLang] || messages.es, 'info');
-        return;
-      }
-      
-      //Remove active class from all buttons and contents
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      tabContents.forEach(content => content.classList.remove('active'));
-
-      // Add active class to the clicked button and its content
-      button.classList.add('active');
-      document.getElementById(`${targetTab}-tab`).classList.add('active');
-      
-      // If the tab is party, load the party content
-      if (targetTab === 'partyContent') {
-        loadPartyContent();
-      }
-      
-      // If the tab is menu, load the menu content
-      if (targetTab === 'menuContent') {
-        loadMenuSelections();
-      }
-      
-      // If the tab is events (RSVP), load the events content
-      if (targetTab === 'eventsContent') {
-        loadEventsContent();
-      }
-      
-      // If the tab is gifts, load the gifts content
-      if (targetTab === 'giftsContent') {
-        loadGiftsContent();
-      }
-      
-      // If the tab is summary, reload all the status data
-      if (targetTab === 'summaryContent') {
-        loadSummaryContent();
-      }
-
+      switchToTab(targetTab);
     });
   });
 
@@ -3051,34 +3019,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (savedLang && languages[savedLang]) {
     currentLanguage = savedLang;
   }
-  
-  // Initialize
-  console.log('Initializing guests page');
-  updateDocumentDirection();
-  updatePageContent();
-  updateLanguageSelector();
-  updateFormatting();
-  
-  // Check which tab is active on page load and load its content
+
   const activeTab = document.querySelector('.tab-btn.active');
-  if (activeTab) {
-    const targetTab = activeTab.getAttribute('data-tab');
-    console.log('Initial tab on page load:', targetTab);
-    
-    // Load appropriate content for the active tab
-    if (targetTab === 'summaryContent') {
-      loadSummaryContent();
-    } else if (targetTab === 'partyContent') {
-      loadPartyContent();
-    } else if (targetTab === 'menuContent') {
-      loadMenuSelections();
-    } else if (targetTab === 'eventsContent') {
-      loadEventsContent();
-    } else if (targetTab === 'giftsContent') {
-      loadGiftsContent();
-    }
-  }
-    
-  console.log(`i18n system initialized, language: ${currentLanguage}`);
+  const targetTab = activeTab.getAttribute('data-tab');
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlTab = urlParams.get('tab');
+  switchToTab(urlTab || targetTab || 'summary', true)
 });
 

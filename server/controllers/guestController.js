@@ -213,14 +213,10 @@ async function getGifts(req, res, next) {
       
       // Generate image URL - gift.image could be an ObjectId reference or a number
       let imageUrl;
-      if (typeof gift.image === 'number') {
-        imageUrl = `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`;
-      } else if (gift.image) {
-        // ObjectId reference - use the guest gift image endpoint
+      if (gift.image) {
         imageUrl = `/api/guest/gifts/${gift._id}/image`;
       } else {
-        // Default fallback image
-        imageUrl = `/assets/images/gift-cards/image_01.jpg`;
+        throw new Error('Cannot find image for gift');
       }
       
       return {
@@ -274,7 +270,7 @@ async function getGiftChoices(req, res, next) {
 
 async function createPaymentSession(req, res, next) {
   try {
-    const lang = getLang(req);                // <- same as getGifts()
+    const lang = getLang(req);
     const { giftId, message } = req.body;
 
     const me = await guestService.getByEmail(req.user.email);
@@ -299,17 +295,14 @@ async function createPaymentSession(req, res, next) {
       descRaw || `Wedding gift: ${title}`
     );
 
-    // Same image URL rules as getGifts()
     let imagePath;
-    if (typeof gift.image === 'number') {
-      imagePath = `/assets/images/gift-cards/image_${String(gift.image).padStart(2, '0')}.jpg`;
-    } else if (gift.image) {
+    if (gift.image) {
       imagePath = `/api/guest/gifts/${gift._id.toString()}/image`;
     } else {
-      imagePath = `/assets/images/gift-cards/image_01.jpg`;
+        return res.status(400).json({ error: 'Cannot find image for gift' });
     }
 
-    // Stripe needs ABSOLUTE URLs for images + redirects
+    // Stripe needs absolute URLs for images + redirects
     const baseUrlFromReq = `${req.protocol}://${req.get('host')}`;
     const baseUrl =
       typeof APP_URL === 'string' && APP_URL.trim().length > 0
@@ -327,9 +320,9 @@ async function createPaymentSession(req, res, next) {
         {
           price_data: {
             currency: 'eur',
-            unit_amount: gift.amount * 100,     // € → cents
+            unit_amount: gift.amount * 100,    // € → cents
             product_data: {
-              name: title,                      // e.g. “Honeymoon Accommodation”
+              name: title,                     // e.g. “Honeymoon Accommodation”
               description,                     // localised description
               images: [imageUrl],              // same visual as your card
             },

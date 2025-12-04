@@ -1,6 +1,6 @@
 (function(){
   // Admin panel client script (based on legacy admin-fixed.js), translated to English
-  const content = document.getElementById('adminContent');
+  const content = document.getElementById('admin');
   const tabs = document.querySelectorAll('.adminTab');
   const logoutBtn = document.getElementById('logoutAdmin');
   const token = localStorage.getItem('adminToken') || '';

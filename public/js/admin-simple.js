@@ -1,7 +1,7 @@
 // Minimal admin client script to avoid 404s and provide basic behavior
 (function(){
-  const content = document.getElementById('adminContent');
-  const logoutBtn = document.getElementById('logoutAdmin');
+  const content = document.getElementById('admin');
+  const logoutBtn = document.getElementById('logout');
 
   function t(key, fallback){
     try{

@@ -42,30 +42,30 @@
 <main class="with-background">
   <div class="tabs-container-full">
     <div class="tabs-header">
-      <button class="tab-btn active" data-tab="summaryContent">
+      <button class="tab-btn active" data-tab="summary">
         <i class="fas fa-chart-bar"></i>
         <span data-i18n="guests:summary">Summary</span>
       </button>
-      <button class="tab-btn" data-tab="partyContent">
+      <button class="tab-btn" data-tab="party">
         <i class="fas fa-users"></i>
         <span data-i18n="guests:party">Party</span>
       </button>
-      <button class="tab-btn" data-tab="eventsContent">
+      <button class="tab-btn" data-tab="events">
         <i class="fas fa-calendar-alt"></i>
         <span data-i18n="guests:rsvp">RSVP</span>
       </button>
-      <button class="tab-btn" data-tab="menuContent">
+      <button class="tab-btn" data-tab="menu">
         <i class="fas fa-utensils"></i>
         <span data-i18n="guests:menu">Menu</span>
       </button>
-      <button class="tab-btn" data-tab="giftsContent">
+      <button class="tab-btn" data-tab="gifts">
         <i class="fas fa-money-bill-wave"></i>
         <span data-i18n="guests:gifts">Gifts</span>
       </button>
     </div>
 
     <!-- Content of the Summary tab -->
-    <div id="summaryContent-tab" class="tab-content active">
+    <div id="summary-tab" class="tab-content active">
       <section id="summaryPage">
         <div class="intro-card intro-section">
           <h2 class="card-title">
@@ -79,7 +79,7 @@
 
       <div class="summary-grid">
         <!-- Summary Section (Left) - dynamically loaded -->
-        <section id="summaryContent" class="summary-card summary-left-panel">
+        <section id="summary" class="summary-card summary-left-panel">
           <h2><i class="fas fa-clipboard-list"></i> <span data-i18n="guests:yourSummary">Your Summary</span></h2>
           <div class="loading-summary">
             <i class="fas fa-spinner fa-spin fa-2x"></i>
@@ -137,8 +137,8 @@
     </div>
 
     <!-- Content of the Party tab -->
-    <div id="partyContent-tab" class="tab-content">
-      <section id="partyContent">
+    <div id="party-tab" class="tab-content">
+      <section id="party">
         <h2><i class="fas fa-users"></i> <span data-i18n="guests:partyManagement">Party Management</span></h2>
         <p class="section-description" data-i18n="rich:guests:partyManagementDesc">
           Manage your wedding party members and their dietary requirements.
@@ -151,30 +151,30 @@
     </div>
 
     <!-- Content of the Menu tab -->
-    <div id="menuContent-tab" class="tab-content">
-      <section id="menuContent">
+    <div id="menu-tab" class="tab-content">
+      <section id="menu-section">
         <h2><i class="fas fa-utensils"></i> <span data-i18n="guests:menuSelection">Menu Selection</span></h2>
         <p class="section-description" data-i18n="guests:menuSelectionDesc2">
           Choose your favorite dishes for our wedding celebrations.
         </p>
-        <div id="menuContent"></div>
+        <div id="menu"></div>
       </section>
     </div>
 
     <!-- Content of the Gifts tab -->
-    <div id="giftsContent-tab" class="tab-content">
-      <section id="giftsContent">
+    <div id="gifts-tab" class="tab-content">
+      <section id="gifts-section">
         <h2><i class="fas fa-money-bill-wave"></i> <span data-i18n="guests:giftsSelection">Gifts Selection</span></h2>
         <p class="section-description" data-i18n="rich:guests:giftsSelectionDesc">
           Choose your favorite gifts for our wedding celebrations.
         </p>
-        <div id="giftsContent"></div>
+        <div id="gifts"></div>
       </section>
     </div>
 
     <!-- Content of the RSVP tab -->
-    <div id="eventsContent-tab" class="tab-content">
-      <section id="eventsContent">
+    <div id="events-tab" class="tab-content">
+      <section id="events-section">
         <h2><i class="fas fa-calendar-alt"></i> <span data-i18n="guests:eventsRSVP">RSVP</span></h2>
         <p class="section-description" data-i18n="rich:guests:eventsRSVPDesc">
           The celebrations will take place over three days: Friday, Saturday and Sunday. They kick off on Friday with a
@@ -182,7 +182,7 @@
           and dancing. Sunday's activities include a farewell brunch. Please confirm your attendance for which ever of
           these events you will be attending.
         </p>
-        <div id="eventsContent"></div>
+        <div id="events"></div>
       </section>
     </div>
   </div>
