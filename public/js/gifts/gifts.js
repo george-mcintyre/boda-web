@@ -255,7 +255,7 @@ overlay.innerHTML = `
         </div>
         <div class="gift-message-input">
         <label for="giftMessage"><span data-i18n="guests:giftsPurchaseMessageLabel">${translate('guests:giftsPurchaseMessageLabel')}</span></label>
-        <textarea id="giftMessage" placeholder="${translate('guests:giftsPurchaseMessagePlaceholder')}" data-i18n-placeholder="guests:giftsPurchaseMessagePlaceholder" rows="3"></textarea>
+        <textarea id="giftMessage" placeholder="${translate('guests:giftsPurchaseMessage:placeholder')}" data-i18n="guests:giftsPurchaseMessage:placeholder" rows="3"></textarea>
         </div>
     </div>
     <div class="action-container">

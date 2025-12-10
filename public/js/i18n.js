@@ -52,7 +52,7 @@ const translations = {
     'login:guest.zone.title': 'Guest Zone',
     'login:header': 'Guest access',
     'login:email.label': 'Email:',
-    'login:email.placeholder': 'Enter your email',
+    'login:email:placeholder': 'Enter your email',
     'login:submit': 'Continue',
     'login:enter.email': 'Please enter your email.',
     'login:success.redirecting': 'Login successful. Redirecting...',
@@ -143,7 +143,7 @@ const translations = {
     // Comments Page
     'guests:commentsTitle': 'Comments',
     'guests:commentsSubtitle:rich': 'Share your thoughts with other guests',
-    'guests:commentPlaceholder:rich': `
+    'guests:comment:placeholder': `
       <textarea
         id="newComment"
         name="comment"
@@ -178,7 +178,7 @@ const translations = {
     'guests:dietaryNut Allergy': 'Nut Allergy',
     'guests:dietaryOther': 'Other',
     'guests:additionalDetailsLabel': 'Additional details or specific requirements:',
-    'guests:additionalDetailsPlaceholder': 'Please describe any specific dietary needs, allergies, or special requirements...',
+    'guests:additionalDetails:placeholder': 'Please describe any specific dietary needs, allergies, or special requirements...',
     'guests:saveMenuSelections': 'Save Menu Selections',
     'guests:saveDietaryRequirements:rich': '<i class="fas fa-save"></i> Save Dietary Requirements',
     
@@ -206,7 +206,7 @@ const translations = {
     'guests:giftsPurchaseTitle': 'Purchase Gift',
     'guests:giftsPurchaseAbout': 'You\'re about to purchase:',
     'guests:giftsPurchaseMessageLabel': 'Add a personal message (optional):',
-    'guests:giftsPurchaseMessagePlaceholder': 'Leave a lovely message for the couple...',
+    'guests:giftsPurchaseMessage:placeholder': 'Leave a lovely message for the couple...',
     'guests:giftsPurchaseCancel': 'Cancel',
     'guests:giftsPurchaseProceed': 'Proceed to Payment',
     'guests:giftsPurchaseProcessing': 'Processing...',
@@ -471,9 +471,9 @@ const translations = {
     'adminLogin:subHeader': 'Access the Admin Panel',
     'adminLogin:description': 'Enter your credentials to manage wedding details and RSVPs.',
     'adminLogin:username': 'Username',
-    'adminLogin:usernamePlaceholder': 'Your username',
+    'adminLogin:username:placeholder': 'Your username',
     'adminLogin:password': 'Password',
-    'adminLogin:passwordPlaceholder': 'Your secret password',
+    'adminLogin:password:placeholder': 'Your secret password',
     'adminLogin:submit': 'Sign in',
 
     'common:advancedFeatures': 'Advanced Features Examples',
@@ -532,7 +532,7 @@ const translations = {
     'login:page.title': 'Acceso de invitados - Boda',
     'login:header': 'Acceso de invitados',
     'login:email.label': 'Correo electrónico:',
-    'login:email.placeholder': 'Introduce tu correo electrónico',
+    'login:email:placeholder': 'Introduce tu correo electrónico',
     'login:submit': 'Continuar',
     'login:enter.email': 'Por favor, introduce tu correo electrónico.',
     'login:success.redirecting': 'Acceso correcto. Redirigiendo...',
@@ -622,7 +622,7 @@ const translations = {
     // Comments Page
     'guests:commentsTitle': 'Comentarios',
     'guests:commentsSubtitle:rich': 'Comparte tus pensamientos con otros invitados',
-    'guests:commentPlaceholder:rich': `
+    'guests:comment:placeholder': `
       <textarea
         id="newComment"
         name="comment"
@@ -657,7 +657,7 @@ const translations = {
     'guests:dietaryNut Allergy': 'Alergia a los frutos secos',
     'guests:dietaryOther': 'Otro',
     'guests:additionalDetailsLabel': 'Detalles adicionales o requisitos específicos:',
-    'guests:additionalDetailsPlaceholder': 'Por favor, describe cualquier requisito dietético o preferencia específica...',
+    'guests:additionalDetails:placeholder': 'Por favor, describe cualquier requisito dietético o preferencia específica...',
     'guests:saveMenuSelections': 'Guardar selecciones de menú',
     'guests:saveDietaryRequirements:rich': '<i class="fas fa-save"></i> Guardar requisitos dietéticos',
     
@@ -684,7 +684,7 @@ const translations = {
     'guests:giftsPurchaseTitle': 'Comprar regalo',
     'guests:giftsPurchaseAbout': 'Vas a comprar:',
     'guests:giftsPurchaseMessageLabel': 'Añade un mensaje personal (opcional):',
-    'guests:giftsPurchaseMessagePlaceholder': 'Deja un mensaje bonito para la pareja...',
+    'guests:giftsPurchaseMessage:placeholder': 'Deja un mensaje bonito para la pareja...',
     'guests:giftsPurchaseCancel': 'Cancelar',
     'guests:giftsPurchaseProceed': 'Continuar al pago',
     'guests:giftsPurchaseProcessing': 'Procesando...',
@@ -951,9 +951,9 @@ const translations = {
     'adminLogin:subHeader': 'Accede al panel de administración',
     'adminLogin:description': 'Introduce tus credenciales para gestionar los detalles de la boda y los RSVPs.',
     'adminLogin:username': 'Usuario',
-    'adminLogin:usernamePlaceholder': 'Tu usuario',
+    'adminLogin:username:placeholder': 'Tu usuario',
     'adminLogin:password': 'Contraseña',
-    'adminLogin:passwordPlaceholder': 'Tu contraseña secreta',
+    'adminLogin:password:placeholder': 'Tu contraseña secreta',
     'adminLogin:submit': 'Iniciar sesión',
 
     'common:advancedFeatures': 'Ejemplos de funciones avanzadas',
@@ -1018,7 +1018,7 @@ const translations = {
     'login:guest.zone.title': 'Espace invités',
     'login:header': 'Accès invité',
     'login:email.label': 'Email :',
-    'login:email.placeholder': 'Entrez votre email',
+    'login:email:placeholder': 'Entrez votre email',
     'login:submit': 'Continuer',
     'login:enter.email': 'Veuillez entrer votre email.',
     'login:success.redirecting': 'Connexion réussie. Redirection...',
@@ -1109,7 +1109,7 @@ const translations = {
     // Comments Page
     'guests:commentsTitle': 'Commentaires',
     'guests:commentsSubtitle:rich': 'Partagez vos pensées avec les autres invités',
-    'guests:commentPlaceholder:rich': `
+    'guests:comment:placeholder': `
         <textarea
           id="newComment"
           name="comment"
@@ -1144,7 +1144,7 @@ const translations = {
     'guests:dietaryNut Allergy': 'Allergie aux fruits à coque',
     'guests:dietaryOther': 'Autre',
     'guests:additionalDetailsLabel': 'Détails supplémentaires ou demandes spécifiques :',
-    'guests:additionalDetailsPlaceholder': 'Veuillez décrire tout besoin alimentaire particulier, allergie ou demande spéciale...',
+    'guests:additionalDetails:placeholder': 'Veuillez décrire tout besoin alimentaire particulier, allergie ou demande spéciale...',
     'guests:saveMenuSelections': 'Enregistrer les sélections de menu',
     'guests:saveDietaryRequirements:rich': '<i class="fas fa-save"></i> Enregistrer les exigences alimentaires',
     
@@ -1172,7 +1172,7 @@ const translations = {
     'guests:giftsPurchaseTitle': 'Acheter un cadeau',
     'guests:giftsPurchaseAbout': 'Vous êtes sur le point d’acheter :',
     'guests:giftsPurchaseMessageLabel': 'Ajouter un message personnel (optionnel) :',
-    'guests:giftsPurchaseMessagePlaceholder': 'Laissez un joli message pour les mariés...',
+    'guests:giftsPurchaseMessage:placeholder': 'Laissez un joli message pour les mariés...',
     'guests:giftsPurchaseCancel': 'Annuler',
     'guests:giftsPurchaseProceed': 'Procéder au paiement',
     'guests:giftsPurchaseProcessing': 'Traitement en cours...',
@@ -1434,9 +1434,9 @@ const translations = {
     'adminLogin:subHeader': 'Accéder au panneau d’administration',
     'adminLogin:description': 'Saisissez vos identifiants pour gérer les détails du mariage et les RSVP.',
     'adminLogin:username': 'Nom d’utilisateur',
-    'adminLogin:usernamePlaceholder': 'Votre nom d’utilisateur',
+    'adminLogin:username:placeholder': 'Votre nom d’utilisateur',
     'adminLogin:password': 'Mot de passe',
-    'adminLogin:passwordPlaceholder': 'Votre mot de passe secret',
+    'adminLogin:password:placeholder': 'Votre mot de passe secret',
     'adminLogin:submit': 'Se connecter',
   
     'common:advancedFeatures': 'Exemples de fonctionnalités avancées',
@@ -1501,7 +1501,7 @@ const translations = {
     'login:guest.zone.title': 'Gästebereich',
     'login:header': 'Gästezugang',
     'login:email.label': 'E-Mail:',
-    'login:email.placeholder': 'Gib deine E-Mail-Adresse ein',
+    'login:email:placeholder': 'Gib deine E-Mail-Adresse ein',
     'login:submit': 'Weiter',
     'login:enter.email': 'Bitte gib deine E-Mail-Adresse ein.',
     'login:success.redirecting': 'Anmeldung erfolgreich. Weiterleitung...',
@@ -1592,7 +1592,7 @@ const translations = {
     // Comments Page
     'guests:commentsTitle': 'Kommentare',
     'guests:commentsSubtitle:rich': 'Teile deine Gedanken mit den anderen Gästen',
-    'guests:commentPlaceholder:rich': `
+    'guests:comment:placeholder': `
         <textarea
           id="newComment"
           name="comment"
@@ -1627,7 +1627,7 @@ const translations = {
     'guests:dietaryNut Allergy': 'Nussallergie',
     'guests:dietaryOther': 'Sonstiges',
     'guests:additionalDetailsLabel': 'Weitere Details oder spezielle Anforderungen:',
-    'guests:additionalDetailsPlaceholder': 'Bitte beschreibe besondere Ernährungsbedürfnisse, Allergien oder andere spezielle Anforderungen...',
+    'guests:additionalDetails:placeholder': 'Bitte beschreibe besondere Ernährungsbedürfnisse, Allergien oder andere spezielle Anforderungen...',
     'guests:saveMenuSelections': 'Menüauswahlen speichern',
     'guests:saveDietaryRequirements:rich': '<i class="fas fa-save"></i> Ernährungsbedürfnisse speichern',
     
@@ -1655,7 +1655,7 @@ const translations = {
     'guests:giftsPurchaseTitle': 'Geschenk kaufen',
     'guests:giftsPurchaseAbout': 'Du bist dabei, folgendes zu kaufen:',
     'guests:giftsPurchaseMessageLabel': 'Persönliche Nachricht hinzufügen (optional):',
-    'guests:giftsPurchaseMessagePlaceholder': 'Schreibe eine schöne Nachricht für das Paar...',
+    'guests:giftsPurchaseMessage:placeholder': 'Schreibe eine schöne Nachricht für das Paar...',
     'guests:giftsPurchaseCancel': 'Abbrechen',
     'guests:giftsPurchaseProceed': 'Zur Zahlung fortfahren',
     'guests:giftsPurchaseProcessing': 'Verarbeite...',
@@ -1917,9 +1917,9 @@ const translations = {
     'adminLogin:subHeader': 'Zum Adminbereich',
     'adminLogin:description': 'Gib deine Zugangsdaten ein, um Hochzeitsdetails und RSVPs zu verwalten.',
     'adminLogin:username': 'Benutzername',
-    'adminLogin:usernamePlaceholder': 'Dein Benutzername',
+    'adminLogin:username:placeholder': 'Dein Benutzername',
     'adminLogin:password': 'Passwort',
-    'adminLogin:passwordPlaceholder': 'Dein geheimes Passwort',
+    'adminLogin:password:placeholder': 'Dein geheimes Passwort',
     'adminLogin:submit': 'Anmelden',
   
     'common:advancedFeatures': 'Beispiele für erweiterte Funktionen',
@@ -2020,6 +2020,7 @@ function updatePageContent() {
     const key = element.getAttribute('data-i18n');
     const isRich = key.endsWith(':rich');
     const isTooltip = key.endsWith(':tooltip');
+    const isPlaceholder = key.endsWith(':placeholder');
     const translation = translate(key);
 
     if (translation !== key) {
@@ -2027,6 +2028,8 @@ function updatePageContent() {
         element.innerHTML = translation;   // render HTML
       } else if (isTooltip) {
         element.setAttribute('title', translation); // set tooltip
+      } else if (isPlaceholder) {
+        element.setAttribute('placeholder', translation); // set placeholder
       } else {
         element.textContent = translation; // plain text
       }

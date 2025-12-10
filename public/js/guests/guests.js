@@ -218,7 +218,7 @@
                 name="party-dietary-detail-${member.id}"
                 class="form-control dietary-detail-textarea"
                 data-member-id="${member.id}"
-                placeholder="${translate("guests:additionalDetailsPlaceholder")}"
+                placeholder="${translate("guests:additionalDetails:placeholder")}"
                 rows="2"
               >${escapeHtml(memberDietary.specialRequestDetail || '')}</textarea>
             </div>
