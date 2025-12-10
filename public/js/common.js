@@ -226,11 +226,11 @@ window.showConfirmDialog = function(message, onConfirm, onCancel) {
     <div class="confirm-dialog">
       <div class="confirm-content">
         <i class="fas fa-question-circle"></i>
-        <h3 data-i18n="rich:common:confirmAction">${translate("rich:common:confirmAction")}</h3>
+        <h3 data-i18n="common:confirmAction:rich">${translate("common:confirmAction:rich")}</h3>
         <p>${message}</p> 
         <div class="form-actions">
-          <button class="btn-base btn-outline btn-sm" data-i18n="rich:common:cancel">${translate("rich:common:cancel")}</button>
-          <button class="btn-base btn-primary btn-sm" data-i18n="rich:common:confirm">${translate("rich:common:confirm")}</button>
+          <button class="btn-base btn-outline btn-sm" data-i18n="common:cancel:rich">${translate("common:cancel:rich")}</button>
+          <button class="btn-base btn-primary btn-sm" data-i18n="common:confirm:rich">${translate("common:confirm:rich")}</button>
         </div>
       </div>
     </div>

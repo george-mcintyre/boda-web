@@ -3,7 +3,7 @@ const translations = {
   en: {
     // Wedding
     'wedding:date': 'June 6th, 2026 • Marbella, Spain',
-    'rich:wedding.common.footer': '© 2026 Boda de Iluminada &amp; George',
+    'wedding.common.footer:rich': '© 2026 Boda de Iluminada &amp; George',
     'wedding:title': 'Iluminada & George',
     'wedding:hero.description': 'Iluminada and George are getting married on the beach in Marbella this June, and we’re so happy to share it with you. Expect sun, sea and lots of laughter.',
     'wedding:hero.description2': 'This site is your wedding hub. Log in with your RSVP email to confirm your party, choose your menu, see the schedule, view our gift list and chat with other guests.',
@@ -22,10 +22,10 @@ const translations = {
     'common:hours': 'Hours',
     'common:minutes': 'Minutes',
     'common:seconds': 'Seconds',
-    'rich:common:cancel': 'Cancel',
-    'rich:common:confirm': 'Confirm',
-    'rich:common:confirmAction': 'Confirm action',
-    'rich:common:new': '<i class="fas fa-plus-circle"></i> New',
+    'common:cancel:rich': 'Cancel',
+    'common:confirm:rich': 'Confirm',
+    'common:confirmAction:rich': 'Confirm action',
+    'common:new:rich': '<i class="fas fa-plus-circle"></i> New',
 
     // Common: Menu
     'common:menu.selection.saved': 'Menu selection saved successfully!',
@@ -68,7 +68,7 @@ const translations = {
 
     // Summary Page
     'guests:summaryPageTitle': 'Your guest area for Iluminada & George\'s wedding',
-    'rich:guests:summaryPageDescription': `
+    'guests:summaryPageDescription:rich': `
       <p>
         Welcome to your personal space for Iluminada &amp; George\'s wedding. 
         From here you can share in the planning, keep your details up to date, 
@@ -89,22 +89,22 @@ const translations = {
     'guests:loadingPartyMembers': 'Loading party members...',
     'guests:loadingComments': 'Loading comments...',
     'guests:partyManagement': 'Party Management',
-    'rich:guests:partyManagementDesc': 'Manage your wedding party members and their dietary requirements.',
+    'guests:partyManagementDesc:rich': 'Manage your wedding party members and their dietary requirements.',
     'guests:giftsSelection': 'Gifts Selection',
-    'rich:guests:giftsSelectionDesc': 'Choose your favorite gifts for our wedding celebrations.',
+    'guests:giftsSelectionDesc:rich': 'Choose your favorite gifts for our wedding celebrations.',
     'guests:eventsRSVP': 'RSVP',
-    'rich:guests:eventsRSVPDesc': 'The celebrations will take place over three days: Friday, Saturday and Sunday. They kick off on Friday with a welcome dinner.   Saturday is a full day of activities including the wedding ceremony, the reception banquet, and dancing.   Sunday\'s activities include a farewell brunch.  Please confirm your attendance for which ever of these events you will be attending.',
+    'guests:eventsRSVPDesc:rich': 'The celebrations will take place over three days: Friday, Saturday and Sunday. They kick off on Friday with a welcome dinner.   Saturday is a full day of activities including the wedding ceremony, the reception banquet, and dancing.   Sunday\'s activities include a farewell brunch.  Please confirm your attendance for which ever of these events you will be attending.',
 
     // Party Page
     'guests:party.page.title': 'Party Management',
     'guests:party.page.description': 'Manage your wedding party members and their dietary requirements.',
     'guests:partyMembersSaved': 'Party members saved successfully!',
     'guests:errorSavingPartyMembers': 'Error saving party members',
-    'rich:guests:savePartyMembers': '<i class="fas fa-save"></i> Save Party Members',
-    'rich:guests:partyMembersTitle': '<i class="fas fa-users"></i> Party Members',
+    'guests:savePartyMembers:rich': '<i class="fas fa-save"></i> Save Party Members',
+    'guests:partyMembersTitle:rich': '<i class="fas fa-users"></i> Party Members',
     'guests:partyDescription': 'Your party includes everyone who will attend the wedding with you. You can add up to {{maxPartySize}} party members including yourself.',
-    'rich:guests:addPartyMember': '<i class="fas fa-plus-circle"></i> Add Party Member',
-    'rich:guests:dietaryRequirements': '<i class="fas fa-utensils"></i> Dietary Requirements',
+    'guests:addPartyMember:rich': '<i class="fas fa-plus-circle"></i> Add Party Member',
+    'guests:dietaryRequirements:rich': '<i class="fas fa-utensils"></i> Dietary Requirements',
     'guests:dietaryDescription': 'Please let us know about any dietary requirements or allergies for each party member.',
     'guests:dietaryRequirementsSaved': 'Dietary requirements saved successfully!',
     'common:errorSavingDietaryRequirements': 'Error saving dietary requirements',
@@ -140,8 +140,8 @@ const translations = {
 
     // Comments Page
     'guests:commentsTitle': 'Comments',
-    'rich:guests:commentsSubtitle': 'Share your thoughts with other guests',
-    'rich:guests:commentPlaceholder': `
+    'guests:commentsSubtitle:rich': 'Share your thoughts with other guests',
+    'guests:commentPlaceholder:rich': `
       <textarea
         id="newComment"
         name="comment"
@@ -178,7 +178,7 @@ const translations = {
     'guests:additionalDetailsLabel': 'Additional details or specific requirements:',
     'guests:additionalDetailsPlaceholder': 'Please describe any specific dietary needs, allergies, or special requirements...',
     'guests:saveMenuSelections': 'Save Menu Selections',
-    'rich:guests:saveDietaryRequirements': '<i class="fas fa-save"></i> Save Dietary Requirements',
+    'guests:saveDietaryRequirements:rich': '<i class="fas fa-save"></i> Save Dietary Requirements',
     
     // Gifts Page
     'guests:giftsPageTitle': 'Gifts list',
@@ -186,7 +186,7 @@ const translations = {
     'guests:giftsLoading': 'Loading gifts...',
     'guests:giftsThankYouTitle': 'Thank You for Your Generosity!',
     'guests:giftsThankYouMessage': 'We are so grateful for your wonderful gifts',
-    'rich:guests:giftsDonatedOn': 'Donated on {{date}}',
+    'guests:giftsDonatedOn:rich': 'Donated on {{date}}',
     'guests:giftsRegistryTitle': 'Gift Registry',
     'guests:giftsRegistrySubtitle': 'Choose from our carefully selected gifts',
     'guests:giftsNoAvailable': 'No gifts available',
@@ -490,19 +490,19 @@ const translations = {
     'common:hours': 'Horas',
     'common:minutes': 'Minutos',
     'common:seconds': 'Segundos',
-    'rich:wedding.common.footer': '© 2026 Boda de Iluminada &amp; George',
+    'wedding.common.footer:rich': '© 2026 Boda de Iluminada &amp; George',
     'common:party.primary.guest': 'Invitado principal',
     'common:party.adult': 'Adulto (18+)',
     'common:party.child': 'Niño',
     'common:party.members': 'miembros',
     'common:party.name': 'Nombre',
     'common:party.age.category': 'Edad',
-    'rich:common:new': '<i class="fas fa-plus-circle"></i> Nuevo',
+    'common:new:rich': '<i class="fas fa-plus-circle"></i> Nuevo',
     'common:party.remove.member': 'Eliminar miembro',
     'common:enter.name': 'Introduce el nombre...', 
-    'rich:common:confirmAction': 'Confirmar acción',
-    'rich:common:cancel': 'Cancelar',
-    'rich:common:confirm': 'Confirmar',
+    'common:confirmAction:rich': 'Confirmar acción',
+    'common:cancel:rich': 'Cancelar',
+    'common:confirm:rich': 'Confirmar',
 
     'common:party.primary': 'Principal',
     'common:menu.saving': 'Guardando...',
@@ -551,7 +551,7 @@ const translations = {
 
     // Summary Page
     'guests:summaryPageTitle': 'Tu área de invitado para la boda de Iluminada y George',
-    'rich:guests:summaryPageDescription': `
+    'guests:summaryPageDescription:rich': `
       <p>
         Bienvenido/a a tu espacio personal para la boda de Iluminada &amp; George. 
         Desde aquí puedes participar en los preparativos, mantener tus datos actualizados 
@@ -572,22 +572,22 @@ const translations = {
     'guests:loadingPartyMembers': 'Cargando miembros del grupo...',
     'guests:loadingComments': 'Cargando comentarios...',
     'guests:partyManagement': 'Gestión del grupo',
-    'rich:guests:partyManagementDesc': 'Gestiona los miembros de tu grupo y sus requisitos dietéticos.',
+    'guests:partyManagementDesc:rich': 'Gestiona los miembros de tu grupo y sus requisitos dietéticos.',
     'guests:giftsSelection': 'Selección de regalos',
-    'rich:guests:giftsSelectionDesc': 'Elige tus regalos favoritos para nuestras celebraciones de boda.',
+    'guests:giftsSelectionDesc:rich': 'Elige tus regalos favoritos para nuestras celebraciones de boda.',
     'guests:eventsRSVP': 'RSVP',
-    'rich:guests:eventsRSVPDesc': 'Las celebraciones tendrán lugar durante tres días: viernes, sábado y domingo. Empiezan el viernes con una cena de bienvenida. El sábado será un día completo de actividades, incluida la ceremonia de la boda, el banquete y el baile. El domingo terminaremos con un brunch de despedida. Por favor, confirma en cuáles de estos eventos vas a asistir.',
+    'guests:eventsRSVPDesc:rich': 'Las celebraciones tendrán lugar durante tres días: viernes, sábado y domingo. Empiezan el viernes con una cena de bienvenida. El sábado será un día completo de actividades, incluida la ceremonia de la boda, el banquete y el baile. El domingo terminaremos con un brunch de despedida. Por favor, confirma en cuáles de estos eventos vas a asistir.',
 
     // Party Page
     'guests:party.page.title': 'Gestión del grupo',
     'guests:party.page.description': 'Gestiona los miembros de tu grupo y sus requisitos dietéticos.',
-    'rich:guests:savePartyMembers': '<i class="fas fa-save"></i> Guardar miembros del grupo',
-    'rich:guests:partyMembersTitle': '<i class="fas fa-users"></i> Miembros del grupo',
+    'guests:savePartyMembers:rich': '<i class="fas fa-save"></i> Guardar miembros del grupo',
+    'guests:partyMembersTitle:rich': '<i class="fas fa-users"></i> Miembros del grupo',
     'guests:partyDescription': 'Tu grupo incluye a todos los que asistirán a la boda contigo. Puedes añadir hasta {{maxPartySize}} miembros de grupo incluyéndote a ti mismo.',
     'guests:partyMembersSaved': 'Miembros del grupo guardados correctamente!',
     'guests:errorSavingPartyMembers': 'Error al guardar los miembros del grupo',
-    'rich:guests:addPartyMember': '<i class="fas fa-plus-circle"></i> Añadir miembro del grupo',
-    'rich:guests:dietaryRequirements': '<i class="fas fa-utensils"></i> Requisitos dietéticos',
+    'guests:addPartyMember:rich': '<i class="fas fa-plus-circle"></i> Añadir miembro del grupo',
+    'guests:dietaryRequirements:rich': '<i class="fas fa-utensils"></i> Requisitos dietéticos',
     'guests:dietaryDescription': 'Por favor, infórmanos sobre cualquier requisito dietético o alergia de cada miembro de tu grupo.',
     'guests:dietaryRequirementsSaved': 'Requisitos dietéticos guardados correctamente!',
     'common:errorSavingDietaryRequirements': 'Error al guardar los requisitos dietéticos',
@@ -618,8 +618,8 @@ const translations = {
 
     // Comments Page
     'guests:commentsTitle': 'Comentarios',
-    'rich:guests:commentsSubtitle': 'Comparte tus pensamientos con otros invitados',
-    'rich:guests:commentPlaceholder': `
+    'guests:commentsSubtitle:rich': 'Comparte tus pensamientos con otros invitados',
+    'guests:commentPlaceholder:rich': `
       <textarea
         id="newComment"
         name="comment"
@@ -656,14 +656,14 @@ const translations = {
     'guests:additionalDetailsLabel': 'Detalles adicionales o requisitos específicos:',
     'guests:additionalDetailsPlaceholder': 'Por favor, describe cualquier requisito dietético o preferencia específica...',
     'guests:saveMenuSelections': 'Guardar selecciones de menú',
-    'rich:guests:saveDietaryRequirements': '<i class="fas fa-save"></i> Guardar requisitos dietéticos',
+    'guests:saveDietaryRequirements:rich': '<i class="fas fa-save"></i> Guardar requisitos dietéticos',
     
     // Gifts Page
     'guests:giftsPageTitle': 'Lista de regalos',
     'guests:giftsPageDescription': 'Tu presencia es nuestro regalo. Pero si quieres contribuir a nuestra luna de miel, puedes elegir un regalo divertido de la lista de abajo; se imprimirá con tu mensaje y se mostrará en un gran panel en el banquete de boda. El importe que elijas se utilizará para financiar nuestra luna de miel. ¡Gracias!',
     'guests:giftsLoading': 'Cargando regalos...',
     'guests:giftsThankYouMessage': 'Estamos muy agradecidos por tus maravillosos regalos',
-    'rich:guests:giftsDonatedOn': 'Donado el {{date}}',
+    'guests:giftsDonatedOn:rich': 'Donado el {{date}}',
     'guests:giftsRegistryTitle': 'Lista de regalos',
     'guests:giftsRegistrySubtitle': 'Elige entre nuestros regalos seleccionados con cariño',
     'guests:giftsNoAvailable': 'No hay regalos disponibles',
@@ -966,7 +966,7 @@ const translations = {
   fr: {
     // Wedding
     'wedding:date': '6 juin 2026 • Marbella, Espagne',
-    'rich:wedding.common.footer': '© 2026 Mariage d’Iluminada &amp; George',
+    'wedding.common.footer:rich': '© 2026 Mariage d’Iluminada &amp; George',
     'wedding:title': 'Iluminada & George',
     'wedding:hero.description': 'Iluminada et George se marient sur la plage de Marbella en juin, et nous sommes ravis de partager ce moment avec vous. Attendez-vous à du soleil, à la mer et à beaucoup de rires.',
     'wedding:hero.description2': 'Ce site est votre espace mariage. Connectez-vous avec l’email de votre RSVP pour confirmer votre groupe, choisir votre menu, voir le programme, consulter notre liste de cadeaux et discuter avec les autres invités.',
@@ -985,10 +985,10 @@ const translations = {
     'common:hours': 'Heures',
     'common:minutes': 'Minutes',
     'common:seconds': 'Secondes',
-    'rich:common:cancel': 'Annuler',
-    'rich:common:confirm': 'Confirmer',
-    'rich:common:confirmAction': 'Confirmer l’action',
-    'rich:common:new': '<i class="fas fa-plus-circle"></i> Nouveau',
+    'common:cancel:rich': 'Annuler',
+    'common:confirm:rich': 'Confirmer',
+    'common:confirmAction:rich': 'Confirmer l’action',
+    'common:new:rich': '<i class="fas fa-plus-circle"></i> Nouveau',
   
     // Common: Menu
     'common:menu.selection.saved': 'Sélection de menu enregistrée avec succès !',
@@ -1031,7 +1031,7 @@ const translations = {
   
     // Summary Page
     'guests:summaryPageTitle': 'Votre espace invité pour le mariage d’Iluminada & George',
-    'rich:guests:summaryPageDescription': `
+    'guests:summaryPageDescription:rich': `
         <p>
           Bienvenue dans votre espace personnel pour le mariage d’Iluminada &amp; George. 
           Depuis ici, vous pouvez participer aux préparatifs, garder vos informations à jour 
@@ -1052,22 +1052,22 @@ const translations = {
     'guests:loadingPartyMembers': 'Chargement des membres du groupe...',
     'guests:loadingComments': 'Chargement des commentaires...',
     'guests:partyManagement': 'Gestion du groupe',
-    'rich:guests:partyManagementDesc': 'Gérez les membres de votre groupe de mariage et leurs exigences alimentaires.',
+    'guests:partyManagementDesc:rich': 'Gérez les membres de votre groupe de mariage et leurs exigences alimentaires.',
     'guests:giftsSelection': 'Sélection de cadeaux',
-    'rich:guests:giftsSelectionDesc': 'Choisissez vos cadeaux préférés pour nos célébrations de mariage.',
+    'guests:giftsSelectionDesc:rich': 'Choisissez vos cadeaux préférés pour nos célébrations de mariage.',
     'guests:eventsRSVP': 'RSVP',
-    'rich:guests:eventsRSVPDesc': 'Les célébrations se dérouleront sur trois jours : vendredi, samedi et dimanche. Elles commencent le vendredi par un dîner de bienvenue. Le samedi est une journée complète d’activités incluant la cérémonie de mariage, le banquet de réception et la soirée dansante. Le dimanche se terminera par un brunch d’au revoir. Veuillez confirmer les événements auxquels vous participerez.',
+    'guests:eventsRSVPDesc:rich': 'Les célébrations se dérouleront sur trois jours : vendredi, samedi et dimanche. Elles commencent le vendredi par un dîner de bienvenue. Le samedi est une journée complète d’activités incluant la cérémonie de mariage, le banquet de réception et la soirée dansante. Le dimanche se terminera par un brunch d’au revoir. Veuillez confirmer les événements auxquels vous participerez.',
   
     // Party Page
     'guests:party.page.title': 'Gestion du groupe',
     'guests:party.page.description': 'Gérez les membres de votre groupe de mariage et leurs exigences alimentaires.',
     'guests:partyMembersSaved': 'Membres du groupe enregistrés avec succès !',
     'guests:errorSavingPartyMembers': 'Erreur lors de l’enregistrement des membres du groupe',
-    'rich:guests:savePartyMembers': '<i class="fas fa-save"></i> Enregistrer les membres du groupe',
-    'rich:guests:partyMembersTitle': '<i class="fas fa-users"></i> Membres du groupe',
+    'guests:savePartyMembers:rich': '<i class="fas fa-save"></i> Enregistrer les membres du groupe',
+    'guests:partyMembersTitle:rich': '<i class="fas fa-users"></i> Membres du groupe',
     'guests:partyDescription': 'Votre groupe comprend toutes les personnes qui assisteront au mariage avec vous. Vous pouvez ajouter jusqu’à {{maxPartySize}} membres, vous compris.',
-    'rich:guests:addPartyMember': '<i class="fas fa-plus-circle"></i> Ajouter un membre',
-    'rich:guests:dietaryRequirements': '<i class="fas fa-utensils"></i> Exigences alimentaires',
+    'guests:addPartyMember:rich': '<i class="fas fa-plus-circle"></i> Ajouter un membre',
+    'guests:dietaryRequirements:rich': '<i class="fas fa-utensils"></i> Exigences alimentaires',
     'guests:dietaryDescription': 'Veuillez nous indiquer les exigences alimentaires ou allergies de chaque membre du groupe.',
     'guests:dietaryRequirementsSaved': 'Exigences alimentaires enregistrées avec succès !',
     'common:errorSavingDietaryRequirements': 'Erreur lors de l’enregistrement des exigences alimentaires',
@@ -1103,8 +1103,8 @@ const translations = {
   
     // Comments Page
     'guests:commentsTitle': 'Commentaires',
-    'rich:guests:commentsSubtitle': 'Partagez vos pensées avec les autres invités',
-    'rich:guests:commentPlaceholder': `
+    'guests:commentsSubtitle:rich': 'Partagez vos pensées avec les autres invités',
+    'guests:commentPlaceholder:rich': `
         <textarea
           id="newComment"
           name="comment"
@@ -1141,7 +1141,7 @@ const translations = {
     'guests:additionalDetailsLabel': 'Détails supplémentaires ou demandes spécifiques :',
     'guests:additionalDetailsPlaceholder': 'Veuillez décrire tout besoin alimentaire particulier, allergie ou demande spéciale...',
     'guests:saveMenuSelections': 'Enregistrer les sélections de menu',
-    'rich:guests:saveDietaryRequirements': '<i class="fas fa-save"></i> Enregistrer les exigences alimentaires',
+    'guests:saveDietaryRequirements:rich': '<i class="fas fa-save"></i> Enregistrer les exigences alimentaires',
     
     // Gifts Page
     'guests:giftsPageTitle': 'Liste de cadeaux',
@@ -1149,7 +1149,7 @@ const translations = {
     'guests:giftsLoading': 'Chargement des cadeaux...',
     'guests:giftsThankYouTitle': 'Merci pour votre générosité !',
     'guests:giftsThankYouMessage': 'Nous sommes très reconnaissants pour vos merveilleux cadeaux',
-    'rich:guests:giftsDonatedOn': 'Offert le {{date}}',
+    'guests:giftsDonatedOn:rich': 'Offert le {{date}}',
     'guests:giftsRegistryTitle': 'Liste de mariage',
     'guests:giftsRegistrySubtitle': 'Choisissez parmi nos cadeaux soigneusement sélectionnés',
     'guests:giftsNoAvailable': 'Aucun cadeau disponible',
@@ -1447,7 +1447,7 @@ const translations = {
   de: {
     // Wedding
     'wedding:date': '6. Juni 2026 • Marbella, Spanien',
-    'rich:wedding.common.footer': '© 2026 Hochzeit von Iluminada &amp; George',
+    'wedding.common.footer:rich': '© 2026 Hochzeit von Iluminada &amp; George',
     'wedding:title': 'Iluminada & George',
     'wedding:hero.description': 'Iluminada und George heiraten diesen Juni am Strand von Marbella, und wir freuen uns sehr, das mit dir zu teilen. Dich erwarten Sonne, Meer und jede Menge Lachen.',
     'wedding:hero.description2': 'Diese Seite ist dein Hochzeitsportal. Melde dich mit der E-Mail aus deinem RSVP an, um deine Gruppe zu bestätigen, dein Menü zu wählen, den Ablauf zu sehen, unsere Geschenkliste anzuschauen und mit anderen Gästen zu chatten.',
@@ -1466,10 +1466,10 @@ const translations = {
     'common:hours': 'Stunden',
     'common:minutes': 'Minuten',
     'common:seconds': 'Sekunden',
-    'rich:common:cancel': 'Abbrechen',
-    'rich:common:confirm': 'Bestätigen',
-    'rich:common:confirmAction': 'Aktion bestätigen',
-    'rich:common:new': '<i class="fas fa-plus-circle"></i> Neu',
+    'common:cancel:rich': 'Abbrechen',
+    'common:confirm:rich': 'Bestätigen',
+    'common:confirmAction:rich': 'Aktion bestätigen',
+    'common:new:rich': '<i class="fas fa-plus-circle"></i> Neu',
   
     // Common: Menu
     'common:menu.selection.saved': 'Menüauswahl erfolgreich gespeichert!',
@@ -1512,7 +1512,7 @@ const translations = {
   
     // Summary Page
     'guests:summaryPageTitle': 'Dein Gästebereich für die Hochzeit von Iluminada & George',
-    'rich:guests:summaryPageDescription': `
+    'guests:summaryPageDescription:rich': `
         <p>
           Willkommen in deinem persönlichen Bereich für die Hochzeit von Iluminada &amp; George. 
           Von hier aus kannst du an der Planung teilhaben, deine Daten aktuell halten 
@@ -1533,22 +1533,22 @@ const translations = {
     'guests:loadingPartyMembers': 'Lade Gruppenmitglieder...',
     'guests:loadingComments': 'Lade Kommentare...',
     'guests:partyManagement': 'Gruppenverwaltung',
-    'rich:guests:partyManagementDesc': 'Verwalte die Mitglieder deiner Hochzeitsgruppe und ihre Ernährungsbedürfnisse.',
+    'guests:partyManagementDesc:rich': 'Verwalte die Mitglieder deiner Hochzeitsgruppe und ihre Ernährungsbedürfnisse.',
     'guests:giftsSelection': 'Geschenkauswahl',
-    'rich:guests:giftsSelectionDesc': 'Wähle deine Lieblingsgeschenke für unsere Hochzeitsfeiern.',
+    'guests:giftsSelectionDesc:rich': 'Wähle deine Lieblingsgeschenke für unsere Hochzeitsfeiern.',
     'guests:eventsRSVP': 'RSVP',
-    'rich:guests:eventsRSVPDesc': 'Die Feierlichkeiten finden an drei Tagen statt: Freitag, Samstag und Sonntag. Am Freitag beginnen wir mit einem Willkommensdinner. Der Samstag ist ein voller Tag mit Aktivitäten, einschließlich der Trauung, dem Empfangsbankett und Tanz. Am Sonntag gibt es einen Abschiedsbrunch. Bitte bestätige deine Teilnahme für die Veranstaltungen, an denen du dabei sein wirst.',
+    'guests:eventsRSVPDesc:rich': 'Die Feierlichkeiten finden an drei Tagen statt: Freitag, Samstag und Sonntag. Am Freitag beginnen wir mit einem Willkommensdinner. Der Samstag ist ein voller Tag mit Aktivitäten, einschließlich der Trauung, dem Empfangsbankett und Tanz. Am Sonntag gibt es einen Abschiedsbrunch. Bitte bestätige deine Teilnahme für die Veranstaltungen, an denen du dabei sein wirst.',
   
     // Party Page
     'guests:party.page.title': 'Gruppenverwaltung',
     'guests:party.page.description': 'Verwalte die Mitglieder deiner Hochzeitsgruppe und ihre Ernährungsbedürfnisse.',
     'guests:partyMembersSaved': 'Gruppenmitglieder erfolgreich gespeichert!',
     'guests:errorSavingPartyMembers': 'Fehler beim Speichern der Gruppenmitglieder',
-    'rich:guests:savePartyMembers': '<i class="fas fa-save"></i> Gruppenmitglieder speichern',
-    'rich:guests:partyMembersTitle': '<i class="fas fa-users"></i> Gruppenmitglieder',
+    'guests:savePartyMembers:rich': '<i class="fas fa-save"></i> Gruppenmitglieder speichern',
+    'guests:partyMembersTitle:rich': '<i class="fas fa-users"></i> Gruppenmitglieder',
     'guests:partyDescription': 'Zu deiner Gruppe gehören alle Personen, die mit dir zur Hochzeit kommen. Du kannst bis zu {{maxPartySize}} Gruppenmitglieder inklusive dir selbst hinzufügen.',
-    'rich:guests:addPartyMember': '<i class="fas fa-plus-circle"></i> Gruppenmitglied hinzufügen',
-    'rich:guests:dietaryRequirements': '<i class="fas fa-utensils"></i> Ernährungsbedürfnisse',
+    'guests:addPartyMember:rich': '<i class="fas fa-plus-circle"></i> Gruppenmitglied hinzufügen',
+    'guests:dietaryRequirements:rich': '<i class="fas fa-utensils"></i> Ernährungsbedürfnisse',
     'guests:dietaryDescription': 'Bitte teile uns die Ernährungsbedürfnisse oder Allergien jedes Gruppenmitglieds mit.',
     'guests:dietaryRequirementsSaved': 'Ernährungsbedürfnisse erfolgreich gespeichert!',
     'common:errorSavingDietaryRequirements': 'Fehler beim Speichern der Ernährungsbedürfnisse',
@@ -1584,8 +1584,8 @@ const translations = {
   
     // Comments Page
     'guests:commentsTitle': 'Kommentare',
-    'rich:guests:commentsSubtitle': 'Teile deine Gedanken mit den anderen Gästen',
-    'rich:guests:commentPlaceholder': `
+    'guests:commentsSubtitle:rich': 'Teile deine Gedanken mit den anderen Gästen',
+    'guests:commentPlaceholder:rich': `
         <textarea
           id="newComment"
           name="comment"
@@ -1622,7 +1622,7 @@ const translations = {
     'guests:additionalDetailsLabel': 'Weitere Details oder spezielle Anforderungen:',
     'guests:additionalDetailsPlaceholder': 'Bitte beschreibe besondere Ernährungsbedürfnisse, Allergien oder andere spezielle Anforderungen...',
     'guests:saveMenuSelections': 'Menüauswahlen speichern',
-    'rich:guests:saveDietaryRequirements': '<i class="fas fa-save"></i> Ernährungsbedürfnisse speichern',
+    'guests:saveDietaryRequirements:rich': '<i class="fas fa-save"></i> Ernährungsbedürfnisse speichern',
     
     // Gifts Page
     'guests:giftsPageTitle': 'Geschenkeliste',
@@ -1630,7 +1630,7 @@ const translations = {
     'guests:giftsLoading': 'Lade Geschenke...',
     'guests:giftsThankYouTitle': 'Vielen Dank für deine Großzügigkeit!',
     'guests:giftsThankYouMessage': 'Wir sind dir für deine wunderbaren Geschenke sehr dankbar',
-    'rich:guests:giftsDonatedOn': 'Gespendet am {{date}}',
+    'guests:giftsDonatedOn:rich': 'Gespendet am {{date}}',
     'guests:giftsRegistryTitle': 'Geschenkliste',
     'guests:giftsRegistrySubtitle': 'Wähle aus unseren sorgfältig ausgewählten Geschenken',
     'guests:giftsNoAvailable': 'Keine Geschenke verfügbar',
@@ -2011,7 +2011,7 @@ function toLocalizedString(value, lang = currentLanguage) {
 function updatePageContent() {
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
-    const isRich = key.startsWith('rich:');
+    const isRich = key.endsWith(':rich');
     const translation = translate(key);
 
     if (translation !== key) {

@@ -115,7 +115,7 @@ try {
     `;
 
     giftChoices.forEach(choice => {
-        const donatedOnText = translate('rich:guests:giftsDonatedOn').replace('{{date}}', formatDate(choice.date));
+        const donatedOnText = translate('guests:giftsDonatedOn:rich').replace('{{date}}', formatDate(choice.date));
         html += `
         <div class="donated-gift-card" style="background-image: url('${escapeHtml(choice.giftImageUrl)}');">
             <div class="donated-gift-overlay">
@@ -124,7 +124,7 @@ try {
                 <div class="donated-gift-price">€${choice.giftAmount}</div>
                 <div class="donated-gift-date">
                 <i class="fas fa-calendar-check"></i>
-                <span data-i18n="rich:guests:giftsDonatedOn" data-i18n-options='{"date": "${formatDate(choice.date)}"}'>${donatedOnText}</span>
+                <span data-i18n="guests:giftsDonatedOn:rich" data-i18n-options='{"date": "${formatDate(choice.date)}"}'>${donatedOnText}</span>
                 </div>
                 ${choice.message ? `
                 <div class="donated-gift-message">

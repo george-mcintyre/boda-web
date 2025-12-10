@@ -81,7 +81,7 @@
       html += `
         <div class="party-members-management">
           <div class="party-members-header">
-            <h3 data-i18n="rich:guests:partyMembersTitle">${translate("rich:guests:partyMembersTitle")}</h3>
+            <h3 data-i18n="guests:partyMembersTitle:rich">${translate("guests:partyMembersTitle:rich")}</h3>
             <span class="party-count">${partyData.length} / ${maxPartySize} ${translate("common:party.members")}</span>
           </div>
           <p class="party-description">
@@ -140,7 +140,7 @@
         html += `
           <div class="add-member-card">
             <button type="button" id="addPartyMemberBtn" class="btn-base btn-secondary btn-sm">
-              <span data-i18n="rich:guests:addPartyMember">${translate("rich:guests:addPartyMember")}</span>
+              <span data-i18n="guests:addPartyMember:rich">${translate("guests:addPartyMember:rich")}</span>
             </button>
           </div>
         `;
@@ -156,7 +156,7 @@
       html += `
           </div>
           <div class="action-container">
-            <button type="button" id="savePartyMembersBtn" class="btn-base btn-primary btn-lg" data-i18n="rich:guests:savePartyMembers">${translate("rich:guests:savePartyMembers")}</button>
+            <button type="button" id="savePartyMembersBtn" class="btn-base btn-primary btn-lg" data-i18n="guests:savePartyMembers:rich">${translate("guests:savePartyMembers:rich")}</button>
           </div>
         </div>
       `;
@@ -165,7 +165,7 @@
       html += `
         <div class="party-dietary-management">
           <div class="dietary-header">
-            <h3 data-i18n="rich:guests:dietaryRequirements">${translate("rich:guests:dietaryRequirements")}</h3>
+            <h3 data-i18n="guests:dietaryRequirements:rich">${translate("guests:dietaryRequirements:rich")}</h3>
           </div>
           <p class="dietary-description">
             ${translate("guests:dietaryDescription")}
@@ -229,7 +229,7 @@
       html += `
           </div>
           <div class="action-container">
-            <button type="button" id="saveDietaryBtn" class="btn-base btn-primary btn-lg" data-i18n="rich:guests:saveDietaryRequirements"> ${translate("rich:guests:saveDietaryRequirements")} </button>
+            <button type="button" id="saveDietaryBtn" class="btn-base btn-primary btn-lg" data-i18n="guests:saveDietaryRequirements:rich"> ${translate("guests:saveDietaryRequirements:rich")} </button>
           </div>
         </div>
       `;
@@ -334,7 +334,7 @@
     newCard.innerHTML = `
       <div class="member-edit-header">
         <span class="member-number">${index + 1}</span>
-        <span class="new-member-indicator" data-i18n="rich:common:new">${translate('rich:common:new')}</span>
+        <span class="new-member-indicator" data-i18n="common:new:rich">${translate('common:new:rich')}</span>
       </div>
       <div class="member-edit-form">
         <div class="form-group">
@@ -360,7 +360,7 @@
             <option value="child"><span data-i18n="common:party.child">${translate('common:party.child')}</span></option>
           </select>
         </div>
-        <button type="button" class="btn-base btn-danger btn-sm" data-member-id="${id}" title="${translate('rich:common:party.remove.member')}">
+        <button type="button" class="btn-base btn-danger btn-sm" data-member-id="${id}" title="${translate('common:party.remove.member:rich')}">
           <i class="fas fa-trash-alt"></i>
         </button>
       </div>
@@ -461,7 +461,7 @@
     const saveBtn = document.getElementById('savePartyMembersBtn');
     if (saveBtn && !saveBtn.classList.contains('unsaved')) {
       saveBtn.classList.add('unsaved');
-      saveBtn.innerHTML = `<span data-i18n="rich:guests:savePartyMembers">${translate("rich:guests:savePartyMembers")}</span> *`;
+      saveBtn.innerHTML = `<span data-i18n="guests:savePartyMembers:rich">${translate("guests:savePartyMembers:rich")}</span> *`;
     }
   }
   
@@ -483,7 +483,7 @@
     const saveBtn = document.getElementById('saveDietaryBtn');
     if (saveBtn && !saveBtn.classList.contains('unsaved')) {
       saveBtn.classList.add('unsaved');
-      saveBtn.innerHTML = `<span data-i18n="rich:guests:saveDietaryRequirements">${translate("rich:guests:saveDietaryRequirements")}</span> *`;
+      saveBtn.innerHTML = `<span data-i18n="guests:saveDietaryRequirements:rich">${translate("guests:saveDietaryRequirements:rich")}</span> *`;
     }
   }
   
@@ -537,7 +537,7 @@
         window.showToast(translate('guests:partyMembersSaved'), 'success');
         if (saveBtn) {
           saveBtn.classList.remove('unsaved');
-          saveBtn.innerHTML = `<span data-i18n="rich:guests:savePartyMembers">${translate("rich:guests:savePartyMembers")}</span>`;
+          saveBtn.innerHTML = `<span data-i18n="guests:savePartyMembers:rich">${translate("guests:savePartyMembers:rich")}</span>`;
         }
         // Reload to get updated IDs and refresh dietary cards
         window.loadPartyContent();
@@ -552,7 +552,7 @@
       if (saveBtn) {
         saveBtn.disabled = false;
         if (!saveBtn.classList.contains('unsaved')) {
-          saveBtn.innerHTML = `<span data-i18n="rich:guests:savePartyMembers">${translate("rich:guests:savePartyMembers")}</span>`;
+          saveBtn.innerHTML = `<span data-i18n="guests:savePartyMembers:rich">${translate("guests:savePartyMembers:rich")}</span>`;
         }
       }
     }
@@ -637,7 +637,7 @@
         window.showToast(translate('guests:dietaryRequirementsSaved'), 'success');
         if (saveBtn) {
           saveBtn.classList.remove('unsaved');
-          saveBtn.innerHTML = `<div data-i18n="rich:guests:saveDietaryRequirements">${translate("rich:guests:saveDietaryRequirements")}</div>`;
+          saveBtn.innerHTML = `<div data-i18n="guests:saveDietaryRequirements:rich">${translate("guests:saveDietaryRequirements:rich")}</div>`;
         }
       } else {
         const data = await response.json();
@@ -650,7 +650,7 @@
       if (saveBtn) {
         saveBtn.disabled = false;
         if (!saveBtn.classList.contains('unsaved')) {
-          saveBtn.innerHTML = `<div data-i18n="rich:guests:saveDietaryRequirements">${translate("rich:guests:saveDietaryRequirements")}</div>`;
+          saveBtn.innerHTML = `<div data-i18n="guests:saveDietaryRequirements:rich">${translate("guests:saveDietaryRequirements:rich")}</div>`;
         }
       }
     }
