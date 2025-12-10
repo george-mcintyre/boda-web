@@ -1944,7 +1944,8 @@
         { name:'location', label: translate('admin:events.field.location'), type:'location', required:true, help: translate('admin:events.field.locationHelp') },
         { name:'title', label: translate('admin:events.field.title'), help: translate('admin:events.field.titleHelp') },
         { name:'description', label: translate('admin:events.field.description'), type:'textarea', rows: 3, help: translate('admin:events.field.descriptionHelp') },
-        { name:'image', label: translate('admin:events.field.image'), type:'file', help: translate('admin:events.field.imageHelp') }
+        { name:'image', label: translate('admin:events.field.image'), type:'file', help: translate('admin:events.field.imageHelp') },
+        { name:'imagePreview', label:'Current Image', type:'imagePreview' }
       ],
       initialValues: {
         name: event.name || '',
