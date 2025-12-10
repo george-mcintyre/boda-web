@@ -780,8 +780,10 @@ footer {
 }
 
 @media (max-width: 600px) {
-  .event-image-container {
-    /* Height will be determined by image aspect ratio */
+   .event-image-container {
+    flex: none;
+    max-width: 100%;
+    width: 100%;
   }
 
   .event-details-card {
