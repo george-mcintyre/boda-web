@@ -19,23 +19,20 @@ async function loadMenuSelections() {
   `;
   
   try {
-    // Get token and current language from localStorage
-    const token = localStorage.getItem('token');
-    const currentLanguage = localStorage.getItem('i18nextLng') || 'es';
     
     // Get party members and menu data in parallel
     const [partyResponse, menuResponse, menuChoicesResponse] = await Promise.all([
       fetch('/api/guest/party', {
         method: 'GET',
-        headers: { 'Authorization': token }
+        headers: { 'Authorization': window.token }
       }),
-      fetch(`/api/guest/menu?lang=${currentLanguage}`, {
+      fetch(`/api/guest/menu?lang=${window.currentLanguage}`, {
         method: 'GET',
-        headers: { 'Authorization': token }
+        headers: { 'Authorization': window.token }
       }),
       fetch('/api/guest/menu-choices', {
         method: 'GET',
-        headers: { 'Authorization': token }
+        headers: { 'Authorization': window.token }
       })
     ]);
 
@@ -592,9 +589,6 @@ async function saveAllMenuChoices() {
   }
 
   try {
-    // Get token from localStorage
-    const token = localStorage.getItem('token');
-    
     // Build choices from current DOM state
     const partyChoices = {};
     
@@ -686,7 +680,7 @@ async function saveAllMenuChoices() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': token
+        'Authorization': window.token
       },
       body: JSON.stringify({ choices: choicesArray })
     });

@@ -213,27 +213,6 @@ class CommentsSystem {
     injectStyles() {
         if (document.getElementById('reaction-styles')) return;
         const style = document.createElement('style');
-        style.id = 'reaction-styles';
-        style.textContent = `
-          .reaction-wrapper { position: relative; display: inline-block; }
-          .heart-btn { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:16px; border:1px solid #eee; background:#fff; cursor:pointer; transition: all .2s ease; }
-          .heart-btn.active { background:#ffe6ea; border-color:#ffb3c1; color:#d6336c; }
-          .heart-btn:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
-          .heart-count { font-size:.9em; color:#555; }
-          /* Position picker directly above the button with a slight overlap so cursor stays within hover area */
-          .emoji-picker { position:absolute; left:0; bottom: calc(100% - 6px); display:flex; gap:6px; background:#fff; border:1px solid #eee; border-radius:20px; padding:6px; box-shadow: 0 6px 20px rgba(0,0,0,.12); opacity:0; transform: translateY(6px); pointer-events:none; transition: all .15s ease; transition-delay: 0ms; z-index: 10; }
-          /* Add a small delay before showing on hover; hide immediately on mouseout */
-          .reaction-wrapper:hover .emoji-picker { opacity:1; transform: translateY(0); pointer-events:auto; transition-delay: 250ms; }
-          .emoji-option { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #eee; background:#fff; cursor:pointer; position:relative; }
-          .emoji-option.active { outline: 2px solid #8B5A96; }
-          .emoji-option .count { position:absolute; bottom:-10px; right:-6px; background:#8B5A96; color:#fff; border-radius:10px; padding:0 6px; font-size:.7em; line-height:18px; height:18px; }
-          /* Summary list when there are reactions */
-          .reaction-summary { display:inline-flex; align-items:center; gap:8px; padding:4px 6px; border:1px solid #eee; border-radius:16px; background:#fff; }
-          .summary-pill { display:inline-flex; align-items:center; gap:4px; padding:4px 8px; border-radius:12px; background:#f8f9fa; border:1px solid #eee; font-size:.9em; cursor:pointer; }
-          .summary-pill .count { color:#555; font-weight:600; }
-          .summary-pill.reacted { outline: 2px solid #8B5A96; background: #f8f0fa; }
-        `;
-        document.head.appendChild(style);
     }
 
     // Available emojis for reactions
@@ -432,10 +411,10 @@ class CommentsSystem {
 
             let triggerAreaHTML = '';
             if (totalCount <= 0) {
-              // Show only heart icon with no count when no reactions have been made
+              // Show only smiley icon with no count when no reactions have been made
               triggerAreaHTML = `
                 <button class="heart-btn" onclick="commentsSystem.toggleReaction('${comment.id}', '❤️')" title="Like (❤️)">
-                  <span>❤️</span>
+                  <span><i class="fas fa-smile"></i></span>
                 </button>`;
             } else {
               // Build summary list of reactions with their counts
@@ -458,7 +437,7 @@ class CommentsSystem {
             return `
                 <div class="comment-item" data-comment-id="${comment.id}">
                     <div class="comment-header">
-                        <span class="comment-author">${this.escapeHtml(comment.name)}</span>
+                        <span class="comment-author">${window.escapeHtml(comment.name)}</span>
                         <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString('es-ES', {
                             year: 'numeric',
                             month: 'short',
@@ -467,7 +446,7 @@ class CommentsSystem {
                             minute: '2-digit'
                         })}</span>
                     </div>
-                    <div class="comment-content">${this.escapeHtml(comment.body)}</div>
+                    <div class="comment-content">${window.escapeHtml(comment.body)}</div>
                     <div class="comment-reactions">
                         ${reaccionesHTML}
                     </div>
@@ -483,14 +462,6 @@ class CommentsSystem {
         }).join('');
 
         commentsList.innerHTML = commentsHTML;
-    }
-
-    // Escape HTML to prevent XSS
-    escapeHtml(text) {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
     }
 
     // Show toast notification
