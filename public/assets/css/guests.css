@@ -733,6 +733,11 @@ main.main-content-full {
 
 .dietary-requirements-list {
   display:flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  align-items: center;
+  align-content: center;
+  justify-content: space-between;
 }
 
 /* Option Selection Panel - Drop Zone */
