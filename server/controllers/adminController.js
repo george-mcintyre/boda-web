@@ -191,16 +191,8 @@ async function updateEventsItem(req, res, next) {
     }
 
     // Image
-    if (image !== undefined) {
-      let imageRef = undefined;
-      if (!image) {
-        imageRef = undefined; // explicit clear
-      } else if (image.imageId) {
-        imageRef = image.imageId;
-      } else if (typeof image === 'string' && image.startsWith('/')) {
-        imageRef = image;
-      }
-      event.image = imageRef;
+    if (image !== undefined && image !== null && image.imageId !== undefined && image.imageId !== null && image.imageId !== '') {
+      event.image = image.imageId;
     }
 
     // Localised fields

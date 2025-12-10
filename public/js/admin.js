@@ -1995,7 +1995,7 @@
           }
           
           // Handle image upload
-          let imageReference = null;
+          let imageReference = event.image;
           const imageFile = document.getElementById('f_image')?.files[0];
           if (imageFile) {
             const formData = new FormData();
@@ -2011,30 +2011,6 @@
               imageReference = {
                 imageId: uploadData.imageId
               };
-            }
-          } else if (event.image) {
-            // Keep existing image reference for edit mode
-            if (typeof event.image === 'string') {
-              // Legacy URL-based image or ObjectId string
-              if (event.image.startsWith('/')) {
-                // Legacy URL-based image - keep as is
-                imageReference = event.image;
-              } else {
-                // ObjectId string - keep as is
-                imageReference = event.image;
-              }
-            } else if (event.image && typeof event.image === 'object') {
-              // Database-stored image object - keep the reference
-              if (event.image.imageId) {
-                // New format with imageId
-                imageReference = { imageId: event.image.imageId };
-              } else if (event.image._id) {
-                // MongoDB ObjectId reference
-                imageReference = event.image._id.toString();
-              } else {
-                // Other object format - keep as is
-                imageReference = event.image;
-              }
             }
           }
           
