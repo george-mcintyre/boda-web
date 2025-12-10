@@ -322,6 +322,10 @@ try {
         </div>
         `;
         
+        html += `
+        <div class="menu-choice-items">
+        `;
+
         // Sort menu courses by the correct order: starter, main, dessert, drinks
         const courseOrder = { starter: 1, main: 2, dessert: 3, drinks: 4 };
         const sortedMenu = menu.slice().sort((a, b) => (courseOrder[a.course] || 999) - (courseOrder[b.course] || 999));
@@ -357,6 +361,10 @@ try {
         }
         });
         
+        html += `
+        </div>
+        `;
+    
         html += `
             </div>
         </div>
