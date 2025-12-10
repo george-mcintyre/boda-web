@@ -4,7 +4,7 @@ const { generateDietaryIconsHTML, generateSelectionIconHTML } = require('../util
 const { mergeLocalizedString, localize, getLang } = require('../utils/localized');
 
 // Format event for API response according to README specification
-function formatEventForApi(event, lang) {
+function formatEventForApi(event, lang = 'en') {
 
   // Format image data for display
   let imageData = null;
@@ -220,7 +220,7 @@ async function updateEventsItem(req, res, next) {
     }
 
     await event.save();
-    res.json(formatEventForApi(event));
+    res.json(formatEventForApi(event, lang));
   } catch (e) {
     next(e);
   }
