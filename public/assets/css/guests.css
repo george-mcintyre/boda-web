@@ -2371,24 +2371,29 @@ main.main-content-full {
   align-items: center;
   font-size: 0.9em;
 }
-}
 
 .menu-choice-item.info-only {
   opacity: 0.9;
 }
 
-  opacity: 0.9;
 .menu-choice-item.info-only {
   opacity: 0.7;
 }
 
 .menu-course-label {
   color: var(--text-light);
+  text-align: left;
+  white-space: nowrap;
+  overflow-wrap: break-word;
+  align-self: flex-start;
 }
 
 .menu-option-label {
   font-weight: 500;
   color: var(--text-dark);
+  text-align: right;
+  justify-self: flex-end;
+  font-style: italic;
 }
 
 .menu-option-label.not-selected {
