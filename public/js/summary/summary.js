@@ -144,6 +144,25 @@ try {
     });
     });
     
+    // Build dietary requirements lookup: { partyGuestId: { specialRequest: [], specialRequestDetail: '' } }
+    const dietaryLookup = {};
+    menuChoices.forEach(memberChoice => {
+    const memberId = memberChoice.partyGuestId;
+    dietaryLookup[memberId] = {
+        specialRequest: memberChoice.specialRequest || [],
+        specialRequestDetail: memberChoice.specialRequestDetail || ''
+    };
+    });
+    
+    // Define dietary options with icons (matching guests.js)
+    const dietaryOptions = [
+    { name: 'vegetarian', label: 'Vegetarian', icon: 'fa-leaf' },
+    { name: 'lactose-intolerant', label: 'Lactose Intolerant', icon: 'fa-cheese' },
+    { name: 'gluten-intolerant', label: 'Gluten Intolerant', icon: 'fa-bread-slice' },
+    { name: 'nut-allergy', label: 'Nut Allergy', icon: 'fa-seedling' },
+    { name: 'other', label: 'Other', icon: 'fa-question-circle' }
+    ];
+    
     // Start building HTML
     let html = '';
 
@@ -251,6 +270,56 @@ try {
             ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:party.primary\">${member.primary ? translate('common:party.primary') : ''}</span>" : ''}
             </div>
             <div class="menu-choices-list">
+        `;
+        const memberDietary = dietaryLookup[member.id] || { specialRequest: [], specialRequestDetail: '' };
+        const selectedRequests = Array.isArray(memberDietary.specialRequest) ? memberDietary.specialRequest : [];
+        
+        // Get selected dietary option names
+        const selectedDietaryNames = selectedRequests
+            .map(r => typeof r === 'string' ? r : r.name)
+            .filter(name => name);
+        
+        html += `
+        <div class="dietary-member-card">
+            <div class="dietary-requirements-list">
+        `;
+        
+        if (selectedDietaryNames.length > 0) {
+            // Show selected dietary requirements with icons
+            selectedDietaryNames.forEach(dietaryName => {
+                const dietaryOption = dietaryOptions.find(opt => opt.name === dietaryName);
+                if (dietaryOption) {
+                    html += `
+                    <div class="dietary-requirement-item">
+                        <i class="fas ${dietaryOption.icon}"></i>
+                        <span>${escapeHtml(dietaryOption.label)}</span>
+                    </div>
+                    `;
+                }
+            });
+            
+            // Show additional details if provided
+            if (memberDietary.specialRequestDetail && memberDietary.specialRequestDetail.trim()) {
+                html += `
+                <div class="dietary-requirement-detail">
+                    <i class="fas fa-info-circle"></i>
+                    <span>${escapeHtml(memberDietary.specialRequestDetail.trim())}</span>
+                </div>
+                `;
+            }
+        } else {
+            // No dietary requirements
+            html += `
+            <div class="no-dietary-requirements">
+                <i class="fas fa-check-circle"></i>
+                <span>No special dietary requirements</span>
+            </div>
+            `;
+        }
+        
+        html += `
+            </div>
+        </div>
         `;
         
         // Sort menu courses by the correct order: starter, main, dessert, drinks

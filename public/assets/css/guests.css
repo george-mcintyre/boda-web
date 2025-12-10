@@ -731,6 +731,10 @@ main.main-content-full {
   color: #f57c00;
 }
 
+.dietary-requirements-list {
+  display:flex;
+}
+
 /* Option Selection Panel - Drop Zone */
 .option-selection-panel {
   background: var(--white);
