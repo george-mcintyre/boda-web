@@ -208,7 +208,7 @@ try {
                 <span class="rsvp-event-datetime">${formatEventDate(event.date)} at ${formatEventTime(event.date)}</span>
             </div>
             <span class="rsvp-attendee-count ${attendees.length > 0 ? 'has-attendees' : 'no-attendees'}">
-                ${attendees.length} attending
+                ${attendees.length} <span data-i18n="guests:eventsAttending">${translate('guests:eventsAttending')}</span>
             </span>
             </div>
             ${attendees.length > 0 ? `

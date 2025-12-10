@@ -121,6 +121,7 @@ const translations = {
     'guests:eventsNoPartyMembers': 'No party members found.',
     'guests:eventsViewOnMap': 'View on Map',
     'guests:eventsWhosAttending': 'Who\'s Attending?',
+    'guests:eventsAttending': 'attending',
     'guests:eventsErrorTitle': 'Error Loading Events',
     'guests:eventsErrorMessage': 'There was a problem loading the events. Please try again.',
     'guests:eventsSchedule': 'Schedule',
@@ -143,15 +144,7 @@ const translations = {
     // Comments Page
     'guests:commentsTitle': 'Comments',
     'guests:commentsSubtitle:rich': 'Share your thoughts with other guests',
-    'guests:comment:placeholder': `
-      <textarea
-        id="newComment"
-        name="comment"
-        placeholder="Write your comment..."
-        rows="3"
-        maxlength="500"
-      ></textarea>
-     `,
+    'guests:comment:placeholder': 'Write your comment...',
     'guests:postComment': 'Post',
 
     'guests:welcome': 'Welcome',
@@ -605,6 +598,7 @@ const translations = {
     'guests:eventsNoPartyMembers': 'No se han encontrado miembros de grupo.',
     'guests:eventsViewOnMap': 'Ver en el mapa',
     'guests:eventsWhosAttending': '¿Quién asiste?',
+    'guests:eventsAttending': 'asistiendo',
     'guests:eventsErrorTitle': 'Error al cargar los eventos',
     'guests:eventsErrorMessage': 'Ha habido un problema al cargar los eventos. Por favor, inténtalo de nuevo.',
     'guests:eventsSchedule': 'Programa',
@@ -622,15 +616,7 @@ const translations = {
     // Comments Page
     'guests:commentsTitle': 'Comentarios',
     'guests:commentsSubtitle:rich': 'Comparte tus pensamientos con otros invitados',
-    'guests:comment:placeholder': `
-      <textarea
-        id="newComment"
-        name="comment"
-        placeholder="Escribe tu comentario..."
-        rows="3"
-        maxlength="500"
-      ></textarea>
-     `,
+    'guests:comment:placeholder': 'Escribe tu comentario...',
     'guests:postComment': 'Publicar',
 
     'guests:welcome': 'Bienvenido/a',
@@ -1087,6 +1073,7 @@ const translations = {
     'guests:eventsNoPartyMembers': 'Aucun membre de groupe trouvé.',
     'guests:eventsViewOnMap': 'Voir sur la carte',
     'guests:eventsWhosAttending': 'Qui participe ?',
+    'guests:eventsAttending': 'participant(s)',
     'guests:eventsErrorTitle': 'Erreur lors du chargement des événements',
     'guests:eventsErrorMessage': 'Un problème est survenu lors du chargement des événements. Veuillez réessayer.',
     'guests:eventsSchedule': 'Programme',
@@ -1109,15 +1096,7 @@ const translations = {
     // Comments Page
     'guests:commentsTitle': 'Commentaires',
     'guests:commentsSubtitle:rich': 'Partagez vos pensées avec les autres invités',
-    'guests:comment:placeholder': `
-        <textarea
-          id="newComment"
-          name="comment"
-          placeholder="Écrivez votre commentaire..."
-          rows="3"
-          maxlength="500"
-        ></textarea>
-       `,
+    'guests:comment:placeholder': 'Écrivez votre commentaire...',
     'guests:postComment': 'Publier',
   
     'guests:welcome': 'Bienvenue',
@@ -1570,6 +1549,7 @@ const translations = {
     'guests:eventsNoPartyMembers': 'Keine Gruppenmitglieder gefunden.',
     'guests:eventsViewOnMap': 'Auf Karte anzeigen',
     'guests:eventsWhosAttending': 'Wer nimmt teil?',
+    'guests:eventsAttending': 'teilnehmender(in)',
     'guests:eventsErrorTitle': 'Fehler beim Laden der Veranstaltungen',
     'guests:eventsErrorMessage': 'Beim Laden der Veranstaltungen ist ein Problem aufgetreten. Bitte versuche es erneut.',
     'guests:eventsSchedule': 'Ablauf',
@@ -1592,15 +1572,7 @@ const translations = {
     // Comments Page
     'guests:commentsTitle': 'Kommentare',
     'guests:commentsSubtitle:rich': 'Teile deine Gedanken mit den anderen Gästen',
-    'guests:comment:placeholder': `
-        <textarea
-          id="newComment"
-          name="comment"
-          placeholder="Schreibe deinen Kommentar..."
-          rows="3"
-          maxlength="500"
-        ></textarea>
-       `,
+    'guests:comment:placeholder': 'Schreibe deinen Kommentar...',
     'guests:postComment': 'Veröffentlichen',
   
     'guests:welcome': 'Willkommen',
