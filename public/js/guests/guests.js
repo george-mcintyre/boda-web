@@ -82,10 +82,10 @@
         <div class="party-members-management">
           <div class="party-members-header">
             <h3 data-i18n="guests:partyMembersTitle:rich">${translate("guests:partyMembersTitle:rich")}</h3>
-            <span class="party-count">${partyData.length} / ${maxPartySize} ${translate("common:party.members")}</span>
+            <span class="party-count">${partyData.length} / ${maxPartySize} <span data-i18n="common:party.members">${translate("common:party.members")}</span></span>
           </div>
           <p class="party-description">
-            ${translateWithVars("guests:partyDescription", { maxPartySize: maxPartySize })}
+            <span data-i18n="guests:partyDescription">${translate("guests:partyDescription")}</span> ${maxPartySize} <span data-i18n="guests:partyDescription2">${translate("guests:partyDescription2")}</span>
             ${!canAddMore ? '<strong>You have reached the maximum party size. Please contact the wedding administrators if you need to add more guests.</strong>' : ''}
           </p>
           <div class="party-members-edit-list">
@@ -167,9 +167,7 @@
           <div class="dietary-header">
             <h3 data-i18n="guests:dietaryRequirements:rich">${translate("guests:dietaryRequirements:rich")}</h3>
           </div>
-          <p class="dietary-description">
-            ${translate("guests:dietaryDescription")}
-          </p>
+          <p class="dietary-description" data-i18n="guests:dietaryDescription">${translate("guests:dietaryDescription")}</p>
           <div class="party-dietary-cards">
       `;
       
@@ -218,7 +216,8 @@
                 name="party-dietary-detail-${member.id}"
                 class="form-control dietary-detail-textarea"
                 data-member-id="${member.id}"
-                placeholder="${translate("guests:additionalDetails:placeholder")}"
+                data-i18n="guests:additionalDetails:placeholder"
+                placeholder="Additional details or specific requirements..."
                 rows="2"
               >${escapeHtml(memberDietary.specialRequestDetail || '')}</textarea>
             </div>

@@ -308,7 +308,8 @@ async function loadMenuSelections() {
             <textarea
               id="special-detail-${member.id}"
               name="special-detail-${member.id}"
-              placeholder="${translate("guests:additionalDetails:placeholder")}"
+              data-i18n="guests:additionalDetails:placeholder"
+              placeholder="Additional details or specific requirements..."
               rows="3"
             >${escapeHtml(memberRequests.specialRequestDetail || '')}</textarea>
           </div>
