@@ -46,6 +46,8 @@ const translations = {
     'common:party.confirm.remove.member': 'Are you sure you want to remove {{memberName}} from your party?',
 
     // Logon Page
+    'login:guest:tooltip': 'Guest Access',
+    'login:admin:tooltip': 'Administrator Access',
     'login:page.title': 'Guest access - Wedding',
     'login:guest.zone.title': 'Guest Zone',
     'login:header': 'Guest access',
@@ -524,8 +526,9 @@ const translations = {
     'wedding:hero.description': 'Iluminada y George se casan en la playa de Marbella este junio y estamos muy felices de compartirlo contigo. Te esperan sol, mar y muchas risas.',
     'wedding:hero.description2': 'Este sitio es tu centro para la boda. Inicia sesión con el correo de tu RSVP para confirmar tu grupo, elegir tu menú, ver el programa, consultar nuestra lista de regalos y chatear con otros invitados.',
 
+    'login:guest:tooltip': 'Acceso de invitados',
+    'login:admin:tooltip': 'Acceso de administrador',
     'login:guest.zone.title': 'Zona de invitados',
-
     'login:page.title': 'Acceso de invitados - Boda',
     'login:header': 'Acceso de invitados',
     'login:email.label': 'Correo electrónico:',
@@ -1009,6 +1012,8 @@ const translations = {
     'common:party.confirm.remove.member': 'Êtes-vous sûr de vouloir retirer {{memberName}} de votre groupe ?',
   
     // Logon Page
+    'login:guest:tooltip': 'Accès invité',
+    'login:admin:tooltip': 'Accès administrateur',
     'login:page.title': 'Accès invité - Mariage',
     'login:guest.zone.title': 'Espace invités',
     'login:header': 'Accès invité',
@@ -1490,6 +1495,8 @@ const translations = {
     'common:party.confirm.remove.member': 'Möchtest du {{memberName}} wirklich aus deiner Gruppe entfernen?',
   
     // Logon Page
+    'login:guest:tooltip': 'Gästezugang',
+    'login:admin:tooltip': 'Administratorzugang',
     'login:page.title': 'Gästezugang - Hochzeit',
     'login:guest.zone.title': 'Gästebereich',
     'login:header': 'Gästezugang',
@@ -2012,11 +2019,14 @@ function updatePageContent() {
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
     const isRich = key.endsWith(':rich');
+    const isTooltip = key.endsWith(':tooltip');
     const translation = translate(key);
 
     if (translation !== key) {
       if (isRich) {
         element.innerHTML = translation;   // render HTML
+      } else if (isTooltip) {
+        element.setAttribute('title', translation); // set tooltip
       } else {
         element.textContent = translation; // plain text
       }
