@@ -150,8 +150,9 @@ async function loadGiftsContent() {
                     ${choice.message ? `
                     <div class="donated-gift-message">
                         <i class="fas fa-quote-left"></i>
-                        ${escapeHtml(choice.message)} -- ${partyNames}
+                        ${escapeHtml(choice.message)}
                         <i class="fas fa-quote-right"></i>
+                         -- ${partyNames}
                     </div>
                     ` : ''}
                 </div>
