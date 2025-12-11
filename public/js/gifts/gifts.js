@@ -108,9 +108,9 @@ try {
         <div class="gifts-thank-you-section">
             <div class="thank-you-header">
                 <i class="fas fa-heart"></i>
+                <h3><span data-i18n="guests:giftsThankYouTitle">${translate('guests:giftsThankYouTitle')}</span></h3>
+                <p><span data-i18n="guests:giftsThankYouMessage">${translate('guests:giftsThankYouMessage')}</span></p>
             </div>
-            <h3><span data-i18n="guests:giftsThankYouTitle">${translate('guests:giftsThankYouTitle')}</span></h3>
-            <p><span data-i18n="guests:giftsThankYouMessage">${translate('guests:giftsThankYouMessage')}</span></p>
         <div class="donated-gifts-grid">
     `;
 
@@ -119,21 +119,21 @@ try {
         html += `
         <div class="donated-gift-card" style="background-image: url('${escapeHtml(choice.giftImageUrl)}');">
             <div class="donated-gift-overlay">
-            <div class="donated-gift-content">
-                <h4 class="donated-gift-title">${escapeHtml(choice.giftTitle)}</h4>
-                <div class="donated-gift-price">€${choice.giftAmount}</div>
-                <div class="donated-gift-date">
-                <i class="fas fa-calendar-check"></i>
-                <span data-i18n="guests:giftsDonatedOn:rich" data-i18n-options='{"date": "${formatDate(choice.date)}"}'>${donatedOnText}</span>
+                <div class="donated-gift-content">
+                    <h4 class="donated-gift-title">${escapeHtml(choice.giftTitle)}</h4>
+                    <div class="donated-gift-price">€${choice.giftAmount}</div>
+                    <div class="donated-gift-date">
+                        <i class="fas fa-calendar-check"></i>
+                        <span data-i18n="guests:giftsDonatedOn:rich" data-i18n-options='{"date": "${formatDate(choice.date)}"}'>${donatedOnText}</span>
+                    </div>
+                    ${choice.message ? `
+                    <div class="donated-gift-message">
+                        <i class="fas fa-quote-left"></i>
+                        ${escapeHtml(choice.message)}
+                        <i class="fas fa-quote-right"></i>
+                    </div>
+                    ` : ''}
                 </div>
-                ${choice.message ? `
-                <div class="donated-gift-message">
-                    <i class="fas fa-quote-left"></i>
-                    ${escapeHtml(choice.message)}
-                    <i class="fas fa-quote-right"></i>
-                </div>
-                ` : ''}
-            </div>
             </div>
         </div>
         `;
@@ -149,9 +149,9 @@ try {
     html += `
     <div class="gifts-available-section">
         <div class="available-gifts-header">
-        <i class="fas fa-gift"></i>
-        <h3><span data-i18n="guests:giftsRegistryTitle">${translate('guests:giftsRegistryTitle')}</span></h3>
-        <p><span data-i18n="guests:giftsRegistrySubtitle">${translate('guests:giftsRegistrySubtitle')}</span></p>
+            <i class="fas fa-gift"></i>
+            <h3><span data-i18n="guests:giftsRegistryTitle">${translate('guests:giftsRegistryTitle')}</span></h3>
+            <p><span data-i18n="guests:giftsRegistrySubtitle">${translate('guests:giftsRegistrySubtitle')}</span></p>
         </div>
         <div class="gift-cards-grid">
     `;
@@ -159,9 +159,9 @@ try {
     if (gifts.length === 0) {
     html += `
         <div class="empty-state">
-        <i class="fas fa-inbox"></i>
-        <h4><span data-i18n="guests:giftsNoAvailable">${translate('guests:giftsNoAvailable')}</span></h4>
-        <p><span data-i18n="guests:giftsNoAvailableDescription">${translate('guests:giftsNoAvailableDescription')}</span></p>
+            <i class="fas fa-inbox"></i>
+            <h4><span data-i18n="guests:giftsNoAvailable">${translate('guests:giftsNoAvailable')}</span></h4>
+            <p><span data-i18n="guests:giftsNoAvailableDescription">${translate('guests:giftsNoAvailableDescription')}</span></p>
         </div>
     `;
     } else {
@@ -171,10 +171,10 @@ try {
         html += `
         <div class="card gift-credit-card ${!isAvailable ? 'sold-out' : ''}" data-gift-id="${gift.id}">
             <div class="gift-card-image-section" style="background-image: url('${escapeHtml(gift.imageUrl)}');">
-            <div class="gift-card-image-overlay">
-                <h4 class="gift-card-title">${escapeHtml(gift.title)}</h4>
-                <div class="gift-card-price">${escapeHtml(gift.priceDisplay)}</div>
-            </div>
+                <div class="gift-card-image-overlay">
+                    <h4 class="gift-card-title">${escapeHtml(gift.title)}</h4>
+                    <div class="gift-card-price">${escapeHtml(gift.priceDisplay)}</div>
+                </div>
             </div>
             <div class="gift-card-details">
             <p class="gift-card-description">${gift.description}</p>
