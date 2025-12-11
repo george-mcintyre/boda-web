@@ -7,7 +7,7 @@
    DIETARY MEMBER CARD - Elevated Style
    ======================================== */
 .dietary-member-card {
-  background: linear-gradient(135deg, var(--accent-color), #f3e8e5);
+  background: linear-gradient(135deg, rgba(139, 90, 150, 0.1), rgba(139, 90, 150, 0.15));
   border: 1px solid rgba(199, 162, 122, 0.3);
   border-radius: var(--radius-xl);
   padding: 16px 20px;

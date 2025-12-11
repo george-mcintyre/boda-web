@@ -280,6 +280,49 @@ try {
             .filter(name => name);
         
         html += `
+        <div class="menu-choice-items">
+        `;
+
+        // Sort menu courses by the correct order: starter, main, dessert, drinks
+        const courseOrder = { starter: 1, main: 2, dessert: 3, drinks: 4 };
+        const sortedMenu = menu.slice().sort((a, b) => (courseOrder[a.course] || 999) - (courseOrder[b.course] || 999));
+        
+        sortedMenu.forEach(course => {
+        const selectedOptionId = memberChoices[course.id];
+        const isSelectable = course.selectionRequired !== false && course.options && course.options.length > 1;
+        
+        if (isSelectable) {
+            // Selectable course - show selected option
+            const selectedLabel = selectedOptionId ? optionsLookup[selectedOptionId] : null;
+            
+            html += `
+            <div class="menu-choice-item">
+                <span class="menu-course-label">${escapeHtml(course.label)}:</span>
+                <span class="menu-option-label ${selectedLabel ? '' : 'not-selected'}">
+                ${selectedLabel ? escapeHtml(selectedLabel) : 'Not selected'}
+                </span>
+            </div>
+            `;
+        } else {
+            // Non-selectable course - show all options or single option
+            const optionLabels = (course.options || []).map(o => o.label);
+            
+            html += `
+            <div class="menu-choice-item info-only">
+                <span class="menu-course-label">${escapeHtml(course.label)}:</span>
+                <span class="menu-option-label">
+                ${optionLabels.length > 0 ? optionLabels.map(l => escapeHtml(l)).join(', ') : 'N/A'}
+                </span>
+            </div>
+            `;
+        }
+        });
+        
+        html += `
+        </div>
+        `;
+
+        html += `
         <div class="dietary-member-card">
             <div class="dietary-requirements-list">
         `;
@@ -322,49 +365,8 @@ try {
         </div>
         `;
         
-        html += `
-        <div class="menu-choice-items">
-        `;
+        
 
-        // Sort menu courses by the correct order: starter, main, dessert, drinks
-        const courseOrder = { starter: 1, main: 2, dessert: 3, drinks: 4 };
-        const sortedMenu = menu.slice().sort((a, b) => (courseOrder[a.course] || 999) - (courseOrder[b.course] || 999));
-        
-        sortedMenu.forEach(course => {
-        const selectedOptionId = memberChoices[course.id];
-        const isSelectable = course.selectionRequired !== false && course.options && course.options.length > 1;
-        
-        if (isSelectable) {
-            // Selectable course - show selected option
-            const selectedLabel = selectedOptionId ? optionsLookup[selectedOptionId] : null;
-            
-            html += `
-            <div class="menu-choice-item">
-                <span class="menu-course-label">${escapeHtml(course.label)}:</span>
-                <span class="menu-option-label ${selectedLabel ? '' : 'not-selected'}">
-                ${selectedLabel ? escapeHtml(selectedLabel) : 'Not selected'}
-                </span>
-            </div>
-            `;
-        } else {
-            // Non-selectable course - show all options or single option
-            const optionLabels = (course.options || []).map(o => o.label);
-            
-            html += `
-            <div class="menu-choice-item info-only">
-                <span class="menu-course-label">${escapeHtml(course.label)}:</span>
-                <span class="menu-option-label">
-                ${optionLabels.length > 0 ? optionLabels.map(l => escapeHtml(l)).join(', ') : 'N/A'}
-                </span>
-            </div>
-            `;
-        }
-        });
-        
-        html += `
-        </div>
-        `;
-    
         html += `
             </div>
         </div>
