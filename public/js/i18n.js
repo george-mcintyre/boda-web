@@ -303,6 +303,8 @@ const translations = {
     'admin:gifts.priceOption.500': '€500',
 
     // Admin Settings Section
+    'admin:settings.enabled': 'Enabled',
+    'admin:settings.disabled': 'Disabled',
     'admin:settings.title': 'Settings',
     'admin:settings.featureToggles': 'Feature Toggles',
     'admin:settings.featureTogglesDescription': 'Control which features are available to guests',
@@ -776,6 +778,8 @@ const translations = {
     'admin:gifts.priceOption.500': '500 €',
 
     // Admin Settings Section
+    'admin:settings.enabled': 'Activado',
+    'admin:settings.disabled': 'Desactivado',
     'admin:settings.title': 'Configuración',
     'admin:settings.featureToggles': 'Activar/desactivar funciones',
     'admin:settings.featureTogglesDescription': 'Controla qué funciones están disponibles para los invitados',
@@ -1257,6 +1261,8 @@ const translations = {
     'admin:gifts.priceOption.500': '500 €',
   
     // Admin Settings Section
+    'admin:settings.enabled': 'Activé',
+    'admin:settings.disabled': 'Désactivé',
     'admin:settings.title': 'Paramètres',
     'admin:settings.featureToggles': 'Fonctionnalités',
     'admin:settings.featureTogglesDescription': 'Contrôlez les fonctionnalités disponibles pour les invités',
@@ -1734,6 +1740,8 @@ const translations = {
     'admin:gifts.priceOption.500': '500 €',
   
     // Admin Settings Section
+    'admin:settings.enabled': 'Aktiviert',
+    'admin:settings.disabled': 'Deaktiviert',
     'admin:settings.title': 'Einstellungen',
     'admin:settings.featureToggles': 'Funktionen',
     'admin:settings.featureTogglesDescription': 'Steuere, welche Funktionen für Gäste verfügbar sind',
