@@ -1626,6 +1626,15 @@
   }
 
   // ========== Messages ==========
+  // State for admin messages pagination
+  let adminMessagesState = {
+    messages: [],
+    nextCursor: null,
+    hasMoreMessages: true,
+    isLoadingMessages: false,
+    limit: 15
+  };
+
   // Global delete function for onclick handlers
   window.deleteMessage = async function(messageId) {
     if (!confirm('Are you sure you want to delete this message?')) {
@@ -1633,8 +1642,8 @@
     }
 
     try {
-      const r = await api(`/api/admin/messages/${messageId}`, { 
-        method: 'DELETE' 
+      const r = await api(`/api/admin/messages/${messageId}`, {
+        method: 'DELETE'
       });
       
       if (r.ok) {
@@ -1645,6 +1654,8 @@
           messageElement.style.transform = 'translateX(-20px)';
           setTimeout(() => {
             messageElement.remove();
+            // Also remove from state
+            adminMessagesState.messages = adminMessagesState.messages.filter(m => m.id !== messageId);
             // Check if there are no more messages
             const remainingMessages = document.querySelectorAll('.message-item');
             if (remainingMessages.length === 0) {
@@ -1671,17 +1682,101 @@
     }
   };
 
+  // Load admin messages with cursor-based pagination
+  async function loadAdminMessages(options = {}) {
+    const { cursor = null, fromBeginning = false, append = false } = options;
+    
+    if (adminMessagesState.isLoadingMessages) return;
+    adminMessagesState.isLoadingMessages = true;
+
+    // Show loading indicator
+    const loadingEl = document.getElementById('adminMessagesLoading');
+    if (loadingEl) {
+      loadingEl.style.display = 'flex';
+    }
+
+    try {
+      const url = new URL('/api/admin/messages', window.location.origin);
+      url.searchParams.append('limit', adminMessagesState.limit);
+      if (!fromBeginning && cursor) {
+        url.searchParams.append('cursor', cursor);
+      }
+
+      const response = await api(url.toString());
+
+      if (response.ok) {
+        const data = await response.json();
+        const items = data.items || [];
+        adminMessagesState.nextCursor = data.nextCursor || null;
+        adminMessagesState.hasMoreMessages = adminMessagesState.nextCursor !== null;
+
+        const newMessages = items.map(msg => ({
+          id: msg.id,
+          author: msg.author || 'Guest',
+          body: msg.body || '',
+          createdAt: msg.createdAt
+        }));
+
+        if (append) {
+          adminMessagesState.messages = [...adminMessagesState.messages, ...newMessages];
+        } else {
+          adminMessagesState.messages = newMessages;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading admin messages:', error);
+    } finally {
+      adminMessagesState.isLoadingMessages = false;
+      // Hide loading indicator
+      if (loadingEl) {
+        loadingEl.style.display = 'none';
+      }
+    }
+
+    renderAdminMessages();
+  }
+
+  // Setup infinite scroll for admin messages
+  function setupAdminMessagesInfiniteScroll() {
+    const container = document.getElementById('adminMessagesList');
+    if (!container) return;
+
+    // Remove existing sentinel if any
+    const existingSentinel = document.getElementById('admin-messages-scroll-sentinel');
+    if (existingSentinel) {
+      existingSentinel.remove();
+    }
+
+    const sentinel = document.createElement('div');
+    sentinel.id = 'admin-messages-scroll-sentinel';
+    sentinel.style.height = '1px';
+    container.appendChild(sentinel);
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && adminMessagesState.hasMoreMessages && !adminMessagesState.isLoadingMessages) {
+          loadAdminMessages({ cursor: adminMessagesState.nextCursor, append: true });
+        }
+      });
+    }, { rootMargin: '100px' });
+
+    observer.observe(sentinel);
+  }
+
   async function showMessages(){
     activate('messages');
     setLoading(translate('admin:loadingMessages'));
 
+    // Reset state
+    adminMessagesState = {
+      messages: [],
+      nextCursor: null,
+      hasMoreMessages: true,
+      isLoadingMessages: false,
+      limit: 15
+    };
+
     try {
-      const res = await api('/api/admin/messages');
-      const data = res.ok ? await res.json() : [];
-      
-      // Use the same data structure as the guest comments system
-      const messages = data.items || data || [];
-      
       content.innerHTML = `
         <div class="admin-content">
           <div class="messages-header">
@@ -1691,13 +1786,7 @@
           
           <!-- Messages list -->
           <div class="messages-list" id="adminMessagesList">
-            ${messages.length === 0 ? `
-              <div class="no-messages">
-                <i class="fas fa-comments"></i>
-                <p><div data-i18n="admin:messages.noMessages">${translate('admin:messages.noMessages')}</div></p>
-              </div>
-            ` : ''}
-            <div class="loading-messages">
+            <div id="adminMessagesLoading" class="loading-messages" style="display: flex;">
               <i class="fas fa-spinner fa-spin"></i>
               <span><div data-i18n="admin:messages.loading">${translate('admin:messages.loading')}</div></span>
             </div>
@@ -1705,8 +1794,11 @@
         </div>
       `;
       
-      // Render the messages
-      renderAdminMessages(messages);
+      // Load initial messages
+      await loadAdminMessages({ fromBeginning: true });
+      
+      // Setup infinite scroll
+      setupAdminMessagesInfiniteScroll();
       
     } catch (error) {
       console.error('Error loading messages:', error);
@@ -1726,16 +1818,26 @@
   }
 
   // Render admin messages with delete functionality
-  function renderAdminMessages(messages) {
+  function renderAdminMessages() {
     const messagesList = document.getElementById('adminMessagesList');
     if (!messagesList) return;
 
-    if (messages.length === 0) {
-      return; // Already handled in showMessages
+    // Keep the sentinel if it exists
+    const sentinel = document.getElementById('admin-messages-scroll-sentinel');
+
+    if (adminMessagesState.messages.length === 0 && !adminMessagesState.isLoadingMessages) {
+      messagesList.innerHTML = `
+        <div class="no-messages">
+          <i class="fas fa-comments"></i>
+          <p><div data-i18n="admin:messages.noMessages">${translate('admin:messages.noMessages')}</div></p>
+        </div>
+      `;
+      if (sentinel) messagesList.appendChild(sentinel);
+      return;
     }
 
     // Sort messages by date (most recent first)
-    const sortedMessages = messages.sort((a, b) => 
+    const sortedMessages = adminMessagesState.messages.sort((a, b) =>
       new Date(b.createdAt) - new Date(a.createdAt)
     );
 
@@ -1762,14 +1864,29 @@
       `;
     }).join('');
 
-    messagesList.innerHTML = messagesHTML;
+    // Add loading indicator at the bottom
+    const loadingHTML = `
+      <div id="adminMessagesLoading" class="loading-messages" style="display: ${adminMessagesState.isLoadingMessages ? 'flex' : 'none'};">
+        <i class="fas fa-spinner fa-spin"></i>
+        <span><div data-i18n="admin:messages.loading">${translate('admin:messages.loading')}</div></span>
+      </div>
+    `;
+
+    messagesList.innerHTML = messagesHTML + loadingHTML;
+    
+    if (sentinel) messagesList.appendChild(sentinel);
+    
+    // Re-setup infinite scroll sentinel if needed
+    if (!sentinel && adminMessagesState.hasMoreMessages) {
+      setupAdminMessagesInfiniteScroll();
+    }
   }
 
   // Format message date for display
   function formatMessageDate(dateString) {
     if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB', {
+    return date.toLocaleDateString(getUserLanguage(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
