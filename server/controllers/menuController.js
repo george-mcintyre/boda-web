@@ -39,7 +39,7 @@ async function listCourses(req, res, next) {
         label: localize(course.label, lang),
         selectionRequired: course.selectionRequired !== undefined ? course.selectionRequired : true,
         options: options.map(option => {
-          const formattedOption = formatCourseOptionForApi(option);
+          const formattedOption = formatCourseOptionForApi(option, lang);
           // Ensure dietary icons are generated
           formattedOption.dietaryIcons = generateDietaryIconsHTML(option);
           return formattedOption;

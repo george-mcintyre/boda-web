@@ -690,6 +690,7 @@
             const label = `<label for="${id}" style="display:block;margin:6px 0 6px 0;font-weight:600;color:#333;">${f.label}${f.required?' *':''}</label>`;
             
             if (f.type === 'textarea') {
+              console.log('textarea', f);
               inputHtml = `<textarea id="${id}" name="${f.name}" rows="${f.rows||3}" style="${baseStyle}">${val!==undefined?String(val):''}</textarea>`;
             } else if (f.type === 'location') {
               // Location selector with map integration - pass separate coordinates if available
@@ -2664,7 +2665,7 @@
         fields: [
           { name: 'label', label: translate('admin:menu.field.option'), required: true, help: translate('admin:menu.field.optionHelp') },
           { name: 'image', label: translate('admin:menu.field.image'), type: 'file', help: translate('admin:menu.field.imageHelp') },
-          { name: 'description', label: translate('admin:menu.field.optionDescription'), required: false, help: translate('admin:menu.field.optionDescriptionHelp') },
+          { name: 'description', label: translate('admin:menu.field.optionDescription'), type: 'textarea', required: false, help: translate('admin:menu.field.optionDescriptionHelp') },
           // Special Dietary Indicators
           { name: 'isVegetarian', label: translate('admin:menu.field.isVegetarian'), type: 'checkbox', help: translate('admin:menu.field.helpVegetarian') },
           { name: 'containsAllergens', label: translate('admin:menu.field.containsAllergens'), type: 'checkbox', help: translate('admin:menu.field.helpAllergens') },
