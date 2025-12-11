@@ -2135,7 +2135,7 @@ main.main-content-full {
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   justify-content: center;
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
