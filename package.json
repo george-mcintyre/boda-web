@@ -20,6 +20,8 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@svar-ui/react-comments": "^2.3.1",
+    "@svar-ui/react-core": "^2.3.1",
     "bson": "^7.0.0"
   }
 }

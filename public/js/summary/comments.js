@@ -8,7 +8,10 @@ class CommentsSystem {
         this.partyMembers = [];
         this.selectedPartyMemberName = '';
         this.initialized = false;
-        this.injectStyles();
+        this.hasMoreComments = true;
+        this.isLoadingComments = false;
+        this.loadCommentsCallbacks = []; // Track callbacks for different contexts
+        this.limit = 10; // Number of comments to load per request
         this.init();
     }
 
@@ -22,10 +25,11 @@ class CommentsSystem {
             return;
         }
         
-        this.loadComments();
+        this.loadComments({ fromBeginning: true });
         this.loadPartyMembers();
         this.setupEventListeners();
         this.updateCharCount();
+        this.setupInfiniteScroll();
         this.initialized = true;
     }
 
@@ -173,11 +177,70 @@ class CommentsSystem {
         }
     }
 
+    // Setup infinite scroll for loading more comments
+    setupInfiniteScroll() {
+        const commentsList = document.getElementById('commentsList');
+        if (!commentsList) return;
+
+        // Create a sentinel element for intersection observer
+        const sentinel = document.createElement('div');
+        sentinel.id = 'comments-sentinel';
+        sentinel.style.height = '1px';
+        sentinel.style.width = '100%';
+        commentsList.appendChild(sentinel);
+
+        // Create intersection observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && this.hasMoreComments && !this.isLoadingComments) {
+                    this.loadMoreComments();
+                }
+            });
+        }, {
+            root: null,
+            rootMargin: '50px',
+            threshold: 0
+        });
+
+        observer.observe(sentinel);
+    }
+
+    // Load more comments (for infinite scroll)
+    async loadMoreComments() {
+        if (this.isLoadingComments || !this.hasMoreComments || !this.nextCursor) {
+            return;
+        }
+
+        await this.loadComments({ 
+            cursor: this.nextCursor,
+            append: true 
+        });
+    }
+
     // Load comments from the server
-    async loadComments() {
+    async loadComments(options = {}) {
+        const { cursor = null, limit = this.limit, fromBeginning = false, append = false } = options;
+        
+        // Prevent multiple simultaneous requests
+        if (this.isLoadingComments) {
+            return;
+        }
+        
+        this.isLoadingComments = true;
+
         try {
             const token = localStorage.getItem('token') || '';
-            const response = await fetch('/api/guest/messages', {
+            const url = new URL('/api/guest/messages', window.location.origin);
+            
+            // Add limit parameter
+            url.searchParams.append('limit', limit);
+            
+            // Add cursor parameter if not loading from beginning
+            if (!fromBeginning && cursor) {
+                url.searchParams.append('cursor', cursor);
+            }
+
+            const response = await fetch(url.toString(), {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -190,29 +253,41 @@ class CommentsSystem {
                 const items = data.items || [];
                 this.nextCursor = data.nextCursor || null;
                 
+                // Check if there are more comments to load
+                this.hasMoreComments = this.nextCursor !== null;
+                
                 // Map API response format to internal format
-                this.comments = items.map(msg => ({
+                const newComments = items.map(msg => ({
                     id: msg.id,
                     name: msg.author || 'Guest',
                     body: msg.body || '',
                     createdAt: msg.createdAt,
                     reactions: msg.reactions || []
                 }));
+
+                if (append) {
+                    // Append new comments to existing ones
+                    this.comments = [...this.comments, ...newComments];
+                } else {
+                    // Replace comments (fresh load)
+                    this.comments = newComments;
+                }
             } else {
                 console.error('Failed to load comments:', response.status);
-                this.comments = [];
+                if (!append) {
+                    this.comments = [];
+                }
             }
         } catch (error) {
             console.error('Error loading comments:', error);
-            this.comments = [];
+            if (!append) {
+                this.comments = [];
+            }
+        } finally {
+            this.isLoadingComments = false;
         }
+        
         this.renderComments();
-    }
-
-    // Inject styles for floating reaction picker
-    injectStyles() {
-        if (document.getElementById('reaction-styles')) return;
-        const style = document.createElement('style');
     }
 
     // Available emojis for reactions
@@ -247,8 +322,11 @@ class CommentsSystem {
                 return;
             }
             
-            // Reload comments to reflect updated counts
-            await this.loadComments();
+            // Reload comments from current cursor to maintain position
+            await this.loadComments({ 
+                cursor: this.comments.length > 0 ? this.comments[this.comments.length - 1].id : null,
+                append: false 
+            });
         } catch (err) {
             console.error('Error applying reaction:', err);
             this.showToast('Connection error when applying reaction', 'error');
@@ -323,8 +401,8 @@ class CommentsSystem {
                 commentInput.value = '';
                 this.updateCharCount();
                 
-                // Reload comments
-                await this.loadComments();
+                // Reload comments from beginning (new comment appears at top)
+                await this.loadComments({ fromBeginning: true });
                 
                 this.showToast('Comment posted successfully', 'success');
             } else {
@@ -355,7 +433,7 @@ class CommentsSystem {
                 });
 
                 if (response.ok) {
-                    await this.loadComments();
+                    await this.loadComments({ fromBeginning: true });
                     this.showToast('Comment deleted successfully', 'success');
                 } else {
                     const errorData = await response.json();
