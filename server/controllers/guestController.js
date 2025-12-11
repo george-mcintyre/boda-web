@@ -237,6 +237,7 @@ async function getGifts(req, res, next) {
 }
 
 async function getGiftChoices(req, res, next) {
+  const lang = getLang(req);
   try {
     const me = await guestService.getByEmail(req.user.email);
     if (!me) return res.status(404).json({ error: 'Guest not found' });
