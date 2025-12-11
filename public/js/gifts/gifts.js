@@ -83,22 +83,22 @@ try {
     if (paymentStatus === 'success') {
     html += `
         <div class="payment-success-card">
-        <div class="success-icon">
-            <i class="fas fa-check-circle"></i>
-        </div>
-        <h1 data-i18n="guests:giftsPaymentSuccessTitle">${translate('guests:giftsPaymentSuccessTitle')}</h1>
-        <p class="success-message" data-i18n="guests:giftsPaymentSuccess">${translate('guests:giftsPaymentSuccess')}</p>
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h1 data-i18n="guests:giftsPaymentSuccessTitle">${translate('guests:giftsPaymentSuccessTitle')}</h1>
+            <p class="success-message" data-i18n="guests:giftsPaymentSuccess">${translate('guests:giftsPaymentSuccess')}</p>
         </div>
     `;
     } else if (paymentStatus === 'cancelled') {
     html += `
         <div class="payment-cancelled-card">
-        <div class="cancelled-icon">
-            <i class="fas fa-times-circle"></i>
+            <div class="cancelled-icon">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <h1 data-i18n="guests:giftsPaymentCancelledTitle">${translate('guests:giftsPaymentCancelledTitle')}</h1>
+            <p class="cancelled-message" data-i18n="guests:giftsPaymentCancelled">${translate('guests:giftsPaymentCancelled')}</p>
         </div>
-        </div>
-        <h1 data-i18n="guests:giftsPaymentCancelledTitle">${translate('guests:giftsPaymentCancelledTitle')}</h1>
-        <p class="cancelled-message" data-i18n="guests:giftsPaymentCancelled">${translate('guests:giftsPaymentCancelled')}</p>
     `;
     }
 
@@ -106,11 +106,11 @@ try {
     if (giftChoices.length > 0) {
     html += `
         <div class="gifts-thank-you-section">
-        <div class="thank-you-header">
-            <i class="fas fa-heart"></i>
+            <div class="thank-you-header">
+                <i class="fas fa-heart"></i>
+            </div>
             <h3><span data-i18n="guests:giftsThankYouTitle">${translate('guests:giftsThankYouTitle')}</span></h3>
             <p><span data-i18n="guests:giftsThankYouMessage">${translate('guests:giftsThankYouMessage')}</span></p>
-        </div>
         <div class="donated-gifts-grid">
     `;
 
