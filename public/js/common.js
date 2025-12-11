@@ -361,8 +361,9 @@ window.switchToTab = function(tabName, updateUrl = true) {
 
 // Function to update URL with tab parameter for deep linking
 window.updateUrlWithTab = function(tabName) {
-  const url = new URL(window.location);
+  const url = new URL(window.location.href);
+  url.search = '';
   url.searchParams.set('tab', tabName);
-  window.history.replaceState({}, '', url);
+  window.history.replaceState({}, '', url.toString());
 }
 
