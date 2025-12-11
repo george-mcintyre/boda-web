@@ -2024,10 +2024,11 @@ function toLocalizedString(value, lang = currentLanguage) {
 function updatePageContent() {
   document.querySelectorAll('[data-i18n]').forEach(element => {
     const key = element.getAttribute('data-i18n');
+    const options = element.getAttribute('data-i18n-options');
     const isRich = key.endsWith(':rich');
     const isTooltip = key.endsWith(':tooltip');
     const isPlaceholder = key.endsWith(':placeholder');
-    const translation = translate(key);
+    const translation = options ? translateWithVars(key, JSON.parse(options)) : translate(key);
 
     if (translation !== key) {
       if (isRich) {
