@@ -377,7 +377,7 @@ class CommentsSystem {
             commentsList.innerHTML = `
                 <div class="no-comments">
                     <i class="fas fa-comments"></i>
-                    <p>No hay comentarios aún. ¡Sé el primero en comentar!</p>
+                    <pdata-i18n="guests:noComments">${translate('guests:noComments')}</p>
                 </div>
             `;
             return;

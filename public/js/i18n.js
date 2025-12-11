@@ -144,6 +144,7 @@ const translations = {
 
     // Comments Page
     'guests:commentsTitle': 'Comments',
+    'guests:noComments': 'No comments yet. Be the first to comment!',
     'guests:commentsSubtitle:rich': 'Share your thoughts with other guests',
     'guests:comment:placeholder': 'Write your comment...',
     'guests:postComment': 'Post',
@@ -618,6 +619,7 @@ const translations = {
     'guests:menuPageDescription': 'Elige tus platos preferidos para el banquete de la boda.',
 
     // Comments Page
+    'guests:noComments': 'No hay comentarios aún. ¡Sé el primero en comentar!',
     'guests:commentsTitle': 'Comentarios',
     'guests:commentsSubtitle:rich': 'Comparte tus pensamientos con otros invitados',
     'guests:comment:placeholder': 'Escribe tu comentario...',
@@ -1102,6 +1104,7 @@ const translations = {
   
     // Comments Page
     'guests:commentsTitle': 'Commentaires',
+    'guests:noComments': 'Aucun commentaire pour l’instant. Soyez le premier à commenter !',
     'guests:commentsSubtitle:rich': 'Partagez vos pensées avec les autres invités',
     'guests:comment:placeholder': 'Écrivez votre commentaire...',
     'guests:postComment': 'Publier',
@@ -1581,6 +1584,7 @@ const translations = {
   
     // Comments Page
     'guests:commentsTitle': 'Kommentare',
+    'guests:noComments': 'Noch keine Kommentare. Sei der Erste, der einen Kommentar schreibt!',
     'guests:commentsSubtitle:rich': 'Teile deine Gedanken mit den anderen Gästen',
     'guests:comment:placeholder': 'Schreibe deinen Kommentar...',
     'guests:postComment': 'Veröffentlichen',
