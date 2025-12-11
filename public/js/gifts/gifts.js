@@ -1,69 +1,89 @@
 // Gifts Management Module
 
-// Function to load the gifts content in the gifts tab
-async function loadGiftsContent() {
-const giftsContent = document.getElementById('gifts');
+function formatPartyNames(partyData) {
+  const names = partyData.map(p => p.name);
 
-if (!giftsContent) {
-    console.error('Gifts content container not found');
-    return;
+  if (names.length === 0) return '';
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} & ${names[1]}`;
+
+// 3 or more: "A, B, & C"
+  return `${names.slice(0, -1).join(', ')}, & ${names[names.length - 1]}`;
 }
 
+// Function to load the gifts content in the gifts tab
+async function loadGiftsContent() {
+  const giftsContent = document.getElementById('gifts');
+
+  if (!giftsContent) {
+    console.error('Gifts content container not found');
+    return;
+  }
+
 // Show loading state
-giftsContent.innerHTML = `
+  giftsContent.innerHTML = `
     <div class="loading-state">
     <i class="fas fa-spinner fa-spin fa-3x"></i>
     <p><span data-i18n="guests:giftsLoading">${translate('guests:giftsLoading')}</span></p>
     </div>
 `;
 
-try {
+  try {
     // Fetch gift choices (donations) and available gifts in parallel
-    const [giftChoicesRes, giftsRes] = await Promise.all([
-    fetch('/api/guest/gift-choices', {
+    const [partyResponse, giftChoicesRes, giftsRes] = await Promise.all([
+      fetch('/api/guest/party', {
         method: 'GET',
-        headers: { 'Authorization': window.token }
-    }),
-    fetch(`/api/guest/gifts?lang=${window.currentLanguage}`, {
+        headers: {'Authorization': window.token}
+      }),
+      fetch('/api/guest/gift-choices', {
         method: 'GET',
-        headers: { 'Authorization': window.token }
-    })
+        headers: {'Authorization': window.token}
+      }),
+      fetch(`/api/guest/gifts?lang=${window.currentLanguage}`, {
+        method: 'GET',
+        headers: {'Authorization': window.token}
+      })
     ]);
-    
+
+    let partyData = [];
     let giftChoices = [];
     let gifts = [];
-    
-    if (giftChoicesRes.ok) {
-    giftChoices = await giftChoicesRes.json();
+
+    if (partyResponse.ok) {
+      partyData = await partyResponse.json();
     }
-    
+
+    if (giftChoicesRes.ok) {
+      giftChoices = await giftChoicesRes.json();
+    }
+
     if (!giftsRes.ok) {
-    throw new Error('Failed to load gifts');
+      throw new Error('Failed to load gifts');
     }
     gifts = await giftsRes.json();
-    
+
     // Helper to escape HTML
     const escapeHtml = (str) => {
-    if (!str) return '';
-    return String(str)
+      if (!str) return '';
+      return String(str)
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
     };
-    
+
     // Format date helper
     const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString(window.currentLanguage || 'en-GB', {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toLocaleDateString(window.currentLanguage || 'en-GB', {
         day: 'numeric',
         month: 'long',
         year: 'numeric'
-    });
+      });
     };
-    
+
     let html = '<div class="gifts-container">';
 
     html += `
@@ -81,7 +101,7 @@ try {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment');
     if (paymentStatus === 'success') {
-    html += `
+      html += `
         <div class="payment-success-card">
             <div class="success-icon">
                 <i class="fas fa-check-circle"></i>
@@ -91,7 +111,7 @@ try {
         </div>
     `;
     } else if (paymentStatus === 'cancelled') {
-    html += `
+      html += `
         <div class="payment-cancelled-card">
             <div class="cancelled-icon">
                 <i class="fas fa-times-circle"></i>
@@ -104,7 +124,8 @@ try {
 
     // ========== Section 1: Thank You Section (if there are donated gifts) ==========
     if (giftChoices.length > 0) {
-    html += `
+      const partyNames = formatPartyNames(partyData);
+      html += `
         <div class="gifts-thank-you-section">
             <div class="thank-you-header">
                 <i class="fas fa-heart"></i>
@@ -114,8 +135,8 @@ try {
         <div class="donated-gifts-grid">
     `;
 
-    giftChoices.forEach(choice => {
-        const donatedOnText = translateWithVars('guests:giftsDonatedOn:rich', { date: formatDate(choice.date) });
+      giftChoices.forEach(choice => {
+        const donatedOnText = translateWithVars('guests:giftsDonatedOn:rich', {date: formatDate(choice.date)});
         html += `
         <div class="donated-gift-card" style="background-image: url('${escapeHtml(choice.giftImageUrl)}');">
             <div class="donated-gift-overlay">
@@ -129,7 +150,7 @@ try {
                     ${choice.message ? `
                     <div class="donated-gift-message">
                         <i class="fas fa-quote-left"></i>
-                        ${escapeHtml(choice.message)}
+                        ${escapeHtml(choice.message)} -- ${partyNames}
                         <i class="fas fa-quote-right"></i>
                     </div>
                     ` : ''}
@@ -137,14 +158,14 @@ try {
             </div>
         </div>
         `;
-    });
+      });
 
-    html += `
+      html += `
         </div>
         </div>
     `;
     }
-    
+
     // ========== Section 2: Available Gifts Grid ==========
     html += `
     <div class="gifts-available-section">
@@ -155,9 +176,9 @@ try {
         </div>
         <div class="gift-cards-grid">
     `;
-    
+
     if (gifts.length === 0) {
-    html += `
+      html += `
         <div class="empty-state">
             <i class="fas fa-inbox"></i>
             <h4><span data-i18n="guests:giftsNoAvailable">${translate('guests:giftsNoAvailable')}</span></h4>
@@ -165,9 +186,9 @@ try {
         </div>
     `;
     } else {
-    gifts.forEach(gift => {
+      gifts.forEach(gift => {
         const isAvailable = gift.stock > 0;
-        
+
         html += `
         <div class="card gift-credit-card ${!isAvailable ? 'sold-out' : ''}" data-gift-id="${gift.id}">
             <div class="gift-card-image-section" style="background-image: url('${escapeHtml(gift.imageUrl)}');">
@@ -180,9 +201,9 @@ try {
             <p class="gift-card-description">${gift.description}</p>
             <div class="gift-card-stock">
                 ${isAvailable
-                ? `<span class="stock-available"><i class="fas fa-check-circle"></i> ${gift.stock} <span data-i18n="guests:giftsAvailable">${translate('guests:giftsAvailable')}</span></span>`
-                : `<span class="stock-sold-out"><i class="fas fa-times-circle"></i> <span data-i18n="guests:giftsSoldOut">${translate('guests:giftsSoldOut')}</span></span>`
-                }
+          ? `<span class="stock-available"><i class="fas fa-check-circle"></i> ${gift.stock} <span data-i18n="guests:giftsAvailable">${translate('guests:giftsAvailable')}</span></span>`
+          : `<span class="stock-sold-out"><i class="fas fa-times-circle"></i> <span data-i18n="guests:giftsSoldOut">${translate('guests:giftsSoldOut')}</span></span>`
+        }
             </div>
             <div class="action-container">
                 ${isAvailable ? `
@@ -200,24 +221,24 @@ try {
             </div>
         </div>
         `;
-    });
+      });
     }
-    
+
     html += `
         </div>
     </div>
     `;
-    
-    html += '</div>'; // Close gifts-container
-    
-    giftsContent.innerHTML = html;
-    
-// Translate the newly loaded content
-if (typeof updatePageContent === 'function') {
-    updatePageContent();
-}
 
-} catch (err) {
+    html += '</div>'; // Close gifts-container
+
+    giftsContent.innerHTML = html;
+
+// Translate the newly loaded content
+    if (typeof updatePageContent === 'function') {
+      updatePageContent();
+    }
+
+  } catch (err) {
     console.error('Error loading gifts:', err);
     giftsContent.innerHTML = `
     <div class="error-state">
@@ -232,17 +253,17 @@ if (typeof updatePageContent === 'function') {
     `;
     // Even on error, try to translate any remaining content
     if (typeof updatePageContent === 'function') {
-    updatePageContent();
+      updatePageContent();
     }
-}
+  }
 }
 
 // Global function to purchase a gift
 window.purchaseGift = async (giftId, giftTitle, giftAmount) => {
 // Show a confirmation dialog with optional message
-const overlay = document.createElement('div');
-overlay.className = 'gift-purchase-overlay';
-overlay.innerHTML = `
+  const overlay = document.createElement('div');
+  overlay.className = 'gift-purchase-overlay';
+  overlay.innerHTML = `
     <div class="gift-purchase-dialog">
     <div class="gift-purchase-header">
         <i class="fas fa-gift"></i>
@@ -269,60 +290,60 @@ overlay.innerHTML = `
     </div>
 `;
 
-document.body.appendChild(overlay);
-setTimeout(() => overlay.classList.add('show'), 10);
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.add('show'), 10);
 
 // Handle cancel
-overlay.querySelector('.btn-cancel-purchase').addEventListener('click', () => {
+  overlay.querySelector('.btn-cancel-purchase').addEventListener('click', () => {
     overlay.classList.remove('show');
     setTimeout(() => document.body.removeChild(overlay), 300);
-});
+  });
 
 // Handle confirm
-overlay.querySelector('.btn-confirm-purchase').addEventListener('click', async () => {
+  overlay.querySelector('.btn-confirm-purchase').addEventListener('click', async () => {
     const message = document.getElementById('giftMessage').value.trim();
     const confirmBtn = overlay.querySelector('.btn-confirm-purchase');
-    
+
     // Show loading state
     confirmBtn.disabled = true;
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="guests:giftsPurchaseProcessing">' + translate('guests:giftsPurchaseProcessing') + '</span>';
-    
+
     try {
-    const response = await fetch(`/api/guest/create-payment-session?lang=${window.currentLanguage}`, {
+      const response = await fetch(`/api/guest/create-payment-session?lang=${window.currentLanguage}`, {
         method: 'POST',
         headers: {
-        'Content-Type': 'application/json',
-        'Authorization': window.token
+          'Content-Type': 'application/json',
+          'Authorization': window.token
         },
-        body: JSON.stringify({ giftId, message })
-    });
-    
-    const data = await response.json();
-    
-    if (response.ok && data.checkoutUrl) {
+        body: JSON.stringify({giftId, message})
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.checkoutUrl) {
         // Redirect to Stripe checkout
         window.location.href = data.checkoutUrl;
-    } else {
+      } else {
         showToast(data.error || translate('guests:giftsPaymentError'), 'error');
         confirmBtn.disabled = false;
         confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> <span data-i18n="guests:giftsPurchaseProceed">' + translate('guests:giftsPurchaseProceed') + '</span>';
-    }
+      }
     } catch (err) {
-    console.error('Error creating payment session:', err);
-    showToast(translate('guests:giftsPaymentServiceError'), 'error');
-    confirmBtn.disabled = false;
-    confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> <span data-i18n="guests:giftsPurchaseProceed">' + translate('guests:giftsPurchaseProceed') + '</span>';
+      console.error('Error creating payment session:', err);
+      showToast(translate('guests:giftsPaymentServiceError'), 'error');
+      confirmBtn.disabled = false;
+      confirmBtn.innerHTML = '<i class="fas fa-credit-card"></i> <span data-i18n="guests:giftsPurchaseProceed">' + translate('guests:giftsPurchaseProceed') + '</span>';
     }
-});
+  });
 
 // Close on escape
-const handleEscape = (e) => {
+  const handleEscape = (e) => {
     if (e.key === 'Escape') {
-    overlay.classList.remove('show');
-    setTimeout(() => document.body.removeChild(overlay), 300);
-    document.removeEventListener('keydown', handleEscape);
+      overlay.classList.remove('show');
+      setTimeout(() => document.body.removeChild(overlay), 300);
+      document.removeEventListener('keydown', handleEscape);
     }
-};
-document.addEventListener('keydown', handleEscape);
+  };
+  document.addEventListener('keydown', handleEscape);
 };
 
