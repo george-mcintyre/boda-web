@@ -2159,6 +2159,7 @@ main.main-content-full {
 }
 
 .donated-gift-title {
+  color: var(--accent-colo);
   margin: 0 0 5px 0;
   font-size: 1.1em;
 }

@@ -115,7 +115,7 @@ try {
     `;
 
     giftChoices.forEach(choice => {
-        const donatedOnText = translate('guests:giftsDonatedOn:rich').replace('{{date}}', formatDate(choice.date));
+        const donatedOnText = translateWithVars('guests:giftsDonatedOn:rich', { date: formatDate(choice.date) });
         html += `
         <div class="donated-gift-card" style="background-image: url('${escapeHtml(choice.giftImageUrl)}');">
             <div class="donated-gift-overlay">
@@ -130,6 +130,7 @@ try {
                 <div class="donated-gift-message">
                     <i class="fas fa-quote-left"></i>
                     ${escapeHtml(choice.message)}
+                    <i class="fas fa-quote-right"></i>
                 </div>
                 ` : ''}
             </div>

@@ -666,6 +666,7 @@ const translations = {
     'guests:giftsPageTitle': 'Lista de regalos',
     'guests:giftsPageDescription': 'Tu presencia es nuestro regalo. Pero si quieres contribuir a nuestra luna de miel, puedes elegir un regalo divertido de la lista de abajo; se imprimirá con tu mensaje y se mostrará en un gran panel en el banquete de boda. El importe que elijas se utilizará para financiar nuestra luna de miel. ¡Gracias!',
     'guests:giftsLoading': 'Cargando regalos...',
+    'guests:giftsThankYouTitle': '¡Gracias por tu generosidad!',
     'guests:giftsThankYouMessage': 'Estamos muy agradecidos por tus maravillosos regalos',
     'guests:giftsDonatedOn:rich': 'Donado el {{date}}',
     'guests:giftsRegistryTitle': 'Lista de regalos',
