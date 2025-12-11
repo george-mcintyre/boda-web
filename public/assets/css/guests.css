@@ -2132,8 +2132,11 @@ main.main-content-full {
 
 .donated-gifts-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+  justify-content: center;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .donated-gift-card {
@@ -2809,6 +2812,23 @@ main.main-content-full {
     grid-template-columns: 1fr;
   }
 
+  /* Tablet: 2 columns for donated gifts */
+  .donated-gifts-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 600px;
+  }
+
+  .donated-gift-card {
+    height: 180px;
+  }
+
+  .gift-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .donated-gifts-grid {
+    grid-template-columns: 1fr;
+  }
   .gift-cards-grid {
     grid-template-columns: 1fr;
   }
