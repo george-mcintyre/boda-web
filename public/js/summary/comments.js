@@ -1,298 +1,18 @@
-// Comments system for the guests page
+// Comments system for the guests page - Willow-styled vanilla implementation
+// This module integrates with the existing API endpoints
+
 class CommentsSystem {
     constructor() {
         this.comments = [];
         this.nextCursor = null;
-        this.currentUser = this.getCurrentUser();
-        this.isAdmin = this.checkIfAdmin();
-        this.partyMembers = [];
-        this.selectedPartyMemberName = '';
-        this.initialized = false;
         this.hasMoreComments = true;
         this.isLoadingComments = false;
-        this.loadCommentsCallbacks = []; // Track callbacks for different contexts
-        this.limit = 10; // Number of comments to load per request
-        this.init();
-    }
-
-    // Initialize the system
-    init() {
-        // Check if comments section is visible (respects messagesEnabled setting)
-        const commentsSection = document.querySelector('.comments-card');
-        if (!commentsSection || commentsSection.style.display === 'none') {
-            console.log('Comments section is hidden, skipping initialization');
-            this.initialized = false;
-            return;
-        }
-        
-        this.loadComments({ fromBeginning: true });
-        this.loadPartyMembers();
-        this.setupEventListeners();
-        this.updateCharCount();
-        this.setupInfiniteScroll();
-        this.initialized = true;
-    }
-
-    // Get current user from localStorage
-    getCurrentUser() {
-        const name = localStorage.getItem('name');
-        const email = localStorage.getItem('email');
-        const token = localStorage.getItem('token');
-        
-        if (name && email && token) {
-            return {
-                id: 'guest_' + Date.now(),
-                name: name,
-                email: email
-            };
-        }
-        
-        // Default user for testing (only if no login data)
-        return {
-            id: 'guest_' + Date.now(),
-            name: 'Guest',
-            email: 'guest@example.com'
-        };
-    }
-
-    // Check if user is admin
-    checkIfAdmin() {
-        return localStorage.getItem('isAdmin') === 'true';
-    }
-
-    // Setup event listeners
-    setupEventListeners() {
-        const commentForm = document.getElementById('commentForm');
-        const commentInput = document.getElementById('newComment');
-        const postingAsSelect = document.getElementById('postingAsSelect');
-
-        if (commentForm) {
-            commentForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.addComment();
-            });
-        }
-
-        if (commentInput) {
-            commentInput.addEventListener('input', () => {
-                this.updateCharCount();
-            });
-        }
-
-        if (postingAsSelect) {
-            postingAsSelect.addEventListener('change', (e) => {
-                this.selectedPartyMemberName = e.target.value;
-                localStorage.setItem('selectedPartyMemberName', this.selectedPartyMemberName);
-            });
-        }
-    }
-
-    // Load party members for the dropdown
-    async loadPartyMembers() {
-        try {
-            const token = localStorage.getItem('token') || '';
-            const response = await fetch('/api/guest/party', {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.ok) {
-                const partyMembers = await response.json();
-                this.partyMembers = partyMembers;
-                this.populatePartyMemberDropdown();
-            } else {
-                console.error('Failed to load party members:', response.status);
-                this.partyMembers = [];
-                this.populatePartyMemberDropdown();
-            }
-        } catch (error) {
-            console.error('Error loading party members:', error);
-            this.partyMembers = [];
-            this.populatePartyMemberDropdown();
-        }
-    }
-
-    // Populate the party member dropdown
-    populatePartyMemberDropdown() {
-        const postingAsSelect = document.getElementById('postingAsSelect');
-        if (!postingAsSelect) return;
-
-        // Clear existing options
-        postingAsSelect.innerHTML = '';
-
-        // Add default option
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = 'Select party member...';
-        postingAsSelect.appendChild(defaultOption);
-
-        // Add party member options
-        this.partyMembers.forEach(member => {
-            const option = document.createElement('option');
-            option.value = member.name;
-            option.textContent = member.name;
-            if (member.primary) {
-                option.textContent += ' (' + translate('common:party.primary') + ')';
-            }
-            postingAsSelect.appendChild(option);
-        });
-
-        // Restore previously selected value
-        const savedSelection = localStorage.getItem('selectedPartyMemberName') || '';
-        if (savedSelection && this.partyMembers.some(m => m.name === savedSelection)) {
-            postingAsSelect.value = savedSelection;
-            this.selectedPartyMemberName = savedSelection;
-        } else {
-            // Default to primary member or first member
-            const primaryMember = this.partyMembers.find(m => m.primary);
-            const fallbackMember = this.partyMembers[0];
-            const defaultMember = primaryMember || fallbackMember;
-            if (defaultMember) {
-                postingAsSelect.value = defaultMember.name;
-                this.selectedPartyMemberName = defaultMember.name;
-                localStorage.setItem('selectedPartyMemberName', this.selectedPartyMemberName);
-            }
-        }
-    }
-
-    // Update character counter
-    updateCharCount() {
-        const commentInput = document.getElementById('newComment');
-        const charCount = document.querySelector('.char-count');
-        
-        if (commentInput && charCount) {
-            const length = commentInput.value.length;
-            charCount.textContent = `${length}/500`;
-            
-            // Change color if limit is exceeded
-            if (length > 450) {
-                charCount.style.color = '#dc3545';
-            } else if (length > 400) {
-                charCount.style.color = '#ffc107';
-            } else {
-                charCount.style.color = 'var(--text-light)';
-            }
-        }
-    }
-
-    // Setup infinite scroll for loading more comments
-    setupInfiniteScroll() {
-        const commentsList = document.getElementById('commentsList');
-        if (!commentsList) return;
-
-        // Create a sentinel element for intersection observer
-        const sentinel = document.createElement('div');
-        sentinel.id = 'comments-sentinel';
-        sentinel.style.height = '1px';
-        sentinel.style.width = '100%';
-        commentsList.appendChild(sentinel);
-
-        // Create intersection observer
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && this.hasMoreComments && !this.isLoadingComments) {
-                    this.loadMoreComments();
-                }
-            });
-        }, {
-            root: null,
-            rootMargin: '50px',
-            threshold: 0
-        });
-
-        observer.observe(sentinel);
-    }
-
-    // Load more comments (for infinite scroll)
-    async loadMoreComments() {
-        if (this.isLoadingComments || !this.hasMoreComments || !this.nextCursor) {
-            return;
-        }
-
-        await this.loadComments({ 
-            cursor: this.nextCursor,
-            append: true 
-        });
-    }
-
-    // Load comments from the server
-    async loadComments(options = {}) {
-        const { cursor = null, limit = this.limit, fromBeginning = false, append = false } = options;
-        
-        // Prevent multiple simultaneous requests
-        if (this.isLoadingComments) {
-            return;
-        }
-        
-        this.isLoadingComments = true;
-
-        try {
-            const token = localStorage.getItem('token') || '';
-            const url = new URL('/api/guest/messages', window.location.origin);
-            
-            // Add limit parameter
-            url.searchParams.append('limit', limit);
-            
-            // Add cursor parameter if not loading from beginning
-            if (!fromBeginning && cursor) {
-                url.searchParams.append('cursor', cursor);
-            }
-
-            const response = await fetch(url.toString(), {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                // API returns { items: [...], nextCursor: string|null }
-                const items = data.items || [];
-                this.nextCursor = data.nextCursor || null;
-                
-                // Check if there are more comments to load
-                this.hasMoreComments = this.nextCursor !== null;
-                
-                // Map API response format to internal format
-                const newComments = items.map(msg => ({
-                    id: msg.id,
-                    name: msg.author || 'Guest',
-                    body: msg.body || '',
-                    createdAt: msg.createdAt,
-                    reactions: msg.reactions || []
-                }));
-
-                if (append) {
-                    // Append new comments to existing ones
-                    this.comments = [...this.comments, ...newComments];
-                } else {
-                    // Replace comments (fresh load)
-                    this.comments = newComments;
-                }
-            } else {
-                console.error('Failed to load comments:', response.status);
-                if (!append) {
-                    this.comments = [];
-                }
-            }
-        } catch (error) {
-            console.error('Error loading comments:', error);
-            if (!append) {
-                this.comments = [];
-            }
-        } finally {
-            this.isLoadingComments = false;
-        }
-        
-        this.renderComments();
-    }
-
-    // Available emojis for reactions
-    getAvailableEmojis() {
-        return [
+        this.limit = 15;
+        this.partyMembers = [];
+        this.selectedPartyMemberName = localStorage.getItem('selectedPartyMemberName') || '';
+        this.isAdmin = localStorage.getItem('isAdmin') === 'true';
+        this.initialized = false;
+        this.availableEmojis = [
             { emoji: '❤️', name: 'heart' },
             { emoji: '👍', name: 'thumbs up' },
             { emoji: '😊', name: 'smile' },
@@ -300,79 +20,214 @@ class CommentsSystem {
             { emoji: '👏', name: 'applause' },
             { emoji: '💕', name: 'love' }
         ];
+        this.init();
     }
 
-    // Add/toggle reaction
-    async toggleReaction(commentId, emoji) {
+    async init() {
+        const commentsSection = document.querySelector('.comments-card');
+        if (!commentsSection || commentsSection.style.display === 'none') {
+            console.log('Comments section is hidden, skipping initialization');
+            return;
+        }
+
+        await this.loadPartyMembers();
+        await this.loadComments({ fromBeginning: true });
+        this.setupEventListeners();
+        this.setupInfiniteScroll();
+        this.initialized = true;
+    }
+
+    getAuthToken() {
+        return localStorage.getItem('token') || '';
+    }
+
+    // Load party members for the dropdown
+    async loadPartyMembers() {
         try {
-            const token = localStorage.getItem('token') || '';
-            const res = await fetch(`/api/guest/messages/${commentId}/reaction`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({ emoji })
+            const response = await fetch('/api/guest/party', {
+                headers: { 'Authorization': `Bearer ${this.getAuthToken()}` }
             });
-            
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) {
-                const msg = (data && (data.error || data.message)) || 'Error updating reaction';
-                this.showToast(msg, 'error');
-                return;
+
+            if (response.ok) {
+                this.partyMembers = await response.json();
             }
-            
-            // Reload comments from current cursor to maintain position
-            await this.loadComments({ 
-                cursor: this.comments.length > 0 ? this.comments[this.comments.length - 1].id : null,
-                append: false 
+        } catch (error) {
+            console.error('Error loading party members:', error);
+        }
+        this.populatePartyDropdown();
+    }
+
+    populatePartyDropdown() {
+        const select = document.getElementById('postingAsSelect');
+        if (!select) return;
+
+        select.innerHTML = '<option value="">Select party member...</option>';
+        
+        this.partyMembers.forEach(member => {
+            const option = document.createElement('option');
+            option.value = JSON.stringify({ id: member._id || member.id, name: member.name });
+            option.textContent = member.name;
+            if (member.primary) {
+                option.textContent += ` (${typeof translate !== 'undefined' ? translate('common:party.primary') : 'Primary'})`;
+            }
+            select.appendChild(option);
+        });
+
+        // Restore selection
+        if (this.selectedPartyMemberName) {
+            const matchingOption = Array.from(select.options).find(opt => {
+                if (!opt.value) return false;
+                try {
+                    const data = JSON.parse(opt.value);
+                    return data.name === this.selectedPartyMemberName;
+                } catch { return false; }
             });
-        } catch (err) {
-            console.error('Error applying reaction:', err);
-            this.showToast('Connection error when applying reaction', 'error');
+            if (matchingOption) {
+                select.value = matchingOption.value;
+            }
+        }
+        
+        // Default to primary member
+        if (!select.value && this.partyMembers.length > 0) {
+            const primary = this.partyMembers.find(m => m.primary) || this.partyMembers[0];
+            const matchingOption = Array.from(select.options).find(opt => {
+                if (!opt.value) return false;
+                try {
+                    const data = JSON.parse(opt.value);
+                    return data.name === primary.name;
+                } catch { return false; }
+            });
+            if (matchingOption) {
+                select.value = matchingOption.value;
+                this.selectedPartyMemberName = primary.name;
+                localStorage.setItem('selectedPartyMemberName', this.selectedPartyMemberName);
+            }
         }
     }
 
-    // Check if user reacted with a specific emoji using the new API format
-    hasUserReacted(reactions, emoji) {
-        if (!reactions || !Array.isArray(reactions)) return false;
-        const reaction = reactions.find(r => r.emoji === emoji);
-        return reaction ? reaction.reacted === true : false;
+    getSelectedAuthor() {
+        const select = document.getElementById('postingAsSelect');
+        if (!select || !select.value) return null;
+        try {
+            return JSON.parse(select.value);
+        } catch { return null; }
     }
 
-    // Get the emoji selected by the user (if any)
-    getUserSelectedEmoji(reactions) {
-        if (!reactions || !Array.isArray(reactions)) return null;
-        const reaction = reactions.find(r => r.reacted === true);
-        return reaction ? reaction.emoji : null;
+    setupEventListeners() {
+        const select = document.getElementById('postingAsSelect');
+        if (select) {
+            select.addEventListener('change', (e) => {
+                const data = this.getSelectedAuthor();
+                if (data) {
+                    this.selectedPartyMemberName = data.name;
+                    localStorage.setItem('selectedPartyMemberName', data.name);
+                }
+            });
+        }
+
+        // Comment form submission
+        const form = document.getElementById('commentForm');
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.addComment();
+            });
+        }
+
+        // Character counter
+        const textarea = document.getElementById('newComment');
+        if (textarea) {
+            textarea.addEventListener('input', () => this.updateCharCount());
+        }
     }
 
-    // Get count for a specific emoji
-    getCountFor(reactions, emoji) {
-        if (!reactions || !Array.isArray(reactions)) return 0;
-        const reaction = reactions.find(r => r.emoji === emoji);
-        return reaction ? reaction.count : 0;
+    updateCharCount() {
+        const textarea = document.getElementById('newComment');
+        const counter = document.querySelector('.char-count');
+        if (textarea && counter) {
+            const len = textarea.value.length;
+            counter.textContent = `${len}/500`;
+            counter.style.color = len > 450 ? '#dc3545' : len > 400 ? '#ffc107' : 'var(--text-light)';
+        }
     }
 
-    // Total reactions across all emojis
-    getTotalReactionsCount(reactions) {
-        if (!reactions || !Array.isArray(reactions)) return 0;
-        return reactions.reduce((sum, r) => sum + (r.count || 0), 0);
+    setupInfiniteScroll() {
+        const container = document.getElementById('comments-root');
+        if (!container) return;
+
+        const sentinel = document.createElement('div');
+        sentinel.id = 'comments-scroll-sentinel';
+        sentinel.style.height = '1px';
+        container.appendChild(sentinel);
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && this.hasMoreComments && !this.isLoadingComments) {
+                    this.loadComments({ cursor: this.nextCursor, append: true });
+                }
+            });
+        }, { rootMargin: '100px' });
+
+        observer.observe(sentinel);
     }
 
-    // Add new comment
+    async loadComments(options = {}) {
+        const { cursor = null, fromBeginning = false, append = false } = options;
+        
+        if (this.isLoadingComments) return;
+        this.isLoadingComments = true;
+
+        try {
+            const url = new URL('/api/guest/messages', window.location.origin);
+            url.searchParams.append('limit', this.limit);
+            if (!fromBeginning && cursor) {
+                url.searchParams.append('cursor', cursor);
+            }
+
+            const response = await fetch(url.toString(), {
+                headers: { 'Authorization': `Bearer ${this.getAuthToken()}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const items = data.items || [];
+                this.nextCursor = data.nextCursor || null;
+                this.hasMoreComments = this.nextCursor !== null;
+
+                const newComments = items.map(msg => ({
+                    id: msg.id,
+                    author: msg.author || 'Guest',
+                    body: msg.body || '',
+                    createdAt: msg.createdAt,
+                    reactions: msg.reactions || []
+                }));
+
+                if (append) {
+                    this.comments = [...this.comments, ...newComments];
+                } else {
+                    this.comments = newComments;
+                }
+            }
+        } catch (error) {
+            console.error('Error loading comments:', error);
+        } finally {
+            this.isLoadingComments = false;
+        }
+
+        this.renderComments();
+    }
+
     async addComment() {
-        const commentInput = document.getElementById('newComment');
-        const body = commentInput.value.trim();
-        const postingAsSelect = document.getElementById('postingAsSelect');
-        const authorName = postingAsSelect ? postingAsSelect.value : '';
+        const textarea = document.getElementById('newComment');
+        const body = textarea?.value.trim();
+        const author = this.getSelectedAuthor();
 
         if (!body) {
             this.showToast('Please write a comment.', 'error');
             return;
         }
 
-        if (!authorName) {
+        if (!author) {
             this.showToast('Please select who is posting the comment.', 'error');
             return;
         }
@@ -383,31 +238,23 @@ class CommentsSystem {
         }
 
         try {
-            const token = localStorage.getItem('token') || '';
             const response = await fetch('/api/guest/messages', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${this.getAuthToken()}`
                 },
-                body: JSON.stringify({ 
-                    body,
-                    authorName: authorName 
-                })
+                body: JSON.stringify({ body, authorName: author.name })
             });
 
             if (response.ok) {
-                // Clear form
-                commentInput.value = '';
+                textarea.value = '';
                 this.updateCharCount();
-                
-                // Reload comments from beginning (new comment appears at top)
                 await this.loadComments({ fromBeginning: true });
-                
                 this.showToast('Comment posted successfully', 'success');
             } else {
-                const errorData = await response.json();
-                this.showToast(errorData.error || 'Error posting comment', 'error');
+                const error = await response.json();
+                this.showToast(error.error || 'Error posting comment', 'error');
             }
         } catch (error) {
             console.error('Error posting comment:', error);
@@ -415,136 +262,180 @@ class CommentsSystem {
         }
     }
 
-    // Delete comment (admin only)
+    async toggleReaction(commentId, emoji) {
+        try {
+            const response = await fetch(`/api/guest/messages/${commentId}/reaction`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.getAuthToken()}`
+                },
+                body: JSON.stringify({ emoji })
+            });
+
+            if (response.ok) {
+                await this.loadComments({ fromBeginning: true });
+            } else {
+                const error = await response.json();
+                this.showToast(error.error || 'Error updating reaction', 'error');
+            }
+        } catch (error) {
+            console.error('Error toggling reaction:', error);
+            this.showToast('Connection error when updating reaction', 'error');
+        }
+    }
+
     async deleteComment(commentId) {
         if (!this.isAdmin) {
             this.showToast('Only administrators can delete comments.', 'error');
             return;
         }
 
-        if (confirm('Are you sure you want to delete this comment?')) {
-            try {
-                const token = localStorage.getItem('adminToken') || localStorage.getItem('token') || '';
-                const response = await fetch(`/api/admin/messages/${commentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+        if (!confirm('Are you sure you want to delete this comment?')) return;
 
-                if (response.ok) {
-                    await this.loadComments({ fromBeginning: true });
-                    this.showToast('Comment deleted successfully', 'success');
-                } else {
-                    const errorData = await response.json();
-                    this.showToast(errorData.error || 'Error deleting comment', 'error');
-                }
-            } catch (error) {
-                console.error('Error deleting comment:', error);
-                this.showToast('Connection error when deleting comment', 'error');
+        try {
+            const token = localStorage.getItem('adminToken') || this.getAuthToken();
+            const response = await fetch(`/api/admin/messages/${commentId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (response.ok) {
+                await this.loadComments({ fromBeginning: true });
+                this.showToast('Comment deleted successfully', 'success');
+            } else {
+                const error = await response.json();
+                this.showToast(error.error || 'Error deleting comment', 'error');
             }
+        } catch (error) {
+            console.error('Error deleting comment:', error);
+            this.showToast('Connection error when deleting comment', 'error');
         }
     }
 
-    // Render Comments
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    formatDate(dateStr) {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+
+        if (diffMins < 1) return 'Just now';
+        if (diffMins < 60) return `${diffMins}m ago`;
+        if (diffHours < 24) return `${diffHours}h ago`;
+        if (diffDays < 7) return `${diffDays}d ago`;
+        
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+        });
+    }
+
     renderComments() {
-        const commentsList = document.getElementById('commentsList');
-        if (!commentsList) return;
+        const container = document.getElementById('comments-root');
+        if (!container) return;
+
+        // Keep the sentinel if it exists
+        const sentinel = document.getElementById('comments-scroll-sentinel');
 
         if (this.comments.length === 0) {
-            commentsList.innerHTML = `
-                <div class="no-comments">
+            container.innerHTML = `
+                <div class="willow-empty-state">
                     <i class="fas fa-comments"></i>
-                    <pdata-i18n="guests:noComments">${translate('guests:noComments')}</p>
+                    <p>${typeof translate !== 'undefined' ? translate('guests:noComments') : 'No comments yet. Be the first to leave a message!'}</p>
                 </div>
             `;
+            if (sentinel) container.appendChild(sentinel);
             return;
         }
 
-        // Sort comments by date (most recent first)
-        const sortedComments = this.comments.sort((a, b) => 
-            new Date(b.createdAt) - new Date(a.createdAt)
-        );
+        const commentsHtml = this.comments
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .map(comment => this.renderComment(comment))
+            .join('');
+
+        container.innerHTML = `<div class="willow-comments-list">${commentsHtml}</div>`;
         
-        const commentsHTML = sortedComments.map(comment => {
-            const reactions = comment.reactions || [];
-            const emojisDisponibles = this.getAvailableEmojis();
+        if (sentinel) container.appendChild(sentinel);
+        
+        // Re-setup infinite scroll sentinel
+        if (!sentinel) this.setupInfiniteScroll();
+    }
 
-            // Render according to requirement:
-            // 1) If no reactions yet -> show a single heart button (no count). Hover shows picker.
-            // 2) If one or more reactions exist -> show a summary list of emojis with their counts.
-            // 3) Hover over the summary list also shows the picker for selection.
-            const selectedEmoji = this.getUserSelectedEmoji(reactions);
-            const totalCount = this.getTotalReactionsCount(reactions);
+    renderComment(comment) {
+        const reactions = comment.reactions || [];
+        const totalReactions = reactions.reduce((sum, r) => sum + (r.count || 0), 0);
 
-            const pickerHTML = emojisDisponibles.map(({ emoji, name }) => {
-                const count = this.getCountFor(reactions, emoji);
-                const isActive = selectedEmoji === emoji ? 'active' : '';
-                return `
-                  <button class="emoji-option ${isActive}" title="${name}" onclick="commentsSystem.toggleReaction('${comment.id}', '${emoji}')">
-                    <span>${emoji}</span>
-                    ${count > 0 ? `<span class="count">${count}</span>` : ''}
-                  </button>`;
-            }).join('');
-
-            let triggerAreaHTML = '';
-            if (totalCount <= 0) {
-              // Show only smiley icon with no count when no reactions have been made
-              triggerAreaHTML = `
-                <button class="heart-btn" onclick="commentsSystem.toggleReaction('${comment.id}', '❤️')" title="Like (❤️)">
-                  <span><i class="fas fa-smile"></i></span>
-                </button>`;
-            } else {
-              // Build summary list of reactions with their counts
-              const summaryPills = reactions
+        // Build reactions HTML
+        let reactionsHtml = '';
+        if (totalReactions > 0) {
+            const pills = reactions
                 .filter(r => r.count > 0)
-                .map(r => {
-                  const isMine = r.reacted ? 'reacted' : '';
-                  return `<span class="summary-pill ${isMine}" onclick="commentsSystem.toggleReaction('${comment.id}', '${r.emoji}')"><span>${r.emoji}</span><span class="count">${r.count}</span></span>`;
-                }).join('');
-              triggerAreaHTML = `<div class="reaction-summary">${summaryPills}</div>`;
-            }
+                .map(r => `
+                    <button class="willow-reaction-pill ${r.reacted ? 'active' : ''}" 
+                            onclick="commentsSystem.toggleReaction('${comment.id}', '${r.emoji}')">
+                        <span class="emoji">${r.emoji}</span>
+                        <span class="count">${r.count}</span>
+                    </button>
+                `).join('');
+            reactionsHtml = `<div class="willow-reactions-row">${pills}</div>`;
+        }
 
-            const reaccionesHTML = `
-              <div class="reaction-wrapper">
-                ${triggerAreaHTML}
-                <div class="emoji-picker">${pickerHTML}</div>
-              </div>
-            `;
-            
+        // Emoji picker
+        const pickerOptions = this.availableEmojis.map(({ emoji, name }) => {
+            const existing = reactions.find(r => r.emoji === emoji);
+            const isActive = existing?.reacted ? 'active' : '';
             return `
-                <div class="comment-item" data-comment-id="${comment.id}">
-                    <div class="comment-header">
-                        <span class="comment-author">${window.escapeHtml(comment.name)}</span>
-                        <span class="comment-date">${new Date(comment.createdAt).toLocaleDateString('es-ES', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })}</span>
-                    </div>
-                    <div class="comment-content">${window.escapeHtml(comment.body)}</div>
-                    <div class="comment-reactions">
-                        ${reaccionesHTML}
-                    </div>
-                    ${this.isAdmin ? `
-                        <div class="comment-actions">
-                            <button class="delete-comment-btn" onclick="commentsSystem.deleteComment('${comment.id}')" title="Delete comment">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    ` : ''}
-                </div>
+                <button class="willow-emoji-option ${isActive}" 
+                        title="${name}"
+                        onclick="commentsSystem.toggleReaction('${comment.id}', '${emoji}')">
+                    ${emoji}
+                </button>
             `;
         }).join('');
 
-        commentsList.innerHTML = commentsHTML;
+        // Admin delete button
+        const deleteBtn = this.isAdmin ? `
+            <button class="willow-delete-btn" onclick="commentsSystem.deleteComment('${comment.id}')" title="Delete">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        ` : '';
+
+        return `
+            <div class="willow-comment" data-id="${comment.id}">
+                <div class="willow-comment-header">
+                    <div class="willow-avatar">
+                        <span>${this.escapeHtml(comment.author.charAt(0).toUpperCase())}</span>
+                    </div>
+                    <div class="willow-meta">
+                        <span class="willow-author">${this.escapeHtml(comment.author)}</span>
+                        <span class="willow-date">${this.formatDate(comment.createdAt)}</span>
+                    </div>
+                    ${deleteBtn}
+                </div>
+                <div class="willow-comment-body">${this.escapeHtml(comment.body)}</div>
+                <div class="willow-comment-footer">
+                    ${reactionsHtml}
+                    <div class="willow-add-reaction">
+                        <button class="willow-reaction-trigger">
+                            <i class="fas fa-smile"></i>
+                        </button>
+                        <div class="willow-emoji-picker">${pickerOptions}</div>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
-    // Show toast notification
     showToast(message, type = 'success') {
-        // Create toast if it doesn't exist
         let toast = document.querySelector('.toast');
         if (!toast) {
             toast = document.createElement('div');
@@ -552,7 +443,6 @@ class CommentsSystem {
             document.body.appendChild(toast);
         }
 
-        // Configure content
         toast.className = `toast ${type === 'error' ? 'toast-error' : 'toast-success'}`;
         toast.innerHTML = `
             <div class="toast-content">
@@ -561,52 +451,25 @@ class CommentsSystem {
             </div>
         `;
 
-        // Show toast
-        setTimeout(() => {
-            toast.classList.add('show');
-        }, 100);
-
-        // Hide toast after 3 seconds
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
-    }
-
-    // Update current user
-    updateCurrentUser(user) {
-        this.currentUser = user;
-        localStorage.setItem('currentGuest', JSON.stringify(user));
-    }
-
-    // Update admin status
-    updateAdminStatus(isAdmin) {
-        this.isAdmin = isAdmin;
-        localStorage.setItem('isAdmin', isAdmin.toString());
-        this.renderComments(); // Re-render to show/hide delete buttons
+        setTimeout(() => toast.classList.add('show'), 100);
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 }
 
-// Initialize comments system when DOM is ready
+// Initialize when DOM is ready
 let commentsSystem;
-
 document.addEventListener('DOMContentLoaded', () => {
     commentsSystem = new CommentsSystem();
     
-    // Re-initialize when settings change (for when messagesEnabled is toggled)
-    // This handles the case when admin enables/disables messages
-    const checkAndReinitComments = () => {
-        const commentsSection = document.querySelector('.comments-card');
-        if (commentsSection && commentsSystem) {
-            const isVisible = commentsSection.style.display !== 'none';
-            if (isVisible && !commentsSystem.initialized) {
+    // Re-initialize when settings change
+    window.addEventListener('focus', () => {
+        const section = document.querySelector('.comments-card');
+        if (section && commentsSystem && !commentsSystem.initialized) {
+            if (section.style.display !== 'none') {
                 commentsSystem.init();
             }
         }
-    };
-    
-    // Check on window focus (settings might have changed)
-    window.addEventListener('focus', checkAndReinitComments);
+    });
 });
 
-// Make available globally for use in other scripts
 window.commentsSystem = commentsSystem;

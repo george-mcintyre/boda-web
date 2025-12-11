@@ -51,14 +51,14 @@ app.use(helmet({
         "'unsafe-inline'",
         "https://cdnjs.cloudflare.com",
         "https://unpkg.com",
-        "https://fonts.googleapis.com"
+        "https://fonts.googleapis.com",
       ],
       "style-src-elem": [
         "'self'",
         "'unsafe-inline'",
         "https://cdnjs.cloudflare.com",
         "https://unpkg.com",
-        "https://fonts.googleapis.com"
+        "https://fonts.googleapis.com",
       ],
       "img-src": ["'self'", "data:", "https:", "http://staticmap.openstreetmap.de"],
       "font-src": ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],

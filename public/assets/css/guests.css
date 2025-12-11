@@ -305,6 +305,124 @@ main.main-content-full {
 /* ========================================
    COMMENTS SIDEBAR
    ======================================== */
+
+/* Posting As Dropdown Styling */
+.comment-posting-as-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 15px;
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--gray-100);
+}
+
+.comment-posting-as-container label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+
+.comment-posting-as-container label i {
+  color: var(--primary-color);
+}
+
+.posting-as-dropdown {
+  flex: 1;
+  min-width: 150px;
+  padding: 8px 12px;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  font-size: 0.95em;
+  font-family: var(--font-primary);
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.posting-as-dropdown:hover {
+  border-color: var(--primary-color);
+}
+
+.posting-as-dropdown:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(139, 90, 150, 0.1);
+}
+
+/* Emoji Picker Styling */
+.emoji-picker-svar {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  gap: 4px;
+  z-index: 100;
+}
+
+.emoji-picker-svar button {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  font-size: 1.2em;
+  transition: all var(--transition-normal);
+}
+
+.emoji-picker-svar button:hover {
+  background: var(--gray-100);
+  transform: scale(1.1);
+}
+
+.emoji-picker-svar button.active {
+  background: rgba(139, 90, 150, 0.15);
+}
+
+/* Comment reactions area */
+.comment-reactions-svar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--gray-100);
+  margin-top: 8px;
+}
+
+/* Loading state within SVAR container */
+.comments-container .loading-comments {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 20px;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.comments-container .loading-comments i {
+  color: var(--primary-color);
+}
+  
+.comments-container {
+  max-height: 1000px;
+  overflow-y: auto;
+  --wx-color-primary: var(--primary-color);
+  --wx-color-primary-hover: var(--primary-hover);
+  --wx-color-background: var(--white);
+  --wx-color-background-secondary: var(--gray-50);
+  --wx-color-border: var(--gray-200);
+  --wx-color-text: var(--text-dark);
+  --wx-color-text-secondary: var(--text-light);
+  --wx-font-family: var(--font-primary);
+  --wx-border-radius: var(--radius-lg);
+}
+  
 .comments-sidebar {
   flex: 0 0 50% !important;
   width: 50% !important;
@@ -2659,16 +2777,8 @@ main.main-content-full {
     max-width: 100% !important;
   }
 
-  .comments-list {
-    max-height: 300px;
-  }
-
   .summary-card {
     padding: 20px;
-  }
-
-  .comments-card .comments-list {
-    max-height: 300px;
   }
 
   .option-card-main {
@@ -2769,5 +2879,308 @@ main.main-content-full {
   .payment-success-card h1,
   .payment-cancelled-card h1 {
     font-size: 1.6em;
+  }
+}
+
+/* Responsive adjustments for SVAR Comments */
+@media (max-width: 768px) {
+  .comment-posting-as-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .comment-posting-as-container label {
+    margin-bottom: 4px;
+  }
+
+  .posting-as-dropdown {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .comments-container {
+    max-height: 350px;
+  }
+
+  .emoji-picker-svar {
+    flex-wrap: wrap;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .comments-container {
+    max-height: 300px;
+  }
+}
+
+/* ========================================
+   WILLOW-STYLED COMMENTS - Vanilla JS Implementation
+   ======================================== */
+
+/* Empty state */
+.willow-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+}
+
+.willow-empty-state i {
+  font-size: 3em;
+  color: var(--accent-color);
+  margin-bottom: 15px;
+  display: block;
+}
+
+.willow-empty-state p {
+  margin: 0;
+  font-size: 1.1em;
+  font-style: italic;
+}
+
+/* Comments list */
+.willow-comments-list {
+  max-height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Individual comment card */
+.willow-comment {
+  background: var(--gray-50);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  border-left: 3px solid var(--primary-color);
+  transition: all var(--transition-normal);
+}
+
+.willow-comment:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+/* Comment header with avatar */
+.willow-comment-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.willow-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--gradient-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-weight: 600;
+  font-size: 1.1em;
+  flex-shrink: 0;
+}
+
+.willow-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.willow-author {
+  font-weight: 600;
+  color: var(--primary-color);
+  font-size: 0.95em;
+}
+
+.willow-date {
+  font-size: 0.8em;
+  color: var(--text-light);
+}
+
+/* Delete button for admins */
+.willow-delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+  opacity: 0;
+}
+
+.willow-comment:hover .willow-delete-btn {
+  opacity: 1;
+}
+
+.willow-delete-btn:hover {
+  background: var(--danger-light);
+  color: var(--danger-color);
+}
+
+/* Comment body */
+.willow-comment-body {
+  color: var(--text-dark);
+  line-height: 1.6;
+  font-size: 0.95em;
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Comment footer with reactions */
+.willow-comment-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--gray-100);
+}
+
+/* Reactions row */
+.willow-reactions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Reaction pill button */
+.willow-reaction-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 10px;
+  background: var(--gray-100);
+  border: 1px solid transparent;
+  border-radius: 16px;
+  cursor: pointer;
+  font-size: 0.85em;
+  transition: all var(--transition-normal);
+}
+
+.willow-reaction-pill:hover {
+  background: rgba(139, 90, 150, 0.1);
+  border-color: var(--primary-color);
+  transform: scale(1.05);
+}
+
+.willow-reaction-pill.active {
+  background: rgba(139, 90, 150, 0.15);
+  border-color: var(--primary-color);
+}
+
+.willow-reaction-pill .emoji {
+  font-size: 1em;
+}
+
+.willow-reaction-pill .count {
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 0.85em;
+}
+
+/* Add reaction button */
+.willow-add-reaction {
+  position: relative;
+  margin-left: auto;
+}
+
+.willow-reaction-trigger {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 10px;
+  color: var(--text-light);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-normal);
+  font-size: 1.1em;
+}
+
+.willow-reaction-trigger:hover {
+  background: var(--gray-100);
+  color: var(--primary-color);
+}
+
+/* Emoji picker dropdown */
+.willow-emoji-picker {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  display: none;
+  flex-wrap: wrap;
+  gap: 4px;
+  z-index: 100;
+  min-width: 180px;
+}
+
+.willow-add-reaction:hover .willow-emoji-picker {
+  display: flex;
+}
+
+.willow-emoji-option {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  font-size: 1.3em;
+  transition: all var(--transition-normal);
+  line-height: 1;
+}
+
+.willow-emoji-option:hover {
+  background: var(--gray-100);
+  transform: scale(1.15);
+}
+
+.willow-emoji-option.active {
+  background: rgba(139, 90, 150, 0.15);
+}
+
+/* Responsive adjustments for Willow comments */
+@media (max-width: 768px) {
+  .willow-comment {
+    padding: 12px;
+  }
+
+  .willow-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 1em;
+  }
+
+  .willow-comment-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .willow-add-reaction {
+    margin-left: 0;
+    margin-top: 8px;
+  }
+
+  .willow-emoji-picker {
+    right: auto;
+    left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .willow-reaction-pill {
+    padding: 4px 8px;
+    font-size: 0.8em;
+  }
+
+  .willow-comment-body {
+    font-size: 0.9em;
   }
 }

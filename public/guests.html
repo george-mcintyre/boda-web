@@ -78,15 +78,6 @@
       </section>
 
       <div class="summary-grid">
-        <!-- Summary Section (Left) - dynamically loaded -->
-        <section id="summary" class="summary-card summary-left-panel">
-          <h2><i class="fas fa-clipboard-list"></i> <span data-i18n="guests:yourSummary">Your Summary</span></h2>
-          <div class="loading-summary">
-            <i class="fas fa-spinner fa-spin fa-2x"></i>
-            <p data-i18n="guests:loadingSummary">Loading summary...</p>
-          </div>
-        </section>
-
         <!-- Comments Card Section (Right) -->
         <section class="summary-card comments-card">
           <div class="comments-header">
@@ -95,7 +86,6 @@
               guests</p>
           </div>
 
-          <!-- New comment form -->
           <div class="new-comment-form">
             <form id="commentForm">
               <div class="comment-input-container">
@@ -112,11 +102,14 @@
                 <div class="char-count-container">
                   <span class="char-count">0/500</span>
                 </div>
-                <div class="comment-posting-as">
-                  <select id="postingAsSelect" class="posting-as-dropdown">
-                    <option data-i18n="guests:loadingPartyMembers">Loading party members...</option>
-                  </select>
-                </div>
+
+                <div class="comment-posting-as-container" style="margin-bottom: 15px;">
+                  <div class="comment-posting-as">
+                    <select id="postingAsSelect" class="posting-as-dropdown">
+                      <option data-i18n="guests:loadingPartyMembers">Loading party members...</option>
+                    </select>
+                  </div>
+                  </div>
                 <button type="submit" class="comment-submit-btn">
                   <i class="fas fa-paper-plane"></i>
                   <span data-i18n="guests:postComment">Post</span>
@@ -126,7 +119,7 @@
           </div>
 
           <!-- Comments list -->
-          <div class="comments-list" id="commentsList">
+          <div id="comments-root" class="comments-container">
             <!-- Comments will be loaded dynamically here -->
             <div class="loading-comments">
               <i class="fas fa-spinner fa-spin"></i>
@@ -134,6 +127,16 @@
             </div>
           </div>
         </section>
+        
+        <!-- Summary Section (Left) - dynamically loaded -->
+        <section id="summary" class="summary-card summary-left-panel">
+          <h2><i class="fas fa-clipboard-list"></i> <span data-i18n="guests:yourSummary">Your Summary</span></h2>
+          <div class="loading-summary">
+            <i class="fas fa-spinner fa-spin fa-2x"></i>
+            <p data-i18n="guests:loadingSummary">Loading summary...</p>
+          </div>
+        </section>
+
       </div>
     </div>
 
