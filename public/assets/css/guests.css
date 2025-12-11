@@ -207,52 +207,28 @@ main.main-content-full {
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   gap: 25px;
   padding: 10px 0;
+  align-items: start;
 }
 
-.summary-two-column {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 25px;
-  padding: 10px 0;
-}
-
-.summary-left-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-.summary-right-panel {
-  display: flex;
-  flex-direction: column;
-}
-
-/* ========================================
-
-.tab-content.active {
-  display: block;
-}
-
-/* Tabs Container */
-.tabs-container {
-  flex: 0 0 50% !important;
-  width: 50% !important;
-  margin: 0 !important;
-  padding: 10px !important;
-  display: block !important;
-  max-width: 50% !important;
-  box-sizing: border-box !important;
-  height: 100% !important;
-}
-
-/* ========================================
-   SUMMARY GRID LAYOUTS
-   ======================================== */
-.summary-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 25px;
-  padding: 10px 0;
+/* Desktop: Comments card constrained by summary panel height */
+@media (min-width: 901px) {
+  .summary-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  
+  /* Comments card height will be set by JS to match summary panel */
+  .summary-grid > .comments-card {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  /* Summary panel determines natural height */
+  .summary-grid > .summary-right-panel {
+    align-self: start;
+  }
 }
 
 .summary-two-column {
@@ -410,7 +386,6 @@ main.main-content-full {
 }
   
 .comments-container {
-  max-height: 1000px;
   overflow-y: auto;
   --wx-color-primary: var(--primary-color);
   --wx-color-primary-hover: var(--primary-hover);
@@ -421,6 +396,13 @@ main.main-content-full {
   --wx-color-text-secondary: var(--text-light);
   --wx-font-family: var(--font-primary);
   --wx-border-radius: var(--radius-lg);
+}
+
+/* Mobile: Limit comments container height */
+@media (max-width: 900px) {
+  .comments-container {
+    max-height: 500px;
+  }
 }
   
 .comments-sidebar {
@@ -441,6 +423,20 @@ main.main-content-full {
   transition: all var(--transition-normal);
   display: flex;
   flex-direction: column;
+  min-height: 0;
+}
+
+/* Desktop: Comments container fills remaining space and scrolls */
+@media (min-width: 901px) {
+  .comments-card .comments-container {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  
+  .comments-card .willow-comments-list {
+    min-height: 0;
+  }
 }
 
 .comments-card:hover {
@@ -2940,11 +2936,10 @@ main.main-content-full {
 
 /* Comments list */
 .willow-comments-list {
-  max-height: 100%;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 15px;
+  overflow-y: auto;
 }
 
 /* Individual comment card */

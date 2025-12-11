@@ -26,6 +26,11 @@ const translations = {
     'common:confirm:rich': 'Confirm',
     'common:confirmAction:rich': 'Confirm action',
     'common:new:rich': '<i class="fas fa-plus-circle"></i> New',
+    'common:justNow': 'Just now',
+    'common:minutesAgo': '{{minutes}} minutes ago',
+    'common:hoursAgo': '{{hours}} hours ago',
+    'common:daysAgo': '{{days}} days ago',
+    
 
     // Common: Menu
     'common:menu.selection.saved': 'Menu selection saved successfully!',
@@ -497,6 +502,10 @@ const translations = {
     'common:party.name': 'Nombre',
     'common:party.age.category': 'Edad',
     'common:new:rich': '<i class="fas fa-plus-circle"></i> Nuevo',
+    'common:justNow': 'Hace {{minutes}} minutos',
+    'common:minutesAgo': 'Hace {{minutes}} minutos',
+    'common:hoursAgo': 'Hace {{hours}} horas',
+    'common:daysAgo': 'Hace {{days}} días',
     'common:party.remove.member': 'Eliminar miembro',
     'common:enter.name': 'Introduce el nombre...', 
     'common:confirmAction:rich': 'Confirmar acción',
@@ -986,6 +995,10 @@ const translations = {
     'common:confirm:rich': 'Confirmer',
     'common:confirmAction:rich': 'Confirmer l’action',
     'common:new:rich': '<i class="fas fa-plus-circle"></i> Nouveau',
+    'common:justNow': 'Juste maintenant',
+    'common:minutesAgo': 'il y a {{minutes}} minutes',
+    'common:hoursAgo': 'il y a {{hours}} heures',
+    'common:daysAgo': 'il y a {{days}} jours',
   
     // Common: Menu
     'common:menu.selection.saved': 'Sélection de menu enregistrée avec succès !',
@@ -1466,6 +1479,10 @@ const translations = {
     'common:confirm:rich': 'Bestätigen',
     'common:confirmAction:rich': 'Aktion bestätigen',
     'common:new:rich': '<i class="fas fa-plus-circle"></i> Neu',
+    'common:justNow': 'Gerade eben',
+    'common:minutesAgo': 'vor {{minutes}} Minuten',
+    'common:hoursAgo': 'vor {{hours}} Stunden',
+    'common:daysAgo': 'vor {{days}} Tagen',
   
     // Common: Menu
     'common:menu.selection.saved': 'Menüauswahl erfolgreich gespeichert!',

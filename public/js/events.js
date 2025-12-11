@@ -194,7 +194,7 @@ async function loadEvents() {
         
         // Format the date for display
         const eventDate = event.date ? new Date(event.date) : null;
-        const dateLabel = eventDate ? eventDate.toLocaleDateString(undefined, {
+        const dateLabel = eventDate ? eventDate.toLocaleDateString(window.currentLanguage || 'en-GB', {
           weekday: 'long',
           year: 'numeric',
           month: 'long',

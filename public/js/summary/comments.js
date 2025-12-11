@@ -327,12 +327,12 @@ class CommentsSystem {
         const diffHours = Math.floor(diffMs / 3600000);
         const diffDays = Math.floor(diffMs / 86400000);
 
-        if (diffMins < 1) return 'Just now';
-        if (diffMins < 60) return `${diffMins}m ago`;
-        if (diffHours < 24) return `${diffHours}h ago`;
-        if (diffDays < 7) return `${diffDays}d ago`;
+        if (diffMins < 1) return translate('common:justNow', 'Just now');
+        if (diffMins < 60) return translateWithVars('common:minutesAgo', { minutes: diffMins });
+        if (diffHours < 24) return translateWithVars('common:hoursAgo', { hours: diffHours });
+        if (diffDays < 7) return translateWithVars('common:daysAgo', { days: diffDays });
         
-        return date.toLocaleDateString('en-US', {
+        return date.toLocaleDateString(window.currentLanguage || 'en-GB', {
             month: 'short',
             day: 'numeric',
             year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
@@ -456,6 +456,26 @@ class CommentsSystem {
     }
 }
 
+// Sync comments card height with summary panel height on desktop
+function syncCommentsHeight() {
+    const isDesktop = window.innerWidth > 900;
+    const commentsCard = document.querySelector('.summary-grid > .comments-card');
+    const summaryPanel = document.querySelector('.summary-grid > .summary-right-panel');
+    
+    if (!commentsCard || !summaryPanel) return;
+    
+    if (isDesktop) {
+        // Get the natural height of the summary panel
+        const summaryHeight = summaryPanel.offsetHeight;
+        if (summaryHeight > 0) {
+            commentsCard.style.maxHeight = summaryHeight + 'px';
+        }
+    } else {
+        // On mobile, remove the constraint
+        commentsCard.style.maxHeight = '';
+    }
+}
+
 // Initialize when DOM is ready
 let commentsSystem;
 document.addEventListener('DOMContentLoaded', () => {
@@ -470,6 +490,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+    
+    // Sync heights on load
+    setTimeout(syncCommentsHeight, 500);
+    
+    // Re-sync on resize
+    window.addEventListener('resize', syncCommentsHeight);
+    
+    // Re-sync when summary content might have changed
+    const observer = new MutationObserver(() => {
+        setTimeout(syncCommentsHeight, 100);
+    });
+    
+    const summaryPanel = document.querySelector('.summary-grid > .summary-right-panel');
+    if (summaryPanel) {
+        observer.observe(summaryPanel, { childList: true, subtree: true });
+    }
 });
 
 window.commentsSystem = commentsSystem;
