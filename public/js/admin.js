@@ -1148,7 +1148,7 @@
       const partyRows = party.map((member, index) => `
         <tr>
           <td>${member.name || ''}</td>
-          <td><div data-i18n="common:party.${member.adult ? 'adult' : 'child'}" class="badge badge-info">${translate('admin:party.' + (member.adult ? 'adult' : 'child'))}</div></td>
+          <td><div data-i18n="common:party.${member.adult ? 'adult' : 'child'}" class="badge badge-info">${translate('common:party.' + (member.adult ? 'adult' : 'child'))}</div></td>
           <td>
             <button class="admin-action" data-action="edit-member" data-index="${index}" data-id="${member.id || ''}">
               <i class="fas fa-edit"></i>
