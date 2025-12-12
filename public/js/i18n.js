@@ -116,7 +116,8 @@ const translations = {
     'guests:dietaryDescription': 'Please let us know about any dietary requirements or allergies for each party member.',
     'guests:dietaryRequirementsSaved': 'Dietary requirements saved successfully!',
     'common:errorSavingDietaryRequirements': 'Error saving dietary requirements',
-    
+    'guests:party.maxPartySizeReached:rich': 'You have reached the maximum party size. Please <a href="mailto:rsvp@iluminada-y-george.com">contact us</a> if you need to add more guests.',
+
     // Events Page
     'guests:eventsPageTitle': 'RSVP to the Wedding Events below',
     'guests:eventsPageDescription': 'We are thrilled to have to have you join us for the wedding. Here are the details of all the events that will be taking place. Please select your name in each event in the Who\'s Attending section. That way we can prepare everything for you to have a great time.',
@@ -601,6 +602,7 @@ const translations = {
     'guests:dietaryDescription': 'Por favor, infórmanos sobre cualquier requisito dietético o alergia de cada miembro de tu grupo.',
     'guests:dietaryRequirementsSaved': 'Requisitos dietéticos guardados correctamente!',
     'common:errorSavingDietaryRequirements': 'Error al guardar los requisitos dietéticos',
+    'guests:party.maxPartySizeReached:rich': 'Has alcanzado el tamaño máximo del grupo. Por favor, <a href="mailto:rsvp@iluminada-y-george.com">contacta con nosotros</a> si necesitas añadir más invitados.',
 
     // Events Page
     'guests:eventsPageTitle': 'Confirma tu asistencia a los eventos de la boda de abajo',
@@ -1085,6 +1087,7 @@ const translations = {
     'guests:dietaryDescription': 'Veuillez nous indiquer les exigences alimentaires ou allergies de chaque membre du groupe.',
     'guests:dietaryRequirementsSaved': 'Exigences alimentaires enregistrées avec succès !',
     'common:errorSavingDietaryRequirements': 'Erreur lors de l’enregistrement des exigences alimentaires',
+    'guests:party.maxPartySizeReached:rich': 'Vous avez atteint la taille maximale du groupe. Besoin de plus d’invités ? <a href="mailto:rsvp@iluminada-y-george.com">Contactez-nous</a>',
     
     // Events Page
     'guests:eventsPageTitle': 'RSVP aux événements du mariage ci-dessous',
@@ -1569,6 +1572,7 @@ const translations = {
     'guests:dietaryDescription': 'Bitte teile uns die Ernährungsbedürfnisse oder Allergien jedes Gruppenmitglieds mit.',
     'guests:dietaryRequirementsSaved': 'Ernährungsbedürfnisse erfolgreich gespeichert!',
     'common:errorSavingDietaryRequirements': 'Fehler beim Speichern der Ernährungsbedürfnisse',
+    'guests:party.maxPartySizeReached:rich': 'Du hast das maximale Gruppengröße erreicht. Benötigst du mehr Gäste? <a href="mailto:rsvp@iluminada-y-george.com">Kontaktiere uns</a>',
     
     // Events Page
     'guests:eventsPageTitle': 'RSVP zu den folgenden Hochzeitsveranstaltungen',

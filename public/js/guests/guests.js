@@ -148,7 +148,7 @@
         html += `
           <div class="max-members-notice">
             <i class="fas fa-info-circle"></i>
-            <p>Maximum party size reached. Need more guests? <a href="mailto:wedding@example.com">Contact us</a></p>
+            <p data-i18n="guests:party.maxPartySizeReached:rich">${translate("guests:party.maxPartySizeReached:rich")}</p>
           </div>
         `;
       }
@@ -385,7 +385,7 @@
         notice.className = 'max-members-notice';
         notice.innerHTML = `
           <i class="fas fa-info-circle"></i>
-          <p>Maximum party size reached. Need more guests? <a href="mailto:wedding@example.com">Contact us</a></p>
+          <p data-i18n="guests:party.maxPartySizeReached:rich">${translate('guests:party.maxPartySizeReached:rich')}</p>
         `;
         membersList.appendChild(notice);
       }

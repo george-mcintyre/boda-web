@@ -1148,7 +1148,7 @@
       const partyRows = party.map((member, index) => `
         <tr>
           <td>${member.name || ''}</td>
-          <td><div data-i18n="admin:party.${member.adult ? 'adult' : 'child'}" class="badge badge-info">${translate('admin:party.' + (member.adult ? 'adult' : 'child'))}</div></td>
+          <td><div data-i18n="common:party.${member.adult ? 'adult' : 'child'}" class="badge badge-info">${translate('admin:party.' + (member.adult ? 'adult' : 'child'))}</div></td>
           <td>
             <button class="admin-action" data-action="edit-member" data-index="${index}" data-id="${member.id || ''}">
               <i class="fas fa-edit"></i>
@@ -1193,7 +1193,7 @@
               <strong>${primaryGuest ? primaryGuest.name : translate('admin:party.unknown')}</strong> 
               <span class="badge badge-primary" data-i18n="common:party.primary">${primaryGuest ? translate('common:party.primary') : ''}</span>
               <span class="badge ${primaryGuest && primaryGuest.adult === false ? 'badge-info' : 'badge-secondary'}">
-                <div data-i18n="admin:party.${primaryGuest && primaryGuest.adult === false ? 'child' : 'adult'}">${translate('admin:party.' + (primaryGuest && primaryGuest.adult === false ? 'child' : 'adult'))}</div>
+                <div data-i18n="common:party.${primaryGuest && primaryGuest.adult === false ? 'child' : 'adult'}">${translate('admin:party.' + (primaryGuest && primaryGuest.adult === false ? 'child' : 'adult'))}</div>
               </span>
             </div>
           </div>
