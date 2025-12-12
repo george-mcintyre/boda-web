@@ -1193,7 +1193,7 @@
               <strong>${primaryGuest ? primaryGuest.name : translate('admin:party.unknown')}</strong> 
               <span class="badge badge-primary" data-i18n="common:party.primary">${primaryGuest ? translate('common:party.primary') : ''}</span>
               <span class="badge ${primaryGuest && primaryGuest.adult === false ? 'badge-info' : 'badge-secondary'}">
-                <div data-i18n="common:party.${primaryGuest && primaryGuest.adult === false ? 'child' : 'adult'}">${translate('admin:party.' + (primaryGuest && primaryGuest.adult === false ? 'child' : 'adult'))}</div>
+                <div data-i18n="common:party.${primaryGuest && primaryGuest.adult === false ? 'child' : 'adult'}">${translate('common:party.' + (primaryGuest && primaryGuest.adult === false ? 'child' : 'adult'))}</div>
               </span>
             </div>
           </div>
