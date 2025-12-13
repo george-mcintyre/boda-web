@@ -4,19 +4,19 @@ const translations = {
     //--------------------------------
     // Wedding
     //--------------------------------
-    'wedding:date': 'June 6th, 2026 • Marbella, Spain',
-    'wedding.common.footer:rich': '© 2026 Boda de Iluminada &amp; George',
     'wedding:title': 'Iluminada & George',
+    'wedding:subtitle': 'We\'re getting married!',
+    'wedding:date': 'June 6th, 2026 • Marbella, Spain',
     'wedding:hero.description': 'Iluminada and George are getting married on the beach in Marbella this June, and we’re so happy to share it with you. Expect sun, sea and lots of laughter.',
     'wedding:hero.description2': 'This site is your wedding hub. Log in with your RSVP email to confirm your party, choose your menu, see the schedule, view our gift list and chat with other guests.',
-    'wedding:subtitle': 'We\'re getting married!',
+    'wedding.common.footer:rich': '© 2026 Boda de Iluminada &amp; George',
 
     //--------------------------------
     // Logon Page
     //--------------------------------
+    'login:page.title': 'Guest access - Wedding',
     'login:guest:tooltip': 'Guest Access',
     'login:admin:tooltip': 'Administrator Access',
-    'login:page.title': 'Guest access - Wedding',
     'login:guest.zone.title': 'Guest Zone',
     'login:header': 'Guest access',
     'login:email.label': 'Email:',
@@ -28,23 +28,24 @@ const translations = {
     'login:server.error': 'Server connection error',
 
     //--------------------------------
-    // Common  
+    // Common
     //--------------------------------
-    'common:people': 'people',
-    'common:person': 'person',
+    // Countdown
     'common:days': 'Days',
-    'common:enter.name': 'Enter name...',
-    'common:error.saving.menu.selection': 'Error saving menu selection',
-    'common:error.saving.menu.selections': 'Error saving menu selections',
-    'common:error.saving.special.request': 'Error saving special request',
-    'common:error.saving.special.request.details': 'Error saving special request details',
-    'common:home': 'Home',
     'common:hours': 'Hours',
     'common:minutes': 'Minutes',
     'common:seconds': 'Seconds',
+
+    // Common: Buttons
+    'common:home': 'Home',
     'common:cancel:rich': 'Cancel',
     'common:confirm:rich': 'Confirm',
+
+    // Common prompts and messages
+    'common:enter.name': 'Enter name...',
     'common:confirmAction:rich': 'Confirm action',
+    'common:people': 'people',
+    'common:person': 'person',
     'common:new:rich': '<i class="fas fa-plus-circle"></i> New',
     'common:justNow': 'Just now',
     'common:minutesAgo': '{{minutes}} minutes ago',
@@ -57,8 +58,8 @@ const translations = {
     'common:menu.saving': 'Saving...',
     'common:menu.special.request.details.saved': 'Special request details saved successfully!',
     'common:menu.special.request.saved': 'Special request saved successfully!',
-      
-    // Common: Party  
+
+    // Common: Party
     'common:party.members': 'members',
     'common:party.adult': 'Adult (18+)',
     'common:party.age.category': 'Age Category',
@@ -69,10 +70,15 @@ const translations = {
     'common:party.remove.member': 'Remove member',
     'common:party.confirm.remove.member': 'Are you sure you want to remove {{memberName}} from your party?',
 
+    // Common: Errors
+    'common:error.saving.menu.selection': 'Error saving menu selection',
+    'common:error.saving.menu.selections': 'Error saving menu selections',
+    'common:error.saving.special.request': 'Error saving special request',
+    'common:error.saving.special.request.details': 'Error saving special request details',
+
     //--------------------------------
     // Guests Zone
     //--------------------------------
-    'guests:welcome': 'Welcome',    
     'guests:title': 'Guest Zone - Iluminada & George Wedding',
     'guests:welcome.title': 'Guest Zone',
     'guests:summary': 'Summary',
@@ -122,9 +128,9 @@ const translations = {
     //--------------------------------
     // Party Page
     //--------------------------------
-    'guests:loadingPartyMembers': 'Loading party members...',
     'guests:party.page.title': 'Party Management',
     'guests:party.page.description': 'Manage your wedding party members and their dietary requirements.',
+    'guests:loadingPartyMembers': 'Loading party members...',
     'guests:partyMembersSaved': 'Party members saved successfully!',
     'guests:errorSavingPartyMembers': 'Error saving party members',
     'guests:savePartyMembers:rich': '<i class="fas fa-save"></i> Save Party Members',
@@ -141,9 +147,10 @@ const translations = {
     //--------------------------------
     // Events Page
     //--------------------------------
-    'guests:eventsLoading': 'Loading events...',
     'guests:eventsPageTitle': 'RSVP to the Wedding Events below',
     'guests:eventsPageDescription': 'We are thrilled to have to have you join us for the wedding. Here are the details of all the events that will be taking place. Please select your name in each event in the Who\'s Attending section. That way we can prepare everything for you to have a great time.',
+
+    'guests:eventsLoading': 'Loading events...',
     'guests:eventsNoEvents': 'No Events Available',
     'guests:eventsNoEventsDescription': 'There are no events scheduled yet. Please check back later.',
     'guests:eventsNoPartyMembers': 'No party members found.',
@@ -168,6 +175,7 @@ const translations = {
     'guests:menuSelection': 'Menu Selection',
     'guests:menuSelectionDesc': 'Your current menu selection for our wedding.',
     'guests:menuSelectionDesc2': 'Choose your preferred dishes for our wedding.',
+
     'guests:menuLoading': 'Loading menu...',
     'guests:menuErrorTitle': 'Error Loading Menu',
     'guests:menuErrorMessage': 'Unable to load menu data. Please try again later.',
@@ -225,7 +233,6 @@ const translations = {
     'guests:giftsPurchaseProcessing': 'Processing...',
     'guests:giftsPaymentError': 'Error processing payment',
     'guests:giftsPaymentServiceError': 'Error connecting to payment service',
-
 
     //--------------------------------
     // Admin Page
@@ -438,8 +445,6 @@ const translations = {
     'admin:menu.field.optionHelp': 'e.g. Cream of Mushroom Soup',
     'admin:menu.field.optionDescription': 'Option Description',
     'admin:menu.field.optionDescriptionHelp': 'e.g. A delicate blend of cream, mushrooms, and garlic',
-    'admin:menu.field.option': 'Option',
-    'admin:menu.field.optionDescription': 'Option Description',
     'admin:menu.field.image': 'Image',
     'admin:menu.field.imageHelp': 'Upload menu option image (will be stored in database)',
 
@@ -516,53 +521,23 @@ const translations = {
     'admin:settings.giftsDesc': 'Show Gift Registry',
   },
   es: {
-    'common:home': 'Inicio',
-    'common:days': 'Días',
-    'common:hours': 'Horas',
-    'common:minutes': 'Minutos',
-    'common:seconds': 'Segundos',
-    'wedding.common.footer:rich': '© 2026 Boda de Iluminada &amp; George',
-    'common:party.primary.guest': 'Invitado principal',
-    'common:party.adult': 'Adulto (18+)',
-    'common:party.child': 'Niño',
-    'common:party.members': 'miembros',
-    'common:party.name': 'Nombre',
-    'common:party.age.category': 'Edad',
-    'common:new:rich': '<i class="fas fa-plus-circle"></i> Nuevo',
-    'common:justNow': 'Hace {{minutes}} minutos',
-    'common:minutesAgo': 'Hace {{minutes}} minutos',
-    'common:hoursAgo': 'Hace {{hours}} horas',
-    'common:daysAgo': 'Hace {{days}} días',
-    'common:party.remove.member': 'Eliminar miembro',
-    'common:enter.name': 'Introduce el nombre...', 
-    'common:confirmAction:rich': 'Confirmar acción',
-    'common:cancel:rich': 'Cancelar',
-    'common:confirm:rich': 'Confirmar',
-
-    'common:party.primary': 'Principal',
-    'common:menu.saving': 'Guardando...',
-    'common:menu.selections.saved': 'Selecciones de menú guardadas correctamente.',
-    'common:error.saving.menu.selections': 'Error al guardar las selecciones de menú',
-    'common:menu.selection.saved': 'Selección de menú guardada correctamente.',
-    'common:error.saving.menu.selection': 'Error al guardar la selección de menú',
-    'common:menu.special.request.saved': 'Petición especial guardada correctamente.',
-    'common:error.saving.special.request': 'Error al guardar la petición especial',
-    'common:menu.special.request.details.saved': 'Detalles de la petición especial guardados correctamente.',
-    'common:error.saving.special.request.details': 'Error al guardar los detalles de la petición especial',
-    'common:people': 'personas',
-    'common:person': 'persona',
-    'common:party.confirm.remove.member': '¿Estás seguro de querer eliminar a {{memberName}} de tu grupo?',
- 
+    //--------------------------------
+    // Wedding
+    //--------------------------------
     'wedding:title': 'Iluminada & George',
     'wedding:subtitle': '¡Nos casamos!',
     'wedding:date': '6 de junio de 2026 • Marbella, España',
     'wedding:hero.description': 'Iluminada y George se casan en la playa de Marbella este junio y estamos muy felices de compartirlo contigo. Te esperan sol, mar y muchas risas.',
     'wedding:hero.description2': 'Este sitio es tu centro para la boda. Inicia sesión con el correo de tu RSVP para confirmar tu grupo, elegir tu menú, ver el programa, consultar nuestra lista de regalos y chatear con otros invitados.',
+    'wedding.common.footer:rich': '© 2026 Boda de Iluminada &amp; George',
 
+    //--------------------------------
+    // Logon Page
+    //--------------------------------
+    'login:page.title': 'Acceso de invitados - Boda',
     'login:guest:tooltip': 'Acceso de invitados',
     'login:admin:tooltip': 'Acceso de administrador',
     'login:guest.zone.title': 'Zona de invitados',
-    'login:page.title': 'Acceso de invitados - Boda',
     'login:header': 'Acceso de invitados',
     'login:email.label': 'Correo electrónico:',
     'login:email:placeholder': 'Introduce tu correo electrónico',
@@ -572,19 +547,69 @@ const translations = {
     'login:email.not.found': 'El correo no figura en la lista de invitados',
     'login:server.error': 'Error de conexión con el servidor',
 
+    //--------------------------------
+    // Common
+    //--------------------------------
+    // Countdown
+    'common:days': 'Días',
+    'common:hours': 'Horas',
+    'common:minutes': 'Minutos',
+    'common:seconds': 'Segundos',
+
+    // Common: Buttons
+    'common:home': 'Inicio',
+    'common:cancel:rich': 'Cancelar',
+    'common:confirm:rich': 'Confirmar',
+
+    // Common prompts and messages
+    'common:enter.name': 'Introduce el nombre...', 
+    'common:confirmAction:rich': 'Confirmar acción',
+    'common:people': 'personas',
+    'common:person': 'persona',
+    'common:new:rich': '<i class="fas fa-plus-circle"></i> Nuevo',
+    'common:justNow': 'Hace {{minutes}} minutos',
+    'common:minutesAgo': 'Hace {{minutes}} minutos',
+    'common:hoursAgo': 'Hace {{hours}} horas',
+    'common:daysAgo': 'Hace {{days}} días',
+
+    // Common: Menu
+    'common:menu.selection.saved': 'Selección de menú guardada correctamente.',
+    'common:menu.selections.saved': 'Selecciones de menú guardadas correctamente.',
+    'common:menu.saving': 'Guardando...',
+    'common:menu.special.request.details.saved': 'Detalles de la petición especial guardados correctamente.',
+    'common:menu.special.request.saved': 'Petición especial guardada correctamente.',
+
+    // Common: Party
+    'common:party.members': 'miembros',
+    'common:party.adult': 'Adulto (18+)',
+    'common:party.age.category': 'Edad',
+    'common:party.child': 'Niño',
+    'common:party.name': 'Nombre',
+    'common:party.primary.guest': 'Invitado principal',
+    'common:party.primary': 'Principal',
+    'common:party.remove.member': 'Eliminar miembro',
+    'common:party.confirm.remove.member': '¿Estás seguro de querer eliminar a {{memberName}} de tu grupo?',
+    
+    // Common: Errors
+    'common:error.saving.menu.selections': 'Error al guardar las selecciones de menú',
+    'common:error.saving.menu.selection': 'Error al guardar la selección de menú',
+    'common:error.saving.special.request': 'Error al guardar la petición especial',
+    'common:error.saving.special.request.details': 'Error al guardar los detalles de la petición especial',
+ 
+    //--------------------------------
+    // Guests Zone
+    //--------------------------------
     'guests:title': 'Zona de invitados - Boda de Iluminada y George',
     'guests:welcome.title': 'Zona de invitados',
     'guests:summary': 'Resumen',
-    'guests:menu': 'Menú',
-
-    'guests:rsvp': 'RSVP',
-
-    'guests:menuSelection': 'Selección de menú',
-    'guests:menuSelectionDesc': 'Tu selección de menú actual para nuestra boda.',
-    'guests:menuSelectionDesc2': 'Elige tus platos preferidos para nuestra boda.',
     'guests:party': 'Grupo',
+    'guests:rsvp': 'RSVP',
+    'guests:menu': 'Menú',
+    'guests:gifts': 'Regalos',
 
+    //--------------------------------
     // Summary Page
+    //--------------------------------
     'guests:loadingSummary': 'Cargando resumen...',
     'guests:summaryPageTitle': 'Tu área de invitado para la boda de Iluminada y George',
     'guests:yourSummary': 'Tu resumen',
@@ -606,23 +631,32 @@ const translations = {
     'guests:summaryRSVP': 'Resumen de asistencia',
     'guests:summaryMenuSelections': 'Selecciones de menú',
 
-    'guests:partyManagement': 'Gestión del grupo',
     'guests:partyManagementDesc:rich': 'Gestiona los miembros de tu grupo y sus requisitos dietéticos.',
     'guests:giftsSelection': 'Selección de regalos',
     'guests:giftsSelectionDesc:rich': 'Elige tus regalos favoritos para nuestras celebraciones de boda.',
     'guests:eventsRSVP': 'RSVP',
     'guests:eventsRSVPDesc:rich': 'Las celebraciones tendrán lugar durante tres días: viernes, sábado y domingo. Empiezan el viernes con una cena de bienvenida. El sábado será un día completo de actividades, incluida la ceremonia de la boda, el banquete y el baile. El domingo terminaremos con un brunch de despedida. Por favor, confirma en cuáles de estos eventos vas a asistir.',
 
+    // Comments Page
+    'guests:loadingComments': 'Cargando comentarios...',
+    'guests:noComments': 'No hay comentarios aún. ¡Sé el primero en comentar!',
+    'guests:commentsTitle': 'Comentarios',
+    'guests:commentsSubtitle:rich': 'Comparte tus pensamientos con otros invitados',
+    'guests:comment:placeholder': 'Escribe tu comentario...',
+    'guests:postComment': 'Publicar',
+    
+    //--------------------------------
     // Party Page
-    'guests:loadingPartyMembers': 'Cargando miembros del grupo...',
+    //--------------------------------
     'guests:party.page.title': 'Gestión del grupo',
     'guests:party.page.description': 'Gestiona los miembros de tu grupo y sus requisitos dietéticos.',
+    'guests:loadingPartyMembers': 'Cargando miembros del grupo...',
+    'guests:partyMembersSaved': 'Miembros del grupo guardados correctamente!',
+    'guests:errorSavingPartyMembers': 'Error al guardar los miembros del grupo',
     'guests:savePartyMembers:rich': '<i class="fas fa-save"></i> Guardar miembros del grupo',
     'guests:partyMembersTitle:rich': '<i class="fas fa-users"></i> Miembros del grupo',
     'guests:partyDescription': 'Tu grupo incluye a todos los que asistirán a la boda contigo. Puedes añadir hasta ',
     'guests:partyDescription2': 'miembros de grupo incluyéndote a ti mismo.',
-    'guests:partyMembersSaved': 'Miembros del grupo guardados correctamente!',
-    'guests:errorSavingPartyMembers': 'Error al guardar los miembros del grupo',
     'guests:addPartyMember:rich': '<i class="fas fa-plus-circle"></i> Añadir miembro del grupo',
     'guests:dietaryRequirements:rich': '<i class="fas fa-utensils"></i> Requisitos dietéticos',
     'guests:dietaryDescription': 'Por favor, infórmanos sobre cualquier requisito dietético o alergia de cada miembro de tu grupo.',
@@ -630,11 +664,13 @@ const translations = {
     'common:errorSavingDietaryRequirements': 'Error al guardar los requisitos dietéticos',
     'guests:party.maxPartySizeReached:rich': 'Has alcanzado el tamaño máximo del grupo. Por favor, <a href="mailto:rsvp@iluminada-y-george.com">contacta con nosotros</a> si necesitas añadir más invitados.',
 
+    //--------------------------------
     // Events Page
-    'guests:eventsLoading': 'Cargando eventos...',
+    //--------------------------------
     'guests:eventsPageTitle': 'Confirma tu asistencia a los eventos de la boda de abajo',
     'guests:eventsPageDescription': 'Nos hace mucha ilusión que nos acompañes en la boda. Aquí tienes los detalles de todos los eventos que tendrán lugar. Por favor, selecciona tu nombre en cada evento en la sección "Quién asiste". Así podremos preparar todo para que lo pases genial.',
-
+    
+    'guests:eventsLoading': 'Cargando eventos...',
     'guests:eventsNoEvents': 'No hay eventos disponibles',
     'guests:eventsNoEventsDescription': 'Todavía no hay eventos programados. Por favor, vuelve a comprobar más tarde.',
     'guests:eventsNoPartyMembers': 'No se han encontrado miembros de grupo.',
@@ -651,21 +687,15 @@ const translations = {
     'guests:logout': 'Cerrar sesión',
     'guests:event': 'Evento',
 
+    //--------------------------------
     // Menu Page
+    //--------------------------------
+    'guests:menuSelection': 'Selección de menú',
+    'guests:menuSelectionDesc': 'Tu selección de menú actual para nuestra boda.',
+    'guests:menuSelectionDesc2': 'Elige tus platos preferidos para nuestra boda.',
     'guests:menuPageTitle': 'Selección de menú',
     'guests:menuPageDescription': 'Elige tus platos preferidos para el banquete de la boda.',
 
-    // Comments Page
-    'guests:loadingComments': 'Cargando comentarios...',
-    'guests:noComments': 'No hay comentarios aún. ¡Sé el primero en comentar!',
-    'guests:commentsTitle': 'Comentarios',
-    'guests:commentsSubtitle:rich': 'Comparte tus pensamientos con otros invitados',
-    'guests:comment:placeholder': 'Escribe tu comentario...',
-    'guests:postComment': 'Publicar',
-
-    'guests:welcome': 'Bienvenido/a',
-    
-    // Menu Selection Page
     'guests:menuLoading': 'Cargando menú...',
     'guests:menuErrorTitle': 'Error al cargar el menú',
     'guests:menuErrorMessage': 'No se pueden cargar los datos del menú. Por favor, inténtalo de nuevo más tarde.',
@@ -691,7 +721,9 @@ const translations = {
     'guests:saveMenuSelections': 'Guardar selecciones de menú',
     'guests:saveDietaryRequirements:rich': '<i class="fas fa-save"></i> Guardar requisitos dietéticos',
     
+    //--------------------------------
     // Gifts Page
+    //--------------------------------
     'guests:giftsPageTitle': 'Lista de regalos',
     'guests:giftsPageDescription': 'Tu presencia es nuestro regalo. Pero si quieres contribuir a nuestra luna de miel, puedes elegir un regalo divertido de la lista de abajo; se imprimirá con tu mensaje y se mostrará en un gran panel en el banquete de boda. El importe que elijas se utilizará para financiar nuestra luna de miel. ¡Gracias!',
     'guests:giftsLoading': 'Cargando regalos...',
@@ -721,43 +753,50 @@ const translations = {
     'guests:giftsPurchaseProcessing': 'Procesando...',
     'guests:giftsPaymentError': 'Error al procesar el pago',
     'guests:giftsPaymentServiceError': 'Error al conectar con el servicio de pagos',
-    'guests:gifts': 'Regalos',
 
-
-    // Admin
+    //--------------------------------
+    // Admin Page
+    //--------------------------------
     'admin:pageTitle': 'Panel de administración - Boda de Iluminada y George',
     'admin:title': 'Panel de administración',
-    'admin:logout': 'Cerrar sesión',
     'admin:welcomeTitle': 'Bienvenido/a, administrador',
     'admin:welcomeDesc': 'Administra toda la información de la boda de Iluminada y George',
+    'admin:logout': 'Cerrar sesión',
+
+    // Navigation Tabs
     'admin:tab.guests': 'Invitados',
     'admin:tab.gifts': 'Lista de regalos',
     'admin:tab.messages': 'Mensajes',
     'admin:tab.events': 'Programa de eventos',
     'admin:tab.menus': 'Gestión del menú',
     'admin:tab.settings': 'Configuración',
+
     'admin:loading': 'Cargando...',
     'admin:loadingGuests': 'Cargando Invitados...',
-    'admin:guests.uploadingGuests': 'Subiendo invitados...',
     'admin:loadingPartyMembers': 'Cargando miembros del grupo...',
     'admin:loadingGiftList': 'Cargando lista de regalos...',
     'admin:loadingMessages': 'Cargando mensajes...',
     'admin:loadingEventSchedule': 'Cargando programa de eventos...',
     'admin:loadingCourses': 'Cargando platos...',
     'admin:loadingSettings': 'Cargando configuración...',
+
+    // Admin Footer
     'admin:footer': 'Panel de administración',
 
-    // Admin Messages Section
-    'admin:messages.title': 'Limpieza de mensajes',
-    'admin:messages.subtitle': 'Elimina cualquier mensaje de invitados que sea inapropiado u ofensivo',
-    'admin:messages.noMessages': 'Todavía no hay mensajes. Los invitados aparecerán aquí cuando publiquen comentarios.',
-    'admin:messages.loading': 'Cargando mensajes...',
-    'admin:messages.errorTitle': 'Error al cargar los mensajes',
-    'admin:messages.errorMessage': 'No se pudieron cargar los mensajes: {{error}}',
-    'admin:messages.retry': 'Reintentar',
-    'admin:messages.delete': 'Eliminar',
+    // Admin Login Page
+    'adminLogin:pageTitle': 'Inicio de sesión de administrador - Boda de Iluminada y George',
+    'adminLogin:subHeader': 'Accede al panel de administración',
+    'adminLogin:description': 'Introduce tus credenciales para gestionar los detalles de la boda y los RSVPs.',
+    'adminLogin:username': 'Usuario',
+    'adminLogin:username:placeholder': 'Tu usuario',
+    'adminLogin:password': 'Contraseña',
+    'adminLogin:password:placeholder': 'Tu contraseña secreta',
+    'adminLogin:submit': 'Iniciar sesión',
 
+    //--------------------------------
     // Admin Guests Section
+    //--------------------------------
+    'admin:guests.uploadingGuests': 'Subiendo invitados...',
     'admin:guests.errorLoading': 'No se pudieron cargar los invitados',
     'admin:guests.adult': 'Adulto',
     'admin:guests.child': 'Niño',
@@ -792,50 +831,6 @@ const translations = {
     'admin:guests.error.failed': 'No se pudieron cargar los invitados: {{error}}',
     'admin:guests.retry': 'Reintentar',
 
-    // Admin Gifts Section
-    'admin:gifts.title': 'Lista de regalos',
-    'admin:gifts.add': 'Añadir',
-    'admin:gifts.edit': 'Editar regalo',
-    'admin:gifts.save': 'Guardar',
-    'admin:gifts.deleteConfirm': '¿Eliminar este regalo?',
-    'admin:gifts.noImage': 'Sin imagen',
-    'admin:gifts.grandTotal': 'Total general',
-    'admin:gifts.grandTotalDescription': 'Las tarjetas disponibles x precio',
-    'admin:gifts.table.description': 'Descripción',
-    'admin:gifts.table.image': 'Imagen',
-    'admin:gifts.table.available': 'Disponibles',
-    'admin:gifts.table.price': 'Precio',
-    'admin:gifts.table.purchased': 'Comprados',
-    'admin:gifts.table.actions': 'Acciones',
-    'admin:gifts.field.title': 'Nombre',
-    'admin:gifts.field.description': 'Descripción',
-    'admin:gifts.field.image': 'Imagen',
-    'admin:gifts.field.available': 'Número disponible',
-    'admin:gifts.field.price': 'Precio',
-    'admin:gifts.field.imageHelp': 'Sube la imagen de la tarjeta de regalo (se guardará en la base de datos)',
-    'admin:gifts.priceOption.25': '25 €',
-    'admin:gifts.priceOption.50': '50 €',
-    'admin:gifts.priceOption.100': '100 €',
-    'admin:gifts.priceOption.200': '200 €',
-    'admin:gifts.priceOption.500': '500 €',
-
-    // Admin Settings Section
-    'admin:settings.enabled': 'Activado',
-    'admin:settings.disabled': 'Desactivado',
-    'admin:settings.title': 'Configuración',
-    'admin:settings.featureToggles': 'Activar/desactivar funciones',
-    'admin:settings.featureTogglesDescription': 'Controla qué funciones están disponibles para los invitados',
-    'admin:settings.enableGuestArea': 'Activar zona de invitados',
-    'admin:settings.enableGuestAreaDesc': 'Permitir que los invitados inicien sesión y gestionen los miembros de su grupo',
-    'admin:settings.showWeddingEvents': 'Mostrar eventos de la boda',
-    'admin:settings.showWeddingEventsDesc': 'Mostrar el calendario de eventos de la boda y permitir a los invitados confirmar su asistencia',
-    'admin:settings.menu': 'Menú',
-    'admin:settings.menuDesc': 'Mostrar selección de menú y preferencias de los invitados',
-    'admin:settings.messages': 'Mensajes',
-    'admin:settings.messagesDesc': 'Mostrar mensajes',
-    'admin:settings.gifts': 'Regalos',
-    'admin:settings.giftsDesc': 'Mostrar lista de regalos',
-
     // Admin Party Management Section
     'admin:party.title': 'Gestionar grupo: ',
     'admin:party.description': 'Gestionar los miembros del grupo de este invitado',
@@ -865,7 +860,9 @@ const translations = {
     'admin:party.error.loadingError': 'Error al cargar los miembros del grupo: {{error}}',
     'admin:party.retry': 'Reintentar',
 
+    //--------------------------------
     // Admin Events Section
+    //--------------------------------
     'admin:events.title': 'Programa de eventos',
     'admin:events.addEvent': 'Añadir evento',
     'admin:events.noImage': 'Sin imagen',
@@ -926,30 +923,34 @@ const translations = {
     'admin:subEvents.option.reception': 'Recepción',
     'admin:subEvents.option.dancing': 'Baile',
 
+    //--------------------------------
     // Admin Menu Management Section
+    //--------------------------------
     'admin:menu.title': 'Gestión del menú',
+    'admin:menu.errorLoading': 'Error al cargar el menú',
+    'admin:menu.failedToLoad': 'No se pudo cargar el menú: {{error}}',
+    'admin:menu.save': 'Guardar',
+    'admin:menu.add': 'Añadir',
+    'admin:menu.retry': 'Reintentar',
+
+    // Menu Courses
+    'admin:menu.emptyCourse': 'Aún no se han definido {{courseType}}.',
     'admin:menu.courseType.starter': 'Entrantes',
     'admin:menu.courseType.main': 'Platos principales',
     'admin:menu.courseType.dessert': 'Postres',
     'admin:menu.courseType.drinks': 'Bebidas',
-    'admin:menu.noOptionsDefined': 'No hay opciones definidas',
-    'admin:menu.emptyCourse': 'Aún no se han definido {{courseType}}.',
-    'admin:menu.errorLoading': 'Error al cargar el menú',
-    'admin:menu.failedToLoad': 'No se pudo cargar el menú: {{error}}',
-    'admin:menu.retry': 'Reintentar',
     'admin:menu.confirmDelete': '¿Eliminar esta parte del menú? Esto eliminará todas sus opciones.',
-    'admin:menu.confirmDeleteOption': '¿Eliminar esta opción de menú?',
     'admin:menu.errorDeleting': 'Error al eliminar la parte del menú',
-    'admin:menu.errorDeletingOption': 'Error al eliminar la opción de menú',
     'admin:menu.editCourse': 'Editar plato',
     'admin:menu.addCourse': 'Añadir plato',
-    'admin:menu.save': 'Guardar',
-    'admin:menu.add': 'Añadir',
     'admin:menu.field.courseType': 'Tipo de plato',
     'admin:menu.field.courseLabel': 'Etiqueta del plato',
     'admin:menu.field.selectionRequired': 'Selección obligatoria',
  
-    
+    // menu Options
+    'admin:menu.noOptionsDefined': 'No hay opciones definidas',
+    'admin:menu.confirmDeleteOption': '¿Eliminar esta opción de menú?',
+    'admin:menu.errorDeletingOption': 'Error al eliminar la opción de menú',
     'admin:menu.option.starter': 'Entrante',
     'admin:menu.option.main': 'Plato principal',
     'admin:menu.option.dessert': 'Postre',
@@ -957,7 +958,6 @@ const translations = {
     'admin:menu.option.yes': 'Sí: los invitados deben elegir una opción',
     'admin:menu.option.no': 'No: se ofrecerán todas las opciones',
     'admin:menu.field.courseLabelHelp': 'p. ej., "Aperitivos", "Plato principal", "Postres"',
-
     'admin:menu.field.helpSelectionRequired': 'Si está activado, los invitados deben seleccionar una opción. Si está desactivado, se ofrecerán todas las opciones.',
     'admin:menu.editCourseOption': 'Editar opción de menú',
     'admin:menu.addCourseOption': 'Añadir opción de menú',
@@ -965,10 +965,10 @@ const translations = {
     'admin:menu.field.optionHelp': 'p. ej., Crema de champiñones',
     'admin:menu.field.optionDescription': 'Descripción de la opción',
     'admin:menu.field.optionDescriptionHelp': 'p. ej., Una delicada mezcla de crema, champiñones y ajo',
-    'admin:menu.field.option': 'Opción',
-    'admin:menu.field.optionDescription': 'Descripción de la opción',
     'admin:menu.field.image': 'Imagen',
     'admin:menu.field.imageHelp': 'Sube la imagen de la opción de menú (se guardará en la base de datos)',
+
+    // menu Options Special Dietary Indicators
     'admin:menu.field.isVegetarian': 'Vegetariano',
     'admin:menu.field.containsAllergens': 'Contiene alérgenos',
     'admin:menu.field.containsLactose': 'Contiene lactosa',
@@ -980,69 +980,83 @@ const translations = {
     'admin:menu.field.helpSpicy': 'Esta opción contiene ingredientes picantes',
     'admin:menu.field.helpNuts': 'Esta opción puede contener frutos secos',
 
+    //--------------------------------
+    // Admin Gifts Section
+    //--------------------------------
+    'admin:gifts.title': 'Lista de regalos',
+    'admin:gifts.add': 'Añadir',
+    'admin:gifts.edit': 'Editar regalo',
+    'admin:gifts.save': 'Guardar',
+    'admin:gifts.deleteConfirm': '¿Eliminar este regalo?',
+    'admin:gifts.noImage': 'Sin imagen',
+    'admin:gifts.grandTotal': 'Total general',
+    'admin:gifts.grandTotalDescription': 'Las tarjetas disponibles x precio',
+    'admin:gifts.table.description': 'Descripción',
+    'admin:gifts.table.image': 'Imagen',
+    'admin:gifts.table.available': 'Disponibles',
+    'admin:gifts.table.price': 'Precio',
+    'admin:gifts.table.purchased': 'Comprados',
+    'admin:gifts.table.actions': 'Acciones',
+    'admin:gifts.field.title': 'Nombre',
+    'admin:gifts.field.description': 'Descripción',
+    'admin:gifts.field.image': 'Imagen',
+    'admin:gifts.field.available': 'Número disponible',
+    'admin:gifts.field.price': 'Precio',
+    'admin:gifts.field.imageHelp': 'Sube la imagen de la tarjeta de regalo (se guardará en la base de datos)',
+    'admin:gifts.priceOption.25': '25 €',
+    'admin:gifts.priceOption.50': '50 €',
+    'admin:gifts.priceOption.100': '100 €',
+    'admin:gifts.priceOption.200': '200 €',
+    'admin:gifts.priceOption.500': '500 €',
 
-    'adminLogin:pageTitle': 'Inicio de sesión de administrador - Boda de Iluminada y George',
-    'adminLogin:subHeader': 'Accede al panel de administración',
-    'adminLogin:description': 'Introduce tus credenciales para gestionar los detalles de la boda y los RSVPs.',
-    'adminLogin:username': 'Usuario',
-    'adminLogin:username:placeholder': 'Tu usuario',
-    'adminLogin:password': 'Contraseña',
-    'adminLogin:password:placeholder': 'Tu contraseña secreta',
-    'adminLogin:submit': 'Iniciar sesión',
+    //--------------------------------
+    // Admin Messages Section
+    //--------------------------------
+    'admin:messages.title': 'Limpieza de mensajes',
+    'admin:messages.subtitle': 'Elimina cualquier mensaje de invitados que sea inapropiado u ofensivo',
+    'admin:messages.noMessages': 'Todavía no hay mensajes. Los invitados aparecerán aquí cuando publiquen comentarios.',
+    'admin:messages.loading': 'Cargando mensajes...',
+    'admin:messages.errorTitle': 'Error al cargar los mensajes',
+    'admin:messages.errorMessage': 'No se pudieron cargar los mensajes: {{error}}',
+    'admin:messages.retry': 'Reintentar',
+    'admin:messages.delete': 'Eliminar',
+
+    //--------------------------------
+    // Admin Settings Section
+    //--------------------------------
+    'admin:settings.enabled': 'Activado',
+    'admin:settings.disabled': 'Desactivado',
+    'admin:settings.title': 'Configuración',
+    'admin:settings.featureToggles': 'Activar/desactivar funciones',
+    'admin:settings.featureTogglesDescription': 'Controla qué funciones están disponibles para los invitados',
+    'admin:settings.enableGuestArea': 'Activar zona de invitados',
+    'admin:settings.enableGuestAreaDesc': 'Permitir que los invitados inicien sesión y gestionen los miembros de su grupo',
+    'admin:settings.showWeddingEvents': 'Mostrar eventos de la boda',
+    'admin:settings.showWeddingEventsDesc': 'Mostrar el calendario de eventos de la boda y permitir a los invitados confirmar su asistencia',
+    'admin:settings.menu': 'Menú',
+    'admin:settings.menuDesc': 'Mostrar selección de menú y preferencias de los invitados',
+    'admin:settings.messages': 'Mensajes',
+    'admin:settings.messagesDesc': 'Mostrar mensajes',
+    'admin:settings.gifts': 'Regalos',
+    'admin:settings.giftsDesc': 'Mostrar lista de regalos',
   },
   fr: {
+    //--------------------------------
     // Wedding
-    'wedding:date': '6 juin 2026 • Marbella, Espagne',
-    'wedding.common.footer:rich': '© 2026 Mariage d’Iluminada &amp; George',
+    //--------------------------------
     'wedding:title': 'Iluminada & George',
+    'wedding:subtitle': 'Nous nous marions !',
+    'wedding:date': '6 juin 2026 • Marbella, Espagne',
     'wedding:hero.description': 'Iluminada et George se marient sur la plage de Marbella en juin, et nous sommes ravis de partager ce moment avec vous. Attendez-vous à du soleil, à la mer et à beaucoup de rires.',
     'wedding:hero.description2': 'Ce site est votre espace mariage. Connectez-vous avec l’email de votre RSVP pour confirmer votre groupe, choisir votre menu, voir le programme, consulter notre liste de cadeaux et discuter avec les autres invités.',
-    'wedding:subtitle': 'Nous nous marions !',
+    'wedding.common.footer:rich': '© 2026 Mariage d’Iluminada &amp; George',
   
-    // Common  
-    'common:people': 'personnes',
-    'common:person': 'personne',
-    'common:days': 'Jours',
-    'common:enter.name': 'Saisir le nom...',
-    'common:error.saving.menu.selection': 'Erreur lors de l’enregistrement de la sélection de menu',
-    'common:error.saving.menu.selections': 'Erreur lors de l’enregistrement des sélections de menu',
-    'common:error.saving.special.request': 'Erreur lors de l’enregistrement de la demande spéciale',
-    'common:error.saving.special.request.details': 'Erreur lors de l’enregistrement des détails de la demande spéciale',
-    'common:home': 'Accueil',
-    'common:hours': 'Heures',
-    'common:minutes': 'Minutes',
-    'common:seconds': 'Secondes',
-    'common:cancel:rich': 'Annuler',
-    'common:confirm:rich': 'Confirmer',
-    'common:confirmAction:rich': 'Confirmer l’action',
-    'common:new:rich': '<i class="fas fa-plus-circle"></i> Nouveau',
-    'common:justNow': 'Juste maintenant',
-    'common:minutesAgo': 'il y a {{minutes}} minutes',
-    'common:hoursAgo': 'il y a {{hours}} heures',
-    'common:daysAgo': 'il y a {{days}} jours',
-  
-    // Common: Menu
-    'common:menu.selection.saved': 'Sélection de menu enregistrée avec succès !',
-    'common:menu.selections.saved': 'Sélections de menu enregistrées avec succès !',
-    'common:menu.saving': 'Enregistrement...',
-    'common:menu.special.request.details.saved': 'Détails de la demande spéciale enregistrés avec succès !',
-    'common:menu.special.request.saved': 'Demande spéciale enregistrée avec succès !',
-      
-    // Common: Party  
-    'common:party.members': 'membres',
-    'common:party.adult': 'Adulte (18+)',
-    'common:party.age.category': 'Catégorie d’âge',
-    'common:party.child': 'Enfant',
-    'common:party.name': 'Nom',
-    'common:party.primary.guest': 'Invité principal',
-    'common:party.primary': 'Principal',
-    'common:party.remove.member': 'Supprimer le membre',
-    'common:party.confirm.remove.member': 'Êtes-vous sûr de vouloir retirer {{memberName}} de votre groupe ?',
-  
+    //--------------------------------
     // Logon Page
+    //--------------------------------
+    'login:page.title': 'Accès invité - Mariage',
     'login:guest:tooltip': 'Accès invité',
     'login:admin:tooltip': 'Accès administrateur',
-    'login:page.title': 'Accès invité - Mariage',
     'login:guest.zone.title': 'Espace invités',
     'login:header': 'Accès invité',
     'login:email.label': 'Email :',
@@ -1052,8 +1066,59 @@ const translations = {
     'login:success.redirecting': 'Connexion réussie. Redirection...',
     'login:email.not.found': 'Email introuvable dans la liste des invités',
     'login:server.error': 'Erreur de connexion au serveur',
-  
+
+    //--------------------------------
+    // Common
+    //--------------------------------
+    // Countdown
+    'common:days': 'Jours',
+    'common:hours': 'Heures',
+    'common:minutes': 'Minutes',
+    'common:seconds': 'Secondes',
+
+    // Common: Buttons
+    'common:home': 'Accueil',
+    'common:cancel:rich': 'Annuler',
+    'common:confirm:rich': 'Confirmer',
+
+    // Common prompts and messages
+    'common:enter.name': 'Saisir le nom...',
+    'common:confirmAction:rich': 'Confirmer l’action',
+    'common:people': 'personnes',
+    'common:person': 'personne',
+    'common:new:rich': '<i class="fas fa-plus-circle"></i> Nouveau',
+    'common:justNow': 'Juste maintenant',
+    'common:minutesAgo': 'il y a {{minutes}} minutes',
+    'common:hoursAgo': 'il y a {{hours}} heures',
+    'common:daysAgo': 'il y a {{days}} jours',
+
+    // Common: Menu
+    'common:menu.selection.saved': 'Sélection de menu enregistrée avec succès !',
+    'common:menu.selections.saved': 'Sélections de menu enregistrées avec succès !',
+    'common:menu.saving': 'Enregistrement...',
+    'common:menu.special.request.details.saved': 'Détails de la demande spéciale enregistrés avec succès !',
+    'common:menu.special.request.saved': 'Demande spéciale enregistrée avec succès !',
+
+    // Common: Party
+    'common:party.members': 'membres',
+    'common:party.adult': 'Adulte (18+)',
+    'common:party.age.category': 'Catégorie d’âge',
+    'common:party.child': 'Enfant',
+    'common:party.name': 'Nom',
+    'common:party.primary.guest': 'Invité principal',
+    'common:party.primary': 'Principal',
+    'common:party.remove.member': 'Supprimer le membre',
+    'common:party.confirm.remove.member': 'Êtes-vous sûr de vouloir retirer {{memberName}} de votre groupe ?',
+
+    // Common: Errors
+    'common:error.saving.menu.selection': 'Erreur lors de l’enregistrement de la sélection de menu',
+    'common:error.saving.menu.selections': 'Erreur lors de l’enregistrement des sélections de menu',
+    'common:error.saving.special.request': 'Erreur lors de l’enregistrement de la demande spéciale',
+    'common:error.saving.special.request.details': 'Erreur lors de l’enregistrement des détails de la demande spéciale',
+
+    //--------------------------------
     // Guests Zone
+    //--------------------------------
     'guests:title': 'Espace invités - Mariage d’Iluminada & George',
     'guests:welcome.title': 'Espace invités',
     'guests:summary': 'Résumé',
@@ -1062,7 +1127,9 @@ const translations = {
     'guests:menu': 'Menu',
     'guests:gifts': 'Cadeaux',
   
+    //--------------------------------
     // Summary Page
+    //--------------------------------
     'guests:loadingSummary': 'Chargement de résumé...',
     'guests:summaryPageTitle': 'Votre espace invité pour le mariage d’Iluminada & George',
     'guests:yourSummary': 'Votre résumé',
@@ -1084,18 +1151,26 @@ const translations = {
     'guests:summaryRSVP': 'Résumé des réponses',
     'guests:summaryMenuSelections': 'Sélections de menu',
   
-    'guests:loadingPartyMembers': 'Chargement des membres du groupe...',
-    'guests:loadingComments': 'Chargement des commentaires...',
-    'guests:partyManagement': 'Gestion du groupe',
     'guests:partyManagementDesc:rich': 'Gérez les membres de votre groupe de mariage et leurs exigences alimentaires.',
     'guests:giftsSelection': 'Sélection de cadeaux',
     'guests:giftsSelectionDesc:rich': 'Choisissez vos cadeaux préférés pour nos célébrations de mariage.',
     'guests:eventsRSVP': 'RSVP',
     'guests:eventsRSVPDesc:rich': 'Les célébrations se dérouleront sur trois jours : vendredi, samedi et dimanche. Elles commencent le vendredi par un dîner de bienvenue. Le samedi est une journée complète d’activités incluant la cérémonie de mariage, le banquet de réception et la soirée dansante. Le dimanche se terminera par un brunch d’au revoir. Veuillez confirmer les événements auxquels vous participerez.',
   
+    // Comments Page
+    'guests:loadingComments': 'Chargement des commentaires...',
+    'guests:commentsTitle': 'Commentaires',
+    'guests:noComments': 'Aucun commentaire pour l’instant. Soyez le premier à commenter !',
+    'guests:commentsSubtitle:rich': 'Partagez vos pensées avec les autres invités',
+    'guests:comment:placeholder': 'Écrivez votre commentaire...',
+    'guests:postComment': 'Publier',
+
+    //--------------------------------
     // Party Page
+    //--------------------------------
     'guests:party.page.title': 'Gestion du groupe',
     'guests:party.page.description': 'Gérez les membres de votre groupe de mariage et leurs exigences alimentaires.',
+    'guests:loadingPartyMembers': 'Chargement des membres du groupe...',
     'guests:partyMembersSaved': 'Membres du groupe enregistrés avec succès !',
     'guests:errorSavingPartyMembers': 'Erreur lors de l’enregistrement des membres du groupe',
     'guests:savePartyMembers:rich': '<i class="fas fa-save"></i> Enregistrer les membres du groupe',
@@ -1109,7 +1184,9 @@ const translations = {
     'common:errorSavingDietaryRequirements': 'Erreur lors de l’enregistrement des exigences alimentaires',
     'guests:party.maxPartySizeReached:rich': 'Vous avez atteint la taille maximale du groupe. Besoin de plus d’invités ? <a href="mailto:rsvp@iluminada-y-george.com">Contactez-nous</a>',
     
+    //--------------------------------
     // Events Page
+    //--------------------------------
     'guests:eventsPageTitle': 'RSVP aux événements du mariage ci-dessous',
     'guests:eventsPageDescription': 'Nous sommes ravis que vous puissiez vous joindre à nous pour le mariage. Voici les détails de tous les événements prévus. Veuillez sélectionner votre nom dans chaque événement, dans la section « Qui participe ? ». Ainsi nous pourrons tout préparer pour que vous passiez un moment formidable.',
   
@@ -1130,24 +1207,15 @@ const translations = {
     'guests:logout': 'Déconnexion',
     'guests:event': 'Événement',
   
+    //--------------------------------
     // Menu Page
+    //--------------------------------
     'guests:menuPageTitle': 'Sélection de menu',
     'guests:menuPageDescription': 'Choisissez vos plats préférés pour le banquet de mariage.',
     'guests:menuSelection': 'Sélection de menu',
     'guests:menuSelectionDesc': 'Votre sélection de menu actuelle pour notre mariage.',
     'guests:menuSelectionDesc2': 'Choisissez vos plats préférés pour notre mariage.',
   
-  
-    // Comments Page
-    'guests:commentsTitle': 'Commentaires',
-    'guests:noComments': 'Aucun commentaire pour l’instant. Soyez le premier à commenter !',
-    'guests:commentsSubtitle:rich': 'Partagez vos pensées avec les autres invités',
-    'guests:comment:placeholder': 'Écrivez votre commentaire...',
-    'guests:postComment': 'Publier',
-  
-    'guests:welcome': 'Bienvenue',
-    
-    // Menu Selection Page
     'guests:menuLoading': 'Chargement du menu...',
     'guests:menuErrorTitle': 'Erreur lors du chargement du menu',
     'guests:menuErrorMessage': 'Impossible de charger les données du menu. Veuillez réessayer plus tard.',
@@ -1173,7 +1241,9 @@ const translations = {
     'guests:saveMenuSelections': 'Enregistrer les sélections de menu',
     'guests:saveDietaryRequirements:rich': '<i class="fas fa-save"></i> Enregistrer les exigences alimentaires',
     
+    //--------------------------------
     // Gifts Page
+    //--------------------------------
     'guests:giftsPageTitle': 'Liste de cadeaux',
     'guests:giftsPageDescription': 'Votre présence est notre cadeau. Mais si vous souhaitez contribuer à notre lune de miel, vous pouvez choisir un cadeau amusant dans la liste ci-dessous ; il sera imprimé avec votre message et affiché sur un grand mur lors du banquet de mariage. Le montant que vous choisissez servira à financer notre lune de miel. Merci.',
     'guests:giftsLoading': 'Chargement des cadeaux...',
@@ -1204,41 +1274,49 @@ const translations = {
     'guests:giftsPaymentError': 'Erreur lors du traitement du paiement',
     'guests:giftsPaymentServiceError': 'Erreur de connexion au service de paiement',
   
-  
-    // Admin
+    //--------------------------------
+    // Admin Page
+    //--------------------------------
     'admin:pageTitle': 'Panneau d’administration - Mariage d’Iluminada & George',
     'admin:title': 'Panneau d’administration',
-    'admin:logout': 'Se déconnecter',
     'admin:welcomeTitle': 'Bienvenue, administrateur',
     'admin:welcomeDesc': 'Gérez toutes les informations du mariage d’Iluminada et George',
+    'admin:logout': 'Se déconnecter',
+
+    // Navigation Tabs
     'admin:tab.guests': 'Invités',
     'admin:tab.gifts': 'Liste de cadeaux',
     'admin:tab.messages': 'Messages',
     'admin:tab.events': 'Programme des événements',
     'admin:tab.menus': 'Gestion du menu',
     'admin:tab.settings': 'Paramètres',
+
     'admin:loading': 'Chargement...',
     'admin:loadingGuests': 'Chargement des invités...',
-    'admin:guests.uploadingGuests': 'Téléchargement des invités...',
     'admin:loadingPartyMembers': 'Chargement des membres du groupe...',
     'admin:loadingGiftList': 'Chargement de la liste de cadeaux...',
     'admin:loadingMessages': 'Chargement des messages...',
     'admin:loadingEventSchedule': 'Chargement du programme des événements...',
     'admin:loadingCourses': 'Chargement des plats...',
     'admin:loadingSettings': 'Chargement des paramètres...',
+
+    // Admin Footer
     'admin:footer': 'Panneau d’administration',
   
-    // Admin Messages Section
-    'admin:messages.title': 'Nettoyage des messages',
-    'admin:messages.subtitle': 'Supprimez tout message d’invité inapproprié ou offensant',
-    'admin:messages.noMessages': 'Aucun message pour l’instant. Les invités apparaîtront ici lorsqu’ils publieront des commentaires.',
-    'admin:messages.loading': 'Chargement des messages...',
-    'admin:messages.errorTitle': 'Erreur lors du chargement des messages',
-    'admin:messages.errorMessage': 'Échec du chargement des messages : {{error}}',
-    'admin:messages.retry': 'Réessayer',
-    'admin:messages.delete': 'Supprimer',
-  
+    // Admin Login Page
+    'adminLogin:pageTitle': 'Connexion administrateur - Mariage d’Iluminada & George',
+    'adminLogin:subHeader': 'Accéder au panneau d’administration',
+    'adminLogin:description': 'Saisissez vos identifiants pour gérer les détails du mariage et les RSVP.',
+    'adminLogin:username': 'Nom d’utilisateur',
+    'adminLogin:username:placeholder': 'Votre nom d’utilisateur',
+    'adminLogin:password': 'Mot de passe',
+    'adminLogin:password:placeholder': 'Votre mot de passe secret',
+    'adminLogin:submit': 'Se connecter',
+
+    //--------------------------------
     // Admin Guests Section
+    //--------------------------------
+    'admin:guests.uploadingGuests': 'Téléchargement des invités...',
     'admin:guests.errorLoading': 'Échec du chargement des invités',
     'admin:guests.adult': 'Adulte',
     'admin:guests.child': 'Enfant',
@@ -1273,50 +1351,6 @@ const translations = {
     'admin:guests.error.failed': 'Échec du chargement des invités : {{error}}',
     'admin:guests.retry': 'Réessayer',
   
-    // Admin Gifts Section
-    'admin:gifts.title': 'Liste de cadeaux',
-    'admin:gifts.add': 'Ajouter',
-    'admin:gifts.edit': 'Modifier le cadeau',
-    'admin:gifts.save': 'Enregistrer',
-    'admin:gifts.deleteConfirm': 'Supprimer ce cadeau ?',
-    'admin:gifts.noImage': 'Aucune image',
-    'admin:gifts.grandTotal': 'Total général',
-    'admin:gifts.grandTotalDescription': 'Cartes disponibles x prix',
-    'admin:gifts.table.description': 'Description',
-    'admin:gifts.table.image': 'Image',
-    'admin:gifts.table.available': 'Disponibles',
-    'admin:gifts.table.price': 'Prix',
-    'admin:gifts.table.purchased': 'Achetées',
-    'admin:gifts.table.actions': 'Actions',
-    'admin:gifts.field.title': 'Nom',
-    'admin:gifts.field.description': 'Description',
-    'admin:gifts.field.image': 'Image',
-    'admin:gifts.field.available': 'Nombre disponible',
-    'admin:gifts.field.price': 'Prix',
-    'admin:gifts.field.imageHelp': 'Téléchargez l’image de la carte cadeau (elle sera stockée dans la base de données)',
-    'admin:gifts.priceOption.25': '25 €',
-    'admin:gifts.priceOption.50': '50 €',
-    'admin:gifts.priceOption.100': '100 €',
-    'admin:gifts.priceOption.200': '200 €',
-    'admin:gifts.priceOption.500': '500 €',
-  
-    // Admin Settings Section
-    'admin:settings.enabled': 'Activé',
-    'admin:settings.disabled': 'Désactivé',
-    'admin:settings.title': 'Paramètres',
-    'admin:settings.featureToggles': 'Fonctionnalités',
-    'admin:settings.featureTogglesDescription': 'Contrôlez les fonctionnalités disponibles pour les invités',
-    'admin:settings.enableGuestArea': 'Activer l’espace invités',
-    'admin:settings.enableGuestAreaDesc': 'Permettre aux invités de se connecter et de gérer les membres de leur groupe',
-    'admin:settings.showWeddingEvents': 'Afficher les événements de mariage',
-    'admin:settings.showWeddingEventsDesc': 'Afficher le calendrier des événements du mariage et permettre aux invités de confirmer leur présence',
-    'admin:settings.menu': 'Menu',
-    'admin:settings.menuDesc': 'Afficher la sélection de menu et les préférences des invités',
-    'admin:settings.messages': 'Messages',
-    'admin:settings.messagesDesc': 'Afficher les messages',
-    'admin:settings.gifts': 'Cadeaux',
-    'admin:settings.giftsDesc': 'Afficher la liste de cadeaux',
-  
     // Admin Party Management Section
     'admin:party.title': 'Gérer le groupe : ',
     'admin:party.description': 'Gérer les membres du groupe pour cet invité',
@@ -1346,7 +1380,9 @@ const translations = {
     'admin:party.error.loadingError': 'Erreur lors du chargement des membres du groupe : {{error}}',
     'admin:party.retry': 'Réessayer',
   
+    //--------------------------------
     // Admin Events Section
+    //--------------------------------
     'admin:events.title': 'Programme des événements',
     'admin:events.addEvent': 'Ajouter un événement',
     'admin:events.noImage': 'Aucune image',
@@ -1407,37 +1443,41 @@ const translations = {
     'admin:subEvents.option.reception': 'Réception',
     'admin:subEvents.option.dancing': 'Soirée dansante',
   
+    //--------------------------------
     // Admin Menu Management Section
+    //--------------------------------
     'admin:menu.title': 'Gestion du menu',
+    'admin:menu.errorLoading': 'Erreur lors du chargement du menu',
+    'admin:menu.failedToLoad': 'Échec du chargement du menu : {{error}}',
+    'admin:menu.save': 'Enregistrer',
+    'admin:menu.add': 'Ajouter',
+    'admin:menu.retry': 'Réessayer',
+
+    // Menu Courses
+    'admin:menu.emptyCourse': 'Aucun {{courseType}} défini pour le moment.',
     'admin:menu.courseType.starter': 'Entrées',
     'admin:menu.courseType.main': 'Plats principaux',
     'admin:menu.courseType.dessert': 'Desserts',
     'admin:menu.courseType.drinks': 'Boissons',
-    'admin:menu.noOptionsDefined': 'Aucune option définie',
-    'admin:menu.emptyCourse': 'Aucun {{courseType}} défini pour le moment.',
-    'admin:menu.errorLoading': 'Erreur lors du chargement du menu',
-    'admin:menu.failedToLoad': 'Échec du chargement du menu : {{error}}',
-    'admin:menu.retry': 'Réessayer',
     'admin:menu.confirmDelete': 'Supprimer cette partie du menu ? Cela supprimera toutes ses options.',
-    'admin:menu.confirmDeleteOption': 'Supprimer cette option de menu ?',
     'admin:menu.errorDeleting': 'Erreur lors de la suppression de la partie du menu',
-    'admin:menu.errorDeletingOption': 'Erreur lors de la suppression de l’option de menu',
     'admin:menu.editCourse': 'Modifier le plat',
     'admin:menu.addCourse': 'Ajouter un plat',
-    'admin:menu.save': 'Enregistrer',
-    'admin:menu.add': 'Ajouter',
     'admin:menu.field.courseType': 'Type de plat',
     'admin:menu.field.courseLabel': 'Libellé du plat',
     'admin:menu.field.selectionRequired': 'Sélection obligatoire',
     
+    // menu Options
+    'admin:menu.noOptionsDefined': 'Aucune option définie',
+    'admin:menu.confirmDeleteOption': 'Supprimer cette option de menu ?',
+    'admin:menu.errorDeletingOption': 'Erreur lors de la suppression de l’option de menu',
     'admin:menu.option.starter': 'Entrée',
     'admin:menu.option.main': 'Plat principal',
     'admin:menu.option.dessert': 'Dessert',
     'admin:menu.option.drinks': 'Boissons',
     'admin:menu.option.yes': 'Oui - Les invités doivent choisir une option',
     'admin:menu.option.no': 'Non - Toutes les options seront proposées',
-    'admin:menu.field.courseLabelHelp': 'ex. « Apéritifs », « Plat principal », « Desserts »',
-  
+    'admin:menu.field.courseLabelHelp': 'ex. « Apéritifs », « Plat principal », « Desserts »',  
     'admin:menu.field.helpSelectionRequired': 'Si activé, les invités doivent sélectionner une option. Si désactivé, toutes les options seront proposées.',
     'admin:menu.editCourseOption': 'Modifier l’option de menu',
     'admin:menu.addCourseOption': 'Ajouter une option de menu',
@@ -1447,6 +1487,8 @@ const translations = {
     'admin:menu.field.optionDescriptionHelp': 'ex. Un délicat mélange de crème, de champignons et d’ail',
     'admin:menu.field.image': 'Image',
     'admin:menu.field.imageHelp': 'Téléchargez l’image de l’option de menu (elle sera stockée dans la base de données)',
+
+    // menu Options Special Dietary Indicators
     'admin:menu.field.isVegetarian': 'Végétarien',
     'admin:menu.field.containsAllergens': 'Contient des allergènes',
     'admin:menu.field.containsLactose': 'Contient du lactose',
@@ -1457,69 +1499,84 @@ const translations = {
     'admin:menu.field.helpLactose': 'Cette option contient du lactose / des produits laitiers',
     'admin:menu.field.helpSpicy': 'Cette option contient des ingrédients épicés',
     'admin:menu.field.helpNuts': 'Cette option peut contenir des fruits à coque',
+
+    //--------------------------------
+    // Admin Gifts Section
+    //--------------------------------
+    'admin:gifts.title': 'Liste de cadeaux',
+    'admin:gifts.add': 'Ajouter',
+    'admin:gifts.edit': 'Modifier le cadeau',
+    'admin:gifts.save': 'Enregistrer',
+    'admin:gifts.deleteConfirm': 'Supprimer ce cadeau ?',
+    'admin:gifts.noImage': 'Aucune image',
+    'admin:gifts.grandTotal': 'Total général',
+    'admin:gifts.grandTotalDescription': 'Cartes disponibles x prix',
+    'admin:gifts.table.description': 'Description',
+    'admin:gifts.table.image': 'Image',
+    'admin:gifts.table.available': 'Disponibles',
+    'admin:gifts.table.price': 'Prix',
+    'admin:gifts.table.purchased': 'Achetées',
+    'admin:gifts.table.actions': 'Actions',
+    'admin:gifts.field.title': 'Nom',
+    'admin:gifts.field.description': 'Description',
+    'admin:gifts.field.image': 'Image',
+    'admin:gifts.field.available': 'Nombre disponible',
+    'admin:gifts.field.price': 'Prix',
+    'admin:gifts.field.imageHelp': 'Téléchargez l’image de la carte cadeau (elle sera stockée dans la base de données)',
+    'admin:gifts.priceOption.25': '25 €',
+    'admin:gifts.priceOption.50': '50 €',
+    'admin:gifts.priceOption.100': '100 €',
+    'admin:gifts.priceOption.200': '200 €',
+    'admin:gifts.priceOption.500': '500 €',
   
-    'adminLogin:pageTitle': 'Connexion administrateur - Mariage d’Iluminada & George',
-    'adminLogin:subHeader': 'Accéder au panneau d’administration',
-    'adminLogin:description': 'Saisissez vos identifiants pour gérer les détails du mariage et les RSVP.',
-    'adminLogin:username': 'Nom d’utilisateur',
-    'adminLogin:username:placeholder': 'Votre nom d’utilisateur',
-    'adminLogin:password': 'Mot de passe',
-    'adminLogin:password:placeholder': 'Votre mot de passe secret',
-    'adminLogin:submit': 'Se connecter',
+    //--------------------------------
+    // Admin Messages Section
+    //--------------------------------
+    'admin:messages.title': 'Nettoyage des messages',
+    'admin:messages.subtitle': 'Supprimez tout message d’invité inapproprié ou offensant',
+    'admin:messages.noMessages': 'Aucun message pour l’instant. Les invités apparaîtront ici lorsqu’ils publieront des commentaires.',
+    'admin:messages.loading': 'Chargement des messages...',
+    'admin:messages.errorTitle': 'Erreur lors du chargement des messages',
+    'admin:messages.errorMessage': 'Échec du chargement des messages : {{error}}',
+    'admin:messages.retry': 'Réessayer',
+    'admin:messages.delete': 'Supprimer',
+  
+    //--------------------------------
+    // Admin Settings Section
+    //--------------------------------
+    'admin:settings.enabled': 'Activé',
+    'admin:settings.disabled': 'Désactivé',
+    'admin:settings.title': 'Paramètres',
+    'admin:settings.featureToggles': 'Fonctionnalités',
+    'admin:settings.featureTogglesDescription': 'Contrôlez les fonctionnalités disponibles pour les invités',
+    'admin:settings.enableGuestArea': 'Activer l’espace invités',
+    'admin:settings.enableGuestAreaDesc': 'Permettre aux invités de se connecter et de gérer les membres de leur groupe',
+    'admin:settings.showWeddingEvents': 'Afficher les événements de mariage',
+    'admin:settings.showWeddingEventsDesc': 'Afficher le calendrier des événements du mariage et permettre aux invités de confirmer leur présence',
+    'admin:settings.menu': 'Menu',
+    'admin:settings.menuDesc': 'Afficher la sélection de menu et les préférences des invités',
+    'admin:settings.messages': 'Messages',
+    'admin:settings.messagesDesc': 'Afficher les messages',
+    'admin:settings.gifts': 'Cadeaux',
+    'admin:settings.giftsDesc': 'Afficher la liste de cadeaux',
   },
   de: {
+    //--------------------------------
     // Wedding
-    'wedding:date': '6. Juni 2026 • Marbella, Spanien',
-    'wedding.common.footer:rich': '© 2026 Hochzeit von Iluminada &amp; George',
+    //--------------------------------
     'wedding:title': 'Iluminada & George',
+    'wedding:subtitle': 'Wir heiraten!',
+    'wedding:date': '6. Juni 2026 • Marbella, Spanien',
     'wedding:hero.description': 'Iluminada und George heiraten diesen Juni am Strand von Marbella, und wir freuen uns sehr, das mit dir zu teilen. Dich erwarten Sonne, Meer und jede Menge Lachen.',
     'wedding:hero.description2': 'Diese Seite ist dein Hochzeitsportal. Melde dich mit der E-Mail aus deinem RSVP an, um deine Gruppe zu bestätigen, dein Menü zu wählen, den Ablauf zu sehen, unsere Geschenkliste anzuschauen und mit anderen Gästen zu chatten.',
-    'wedding:subtitle': 'Wir heiraten!',
+    'wedding.common.footer:rich': '© 2026 Hochzeit von Iluminada &amp; George',
   
-    // Common  
-    'common:people': 'Personen',
-    'common:person': 'Person',
-    'common:days': 'Tage',
-    'common:enter.name': 'Namen eingeben...',
-    'common:error.saving.menu.selection': 'Fehler beim Speichern der Menüauswahl',
-    'common:error.saving.menu.selections': 'Fehler beim Speichern der Menüauswahlen',
-    'common:error.saving.special.request': 'Fehler beim Speichern des Sonderwunsches',
-    'common:error.saving.special.request.details': 'Fehler beim Speichern der Details des Sonderwunsches',
-    'common:home': 'Startseite',
-    'common:hours': 'Stunden',
-    'common:minutes': 'Minuten',
-    'common:seconds': 'Sekunden',
-    'common:cancel:rich': 'Abbrechen',
-    'common:confirm:rich': 'Bestätigen',
-    'common:confirmAction:rich': 'Aktion bestätigen',
-    'common:new:rich': '<i class="fas fa-plus-circle"></i> Neu',
-    'common:justNow': 'Gerade eben',
-    'common:minutesAgo': 'vor {{minutes}} Minuten',
-    'common:hoursAgo': 'vor {{hours}} Stunden',
-    'common:daysAgo': 'vor {{days}} Tagen',
-  
-    // Common: Menu
-    'common:menu.selection.saved': 'Menüauswahl erfolgreich gespeichert!',
-    'common:menu.selections.saved': 'Menüauswahlen erfolgreich gespeichert!',
-    'common:menu.saving': 'Speichere...',
-    'common:menu.special.request.details.saved': 'Details des Sonderwunsches erfolgreich gespeichert!',
-    'common:menu.special.request.saved': 'Sonderwunsch erfolgreich gespeichert!',
-      
-    // Common: Party  
-    'common:party.members': 'Mitglieder',
-    'common:party.adult': 'Erwachsener (18+)',
-    'common:party.age.category': 'Alterskategorie',
-    'common:party.child': 'Kind',
-    'common:party.name': 'Name',
-    'common:party.primary.guest': 'Hauptgast',
-    'common:party.primary': 'Hauptgast',
-    'common:party.remove.member': 'Mitglied entfernen',
-    'common:party.confirm.remove.member': 'Möchtest du {{memberName}} wirklich aus deiner Gruppe entfernen?',
-  
+    //--------------------------------
     // Logon Page
+    //--------------------------------
+    'login:page.title': 'Gästezugang - Hochzeit',
     'login:guest:tooltip': 'Gästezugang',
     'login:admin:tooltip': 'Administratorzugang',
-    'login:page.title': 'Gästezugang - Hochzeit',
     'login:guest.zone.title': 'Gästebereich',
     'login:header': 'Gästezugang',
     'login:email.label': 'E-Mail:',
@@ -1529,8 +1586,59 @@ const translations = {
     'login:success.redirecting': 'Anmeldung erfolgreich. Weiterleitung...',
     'login:email.not.found': 'E-Mail nicht in der Gästeliste gefunden',
     'login:server.error': 'Serververbindungsfehler',
-  
+
+    //--------------------------------
+    // Common
+    //--------------------------------
+    // Countdown
+    'common:days': 'Tage',
+    'common:hours': 'Stunden',
+    'common:minutes': 'Minuten',
+    'common:seconds': 'Sekunden',
+
+    // Common: Buttons
+    'common:home': 'Startseite',
+    'common:cancel:rich': 'Abbrechen',
+    'common:confirm:rich': 'Bestätigen',
+
+    // Common prompts and messages
+    'common:enter.name': 'Namen eingeben...',
+    'common:confirmAction:rich': 'Aktion bestätigen',
+    'common:people': 'Personen',
+    'common:person': 'Person',
+    'common:new:rich': '<i class="fas fa-plus-circle"></i> Neu',
+    'common:justNow': 'Gerade eben',
+    'common:minutesAgo': 'vor {{minutes}} Minuten',
+    'common:hoursAgo': 'vor {{hours}} Stunden',
+    'common:daysAgo': 'vor {{days}} Tagen',
+
+    // Common: Menu
+    'common:menu.selection.saved': 'Menüauswahl erfolgreich gespeichert!',
+    'common:menu.selections.saved': 'Menüauswahlen erfolgreich gespeichert!',
+    'common:menu.saving': 'Speichere...',
+    'common:menu.special.request.details.saved': 'Details des Sonderwunsches erfolgreich gespeichert!',
+    'common:menu.special.request.saved': 'Sonderwunsch erfolgreich gespeichert!',
+
+    // Common: Party
+    'common:party.members': 'Mitglieder',
+    'common:party.adult': 'Erwachsener (18+)',
+    'common:party.age.category': 'Alterskategorie',
+    'common:party.child': 'Kind',
+    'common:party.name': 'Name',
+    'common:party.primary.guest': 'Hauptgast',
+    'common:party.primary': 'Hauptgast',
+    'common:party.remove.member': 'Mitglied entfernen',
+    'common:party.confirm.remove.member': 'Möchtest du {{memberName}} wirklich aus deiner Gruppe entfernen?',
+
+    // Common: Errors
+    'common:error.saving.menu.selection': 'Fehler beim Speichern der Menüauswahl',
+    'common:error.saving.menu.selections': 'Fehler beim Speichern der Menüauswahlen',
+    'common:error.saving.special.request': 'Fehler beim Speichern des Sonderwunsches',
+    'common:error.saving.special.request.details': 'Fehler beim Speichern der Details des Sonderwunsches',
+
+    //--------------------------------
     // Guests Zone
+    //--------------------------------
     'guests:title': 'Gästebereich - Hochzeit von Iluminada & George',
     'guests:welcome.title': 'Gästebereich',
     'guests:summary': 'Übersicht',
@@ -1539,7 +1647,9 @@ const translations = {
     'guests:menu': 'Menü',
     'guests:gifts': 'Geschenke',
   
+    //--------------------------------
     // Summary Page
+    //--------------------------------
     'guests:loadingSummary': 'Lade Übersicht...',
     'guests:summaryPageTitle': 'Dein Gästebereich für die Hochzeit von Iluminada & George',
     'guests:yourSummary': 'Deine Übersicht',
@@ -1561,18 +1671,26 @@ const translations = {
     'guests:summaryRSVP': 'RSVP-Übersicht',
     'guests:summaryMenuSelections': 'Menüauswahlen',
   
-    'guests:loadingPartyMembers': 'Lade Mitglieder...',
-    'guests:loadingComments': 'Lade Kommentare...',
-    'guests:partyManagement': 'Gruppenverwaltung',
     'guests:partyManagementDesc:rich': 'Verwalte die Mitglieder deiner Hochzeitsgruppe und ihre Ernährungsbedürfnisse.',
     'guests:giftsSelection': 'Geschenkauswahl',
     'guests:giftsSelectionDesc:rich': 'Wähle deine Lieblingsgeschenke für unsere Hochzeitsfeiern.',
     'guests:eventsRSVP': 'RSVP',
     'guests:eventsRSVPDesc:rich': 'Die Feierlichkeiten finden an drei Tagen statt: Freitag, Samstag und Sonntag. Am Freitag beginnen wir mit einem Willkommensdinner. Der Samstag ist ein voller Tag mit Aktivitäten, einschließlich der Trauung, dem Empfangsbankett und Tanz. Am Sonntag gibt es einen Abschiedsbrunch. Bitte bestätige deine Teilnahme für die Veranstaltungen, an denen du dabei sein wirst.',
   
+    // Comments Page
+    'guests:loadingComments': 'Lade Kommentare...',
+    'guests:commentsTitle': 'Kommentare',
+    'guests:noComments': 'Noch keine Kommentare. Sei der Erste, der einen Kommentar schreibt!',
+    'guests:commentsSubtitle:rich': 'Teile deine Gedanken mit den anderen Gästen',
+    'guests:comment:placeholder': 'Schreibe deinen Kommentar...',
+    'guests:postComment': 'Veröffentlichen',
+      
+    //--------------------------------
     // Party Page
+    //--------------------------------
     'guests:party.page.title': 'Gruppenverwaltung',
     'guests:party.page.description': 'Verwalte die Mitglieder deiner Hochzeitsgruppe und ihre Ernährungsbedürfnisse.',
+    'guests:loadingPartyMembers': 'Lade Mitglieder...',
     'guests:partyMembersSaved': 'Gruppenmitglieder erfolgreich gespeichert!',
     'guests:errorSavingPartyMembers': 'Fehler beim Speichern der Gruppenmitglieder',
     'guests:savePartyMembers:rich': '<i class="fas fa-save"></i> Gruppenmitglieder speichern',
@@ -1586,7 +1704,9 @@ const translations = {
     'common:errorSavingDietaryRequirements': 'Fehler beim Speichern der Ernährungsbedürfnisse',
     'guests:party.maxPartySizeReached:rich': 'Du hast das maximale Gruppengröße erreicht. Benötigst du mehr Gäste? <a href="mailto:rsvp@iluminada-y-george.com">Kontaktiere uns</a>',
     
+    //--------------------------------
     // Events Page
+    //--------------------------------
     'guests:eventsPageTitle': 'RSVP zu den folgenden Hochzeitsveranstaltungen',
     'guests:eventsPageDescription': 'Wir freuen uns sehr, dass du bei unserer Hochzeit dabei bist. Hier findest du die Details zu allen Veranstaltungen. Bitte wähle bei jeder Veranstaltung deinen Namen im Bereich „Wer nimmt teil?“, damit wir alles für dich vorbereiten können.',
   
@@ -1607,24 +1727,15 @@ const translations = {
     'guests:logout': 'Abmelden',
     'guests:event': 'Veranstaltung',
   
+    //--------------------------------
     // Menu Page
+    //--------------------------------
     'guests:menuPageTitle': 'Menüauswahl',
     'guests:menuPageDescription': 'Wähle deine bevorzugten Gerichte für das Hochzeitsbankett.',
     'guests:menuSelection': 'Menüauswahl',
     'guests:menuSelectionDesc': 'Deine aktuelle Menüauswahl für unsere Hochzeit.',
     'guests:menuSelectionDesc2': 'Wähle deine bevorzugten Gerichte für unsere Hochzeit.',
   
-  
-    // Comments Page
-    'guests:commentsTitle': 'Kommentare',
-    'guests:noComments': 'Noch keine Kommentare. Sei der Erste, der einen Kommentar schreibt!',
-    'guests:commentsSubtitle:rich': 'Teile deine Gedanken mit den anderen Gästen',
-    'guests:comment:placeholder': 'Schreibe deinen Kommentar...',
-    'guests:postComment': 'Veröffentlichen',
-  
-    'guests:welcome': 'Willkommen',
-    
-    // Menu Selection Page
     'guests:menuLoading': 'Lade Menü...',
     'guests:menuErrorTitle': 'Fehler beim Laden des Menüs',
     'guests:menuErrorMessage': 'Menüdaten können nicht geladen werden. Bitte versuche es später noch einmal.',
@@ -1650,7 +1761,9 @@ const translations = {
     'guests:saveMenuSelections': 'Menüauswahlen speichern',
     'guests:saveDietaryRequirements:rich': '<i class="fas fa-save"></i> Ernährungsbedürfnisse speichern',
     
+    //--------------------------------
     // Gifts Page
+    //--------------------------------
     'guests:giftsPageTitle': 'Geschenkeliste',
     'guests:giftsPageDescription': 'Deine Anwesenheit ist unser Geschenk. Wenn du dennoch zu unserer Flitterreise beitragen möchtest, kannst du unten ein lustiges Geschenk auswählen. Es wird mit deiner Nachricht gedruckt und auf einer großen Wand beim Hochzeitsbankett ausgestellt. Der von dir gewählte Geldbetrag wird zur Finanzierung unserer Flitterreise verwendet. Vielen Dank!',
     'guests:giftsLoading': 'Lade Geschenke...',
@@ -1681,41 +1794,49 @@ const translations = {
     'guests:giftsPaymentError': 'Fehler bei der Zahlungsabwicklung',
     'guests:giftsPaymentServiceError': 'Fehler bei der Verbindung zum Zahlungsdienst',
   
-  
-    // Admin
+    //--------------------------------
+    // Admin Page
+    //--------------------------------
     'admin:pageTitle': 'Adminbereich - Hochzeit von Iluminada & George',
     'admin:title': 'Adminbereich',
-    'admin:logout': 'Abmelden',
     'admin:welcomeTitle': 'Willkommen, Administrator',
     'admin:welcomeDesc': 'Verwalte alle Hochzeitsinformationen für Iluminada und George',
+    'admin:logout': 'Abmelden',
+
+    // Navigation Tabs
     'admin:tab.guests': 'Gäste',
     'admin:tab.gifts': 'Geschenkliste',
     'admin:tab.messages': 'Nachrichten',
     'admin:tab.events': 'Veranstaltungskalender',
     'admin:tab.menus': 'Menüverwaltung',
     'admin:tab.settings': 'Einstellungen',
+
     'admin:loading': 'Lade...',
     'admin:loadingGuests': 'Lade Gäste...',
-    'admin:guests.uploadingGuests': 'Lade Gäste hoch...',
     'admin:loadingPartyMembers': 'Lade Gruppenmitglieder...',
     'admin:loadingGiftList': 'Lade Geschenkliste...',
     'admin:loadingMessages': 'Lade Nachrichten...',
     'admin:loadingEventSchedule': 'Lade Veranstaltungskalender...',
     'admin:loadingCourses': 'Lade Gänge...',
     'admin:loadingSettings': 'Lade Einstellungen...',
+
+    // Admin Footer
     'admin:footer': 'Adminbereich',
   
-    // Admin Messages Section
-    'admin:messages.title': 'Nachrichtenbereinigung',
-    'admin:messages.subtitle': 'Lösche Nachrichten von Gästen, die unangebracht oder anstößig sind',
-    'admin:messages.noMessages': 'Noch keine Nachrichten. Gäste erscheinen hier, sobald sie Kommentare schreiben.',
-    'admin:messages.loading': 'Lade Nachrichten...',
-    'admin:messages.errorTitle': 'Fehler beim Laden der Nachrichten',
-    'admin:messages.errorMessage': 'Nachrichten konnten nicht geladen werden: {{error}}',
-    'admin:messages.retry': 'Erneut versuchen',
-    'admin:messages.delete': 'Löschen',
-  
+    // Admin Login Page
+    'adminLogin:pageTitle': 'Admin-Login - Hochzeit von Iluminada & George',
+    'adminLogin:subHeader': 'Zum Adminbereich',
+    'adminLogin:description': 'Gib deine Zugangsdaten ein, um Hochzeitsdetails und RSVPs zu verwalten.',
+    'adminLogin:username': 'Benutzername',
+    'adminLogin:username:placeholder': 'Dein Benutzername',
+    'adminLogin:password': 'Passwort',
+    'adminLogin:password:placeholder': 'Dein geheimes Passwort',
+    'adminLogin:submit': 'Anmelden',
+
+    //--------------------------------
     // Admin Guests Section
+    //--------------------------------
+    'admin:guests.uploadingGuests': 'Lade Gäste hoch...',
     'admin:guests.errorLoading': 'Gäste konnten nicht geladen werden',
     'admin:guests.adult': 'Erwachsener',
     'admin:guests.child': 'Kind',
@@ -1750,50 +1871,6 @@ const translations = {
     'admin:guests.error.failed': 'Gäste konnten nicht geladen werden: {{error}}',
     'admin:guests.retry': 'Erneut versuchen',
   
-    // Admin Gifts Section
-    'admin:gifts.title': 'Geschenkliste',
-    'admin:gifts.add': 'Hinzufügen',
-    'admin:gifts.edit': 'Geschenk bearbeiten',
-    'admin:gifts.save': 'Speichern',
-    'admin:gifts.deleteConfirm': 'Dieses Geschenk löschen?',
-    'admin:gifts.noImage': 'Kein Bild',
-    'admin:gifts.grandTotal': 'Gesamtsumme',
-    'admin:gifts.grandTotalDescription': 'Verfügbare Karten x Preis',
-    'admin:gifts.table.description': 'Beschreibung',
-    'admin:gifts.table.image': 'Bild',
-    'admin:gifts.table.available': 'Verfügbar',
-    'admin:gifts.table.price': 'Preis',
-    'admin:gifts.table.purchased': 'Gekauft',
-    'admin:gifts.table.actions': 'Aktionen',
-    'admin:gifts.field.title': 'Name',
-    'admin:gifts.field.description': 'Beschreibung',
-    'admin:gifts.field.image': 'Bild',
-    'admin:gifts.field.available': 'Verfügbare Anzahl',
-    'admin:gifts.field.price': 'Preis',
-    'admin:gifts.field.imageHelp': 'Bild der Geschenkkarte hochladen (wird in der Datenbank gespeichert)',
-    'admin:gifts.priceOption.25': '25 €',
-    'admin:gifts.priceOption.50': '50 €',
-    'admin:gifts.priceOption.100': '100 €',
-    'admin:gifts.priceOption.200': '200 €',
-    'admin:gifts.priceOption.500': '500 €',
-  
-    // Admin Settings Section
-    'admin:settings.enabled': 'Aktiviert',
-    'admin:settings.disabled': 'Deaktiviert',
-    'admin:settings.title': 'Einstellungen',
-    'admin:settings.featureToggles': 'Funktionen',
-    'admin:settings.featureTogglesDescription': 'Steuere, welche Funktionen für Gäste verfügbar sind',
-    'admin:settings.enableGuestArea': 'Gästebereich aktivieren',
-    'admin:settings.enableGuestAreaDesc': 'Gästen erlauben, sich anzumelden und ihre Gruppe zu verwalten',
-    'admin:settings.showWeddingEvents': 'Hochzeitsveranstaltungen anzeigen',
-    'admin:settings.showWeddingEventsDesc': 'Den Veranstaltungskalender anzeigen und Gästen erlauben, ihre Teilnahme zu bestätigen',
-    'admin:settings.menu': 'Menü',
-    'admin:settings.menuDesc': 'Menüauswahl und Präferenzen der Gäste anzeigen',
-    'admin:settings.messages': 'Nachrichten',
-    'admin:settings.messagesDesc': 'Nachrichten anzeigen',
-    'admin:settings.gifts': 'Geschenke',
-    'admin:settings.giftsDesc': 'Geschenkliste anzeigen',
-  
     // Admin Party Management Section
     'admin:party.title': 'Gruppe verwalten: ',
     'admin:party.description': 'Gruppenmitglieder für diesen Gast verwalten',
@@ -1823,7 +1900,9 @@ const translations = {
     'admin:party.error.loadingError': 'Fehler beim Laden der Gruppenmitglieder: {{error}}',
     'admin:party.retry': 'Erneut versuchen',
   
+    //--------------------------------
     // Admin Events Section
+    //--------------------------------
     'admin:events.title': 'Veranstaltungskalender',
     'admin:events.addEvent': 'Veranstaltung hinzufügen',
     'admin:events.noImage': 'Kein Bild',
@@ -1884,29 +1963,34 @@ const translations = {
     'admin:subEvents.option.reception': 'Empfang',
     'admin:subEvents.option.dancing': 'Tanz',
   
+    //--------------------------------
     // Admin Menu Management Section
+    //--------------------------------
     'admin:menu.title': 'Menüverwaltung',
+    'admin:menu.errorLoading': 'Fehler beim Laden des Menüs',
+    'admin:menu.failedToLoad': 'Menü konnte nicht geladen werden: {{error}}',
+    'admin:menu.save': 'Speichern',
+    'admin:menu.add': 'Hinzufügen',
+    'admin:menu.retry': 'Erneut versuchen',
+
+    // Menu Courses
+    'admin:menu.emptyCourse': 'Noch keine {{courseType}} definiert.',
     'admin:menu.courseType.starter': 'Vorspeisen',
     'admin:menu.courseType.main': 'Hauptgerichte',
     'admin:menu.courseType.dessert': 'Desserts',
     'admin:menu.courseType.drinks': 'Getränke',
-    'admin:menu.noOptionsDefined': 'Keine Optionen definiert',
-    'admin:menu.emptyCourse': 'Noch keine {{courseType}} definiert.',
-    'admin:menu.errorLoading': 'Fehler beim Laden des Menüs',
-    'admin:menu.failedToLoad': 'Menü konnte nicht geladen werden: {{error}}',
-    'admin:menu.retry': 'Erneut versuchen',
     'admin:menu.confirmDelete': 'Diesen Menüteil löschen? Dadurch werden alle zugehörigen Optionen entfernt.',
-    'admin:menu.confirmDeleteOption': 'Diese Menüoption löschen?',
     'admin:menu.errorDeleting': 'Fehler beim Löschen des Menü­teils',
-    'admin:menu.errorDeletingOption': 'Fehler beim Löschen der Menüoption',
     'admin:menu.editCourse': 'Gang bearbeiten',
     'admin:menu.addCourse': 'Gang hinzufügen',
-    'admin:menu.save': 'Speichern',
-    'admin:menu.add': 'Hinzufügen',
     'admin:menu.field.courseType': 'Gangtyp',
     'admin:menu.field.courseLabel': 'Bezeichnung des Gangs',
     'admin:menu.field.selectionRequired': 'Auswahl erforderlich',
     
+    // menu Options
+    'admin:menu.noOptionsDefined': 'Keine Optionen definiert',
+    'admin:menu.confirmDeleteOption': 'Diese Menüoption löschen?',
+    'admin:menu.errorDeletingOption': 'Fehler beim Löschen der Menüoption',
     'admin:menu.option.starter': 'Vorspeise',
     'admin:menu.option.main': 'Hauptgericht',
     'admin:menu.option.dessert': 'Dessert',
@@ -1914,7 +1998,6 @@ const translations = {
     'admin:menu.option.yes': 'Ja – Gäste müssen eine Option wählen',
     'admin:menu.option.no': 'Nein – Alle Optionen werden angeboten',
     'admin:menu.field.courseLabelHelp': 'z. B. „Vorspeisen“, „Hauptgang“, „Desserts“',
-  
     'admin:menu.field.helpSelectionRequired': 'Wenn aktiviert, müssen Gäste eine Option auswählen. Wenn deaktiviert, werden alle Optionen serviert.',
     'admin:menu.editCourseOption': 'Menüoption bearbeiten',
     'admin:menu.addCourseOption': 'Menüoption hinzufügen',
@@ -1924,6 +2007,8 @@ const translations = {
     'admin:menu.field.optionDescriptionHelp': 'z. B. Eine feine Mischung aus Sahne, Pilzen und Knoblauch',
     'admin:menu.field.image': 'Bild',
     'admin:menu.field.imageHelp': 'Bild der Menüoption hochladen (wird in der Datenbank gespeichert)',
+
+    // menu Options Special Dietary Indicators
     'admin:menu.field.isVegetarian': 'Vegetarisch',
     'admin:menu.field.containsAllergens': 'Enthält Allergene',
     'admin:menu.field.containsLactose': 'Enthält Laktose',
@@ -1934,15 +2019,66 @@ const translations = {
     'admin:menu.field.helpLactose': 'Diese Option enthält Laktose/Milchprodukte',
     'admin:menu.field.helpSpicy': 'Diese Option enthält scharfe Zutaten',
     'admin:menu.field.helpNuts': 'Diese Option kann Nüsse enthalten',
+
+    //--------------------------------
+    // Admin Gifts Section
+    //--------------------------------
+    'admin:gifts.title': 'Geschenkliste',
+    'admin:gifts.add': 'Hinzufügen',
+    'admin:gifts.edit': 'Geschenk bearbeiten',
+    'admin:gifts.save': 'Speichern',
+    'admin:gifts.deleteConfirm': 'Dieses Geschenk löschen?',
+    'admin:gifts.noImage': 'Kein Bild',
+    'admin:gifts.grandTotal': 'Gesamtsumme',
+    'admin:gifts.grandTotalDescription': 'Verfügbare Karten x Preis',
+    'admin:gifts.table.description': 'Beschreibung',
+    'admin:gifts.table.image': 'Bild',
+    'admin:gifts.table.available': 'Verfügbar',
+    'admin:gifts.table.price': 'Preis',
+    'admin:gifts.table.purchased': 'Gekauft',
+    'admin:gifts.table.actions': 'Aktionen',
+    'admin:gifts.field.title': 'Name',
+    'admin:gifts.field.description': 'Beschreibung',
+    'admin:gifts.field.image': 'Bild',
+    'admin:gifts.field.available': 'Verfügbare Anzahl',
+    'admin:gifts.field.price': 'Preis',
+    'admin:gifts.field.imageHelp': 'Bild der Geschenkkarte hochladen (wird in der Datenbank gespeichert)',
+    'admin:gifts.priceOption.25': '25 €',
+    'admin:gifts.priceOption.50': '50 €',
+    'admin:gifts.priceOption.100': '100 €',
+    'admin:gifts.priceOption.200': '200 €',
+    'admin:gifts.priceOption.500': '500 €',
   
-    'adminLogin:pageTitle': 'Admin-Login - Hochzeit von Iluminada & George',
-    'adminLogin:subHeader': 'Zum Adminbereich',
-    'adminLogin:description': 'Gib deine Zugangsdaten ein, um Hochzeitsdetails und RSVPs zu verwalten.',
-    'adminLogin:username': 'Benutzername',
-    'adminLogin:username:placeholder': 'Dein Benutzername',
-    'adminLogin:password': 'Passwort',
-    'adminLogin:password:placeholder': 'Dein geheimes Passwort',
-    'adminLogin:submit': 'Anmelden',
+    //--------------------------------
+    // Admin Messages Section
+    //--------------------------------
+    'admin:messages.title': 'Nachrichtenbereinigung',
+    'admin:messages.subtitle': 'Lösche Nachrichten von Gästen, die unangebracht oder anstößig sind',
+    'admin:messages.noMessages': 'Noch keine Nachrichten. Gäste erscheinen hier, sobald sie Kommentare schreiben.',
+    'admin:messages.loading': 'Lade Nachrichten...',
+    'admin:messages.errorTitle': 'Fehler beim Laden der Nachrichten',
+    'admin:messages.errorMessage': 'Nachrichten konnten nicht geladen werden: {{error}}',
+    'admin:messages.retry': 'Erneut versuchen',
+    'admin:messages.delete': 'Löschen',
+  
+    //--------------------------------
+    // Admin Settings Section
+    //--------------------------------
+    'admin:settings.enabled': 'Aktiviert',
+    'admin:settings.disabled': 'Deaktiviert',
+    'admin:settings.title': 'Einstellungen',
+    'admin:settings.featureToggles': 'Funktionen',
+    'admin:settings.featureTogglesDescription': 'Steuere, welche Funktionen für Gäste verfügbar sind',
+    'admin:settings.enableGuestArea': 'Gästebereich aktivieren',
+    'admin:settings.enableGuestAreaDesc': 'Gästen erlauben, sich anzumelden und ihre Gruppe zu verwalten',
+    'admin:settings.showWeddingEvents': 'Hochzeitsveranstaltungen anzeigen',
+    'admin:settings.showWeddingEventsDesc': 'Den Veranstaltungskalender anzeigen und Gästen erlauben, ihre Teilnahme zu bestätigen',
+    'admin:settings.menu': 'Menü',
+    'admin:settings.menuDesc': 'Menüauswahl und Präferenzen der Gäste anzeigen',
+    'admin:settings.messages': 'Nachrichten',
+    'admin:settings.messagesDesc': 'Nachrichten anzeigen',
+    'admin:settings.gifts': 'Geschenke',
+    'admin:settings.giftsDesc': 'Geschenkliste anzeigen',  
   }
 };
 
