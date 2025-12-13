@@ -14,7 +14,7 @@ async function loadMenuSelections() {
   menuContent.innerHTML = `
     <div class="loading-state">
       <i class="fas fa-spinner fa-spin fa-3x"></i>
-      <p><div data-i18n="guests:menuLoading">Loading menu...</div></p>
+      <p><div data-i18n="guests:menuLoading">${translate('guests:menuLoading')}</div></p>
     </div>
   `;
   

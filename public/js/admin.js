@@ -904,7 +904,7 @@
   // ========== Guests ==========
   async function showGuests(){
     activate('guests');
-    setLoading(translate('guests:loadingGuests'));
+    setLoading(translate('admin:loadingGuests'));
     try {
       // Use pagination for large guest lists
       let url = '/api/admin/guests';
@@ -1078,7 +1078,7 @@
               return;
             }
             
-            setLoading(translate('admin:uploadingGuests'));
+            setLoading(translate('admin:guests.uploadingGuests'));
             
             const r = await api('/api/admin/guests/bulk-upload', {
               method: 'POST',
