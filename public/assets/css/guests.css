@@ -541,7 +541,7 @@ main.main-content-full {
 
 .loading-comments i {
   margin-right: 8px;
-  color: var(--primary-color);
+  color: var(--accent-color);
 }
 
 .comment-item {
@@ -1782,6 +1782,26 @@ main.main-content-full {
   display: block;
 }
 
+.map-card{
+  border-radius: var(--radius-xxl);
+  overflow: hidden;
+}
+
+.map-img{
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.two-column-list{
+  display: flex;
+  gap: 16px; /* optional */
+}
+
+.two-column-list > *{
+  flex: 0 0 50%;
+}
+
 .event-image-container .no-image {
   display: flex;
   align-items: center;
@@ -1960,6 +1980,10 @@ main.main-content-full {
     max-height: none;
     padding: 25px;
   }
+}
+
+@media (max-width: 700px){
+  .two-column-list{ flex-direction: column; }
 }
 
 @media (max-width: 768px) {
@@ -2310,6 +2334,11 @@ main.main-content-full {
   margin: var(--spacing-xxxl) 0;
 }
 
+.list-unstyled {
+  list-style:circle;
+  padding-left: 20px;
+  color: var(--primary-color);
+}
 
 /* ========================================
    SUMMARY SECTION COMPONENTS

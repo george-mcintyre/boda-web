@@ -83,7 +83,7 @@ const translations = {
     'guests:welcome.title': 'Guest Zone',
     'guests:summary': 'Summary',
     'guests:party': 'Party',
-    'guests:rsvp': 'RSVP',
+    'guests:rsvp': 'Events',
     'guests:menu': 'Menu',
     'guests:gifts': 'Gifts',
 
@@ -98,14 +98,25 @@ const translations = {
         Welcome to your personal space for Iluminada &amp; George\'s wedding. 
         From here you can share in the planning, keep your details up to date, 
         and help us make the celebration feel just right for you and your party.
-      </p>
-      <p>
-        In this area you can update the names of everyone in your party, tell us about any food allergies 
-        or special dietary needs, confirm who will attend each of the wedding events, 
-        choose your preferred courses and drinks for the banquet, send messages to other guests 
-        and, if you wish, select a gift for us from the wedding registry.  
         We\'re so happy to be celebrating this with you. ❤️
       </p>
+      <div class="intro-card intro-section">
+        In this area you can:
+        <ul class="list-unstyled">
+          <li>update the names of everyone in your <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-users"></i> party</button>,</li>
+          <li>tell us about any <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-utensils"></i>food</button> allergies
+          or <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-utensils"></i>special dietary needs</button></li>
+          <li>confirm who will attend each of the <button class="btn-slim btn-link" onclick="switchToTab('events')"><i class="fas fa-calendar-check"></i> wedding events</button>,</li>
+          <li>and send messages to other guests (below).</li>
+        </ul>
+      </div>
+      <div class="intro-card intro-section">
+        Later we will open:
+        <ul class="list-unstyled">
+          <li><button class="btn-slim btn-link" disabled="true" onclick="switchToTab('menu')"><i class="fas fa-utensils"></i> The Menu</button> where you will be able to choose your preferred courses and drinks for the banquet,</li>
+          <li><button class="btn-slim btn-link" disabled="true" onclick="switchToTab('gifts')"><i class="fas fa-gift"></i> Gift Registry</button> where you will be able to select a gift for us.</li>
+        </ul>
+      </div>
     `,
     'guests:summaryYourParty': 'Your Party',
     'guests:summaryRSVP': 'RSVP Summary',
@@ -114,14 +125,24 @@ const translations = {
     'guests:partyManagementDesc:rich': 'Manage your wedding party members and their dietary requirements.',
     'guests:giftsSelection': 'Gifts Selection',
     'guests:giftsSelectionDesc:rich': 'Choose your favorite gifts for our wedding celebrations.',
-    'guests:eventsRSVP': 'RSVP',
     'guests:eventsRSVPDesc:rich': 'The celebrations will take place over three days: Friday, Saturday and Sunday. They kick off on Friday with a welcome dinner.   Saturday is a full day of activities including the wedding ceremony, the reception banquet, and dancing.   Sunday\'s activities include a farewell brunch.  Please confirm your attendance for which ever of these events you will be attending.',
 
     // Comments Page
     'guests:loadingComments': 'Loading comments...',
     'guests:commentsTitle': 'Comments',
     'guests:noComments': 'No comments yet. Be the first to comment!',
-    'guests:commentsSubtitle:rich': 'Share your thoughts with other guests',
+    'guests:commentsSubtitle:rich': `
+      <p>
+        Share your thoughts with other guests:
+      </p>
+      <div class="intro-card intro-section">
+        <ul class="list-unstyled">
+          <li>Select the name of the person in your party who wants to comment</li>
+          <li>Type your comment, up to 500 letters,</li>
+          <li>Press <i class="fas fa-paper-plane"></i> Post</li>
+        </ul>
+      </div>
+    `,
     'guests:comment:placeholder': 'Write your comment...',
     'guests:postComment': 'Post',
 
@@ -147,8 +168,104 @@ const translations = {
     //--------------------------------
     // Events Page
     //--------------------------------
-    'guests:eventsPageTitle': 'RSVP to the Wedding Events below',
-    'guests:eventsPageDescription': 'We are thrilled to have to have you join us for the wedding. Here are the details of all the events that will be taking place. Please select your name in each event in the Who\'s Attending section. That way we can prepare everything for you to have a great time.',
+    'guests:eventsPageTitle': 'Wedding Destination and Events',
+    'guests:eventsPageDescription:rich': `
+      <p>
+        Our wedding celebrations will take place along the beautiful Costa del Sol, between Estepona and Fuengirola,
+        with the main event about 6 km east of Marbella, a pre-wedding welcome soiree close to Estepona, and a
+        farewell brunch in the centre of Marbella.  <strong>Please select the events you will be attending from the event schedule below.</strong>
+      </p>
+
+      <div class="intro-card intro-section">
+        <h4>Getting here</h4>
+        <p>
+          The easiest way to arrive is via <strong>Málaga–Costa del Sol Airport (AGP)</strong>, the main international
+          gateway for the Costa del Sol, with frequent flights from across Europe and beyond. It is roughly
+          20–30 minutes from Fuengirola and Marbella, and about an hour from Estepona by car
+        </p>
+        <p>
+          You can also fly into <strong>Gibraltar International Airport (GIB)</strong>, which serves Gibraltar and the
+          surrounding Costa del Sol area and is just over the border from Spain.
+        </p>
+          <img
+            src="assets/images/costa-map.png"
+            alt="Map: Málaga & Gibraltar airports relative to Fuengirola, Marbella, and Estepona"
+            class="map-img map-card"
+            loading="lazy"
+          />
+      </div>
+
+      <div class="intro-card intro-section">
+        <h4>Where to stay</h4>
+        <p>
+          You are free to choose any accommodation you like – hotels, holiday rentals, or Airbnbs all work well.
+          This is high season on the Costa del Sol, so we strongly recommend booking as early as possible to get
+          good prices and secure availability.
+        </p>
+        <p>
+          As a general guide, accommodation is usually <strong>more affordable around Fuengirola</strong>, then
+          <strong>Estepona</strong>, with <strong>Marbella and Puerto Banús</strong> typically being the most
+          expensive areas. We have not organised specific wedding rates, so please choose whichever option suits you best.
+        </p>
+      </div>
+
+      <div class="intro-card intro-section">
+        <h4>Getting around</h4>
+        <p>
+          The coast is well connected by <strong>bus</strong>, with regular services between towns such as
+          Málaga, Marbella, Fuengirola and Estepona operated by Avanza.
+          You can check lines and schedules here:
+          <a href="https://marbella.avanzagrupo.com/en/bus-lines-and-schedules/all-lines" target="_blank" rel="noopener">
+            Avanza Costa del Sol bus lines
+          </a>.
+        </p>
+        <p>
+          <strong>Uber</strong> is very reliable and affordable in the area.  Typically not more than €10 for a 10 minute journey.
+        </p>
+        <p>
+          If you are planning to stay several days before or after the wedding, <strong>renting a car</strong> is often
+          the most convenient way to explore the whole area at your own pace.
+        </p>
+      </div>
+
+      <div class="intro-card intro-section">
+        <h4>Make a holiday of it</h4>
+        <p>
+          The Costa del Sol and Andalusia offer plenty of amazing day trips and experiences within easy reach of the
+          wedding area:
+        </p>
+        <div class="two-column-list">
+        <div class="two-column-list-item">
+          <ul class="list-unstyled">
+            <li><strong>Gibraltar</strong> – dramatic views from the Rock, tunnels and the famous monkeys.</li>
+            <li><strong>Guadalmina River Adventure</strong> – a refreshing river walk and canyoning-style experience.</li>
+            <li><strong>Ronda</strong> – a spectacular historic town perched above a deep gorge.</li>
+            <li><strong>Morocco Day Trip</strong> – ferries from Tarifa or Algeciras make Tangier and northern Morocco
+                possible in a day.</li>
+            <li><strong>Whale &amp; dolphin boat trips</strong> – available from several nearby ports along the coast.</li>
+            <li><strong>Seville</strong> – Andalusia’s capital, with its cathedral, Alcázar and lively old town.</li>
+            <li><strong>Caminito del Rey</strong> – a famous cliffside walkway; tickets must be booked in advance. </li>
+            <li><strong>Granada &amp; the Alhambra</strong> – one of Spain’s most iconic palaces and gardens; advance booking is essential.</li>
+          </ul>
+        </div>
+        <div class="two-column-list-item">
+          <img
+            src="assets/images/ttd.png"
+            alt="Things to do in the Costa del Sol"
+            class="map-img"
+            loading="lazy"
+          />
+        </div>
+        </div>
+        <br/>
+        <p>
+          Whether you stay just for the events or turn it into a longer break, we hope you enjoy everything this part of Spain has to offer while celebrating with us.
+        </p>
+      </div>
+      <p>
+        <strong><i class="fas fa-calendar-check"></i> Select the events you will be attending from the event schedule below.</strong>
+      </p>
+    `,
 
     'guests:eventsLoading': 'Loading events...',
     'guests:eventsNoEvents': 'No Events Available',
@@ -603,7 +720,7 @@ const translations = {
     'guests:welcome.title': 'Zona de invitados',
     'guests:summary': 'Resumen',
     'guests:party': 'Grupo',
-    'guests:rsvp': 'RSVP',
+    'guests:rsvp': 'Eventos',
     'guests:menu': 'Menú',
     'guests:gifts': 'Regalos',
 
@@ -615,17 +732,28 @@ const translations = {
     'guests:yourSummary': 'Tu resumen',
     'guests:summaryPageDescription:rich': `
       <p>
-        Bienvenido/a a tu espacio personal para la boda de Iluminada &amp; George. 
-        Desde aquí puedes participar en los preparativos, mantener tus datos actualizados 
+        Bienvenido/a a tu espacio personal para la boda de Iluminada y George. 
+        Desde aquí puedes participar en la planificación, mantener tus datos actualizados 
         y ayudarnos a que la celebración sea perfecta para ti y tu grupo.
+        Estamos muy felices de celebrarlo contigo. ❤️
       </p>
-      <p>
-        En esta área puedes actualizar los nombres de todas las personas de tu grupo, contarnos cualquier alergia alimentaria 
-        o necesidad dietética especial, confirmar quién asistirá a cada uno de los eventos de la boda, 
-        elegir tus platos y bebidas preferidos para el banquete, enviar mensajes a otros invitados 
-        y, si lo deseas, elegir un regalo para nosotros de la lista de bodas.  
-        Estamos muy felices de celebrar esto contigo. ❤️
-      </p>
+      <div class="intro-card intro-section">
+        En esta área puedes:
+        <ul class="list-unstyled">
+          <li>actualizar los nombres de todas las personas en tu <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-users"></i> grupo</button>,</li>
+          <li>informarnos sobre cualquier <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-utensils"></i> alergia alimentaria</button>
+          o <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-utensils"></i> necesidad dietética especial</button></li>
+          <li>confirmar quién asistirá a cada uno de los <button class="btn-slim btn-link" onclick="switchToTab('events')"><i class="fas fa-calendar-check"></i> eventos de la boda</button>,</li>
+          <li>y enviar mensajes a otros invitados (abajo).</li>
+        </ul>
+      </div>
+      <div class="intro-card intro-section">
+        Más adelante abriremos:
+        <ul class="list-unstyled">
+          <li><button class="btn-slim btn-link" disabled="true" onclick="switchToTab('menu')"><i class="fas fa-utensils"></i> El Menú</button> donde podrás elegir tus platos y bebidas preferidos para el banquete,</li>
+          <li><button class="btn-slim btn-link" disabled="true" onclick="switchToTab('gifts')"><i class="fas fa-gift"></i> Lista de Regalos</button> donde podrás seleccionar un regalo para nosotros.</li>
+        </ul>
+      </div>
     `,
     'guests:summaryYourParty': 'Tu grupo',
     'guests:summaryRSVP': 'Resumen de asistencia',
@@ -634,14 +762,24 @@ const translations = {
     'guests:partyManagementDesc:rich': 'Gestiona los miembros de tu grupo y sus requisitos dietéticos.',
     'guests:giftsSelection': 'Selección de regalos',
     'guests:giftsSelectionDesc:rich': 'Elige tus regalos favoritos para nuestras celebraciones de boda.',
-    'guests:eventsRSVP': 'RSVP',
     'guests:eventsRSVPDesc:rich': 'Las celebraciones tendrán lugar durante tres días: viernes, sábado y domingo. Empiezan el viernes con una cena de bienvenida. El sábado será un día completo de actividades, incluida la ceremonia de la boda, el banquete y el baile. El domingo terminaremos con un brunch de despedida. Por favor, confirma en cuáles de estos eventos vas a asistir.',
 
     // Comments Page
     'guests:loadingComments': 'Cargando comentarios...',
     'guests:noComments': 'No hay comentarios aún. ¡Sé el primero en comentar!',
     'guests:commentsTitle': 'Comentarios',
-    'guests:commentsSubtitle:rich': 'Comparte tus pensamientos con otros invitados',
+    'guests:commentsSubtitle:rich': `
+      <p>
+        Comparte tus pensamientos con otros invitados:
+      </p>
+      <div class="intro-card intro-section">
+        <ul class="list-unstyled">
+          <li>Selecciona el nombre de la persona de tu grupo que desea comentar</li>
+          <li>Escribe tu comentario, hasta 500 caracteres,</li>
+          <li>Presiona <i class="fas fa-paper-plane"></i> Publicar</li>
+        </ul>
+      </div>
+    `,
     'guests:comment:placeholder': 'Escribe tu comentario...',
     'guests:postComment': 'Publicar',
     
@@ -668,7 +806,102 @@ const translations = {
     // Events Page
     //--------------------------------
     'guests:eventsPageTitle': 'Confirma tu asistencia a los eventos de la boda de abajo',
-    'guests:eventsPageDescription': 'Nos hace mucha ilusión que nos acompañes en la boda. Aquí tienes los detalles de todos los eventos que tendrán lugar. Por favor, selecciona tu nombre en cada evento en la sección "Quién asiste". Así podremos preparar todo para que lo pases genial.',
+    'guests:eventsPageDescription:rich': `
+      <p>
+        La celebración de nuestra boda, se realizará en tres dias y tendrá lugar a lo largo de la hermosa Costa del Sol, entre Estepona y Fuengirola,
+        con el evento principal a unos 6 km al este de Marbella, una velada de bienvenida previa a la boda cerca de Estepona,
+        y un brunch de despedida en el centro de Marbella. <strong>Por favor, selecciona los eventos a los que asistirás en el programa de eventos a continuación.</strong>
+      </p>
+
+      <div class="intro-card intro-section">
+        <h4>Cómo llegar</h4>
+        <p>
+          La forma más sencilla de llegar es a través del <strong>Aeropuerto de Málaga–Costa del Sol (AGP)</strong>, el principal
+          aeropuerto internacional de la Costa del Sol, con vuelos frecuentes desde toda Europa y otros destinos. Se encuentra a unos
+          20–30 minutos de Fuengirola y Marbella, y aproximadamente a una hora de Estepona en coche.
+        </p>
+        <p>
+          También puedes volar al <strong>Aeropuerto Internacional de Gibraltar (GIB)</strong>, que da servicio a Gibraltar y a la
+          zona occidental de la Costa del Sol, justo al otro lado de la frontera con España.
+        </p>
+        <img
+          src="assets/images/costa-map.png"
+          alt="Mapa: aeropuertos de Málaga y Gibraltar en relación con Fuengirola, Marbella y Estepona"
+          class="map-img map-card"
+          loading="lazy"
+        />
+      </div>
+
+      <div class="intro-card intro-section">
+        <h4>Dónde alojarse</h4>
+        <p>
+          Puedes elegir libremente el alojamiento que prefieras: hoteles, alquileres vacacionales o Airbnbs funcionan muy bien.
+          Será temporada alta en la Costa del Sol, por lo que recomendamos reservar con la mayor antelación posible para conseguir
+          buenos precios y asegurar disponibilidad.
+        </p>
+        <p>
+          Como referencia general, el alojamiento suele ser <strong>más económico en Fuengirola</strong>, seguido de
+          <strong>Estepona</strong>, siendo <strong>Marbella y Puerto Banús</strong> normalmente las zonas más caras.
+          No hemos organizado tarifas especiales para la boda, así que elige la opción que mejor se adapte a ti.
+        </p>
+      </div>
+
+      <div class="intro-card intro-section">
+        <h4>Cómo moverse</h4>
+        <p>
+          La costa está bien comunicada por <strong>autobús</strong>, con servicios regulares entre ciudades como
+          Málaga, Marbella, Fuengirola y Estepona operados por Avanza.
+          Puedes consultar las líneas y horarios aquí:
+          <a href="https://marbella.avanzagrupo.com/en/bus-lines-and-schedules/all-lines" target="_blank" rel="noopener">
+            Líneas de autobús Avanza Costa del Sol
+          </a>.
+        </p>
+        <p>
+          <strong>Uber</strong> es muy fiable y asequible en la zona. Normalmente no más de 10 € por un trayecto de 10 minutos.
+        </p>
+        <p>
+          Si planeas quedarte varios días antes o después de la boda, <strong>alquilar un coche</strong> suele ser la forma más cómoda
+          de explorar la zona a tu ritmo.
+        </p>
+      </div>
+
+      <div class="intro-card intro-section">
+        <h4>Aprovecha para hacer vacaciones</h4>
+        <p>
+          La Costa del Sol y Andalucía ofrecen muchas excursiones y experiencias increíbles a poca distancia de la zona de la boda:
+        </p>
+        <div class="two-column-list">
+          <div class="two-column-list-item">
+            <ul class="list-unstyled">
+              <li><strong>Gibraltar</strong> – vistas espectaculares desde el Peñón, túneles y los famosos monos.</li>
+              <li><strong>Aventura en el río Guadalmina</strong> – una experiencia refrescante de senderismo acuático.</li>
+              <li><strong>Ronda</strong> – una espectacular ciudad histórica situada sobre un profundo desfiladero.</li>
+              <li><strong>Excursión de un día a Marruecos</strong> – ferris desde Tarifa o Algeciras permiten visitar Tánger y el norte de Marruecos en un día.</li>
+              <li><strong>Avistamiento de ballenas y delfines</strong> – disponible desde varios puertos cercanos de la costa.</li>
+              <li><strong>Sevilla</strong> – la capital de Andalucía, con su catedral, el Alcázar y su animado casco histórico.</li>
+              <li><strong>Caminito del Rey</strong> – una famosa pasarela suspendida en los acantilados; es necesario reservar con antelación.</li>
+              <li><strong>Granada y la Alhambra</strong> – uno de los conjuntos monumentales más emblemáticos de España; la reserva anticipada es imprescindible.</li>
+            </ul>
+          </div>
+          <div class="two-column-list-item">
+            <img
+              src="assets/images/ttd.png"
+              alt="Cosas que hacer en la Costa del Sol"
+              class="map-img"
+              loading="lazy"
+            />
+          </div>
+        </div>
+        <br/>
+        <p>
+          Tanto si te quedas solo para los eventos como si lo conviertes en unas vacaciones más largas, esperamos que disfrutes
+          de todo lo que esta parte de España tiene para ofrecer mientras lo celebras con nosotros.
+        </p>
+      </div>
+      <p>
+        <strong><i class="fas fa-calendar-check"></i> Selecciona los eventos a los que asistirás en el programa de eventos a continuación.</strong>
+      </p>
+    `,
     
     'guests:eventsLoading': 'Cargando eventos...',
     'guests:eventsNoEvents': 'No hay eventos disponibles',
@@ -1123,7 +1356,7 @@ const translations = {
     'guests:welcome.title': 'Espace invités',
     'guests:summary': 'Résumé',
     'guests:party': 'Groupe',
-    'guests:rsvp': 'RSVP',
+    'guests:rsvp': 'Événements',
     'guests:menu': 'Menu',
     'guests:gifts': 'Cadeaux',
   
@@ -1134,18 +1367,29 @@ const translations = {
     'guests:summaryPageTitle': 'Votre espace invité pour le mariage d’Iluminada & George',
     'guests:yourSummary': 'Votre résumé',
     'guests:summaryPageDescription:rich': `
-        <p>
-          Bienvenue dans votre espace personnel pour le mariage d’Iluminada &amp; George. 
-          Depuis ici, vous pouvez participer aux préparatifs, garder vos informations à jour 
-          et nous aider à faire en sorte que la fête soit parfaitement adaptée à vous et à votre groupe.
-        </p>
-        <p>
-          Dans cet espace, vous pouvez mettre à jour les noms de toutes les personnes de votre groupe, nous indiquer d’éventuelles allergies alimentaires 
-          ou besoins spécifiques, confirmer qui participera à chacun des événements du mariage, 
-          choisir vos plats et boissons préférés pour le banquet, envoyer des messages aux autres invités 
-          et, si vous le souhaitez, choisir un cadeau pour nous dans la liste de mariage.  
-          Nous sommes tellement heureux de fêter cela avec vous. ❤️
-        </p>
+      <p>
+        Bienvenue dans votre espace personnel pour le mariage d’Iluminada et George. 
+        Depuis cet espace, vous pouvez participer à l’organisation, garder vos informations à jour 
+        et nous aider à rendre la célébration parfaite pour vous et votre groupe.
+        Nous sommes très heureux de célébrer cela avec vous. ❤️
+      </p>
+      <div class="intro-card intro-section">
+        Dans cette section, vous pouvez :
+        <ul class="list-unstyled">
+          <li>mettre à jour les noms de toutes les personnes de votre <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-users"></i> groupe</button>,</li>
+          <li>nous informer de toute <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-utensils"></i> allergie alimentaire</button>
+          ou de tout <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-utensils"></i> besoin diététique particulier</button></li>
+          <li>confirmer qui participera à chacun des <button class="btn-slim btn-link" onclick="switchToTab('events')"><i class="fas fa-calendar-check"></i> événements du mariage</button>,</li>
+          <li>et envoyer des messages aux autres invités (ci-dessous).</li>
+        </ul>
+      </div>
+      <div class="intro-card intro-section">
+        Plus tard, nous ouvrirons :
+        <ul class="list-unstyled">
+          <li><button class="btn-slim btn-link" disabled="true" onclick="switchToTab('menu')"><i class="fas fa-utensils"></i> Le Menu</button> où vous pourrez choisir vos plats et boissons préférés pour le banquet,</li>
+          <li><button class="btn-slim btn-link" disabled="true" onclick="switchToTab('gifts')"><i class="fas fa-gift"></i> Liste de Cadeaux</button> où vous pourrez sélectionner un cadeau pour nous.</li>
+        </ul>
+      </div>
       `,
     'guests:summaryYourParty': 'Votre groupe',
     'guests:summaryRSVP': 'Résumé des réponses',
@@ -1154,14 +1398,24 @@ const translations = {
     'guests:partyManagementDesc:rich': 'Gérez les membres de votre groupe de mariage et leurs exigences alimentaires.',
     'guests:giftsSelection': 'Sélection de cadeaux',
     'guests:giftsSelectionDesc:rich': 'Choisissez vos cadeaux préférés pour nos célébrations de mariage.',
-    'guests:eventsRSVP': 'RSVP',
     'guests:eventsRSVPDesc:rich': 'Les célébrations se dérouleront sur trois jours : vendredi, samedi et dimanche. Elles commencent le vendredi par un dîner de bienvenue. Le samedi est une journée complète d’activités incluant la cérémonie de mariage, le banquet de réception et la soirée dansante. Le dimanche se terminera par un brunch d’au revoir. Veuillez confirmer les événements auxquels vous participerez.',
   
     // Comments Page
     'guests:loadingComments': 'Chargement des commentaires...',
     'guests:commentsTitle': 'Commentaires',
     'guests:noComments': 'Aucun commentaire pour l’instant. Soyez le premier à commenter !',
-    'guests:commentsSubtitle:rich': 'Partagez vos pensées avec les autres invités',
+    'guests:commentsSubtitle:rich': `
+      <p>
+        Partagez vos réflexions avec les autres invités :
+      </p>
+      <div class="intro-card intro-section">
+        <ul class="list-unstyled">
+          <li>Sélectionnez le nom de la personne de votre groupe qui souhaite commenter</li>
+          <li>Saisissez votre commentaire, jusqu’à 500 caractères,</li>
+          <li>Appuyez sur <i class="fas fa-paper-plane"></i> Publier</li>
+        </ul>
+      </div>
+    `,
     'guests:comment:placeholder': 'Écrivez votre commentaire...',
     'guests:postComment': 'Publier',
 
@@ -1188,7 +1442,102 @@ const translations = {
     // Events Page
     //--------------------------------
     'guests:eventsPageTitle': 'RSVP aux événements du mariage ci-dessous',
-    'guests:eventsPageDescription': 'Nous sommes ravis que vous puissiez vous joindre à nous pour le mariage. Voici les détails de tous les événements prévus. Veuillez sélectionner votre nom dans chaque événement, dans la section « Qui participe ? ». Ainsi nous pourrons tout préparer pour que vous passiez un moment formidable.',
+    'guests:eventsPageDescription:rich': `
+      <p>
+        Nos célébrations de mariage auront lieu le long de la magnifique Costa del Sol, entre Estepona et Fuengirola,
+        avec l’événement principal à environ 6 km à l’est de Marbella, une soirée de bienvenue avant le mariage près d’Estepona,
+        et un brunch d’au revoir dans le centre de Marbella. <strong>Merci de sélectionner les événements auxquels vous assisterez dans le programme ci-dessous.</strong>
+      </p>
+
+      <div class="intro-card intro-section">
+        <h4>Comment s’y rendre</h4>
+        <p>
+          Le moyen le plus simple d’arriver est via l’<strong>aéroport de Málaga–Costa del Sol (AGP)</strong>, principal
+          aéroport international de la Costa del Sol, avec des vols fréquents depuis toute l’Europe et au-delà.
+          Il se situe à environ 20–30 minutes de Fuengirola et Marbella, et à environ une heure d’Estepona en voiture.
+        </p>
+        <p>
+          Vous pouvez également arriver par l’<strong>aéroport international de Gibraltar (GIB)</strong>, qui dessert Gibraltar
+          et l’ouest de la Costa del Sol, juste de l’autre côté de la frontière espagnole.
+        </p>
+        <img
+          src="assets/images/costa-map.png"
+          alt="Carte : aéroports de Málaga et Gibraltar par rapport à Fuengirola, Marbella et Estepona"
+          class="map-img map-card"
+          loading="lazy"
+        />
+      </div>
+
+      <div class="intro-card intro-section">
+        <h4>Où loger</h4>
+        <p>
+          Vous êtes libre de choisir l’hébergement qui vous convient : hôtels, locations de vacances ou Airbnbs sont tous adaptés.
+          Il s’agit de la haute saison sur la Costa del Sol ; nous vous recommandons donc de réserver le plus tôt possible afin
+          d’obtenir de bons tarifs et de garantir la disponibilité.
+        </p>
+        <p>
+          À titre indicatif, l’hébergement est généralement <strong>plus abordable du côté de Fuengirola</strong>, puis
+          <strong>Estepona</strong>, tandis que <strong>Marbella et Puerto Banús</strong> sont habituellement les plus chers.
+          Nous n’avons pas négocié de tarifs spéciaux pour le mariage.
+        </p>
+      </div>
+
+      <div class="intro-card intro-section">
+        <h4>Se déplacer</h4>
+        <p>
+          La côte est bien desservie par <strong>bus</strong>, avec des liaisons régulières entre Málaga, Marbella,
+          Fuengirola et Estepona opérées par Avanza.
+          Vous pouvez consulter les lignes et horaires ici :
+          <a href="https://marbella.avanzagrupo.com/en/bus-lines-and-schedules/all-lines" target="_blank" rel="noopener">
+            Lignes de bus Avanza Costa del Sol
+          </a>.
+        </p>
+        <p>
+          <strong>Uber</strong> est très fiable et abordable dans la région, généralement moins de 10 € pour un trajet de 10 minutes.
+        </p>
+        <p>
+          Si vous prévoyez de rester plusieurs jours avant ou après le mariage, <strong>louer une voiture</strong> est souvent
+          le moyen le plus pratique pour explorer la région à votre rythme.
+        </p>
+      </div>
+
+      <div class="intro-card intro-section">
+        <h4>Profitez-en pour voyager</h4>
+        <p>
+          La Costa del Sol et l’Andalousie offrent de nombreuses excursions et expériences exceptionnelles à proximité du lieu du mariage :
+        </p>
+        <div class="two-column-list">
+          <div class="two-column-list-item">
+            <ul class="list-unstyled">
+              <li><strong>Gibraltar</strong> – vues spectaculaires depuis le Rocher, tunnels et célèbres singes.</li>
+              <li><strong>Aventure dans la rivière Guadalmina</strong> – une expérience rafraîchissante de randonnée aquatique.</li>
+              <li><strong>Ronda</strong> – une ville historique spectaculaire perchée au-dessus d’un profond ravin.</li>
+              <li><strong>Excursion d’une journée au Maroc</strong> – des ferries depuis Tarifa ou Algeciras permettent de visiter Tanger et le nord du Maroc en une journée.</li>
+              <li><strong>Sorties en bateau pour observer les baleines et les dauphins</strong> – proposées depuis plusieurs ports de la côte.</li>
+              <li><strong>Séville</strong> – capitale de l’Andalousie, avec sa cathédrale, l’Alcázar et son centre historique animé.</li>
+              <li><strong>Caminito del Rey</strong> – passerelle spectaculaire accrochée à la falaise ; réservation indispensable.</li>
+              <li><strong>Grenade et l’Alhambra</strong> – l’un des sites les plus emblématiques d’Espagne ; réservation à l’avance obligatoire.</li>
+            </ul>
+          </div>
+          <div class="two-column-list-item">
+            <img
+              src="assets/images/ttd.png"
+              alt="Choses à faire sur la Costa del Sol"
+              class="map-img"
+              loading="lazy"
+            />
+          </div>
+        </div>
+        <br/>
+        <p>
+          Que vous veniez uniquement pour les événements ou que vous en profitiez pour prolonger votre séjour,
+          nous espérons que vous apprécierez tout ce que cette région d’Espagne a à offrir en célébrant avec nous.
+        </p>
+      </div>
+      <p>
+        <strong><i class="fas fa-calendar-check"></i> Veuillez sélectionner les événements auxquels vous assisterez dans le programme ci-dessous.</strong>
+      </p>
+    `,
   
     'guests:eventsLoading': 'Chargement des événements...',
     'guests:eventsNoEvents': 'Aucun événement disponible',
@@ -1643,7 +1992,7 @@ const translations = {
     'guests:welcome.title': 'Gästebereich',
     'guests:summary': 'Übersicht',
     'guests:party': 'Gruppe',
-    'guests:rsvp': 'RSVP',
+    'guests:rsvp': 'Veranstaltungen',
     'guests:menu': 'Menü',
     'guests:gifts': 'Geschenke',
   
@@ -1654,18 +2003,29 @@ const translations = {
     'guests:summaryPageTitle': 'Dein Gästebereich für die Hochzeit von Iluminada & George',
     'guests:yourSummary': 'Deine Übersicht',
     'guests:summaryPageDescription:rich': `
-        <p>
-          Willkommen in deinem persönlichen Bereich für die Hochzeit von Iluminada &amp; George. 
-          Von hier aus kannst du an der Planung teilhaben, deine Daten aktuell halten 
-          und uns helfen, die Feier genau richtig für dich und deine Gruppe zu gestalten.
-        </p>
-        <p>
-          In diesem Bereich kannst du die Namen aller Personen in deiner Gruppe aktualisieren, uns über Lebensmittelallergien 
-          oder besondere Ernährungsbedürfnisse informieren, bestätigen, wer an welchen Hochzeitsveranstaltungen teilnimmt, 
-          deine bevorzugten Gänge und Getränke für das Bankett auswählen, Nachrichten an andere Gäste senden 
-          und, wenn du möchtest, ein Geschenk für uns aus der Geschenkliste auswählen.  
-          Wir freuen uns so sehr, dies mit dir zu feiern. ❤️
-        </p>
+      <p>
+        Willkommen in deinem persönlichen Bereich für die Hochzeit von Iluminada und George. 
+        Hier kannst du an der Planung mitwirken, deine Angaben aktuell halten 
+        und uns helfen, die Feier für dich und deine Gruppe perfekt zu gestalten.
+        Wir freuen uns sehr, dies mit dir zu feiern. ❤️
+      </p>
+      <div class="intro-card intro-section">
+        In diesem Bereich kannst du:
+        <ul class="list-unstyled">
+          <li>die Namen aller Personen in deiner <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-users"></i> Gruppe</button> aktualisieren,</li>
+          <li>uns über <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-utensils"></i> Lebensmittelallergien</button>
+          oder <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-utensils"></i> besondere Ernährungsbedürfnisse</button> informieren</li>
+          <li>bestätigen, wer an welchen <button class="btn-slim btn-link" onclick="switchToTab('events')"><i class="fas fa-calendar-check"></i> Hochzeitsveranstaltungen</button> teilnimmt,</li>
+          <li>und Nachrichten an andere Gäste senden (unten).</li>
+        </ul>
+      </div>
+      <div class="intro-card intro-section">
+        Später werden wir freischalten:
+        <ul class="list-unstyled">
+          <li><button class="btn-slim btn-link" disabled="true" onclick="switchToTab('menu')"><i class="fas fa-utensils"></i> Das Menü</button>, wo du deine bevorzugten Speisen und Getränke für das Bankett auswählen kannst,</li>
+          <li><button class="btn-slim btn-link" disabled="true" onclick="switchToTab('gifts')"><i class="fas fa-gift"></i> Geschenkliste</button>, wo du ein Geschenk für uns auswählen kannst.</li>
+        </ul>
+      </div>
       `,
     'guests:summaryYourParty': 'Deine Gruppe',
     'guests:summaryRSVP': 'RSVP-Übersicht',
@@ -1674,14 +2034,24 @@ const translations = {
     'guests:partyManagementDesc:rich': 'Verwalte die Mitglieder deiner Hochzeitsgruppe und ihre Ernährungsbedürfnisse.',
     'guests:giftsSelection': 'Geschenkauswahl',
     'guests:giftsSelectionDesc:rich': 'Wähle deine Lieblingsgeschenke für unsere Hochzeitsfeiern.',
-    'guests:eventsRSVP': 'RSVP',
     'guests:eventsRSVPDesc:rich': 'Die Feierlichkeiten finden an drei Tagen statt: Freitag, Samstag und Sonntag. Am Freitag beginnen wir mit einem Willkommensdinner. Der Samstag ist ein voller Tag mit Aktivitäten, einschließlich der Trauung, dem Empfangsbankett und Tanz. Am Sonntag gibt es einen Abschiedsbrunch. Bitte bestätige deine Teilnahme für die Veranstaltungen, an denen du dabei sein wirst.',
   
     // Comments Page
     'guests:loadingComments': 'Lade Kommentare...',
     'guests:commentsTitle': 'Kommentare',
     'guests:noComments': 'Noch keine Kommentare. Sei der Erste, der einen Kommentar schreibt!',
-    'guests:commentsSubtitle:rich': 'Teile deine Gedanken mit den anderen Gästen',
+    'guests:commentsSubtitle:rich': `
+      <p>
+        Teile deine Gedanken mit den anderen Gästen:
+      </p>
+      <div class="intro-card intro-section">
+        <ul class="list-unstyled">
+          <li>Wähle den Namen der Person aus deiner Gruppe aus, die kommentieren möchte</li>
+          <li>Gib deinen Kommentar ein, bis zu 500 Zeichen,</li>
+          <li>Klicke auf <i class="fas fa-paper-plane"></i> Posten</li>
+        </ul>
+      </div>
+    `,
     'guests:comment:placeholder': 'Schreibe deinen Kommentar...',
     'guests:postComment': 'Veröffentlichen',
       
@@ -1708,7 +2078,102 @@ const translations = {
     // Events Page
     //--------------------------------
     'guests:eventsPageTitle': 'RSVP zu den folgenden Hochzeitsveranstaltungen',
-    'guests:eventsPageDescription': 'Wir freuen uns sehr, dass du bei unserer Hochzeit dabei bist. Hier findest du die Details zu allen Veranstaltungen. Bitte wähle bei jeder Veranstaltung deinen Namen im Bereich „Wer nimmt teil?“, damit wir alles für dich vorbereiten können.',
+    'guests:eventsPageDescription:rich': `
+      <p>
+        Unsere Hochzeitsfeierlichkeiten finden entlang der wunderschönen Costa del Sol zwischen Estepona und Fuengirola statt,
+        mit dem Hauptevent etwa 6 km östlich von Marbella, einem Willkommensabend vor der Hochzeit in der Nähe von Estepona
+        und einem Abschiedsbrunch im Zentrum von Marbella. <strong>Bitte wählt im untenstehenden Veranstaltungsplan die Events aus, an denen ihr teilnehmen möchtet.</strong>
+      </p>
+
+      <div class="intro-card intro-section">
+        <h4>Anreise</h4>
+        <p>
+          Die einfachste Anreise erfolgt über den <strong>Flughafen Málaga–Costa del Sol (AGP)</strong>, das wichtigste
+          internationale Drehkreuz der Costa del Sol mit häufigen Verbindungen aus ganz Europa und darüber hinaus.
+          Fuengirola und Marbella sind etwa 20–30 Minuten entfernt, Estepona rund eine Stunde mit dem Auto.
+        </p>
+        <p>
+          Alternativ könnt ihr auch zum <strong>Internationalen Flughafen Gibraltar (GIB)</strong> fliegen, der Gibraltar
+          und den westlichen Teil der Costa del Sol bedient und sich direkt hinter der spanischen Grenze befindet.
+        </p>
+        <img
+          src="assets/images/costa-map.png"
+          alt="Karte: Flughäfen Málaga und Gibraltar im Verhältnis zu Fuengirola, Marbella und Estepona"
+          class="map-img map-card"
+          loading="lazy"
+        />
+      </div>
+
+      <div class="intro-card intro-section">
+        <h4>Unterkunft</h4>
+        <p>
+          Ihr könnt eure Unterkunft frei wählen – Hotels, Ferienwohnungen oder Airbnbs sind alle gut geeignet.
+          Es ist Hochsaison an der Costa del Sol, daher empfehlen wir dringend, so früh wie möglich zu buchen,
+          um gute Preise und Verfügbarkeit zu sichern.
+        </p>
+        <p>
+          Als grobe Orientierung gilt: Unterkünfte sind meist <strong>günstiger in Fuengirola</strong>, gefolgt von
+          <strong>Estepona</strong>, während <strong>Marbella und Puerto Banús</strong> in der Regel am teuersten sind.
+          Es wurden keine speziellen Hochzeitstarife vereinbart.
+        </p>
+      </div>
+
+      <div class="intro-card intro-section">
+        <h4>Vor Ort unterwegs</h4>
+        <p>
+          Die Küste ist gut mit <strong>Bussen</strong> angebunden, mit regelmäßigen Verbindungen zwischen Städten wie
+          Málaga, Marbella, Fuengirola und Estepona, betrieben von Avanza.
+          Linien und Fahrpläne findet ihr hier:
+          <a href="https://marbella.avanzagrupo.com/en/bus-lines-and-schedules/all-lines" target="_blank" rel="noopener">
+            Avanza Costa del Sol Buslinien
+          </a>.
+        </p>
+        <p>
+          <strong>Uber</strong> ist in der Region sehr zuverlässig und günstig – meist nicht mehr als 10 € für eine Fahrt von 10 Minuten.
+        </p>
+        <p>
+          Wenn ihr plant, mehrere Tage vor oder nach der Hochzeit zu bleiben, ist <strong>ein Mietwagen</strong> oft die
+          bequemste Möglichkeit, die Gegend in eurem eigenen Tempo zu erkunden.
+        </p>
+      </div>
+
+      <div class="intro-card intro-section">
+        <h4>Macht Urlaub daraus</h4>
+        <p>
+          Die Costa del Sol und Andalusien bieten zahlreiche großartige Ausflüge und Erlebnisse in unmittelbarer Nähe des Hochzeitsortes:
+        </p>
+        <div class="two-column-list">
+          <div class="two-column-list-item">
+            <ul class="list-unstyled">
+              <li><strong>Gibraltar</strong> – beeindruckende Ausblicke vom Felsen, Tunnel und die berühmten Affen.</li>
+              <li><strong>Guadalmina-Flussabenteuer</strong> – ein erfrischendes Fluss- und Schluchtenwandererlebnis.</li>
+              <li><strong>Ronda</strong> – eine spektakuläre historische Stadt hoch über einer tiefen Schlucht.</li>
+              <li><strong>Tagesausflug nach Marokko</strong> – Fähren von Tarifa oder Algeciras ermöglichen einen Besuch in Tanger und Nordmarokko an einem Tag.</li>
+              <li><strong>Wal- und Delfinbeobachtung</strong> – Bootsfahrten ab mehreren nahegelegenen Häfen entlang der Küste.</li>
+              <li><strong>Sevilla</strong> – die Hauptstadt Andalusiens mit Kathedrale, Alcázar und lebendiger Altstadt.</li>
+              <li><strong>Caminito del Rey</strong> – ein berühmter Steg entlang steiler Felswände; Tickets müssen im Voraus gebucht werden.</li>
+              <li><strong>Granada und die Alhambra</strong> – eines der bekanntesten Wahrzeichen Spaniens; frühzeitige Reservierung ist unerlässlich.</li>
+            </ul>
+          </div>
+          <div class="two-column-list-item">
+            <img
+              src="assets/images/ttd.png"
+              alt="Aktivitäten an der Costa del Sol"
+              class="map-img"
+              loading="lazy"
+            />
+          </div>
+        </div>
+        <br/>
+        <p>
+          Egal, ob ihr nur für die Veranstaltungen anreist oder euren Aufenthalt verlängert – wir hoffen,
+          dass ihr alles genießt, was diese Region Spaniens zu bieten hat, während ihr mit uns feiert.
+        </p>
+      </div>
+      <p>
+        <strong><i class="fas fa-calendar-check"></i> Bitte wählt im untenstehenden Veranstaltungsplan die Events aus, an denen ihr teilnehmen möchtet.</strong>
+      </p>
+    `,
   
     'guests:eventsLoading': 'Lade Veranstaltungen...',
     'guests:eventsNoEvents': 'Keine Veranstaltungen verfügbar',

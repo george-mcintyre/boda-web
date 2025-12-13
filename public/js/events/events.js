@@ -395,7 +395,7 @@ async function loadEventsContent() {
           <div data-i18n="guests:eventsPageTitle">${translate('guests:eventsPageTitle')}</div>
         </h2>
         <p class="card-description">
-          <div data-i18n="guests:eventsPageDescription">${translate('guests:eventsPageDescription')}</div>
+          <div data-i18n="guests:eventsPageDescription:rich">${translate('guests:eventsPageDescription:rich')}</div>
         </p>
       </div>
     `;
