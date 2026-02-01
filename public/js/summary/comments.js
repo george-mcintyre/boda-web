@@ -466,7 +466,7 @@ function syncCommentsHeight() {
     
     if (isDesktop) {
         // Get the natural height of the summary panel
-        const summaryHeight = summaryPanel.offsetHeight;
+        const summaryHeight = summaryPanel.offsetHeight + 2000;
         if (summaryHeight > 0) {
             commentsCard.style.maxHeight = summaryHeight + 'px';
         }

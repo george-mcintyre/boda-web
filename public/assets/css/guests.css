@@ -459,7 +459,7 @@ main.main-content-full {
 }
 
 .comments-card .comments-list {
-  max-height: 3000px;
+  /* max-height: 400px; */
   overflow-y: auto;
   flex: 1;
 }
