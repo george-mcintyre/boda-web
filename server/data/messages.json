@@ -1,1 +1,42 @@
-[]
+[
+  {
+    "_id": {"$oid": "6940637388fe67bc4145cb18"},
+    "__v": 1,
+    "content": "Soy el mejor invitado que puede haber en una Boda.",
+    "createdAt": {"$date": "2025-12-15T19:37:23.125Z"},
+    "email": "fcojimenez9@hotmail.es",
+    "name": "Fran Jiménez Corzo",
+    "updatedAt": {"$date": "2025-12-21T18:46:18.230Z"},
+    "userReactions": [
+      {
+        "email": "benoit.heinrich@gmail.com",
+        "emoji": "\uD83D\uDE0A"
+      }
+    ]
+  },
+  {
+    "_id": {"$oid": "696a8eb5e958e3594dedc34e"},
+    "__v": 1,
+    "content": "Wishing you a happy, fulfilling life together. Looking forward to this unique day! Lots of love, Saskia & Laurent",
+    "createdAt": {"$date": "2026-01-16T19:17:09.026Z"},
+    "email": "laurentlahaye@mac.com",
+    "name": "Laurent Lahaye",
+    "updatedAt": {"$date": "2026-01-25T14:32:55.038Z"},
+    "userReactions": [
+      {
+        "email": "george.mcintyre@me.com",
+        "emoji": "❤\uFE0F"
+      }
+    ]
+  },
+  {
+    "_id": {"$oid": "69762a108a060c051a5b09df"},
+    "__v": 0,
+    "content": "Can’t wait to see everyone! Now the planning is really getting frantic. \uD83D\uDC95\uD83D\uDC95\uD83D\uDC95",
+    "createdAt": {"$date": "2026-01-25T14:34:56.576Z"},
+    "email": "george.mcintyre@me.com",
+    "name": "George McIntyre",
+    "updatedAt": {"$date": "2026-01-25T14:34:56.576Z"},
+    "userReactions": []
+  }
+]

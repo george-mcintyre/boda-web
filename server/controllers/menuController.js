@@ -322,11 +322,14 @@ async function createCourseOption(req, res, next) {
     option.label = mergeLocalizedString(undefined, label, lang);
     option.description = mergeLocalizedString(undefined, description, lang);
 
-    // Non-localised image or other props if needed
+    // Non-localised image
     if (image !== undefined) {
-      // Handle image object format from frontend (e.g., { imageId: '...' })
-      if (typeof image === 'object' && image !== null && image.imageId) {
+      if (image === null) {
+        option.image = null;
+      } else if (typeof image === 'object' && image.imageId) {
         option.image = image.imageId;
+      } else if (typeof image === 'string' && image.length === 24 && /^[0-9a-fA-F]{24}$/.test(image)) {
+        option.image = image;
       }
     }
 
@@ -357,9 +360,12 @@ async function updateCourseOption(req, res, next) {
     // Non-localised stuff
     Object.assign(option, rest);
     if (image !== undefined) {
-      // Handle image object format from frontend (e.g., { imageId: '...' })
-      if (typeof image === 'object' && image !== null && image.imageId) {
+      if (image === null) {
+        option.image = null;
+      } else if (typeof image === 'object' && image.imageId) {
         option.image = image.imageId;
+      } else if (typeof image === 'string' && image.length === 24 && /^[0-9a-fA-F]{24}$/.test(image)) {
+        option.image = image;
       }
     }
 

@@ -1,1 +1,1033 @@
-[]
+[
+  {
+    "_id": {"$oid": "692922faa458437702acc720"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-11-28T04:20:10.086Z"},
+    "guestId": {"$oid": "69286dd55db995ff67a64c6b"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd55db995ff67a64c6b",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-13T17:58:39.226Z"}
+  },
+  {
+    "_id": {"$oid": "693abdd8a458437702b5a2a3"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-11T12:49:27.970Z"},
+    "guestId": {"$oid": "69286dd65db995ff67a64c86"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd65db995ff67a64c86",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-11T12:49:35.330Z"}
+  },
+  {
+    "_id": {"$oid": "693dde2ca458437702b5e4d2"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-13T21:44:12.926Z"},
+    "guestId": {"$oid": "69286ddc5db995ff67a64ce6"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddc5db995ff67a64ce6",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-13T21:45:18.161Z"}
+  },
+  {
+    "_id": {"$oid": "693e7b6ba458437702b5ef2e"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-14T08:55:07.634Z"},
+    "guestId": {"$oid": "69286dd95db995ff67a64cb9"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd95db995ff67a64cb9",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-14T08:55:18.809Z"}
+  },
+  {
+    "_id": {"$oid": "693f2677a458437702b5fe08"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-14T21:04:55.167Z"},
+    "guestId": {"$oid": "69286de05db995ff67a64d31"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286de05db995ff67a64d31",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-14T21:07:08.926Z"}
+  },
+  {
+    "_id": {"$oid": "693fd73aa458437702b609e5"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T09:39:06.860Z"},
+    "guestId": {"$oid": "69286dd55db995ff67a64c74"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd55db995ff67a64c74",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T09:39:25.988Z"}
+  },
+  {
+    "_id": {"$oid": "693fe010a458437702b60aa0"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T10:16:48.610Z"},
+    "guestId": {"$oid": "69286dd85db995ff67a64ca1"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd85db995ff67a64ca1",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T10:18:11.031Z"}
+  },
+  {
+    "_id": {"$oid": "693ff017a458437702b60c1d"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T11:25:11.497Z"},
+    "guestId": {"$oid": "69286ddb5db995ff67a64cda"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddb5db995ff67a64cda",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T18:26:14.450Z"}
+  },
+  {
+    "_id": {"$oid": "69422a92bbf9209f820922e6"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-17T03:59:14.717Z"},
+    "guestId": {"$oid": "69286ddf5db995ff67a64d1f"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddf5db995ff67a64d1f",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-17T04:01:05.436Z"}
+  },
+  {
+    "_id": {"$oid": "694304813e96b8dcf1ec9071"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-17T19:29:05.487Z"},
+    "guestId": {"$oid": "69286dd55db995ff67a64c68"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd55db995ff67a64c68",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-17T19:30:08.538Z"}
+  },
+  {
+    "_id": {"$oid": "6945ba7b3e96b8dcf1ecc133"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-19T20:50:03.600Z"},
+    "guestId": {"$oid": "69286dd75db995ff67a64c8f"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd75db995ff67a64c8f",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-19T20:52:17.179Z"}
+  },
+  {
+    "_id": {"$oid": "694a72ca3e96b8dcf1ecf0b5"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-23T10:45:30.754Z"},
+    "guestId": {"$oid": "69286ddb5db995ff67a64cdd"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddb5db995ff67a64cdd",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-29T11:37:32.709Z"}
+  },
+  {
+    "_id": {"$oid": "694d6ea73e96b8dcf1ed1995"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-25T17:04:39.383Z"},
+    "guestId": {"$oid": "69286dd45db995ff67a64c62"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd45db995ff67a64c62",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-25T17:07:15.422Z"}
+  },
+  {
+    "_id": {"$oid": "694e7e283e96b8dcf1ed886f"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-26T12:23:04.760Z"},
+    "guestId": {"$oid": "69286dda5db995ff67a64cbf"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dda5db995ff67a64cbf",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-26T12:33:50.452Z"}
+  },
+  {
+    "_id": {"$oid": "6963f81f3e96b8dcf1f8252c"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-11T19:21:03.104Z"},
+    "guestId": {"$oid": "69286dd65db995ff67a64c77"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd65db995ff67a64c77",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-11T19:23:36.502Z"}
+  },
+  {
+    "_id": {"$oid": "696a8b6dbb749c87182322dc"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-16T19:03:09.808Z"},
+    "guestId": {"$oid": "69286dd95db995ff67a64cb3"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd95db995ff67a64cb3",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-16T19:10:20.997Z"}
+  },
+  {
+    "_id": {"$oid": "696ee21fbb749c8718257a0c"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-20T02:02:07.370Z"},
+    "guestId": {"$oid": "69286dda5db995ff67a64cc5"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dda5db995ff67a64cc5",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-20T02:02:54.511Z"}
+  },
+  {
+    "_id": {"$oid": "697001e9bb749c8718261602"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-20T22:30:01.234Z"},
+    "guestId": {"$oid": "69286dd45db995ff67a64c5c"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd45db995ff67a64c5c",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-20T22:32:42.153Z"}
+  },
+  {
+    "_id": {"$oid": "6971f1684566d89eefbf4d4e"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-22T09:44:08.875Z"},
+    "guestId": {"$oid": "69286ddf5db995ff67a64d1c"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddf5db995ff67a64d1c",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-22T09:46:45.162Z"}
+  },
+  {
+    "_id": {"$oid": "69738d504566d89eefc02c97"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-23T15:01:35.971Z"},
+    "guestId": {"$oid": "69286de15db995ff67a64d3d"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286de15db995ff67a64d3d",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "61d7e68e819fed890ddc9099",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-23T15:01:45.977Z"}
+  },
+  {
+    "_id": {"$oid": "6975f4e44566d89eefc176aa"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-25T10:48:04.718Z"},
+    "guestId": {"$oid": "69286ddc5db995ff67a64ce3"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddc5db995ff67a64ce3",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-25T10:48:25.300Z"}
+  },
+  {
+    "_id": {"$oid": "69762b044566d89eefc19269"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-25T14:39:00.550Z"},
+    "guestId": {"$oid": "69286dd65db995ff67a64c7a"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd65db995ff67a64c7a",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-25T14:51:33.448Z"}
+  },
+  {
+    "_id": {"$oid": "698103ba5375628d304768fb"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-02-02T20:06:18.166Z"},
+    "guestId": {"$oid": "69286dd45db995ff67a64c5f"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd45db995ff67a64c5f",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2026-02-02T20:06:17.988Z"}
+  },
+  {
+    "_id": {"$oid": "6989b38f5e5bdd4c9ff727dc"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-02-09T10:14:39.067Z"},
+    "guestId": {"$oid": "69286dd95db995ff67a64cad"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd95db995ff67a64cad",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": true
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": true
+          }
+        ]
+      },
+      {
+        "partyGuestId": "null",
+        "choices": [
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "692381ef76402958d7ee1977"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "69237e6b76402958d7ee1956"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          },
+          {
+            "eventId": {"$oid": "6923849276402958d7ee1a73"},
+            "attending": false
+          }
+        ]
+      }
+    ],
+    "updatedAt": {"$date": "2026-02-09T10:29:17.453Z"}
+  }
+]

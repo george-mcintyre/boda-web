@@ -1,17 +1,34 @@
 [
   {
+    "_id": {"$oid": "69284347fb51d5733d1e3f07"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-11-27T12:25:43.793Z"},
     "email": "george.mcintyre@me.com",
     "password": "i-8rEzYrDdDp",
-    "token": "935aca68-e532-416b-a4bd-1c6ff0461e6c"
+    "updatedAt": {"$date": "2025-11-27T12:25:43.793Z"}
   },
   {
+    "_id": {"$oid": "69284347fb51d5733d1e3f08"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-11-27T12:25:43.793Z"},
     "email": "iluminada.jimenezc@gmail.com",
     "password": "@u.dNQVh89EF",
-    "token": "735aca68-e532-416b-a4bd-1c6ff0461e6c"
+    "updatedAt": {"$date": "2025-11-27T12:25:43.793Z"}
   },
   {
+    "_id": {"$oid": "69284347fb51d5733d1e3f09"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-11-27T12:25:43.793Z"},
     "email": "mybeachweddingmalaga@gmail.com",
     "password": "Jv7p!vFJc!.x",
-    "token": "835aca68-e532-416b-a4bd-1c6ff0461e6c"
+    "updatedAt": {"$date": "2025-11-27T12:25:43.793Z"}
+  },
+  {
+    "_id": {"$oid": "693da7f4dd94651e528e15ed"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-11-27T12:25:43.793Z"},
+    "email": "benoit.heinrich@gmail.com",
+    "password": "Qe8E_kY!_gxm",
+    "updatedAt": {"$date": "2025-11-27T12:25:43.793Z"}
   }
 ]

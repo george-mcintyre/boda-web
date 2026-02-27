@@ -1,23 +1,50 @@
 [
   {
-    "title": "Welcome Champagne",
-    "description": "Help us start our celebration with a toast",
+    "_id": {"$oid": "69284348fb51d5733d1e3f37"},
+    "__v": 0,
     "amount": 25,
     "available": 10,
-    "image": null
+    "createdAt": {"$date": "2025-11-27T12:25:44.382Z"},
+    "description": {
+      "en": "Help us start our celebration with a toast"
+    },
+    "enabled": true,
+    "image": {"$oid": "69305911ebebcf4b29bb60ff"},
+    "title": {
+      "en": "Welcome Champagne"
+    },
+    "updatedAt": {"$date": "2025-12-03T15:36:50.334Z"}
   },
   {
-    "title": "Honeymoon Accommodation",
-    "description": "Help fund our romantic getaway",
-    "amount": 200,
-    "available": 5,
-    "image": null
-  },
-  {
-    "title": "Dream Honeymoon",
-    "description": "Make our honeymoon unforgettable",
+    "_id": {"$oid": "69284348fb51d5733d1e3f39"},
+    "__v": 0,
     "amount": 500,
     "available": 3,
-    "image": null
+    "createdAt": {"$date": "2025-11-27T12:25:44.382Z"},
+    "description": {
+      "en": "Make our honeymoon unforgettable"
+    },
+    "enabled": true,
+    "image": {"$oid": "6930592eebebcf4b29bb610f"},
+    "title": {
+      "en": "Dream Honeymoon"
+    },
+    "updatedAt": {"$date": "2025-12-03T15:37:19.201Z"}
+  },
+  {
+    "_id": {"$oid": "69284348fb51d5733d1e3f38"},
+    "__v": 0,
+    "amount": 200,
+    "available": 5,
+    "createdAt": {"$date": "2025-11-27T12:25:44.382Z"},
+    "description": {
+      "en": "Help fund our romantic getaway"
+    },
+    "enabled": true,
+    "image": {"$oid": "6930591febebcf4b29bb6107"},
+    "title": {
+      "en": "Honeymoon Accommodation"
+    },
+    "updatedAt": {"$date": "2025-12-03T15:37:04.697Z"}
   }
 ]

@@ -1,12 +1,14 @@
 [
   {
-    "createdAt": {"$date": "2025-11-23T19:01:07.085Z"},
-    "defaultLanguage": "en",
-    "eventsEnabled": false,
+    "_id": {"$oid": "6928023899ed789c08cd0a85"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-11-27T07:48:08.855Z"},
+    "defaultLanguage": "es",
+    "eventsEnabled": true,
     "giftsEnabled": false,
-    "guestsEnabled": false,
+    "guestsEnabled": true,
     "menuEnabled": false,
-    "messagesEnabled": false,
-    "updatedAt": {"$date": "2025-11-25T17:17:19.432Z"}
+    "messagesEnabled": true,
+    "updatedAt": {"$date": "2025-12-13T17:36:07.236Z"}
   }
 ]

@@ -251,19 +251,18 @@ function formatCourseForApi(course) {
 function formatCourseOptionForApi(option, lang) {
   // Format image data for display
   let imageData = null;
-  if (option.image && option.image.data) {
-    // Database-stored image with populated data
-    const base64Data = option.image.data.toString('base64');
-    imageData = `data:${option.image.contentType};base64,${base64Data}`;
-  } else if (option.image && option.image._id) {
-    // Image reference with populated data
-    if (option.image.data) {
+  if (option.image) {
+    if (option.image.data && option.image.contentType) {
+      // Populated image document with binary data
       const base64Data = option.image.data.toString('base64');
       imageData = `data:${option.image.contentType};base64,${base64Data}`;
+    } else {
+      // Unpopulated ObjectId reference — return as string for frontend
+      const idStr = option.image._id ? option.image._id.toString() : option.image.toString();
+      if (idStr.length === 24 && /^[0-9a-fA-F]{24}$/.test(idStr)) {
+        imageData = idStr;
+      }
     }
-  } else if (option.image && typeof option.image === 'string' && option.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(option.image)) {
-    // ObjectId reference - return the ObjectId string for frontend to use API endpoint
-    imageData = option.image;
   }
 
   return {

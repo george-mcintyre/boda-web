@@ -1,1 +1,967 @@
-[]
+[
+  {
+    "_id": {"$oid": "6928a7829176ff1f6d05b82c"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-11-27T19:33:22.023Z"},
+    "guestId": {"$oid": "69286dd55db995ff67a64c6b"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd55db995ff67a64c6b",
+        "choices": [
+          {
+            "courseId": {"$oid": "69241c73417a12722a56b983"},
+            "optionId": {"$oid": "69241c84417a12722a56b98b"}
+          },
+          {
+            "courseId": {"$oid": "69241d37417a12722a56b9ab"},
+            "optionId": {"$oid": "69241d69417a12722a56b9c4"}
+          },
+          {
+            "courseId": {"$oid": "6923d62beac56d718dbca656"},
+            "optionId": {"$oid": "69241dd2417a12722a56b9f9"}
+          },
+          {
+            "courseId": {"$oid": "69241e5a417a12722a56ba3b"},
+            "optionId": {"$oid": "69241e76417a12722a56ba46"}
+          }
+        ],
+        "specialRequests": [],
+        "specialRequestDetail": "sans alcool (ou alors juste un verre, ou deux)"
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-13T17:49:23.618Z"}
+  },
+  {
+    "_id": {"$oid": "692b592a001a3d6540407e00"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-11-29T20:35:54.506Z"},
+    "guestId": {"$oid": "69286dd65db995ff67a64c86"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd65db995ff67a64c86",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-11-29T20:35:54.506Z"}
+  },
+  {
+    "_id": {"$oid": "693a983f158ca5491898c3bb"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-11T10:09:03.785Z"},
+    "guestId": {"$oid": "69286dde5db995ff67a64d04"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dde5db995ff67a64d04",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-11T10:09:03.785Z"}
+  },
+  {
+    "_id": {"$oid": "693da561f7ac32fc02285327"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-13T17:41:53.642Z"},
+    "guestId": {"$oid": "69286dde5db995ff67a64d07"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dde5db995ff67a64d07",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-13T17:41:53.642Z"}
+  },
+  {
+    "_id": {"$oid": "693db79787b3ca49bcabec08"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-13T18:59:35.267Z"},
+    "guestId": {"$oid": "69286dd85db995ff67a64c9b"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd85db995ff67a64c9b",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-13T18:59:35.267Z"}
+  },
+  {
+    "_id": {"$oid": "693dbe17cbde775834b3adca"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-13T19:27:19.109Z"},
+    "guestId": {"$oid": "69286ddc5db995ff67a64ce9"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddc5db995ff67a64ce9",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-13T19:27:19.109Z"}
+  },
+  {
+    "_id": {"$oid": "693dd36da4c08ca0e8d4bc9e"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-13T20:58:21.083Z"},
+    "guestId": {"$oid": "69286ddd5db995ff67a64cfb"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddd5db995ff67a64cfb",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-13T20:58:21.083Z"}
+  },
+  {
+    "_id": {"$oid": "693dddb7983ec53988c25d17"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-13T21:42:15.237Z"},
+    "guestId": {"$oid": "69286ddc5db995ff67a64ce6"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddc5db995ff67a64ce6",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-13T21:42:15.237Z"}
+  },
+  {
+    "_id": {"$oid": "693e621dcc5dd298382d4d89"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-14T07:07:09.986Z"},
+    "guestId": {"$oid": "69286dd85db995ff67a64c98"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd85db995ff67a64c98",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-14T07:07:09.986Z"}
+  },
+  {
+    "_id": {"$oid": "693e79ef411c70859e76c5cd"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-14T08:48:47.661Z"},
+    "guestId": {"$oid": "69286dd95db995ff67a64cb9"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd95db995ff67a64cb9",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-16T22:32:12.097Z"}
+  },
+  {
+    "_id": {"$oid": "693e8430ac26f3beb506bc00"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-14T09:32:32.753Z"},
+    "guestId": {"$oid": "69286dda5db995ff67a64ccb"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dda5db995ff67a64ccb",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-14T09:32:32.753Z"}
+  },
+  {
+    "_id": {"$oid": "693f128ab415151099e4765e"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-14T19:39:54.806Z"},
+    "guestId": {"$oid": "69286dd65db995ff67a64c7d"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd65db995ff67a64c7d",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-14T19:39:54.806Z"}
+  },
+  {
+    "_id": {"$oid": "693f1e176886447b66ec88e7"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-14T20:29:11.774Z"},
+    "guestId": {"$oid": "69286dda5db995ff67a64cbf"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dda5db995ff67a64cbf",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-26T12:22:29.195Z"}
+  },
+  {
+    "_id": {"$oid": "693f25bfd2036d2d2e1ec2c0"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-14T21:01:51.831Z"},
+    "guestId": {"$oid": "69286de05db995ff67a64d31"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286de05db995ff67a64d31",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-14T21:01:51.831Z"}
+  },
+  {
+    "_id": {"$oid": "693fd6f6f242655801bd35ad"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T09:37:58.148Z"},
+    "guestId": {"$oid": "69286dd55db995ff67a64c74"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd55db995ff67a64c74",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T09:37:58.148Z"}
+  },
+  {
+    "_id": {"$oid": "693fd95f0fe926ac0009535f"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T09:48:15.589Z"},
+    "guestId": {"$oid": "69286dd95db995ff67a64caa"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd95db995ff67a64caa",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T09:48:15.589Z"}
+  },
+  {
+    "_id": {"$oid": "693fda09b1b36af97dbc34b3"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T09:51:05.518Z"},
+    "guestId": {"$oid": "69286ddc5db995ff67a64ce3"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddc5db995ff67a64ce3",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T09:51:05.518Z"}
+  },
+  {
+    "_id": {"$oid": "693fdcf83de9032ddab7f6ec"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T10:03:36.303Z"},
+    "guestId": {"$oid": "69286dd55db995ff67a64c71"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd55db995ff67a64c71",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T10:03:36.303Z"}
+  },
+  {
+    "_id": {"$oid": "693fdf18d9c0dbc4ded509a7"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T10:12:40.168Z"},
+    "guestId": {"$oid": "69286dd85db995ff67a64ca1"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd85db995ff67a64ca1",
+        "choices": [],
+        "specialRequests": [
+          {
+            "name": "vegetarian",
+            "selected": true
+          }
+        ],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T10:14:49.470Z"}
+  },
+  {
+    "_id": {"$oid": "693fdf20fc4fb6f90e12150a"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T10:12:48.572Z"},
+    "guestId": {"$oid": "69286de05db995ff67a64d34"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286de05db995ff67a64d34",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T10:12:48.572Z"}
+  },
+  {
+    "_id": {"$oid": "693fe603160781124d4fc2bd"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T10:42:11.115Z"},
+    "guestId": {"$oid": "69286dd75db995ff67a64c89"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd75db995ff67a64c89",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T10:42:11.115Z"}
+  },
+  {
+    "_id": {"$oid": "693fe704160781124d4fc2c6"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T10:46:28.698Z"},
+    "guestId": {"$oid": "69286dda5db995ff67a64cc2"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dda5db995ff67a64cc2",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T10:46:28.698Z"}
+  },
+  {
+    "_id": {"$oid": "693fef2ba5cf69ecd61f5c00"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T11:21:15.269Z"},
+    "guestId": {"$oid": "69286ddb5db995ff67a64cda"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddb5db995ff67a64cda",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T11:21:15.269Z"}
+  },
+  {
+    "_id": {"$oid": "6940227cb4c4a8980ba6a599"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T15:00:12.351Z"},
+    "guestId": {"$oid": "69286de15db995ff67a64d3d"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286de15db995ff67a64d3d",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T15:00:12.351Z"}
+  },
+  {
+    "_id": {"$oid": "694022dc5944b86fc98c7206"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T15:01:48.987Z"},
+    "guestId": {"$oid": "69286dd55db995ff67a64c65"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd55db995ff67a64c65",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T15:01:48.987Z"}
+  },
+  {
+    "_id": {"$oid": "6940309fab6c651fdb696fd6"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T16:00:31.682Z"},
+    "guestId": {"$oid": "69286dd55db995ff67a64c68"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd55db995ff67a64c68",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": "None"
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-17T19:24:41.032Z"}
+  },
+  {
+    "_id": {"$oid": "69405ee83c15b95834e40418"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-15T19:18:00.728Z"},
+    "guestId": {"$oid": "69286dd85db995ff67a64ca7"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd85db995ff67a64ca7",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-15T19:18:00.728Z"}
+  },
+  {
+    "_id": {"$oid": "69414d6d42ca5225104641bb"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-16T12:15:41.385Z"},
+    "guestId": {"$oid": "69286ddc5db995ff67a64ce0"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddc5db995ff67a64ce0",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": "No special needs"
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-16T12:18:20.608Z"}
+  },
+  {
+    "_id": {"$oid": "6941b8289d725177b2b472ff"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-16T19:51:04.177Z"},
+    "guestId": {"$oid": "69286dd95db995ff67a64cad"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd95db995ff67a64cad",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-16T19:51:04.177Z"}
+  },
+  {
+    "_id": {"$oid": "69422a3b8baa9b2fb011a669"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-17T03:57:47.229Z"},
+    "guestId": {"$oid": "69286ddf5db995ff67a64d1f"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddf5db995ff67a64d1f",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-17T03:57:47.229Z"}
+  },
+  {
+    "_id": {"$oid": "69429c390e6c4eee1a9fb3e7"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-17T12:04:09.519Z"},
+    "guestId": {"$oid": "69286ddb5db995ff67a64cdd"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddb5db995ff67a64cdd",
+        "choices": [],
+        "specialRequests": [
+          {
+            "name": "lactose-intolerant",
+            "selected": true
+          },
+          {
+            "name": "gluten-intolerant",
+            "selected": true
+          }
+        ],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-29T11:36:52.308Z"}
+  },
+  {
+    "_id": {"$oid": "6945b9cccd9d77a8e9b4bcb7"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-19T20:47:08.245Z"},
+    "guestId": {"$oid": "69286dd75db995ff67a64c8f"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd75db995ff67a64c8f",
+        "choices": [],
+        "specialRequests": [
+          {
+            "name": "other",
+            "selected": true
+          }
+        ],
+        "specialRequestDetail": "Everything fine except Pork"
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-19T20:48:40.079Z"}
+  },
+  {
+    "_id": {"$oid": "6947facf537d006944769d44"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-21T13:49:03.167Z"},
+    "guestId": {"$oid": "69286dd45db995ff67a64c5f"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd45db995ff67a64c5f",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      }
+    ],
+    "updatedAt": {"$date": "2026-02-02T19:59:27.510Z"}
+  },
+  {
+    "_id": {"$oid": "69483a83da6574f913fc4cd8"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-21T18:20:51.103Z"},
+    "guestId": {"$oid": "69286dd75db995ff67a64c92"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd75db995ff67a64c92",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-21T18:20:51.103Z"}
+  },
+  {
+    "_id": {"$oid": "694d6e40fbd5e099a28f2f85"},
+    "__v": 0,
+    "createdAt": {"$date": "2025-12-25T17:02:56.843Z"},
+    "guestId": {"$oid": "69286dd45db995ff67a64c62"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd45db995ff67a64c62",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      }
+    ],
+    "updatedAt": {"$date": "2025-12-25T17:06:22.921Z"}
+  },
+  {
+    "_id": {"$oid": "69579802a910f1989cb0853c"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-02T10:03:46.442Z"},
+    "guestId": {"$oid": "69286ddd5db995ff67a64cf2"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddd5db995ff67a64cf2",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-02T10:03:46.442Z"}
+  },
+  {
+    "_id": {"$oid": "6963f7b56ebf9250a8c9ee57"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-11T19:19:17.431Z"},
+    "guestId": {"$oid": "69286dd65db995ff67a64c77"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd65db995ff67a64c77",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-11T19:19:17.431Z"}
+  },
+  {
+    "_id": {"$oid": "69652ec8a47b37e4983af488"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-12T17:26:32.955Z"},
+    "guestId": {"$oid": "69286dd95db995ff67a64cb6"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd95db995ff67a64cb6",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": "No red meat or shellfish"
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-12T17:31:45.820Z"}
+  },
+  {
+    "_id": {"$oid": "696a85b8c5a869574c020f81"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-16T18:38:48.356Z"},
+    "guestId": {"$oid": "69286dd95db995ff67a64cb3"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd95db995ff67a64cb3",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-16T18:59:42.463Z"}
+  },
+  {
+    "_id": {"$oid": "696ed027355b72c14aa54947"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-20T00:45:27.925Z"},
+    "guestId": {"$oid": "69286dda5db995ff67a64cc5"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dda5db995ff67a64cc5",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-20T00:45:27.925Z"}
+  },
+  {
+    "_id": {"$oid": "697000df30616343a8d96c56"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-20T22:25:35.374Z"},
+    "guestId": {"$oid": "69286dd45db995ff67a64c5c"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd45db995ff67a64c5c",
+        "choices": [],
+        "specialRequests": [
+          {
+            "name": "other",
+            "selected": true
+          }
+        ],
+        "specialRequestDetail": "No pork products and no alcohol in food please"
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": ""
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-20T22:27:40.191Z"}
+  },
+  {
+    "_id": {"$oid": "6971f01813b035a6b2ec0156"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-22T09:38:32.040Z"},
+    "guestId": {"$oid": "69286ddf5db995ff67a64d1c"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286ddf5db995ff67a64d1c",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-22T09:38:32.040Z"}
+  },
+  {
+    "_id": {"$oid": "6973d206e013cf3880950c0f"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-23T19:54:46.187Z"},
+    "guestId": {"$oid": "69286dd75db995ff67a64c95"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd75db995ff67a64c95",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-23T19:54:46.187Z"}
+  },
+  {
+    "_id": {"$oid": "697628f29993ae53cc33c0b8"},
+    "__v": 0,
+    "createdAt": {"$date": "2026-01-25T14:30:10.904Z"},
+    "guestId": {"$oid": "69286dd65db995ff67a64c7a"},
+    "partyChoices": [
+      {
+        "partyGuestId": "69286dd65db995ff67a64c7a",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      },
+      {
+        "partyGuestId": "member-undefined",
+        "choices": [],
+        "specialRequests": [],
+        "specialRequestDetail": null
+      }
+    ],
+    "updatedAt": {"$date": "2026-01-25T14:30:10.904Z"}
+  }
+]

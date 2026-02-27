@@ -1,132 +1,302 @@
 [
   {
     "_id": {"$oid": "69237e6b76402958d7ee1956"},
+    "__v": 27,
     "createdAt": {"$date": "2025-11-23T21:36:43.136Z"},
     "date": {"$date": "2026-06-06T11:00:00.000Z"},
     "description": {
-      "en": "Come and join us as we celebrate our love.  The beach wedding!"
+      "en": "<p>\n  Our wedding ceremony will take place on a beach that has special significance, where George and Iluminada will finally be tying the knot after  11 years. With the sea as our backdrop, we invite you to join us for this meaningful moment as we  begin our celebration.\n</p>\n\n<p>\n  <strong>Dress code:</strong> Formal wedding attire (no specific colours required). As this is a beach ceremony, we\n  recommend something comfortable yet smart, and suitable for warm weather.\n  <strong>Sombrillas will be provided for shade.</strong>\n</p>\n\n<p>\n  <strong>Please arrive on time:</strong> the ceremony will commence promptly, so kindly plan to be seated before the\n  bride arrives.\n</p>\n\n<p>\n  <strong>Parking:</strong> Nearby parking is available at Playa de Alicate and at Pl. de los Tamarindos.\n</p>\n",
+      "es": "<p>\nNuestra ceremonia de boda se celebrará en una playa con un significado especial, donde George e Iluminada finalmente se casarán después de 11 años. Con el mar como telón de fondo, os invitamos a uniros a nosotros en este momento tan especial para comenzar nuestra celebración.\n</p>\n\n<p>\n<strong>Código de vestimenta:</strong> Traje formal de boda (no se requieren colores específicos). Al ser una ceremonia en la playa, recomendamos usar ropa cómoda pero elegante, adecuada para climas cálidos.\n<strong>Se proporcionarán sombrillas.</strong>\n</p>\n\n<p>\n<strong>Por favor, lleguen puntuales:</strong> la ceremonia comenzará puntualmente, así que por favor planeen sentarse antes de que llegue la novia.\n</p>\n\n<p>\n<strong>Aparcamiento:</strong> Hay aparcamiento disponible en la Playa de Alicate y en la Pl. de los Tamarindos.\n</p>",
+      "fr": "<p>\n\nNotre cérémonie de mariage aura lieu sur une plage chargée de sens, où George et Iluminada s'uniront enfin par les liens du mariage après 11 ans. Avec la mer pour toile de fond, nous vous invitons à vous joindre à nous pour ce moment si particulier qui marquera le début de nos festivités.\n\n</p>\n\n<strong>Tenue vestimentaire :</strong> Tenue de mariage élégante (aucune couleur spécifique n'est requise). Comme il s'agit d'une cérémonie sur la plage,\n\nnous vous recommandons une tenue confortable et élégante, adaptée à la chaleur.\n\n<strong>Des parasols seront mis à votre disposition.</strong>\n\n</p>\n\n<p>\n\n<strong>Merci d'arriver à l'heure :</strong> La cérémonie commencera à l'heure précise, veuillez donc prendre place avant l'arrivée de la\nmariée.\n\n</p>\n\n<strong>Parking :</strong> Des parkings sont disponibles à proximité, à Playa de Alicate et à la Pl. de los Tamarindos.\n\n</p>",
+      "de": "<p>\nUnsere Trauung findet an einem Strand mit besonderer Bedeutung statt, wo George und Iluminada nach 11 Jahren endlich den Bund fürs Leben schließen werden. Vor der Kulisse des Meeres laden wir Sie herzlich ein, diesen bedeutungsvollen Moment mit uns zu feiern.\n\n</p>\n\n<p>\n<strong>Kleiderordnung:</strong> Festliche Hochzeitskleidung (keine Farbvorgaben). Da es sich um eine Strandzeremonie handelt,\nempfehlen wir Ihnen bequeme, aber elegante Kleidung, die dem warmen Wetter angepasst ist.\n\n<strong>Sonnenschirme werden bereitgestellt.</strong>\n\n</p>\n\n<p>\n<strong>Bitte seien Sie pünktlich:</strong> Die Zeremonie beginnt pünktlich. Bitte nehmen Sie daher vor der Ankunft der Braut Platz.\n\n</p>\n\n<p>\n<strong>Parken:</strong> Parkplätze stehen in der Nähe am Playa de Alicate und an der Pl. de los Tamarindos zur Verfügung.\n\n</p>"
     },
     "end": {"$date": "2026-06-06T23:00:00.000Z"},
-    "image": null,
+    "image": {"$oid": "693c054471f92da93e607bcd"},
     "locationAddress": "Urbanización las Chapas, s/n, 29604 Marbella, Málaga",
     "locationLatitude": 36.49992141718805,
     "locationLongitude": -4.81805492057585,
-    "name": "Wedding Ceremony",
+    "name": {
+      "en": "Wedding Ceremony",
+      "es": "Ceremonia de boda",
+      "fr": "Cérémonie de mariage",
+      "de": "Hochzeitszeremonie"
+    },
     "sub_events": [
       {
-        "name": "Welcome Cocktails",
+        "name": {
+          "en": "Welcome Cocktails",
+          "de": "Begrüßungscocktails",
+          "es": "Cócteles de bienvenida",
+          "fr": "Cocktails de bienvenue"
+        },
         "date": {"$date": "2026-06-06T11:00:00.000Z"},
         "end": {"$date": "2026-06-06T12:00:00.000Z"},
-        "description": "Enjoy a glass of champagne while we wait for the bride to appear.  Entertainment will start promptly so don't be late.",
+        "description": {
+          "en": "",
+          "de": "",
+          "es": "",
+          "fr": ""
+        },
         "icon": "cocktails"
       },
       {
-        "name": "Wedding Ceremony",
+        "name": {
+          "en": "Wedding Ceremony",
+          "de": "Hochzeitszeremonie",
+          "es": "Ceremonia de boda",
+          "fr": "Cérémonie de mariage"
+        },
         "date": {"$date": "2026-06-06T12:00:00.000Z"},
         "end": {"$date": "2026-06-06T13:00:00.000Z"},
-        "description": "The Wedding Ceremony",
+        "description": {
+          "en": "",
+          "de": "",
+          "es": "",
+          "fr": ""
+        },
         "icon": "ceremony"
       },
       {
-        "name": "Photographs",
+        "name": {
+          "en": "Photographs, Cocktails and Aperitifs ",
+          "de": "Fotografien, Cocktails und Aperitifs",
+          "es": "Fotografías, Cócteles y Aperitivos",
+          "fr": "Photographies, cocktails et apéritifs"
+        },
         "date": {"$date": "2026-06-06T13:00:00.000Z"},
-        "end": {"$date": "2026-06-06T14:00:00.000Z"},
-        "description": "The bride and groom will go to take photographs, while guests wait to take places at reception",
+        "end": {"$date": "2026-06-06T14:30:00.000Z"},
+        "description": {
+          "en": "",
+          "de": "",
+          "es": "",
+          "fr": ""
+        },
         "icon": "cocktails"
       },
       {
-        "name": "Reception Dinner",
-        "date": {"$date": "2026-06-06T14:00:00.000Z"},
+        "name": {
+          "en": "Banquet",
+          "de": "Bankett",
+          "es": "Banquete",
+          "fr": "Banquet"
+        },
+        "date": {"$date": "2026-06-06T14:30:00.000Z"},
         "end": {"$date": "2026-06-06T17:00:00.000Z"},
-        "description": "The dinner",
+        "description": {
+          "en": "",
+          "de": "",
+          "es": "",
+          "fr": ""
+        },
         "icon": "reception"
       },
       {
-        "name": "Cake, Fireworks, First Dance, and Games",
+        "name": {
+          "en": "Cake, Fireworks, First Dance, and Games",
+          "de": "Kuchen, Feuerwerk, Eröffnungstanz und Spiele",
+          "es": "Pastel, fuegos artificiales, primer baile y juegos",
+          "fr": "Gâteau, feux d'artifice, première danse et jeux"
+        },
         "date": {"$date": "2026-06-06T17:00:00.000Z"},
         "end": {"$date": "2026-06-06T19:00:00.000Z"},
-        "description": null,
+        "description": {
+          "en": "",
+          "de": "",
+          "es": "",
+          "fr": ""
+        },
         "icon": "reception"
       },
       {
-        "name": "Party",
+        "name": {
+          "en": "Party",
+          "de": "Party",
+          "es": "Fiesta",
+          "fr": "Faire la fête"
+        },
         "date": {"$date": "2026-06-06T19:00:00.000Z"},
         "end": {"$date": "2026-06-05T23:00:00.000Z"},
-        "description": null,
+        "description": {
+          "en": "",
+          "de": "",
+          "es": "",
+          "fr": ""
+        },
         "icon": "dancing"
       }
     ],
     "title": {
-      "en": "Oyana Beach Restaurant"
+      "en": "Oyana Beach",
+      "es": "Oyana Beach",
+      "fr": "Oyana Beach",
+      "de": "Oyana Beach"
     },
-    "updatedAt": {"$date": "2025-11-23T22:08:13.348Z"}
-  },
-  {
-    "_id": {"$oid": "692381ef76402958d7ee1977"},
-    "createdAt": {"$date": "2025-11-23T21:51:43.758Z"},
-    "date": {"$date": "2026-06-05T19:00:00.000Z"},
-    "description": {
-      "en": "Join us to meet the others in the wedding party and get in the mood for love!"
-    },
-    "end": {"$date": "2026-06-05T22:00:00.000Z"},
-    "image": null,
-    "locationAddress": "Playa Padron, Carr. de Cadiz, Km 159, 29680 Estepona, Málaga",
-    "locationLatitude": 36.438354134601,
-    "locationLongitude": -5.104264180418514,
-    "name": "Welcome Cocktails",
-    "sub_events": [
-      {
-        "name": "Welcome",
-        "date": {"$date": "2026-06-05T19:00:00.000Z"},
-        "end": {"$date": "2026-06-05T19:30:00.000Z"},
-        "description": null,
-        "icon": "cocktails"
-      },
-      {
-        "name": "Dinner",
-        "date": {"$date": "2026-06-05T19:30:00.000Z"},
-        "end": {"$date": "2026-06-05T21:00:00.000Z"},
-        "description": null,
-        "icon": "reception"
-      },
-      {
-        "name": "Dancing",
-        "date": {"$date": "2026-06-05T21:00:00.000Z"},
-        "end": {"$date": "2026-06-04T22:00:00.000Z"},
-        "description": "",
-        "icon": "dancing"
-      }
-    ],
-    "title": {
-      "en": "Sublim Beach Club"
-    },
-    "updatedAt": {"$date": "2025-11-23T22:05:59.829Z"}
+    "updatedAt": {"$date": "2025-12-13T17:17:38.299Z"}
   },
   {
     "_id": {"$oid": "6923849276402958d7ee1a73"},
+    "__v": 29,
     "createdAt": {"$date": "2025-11-23T22:02:58.267Z"},
     "date": {"$date": "2026-06-07T12:30:00.000Z"},
     "description": {
-      "en": "Wedding Brunch"
+      "en": "<p>\n  We will conclude our wedding celebrations with a relaxed post-wedding brunch on the beach, the perfect way to unwind\n  and enjoy one last gathering together by the sea. This final event offers a laid-back atmosphere to reflect on the\n  festivities and spend time with friends and family before saying goodbye.\n</p>\n\n<p>\n  <strong>Dress code:</strong> White attire with smart-casual beachwear — comfortable, elegant, and suited to the setting.\n  Drinks, cocktails, and apéritifs will be served, and sun loungers and chill-out areas will be available for you to\n  relax and enjoy the afternoon.\n</p>\n\n<p>\n  This will be our chance to share a final toast and say farewell to George and Iluminada, who will be departing for\n  their honeymoon the following morning.\n</p>\n",
+      "de": "<p>\nWir lassen unsere Hochzeitsfeier mit einem entspannten Brunch am Strand ausklingen – die perfekte Gelegenheit, um zu entspannen\nund ein letztes Mal gemeinsam am Meer zusammenzukommen. Diese letzte Veranstaltung bietet eine lockere Atmosphäre, um die Feierlichkeiten Revue passieren zu lassen\nund Zeit mit Freunden und Familie zu verbringen, bevor wir uns verabschieden.\n\n</p>\n\n<p>\n<strong>Dresscode:</strong> Weiße Kleidung mit legerer Strandmode – bequem, elegant und dem Ambiente angemessen.\n\nEs werden Getränke, Cocktails und Aperitifs serviert, und Sonnenliegen sowie Chill-out-Bereiche stehen Ihnen zur Verfügung, um\nden Nachmittag zu genießen.\n\n</p>\n\n<p>\nDies ist unsere Gelegenheit, ein letztes Mal auf George und Iluminada anzustoßen und sie zu verabschieden, die am nächsten Morgen in ihre Flitterwochen aufbrechen.\n\n</p>",
+      "es": "<p>\nConcluiremos la celebración de nuestra boda con un brunch relajado en la playa, la manera perfecta para desconectar y disfrutar de un último encuentro juntos, junto al mar. Este último evento ofrece un ambiente relajado para reflexionar sobre las festividades y pasar tiempo con amigos y familiares antes de despedirnos.\n</p>\n\n<p>\n<strong>Código de vestimenta:</strong> Traje blanco con ropa de playa elegante e informal: cómodo, elegante y adecuado al entorno.\n\nSe servirán bebidas, cócteles y aperitivos, y habrá tumbonas y zonas de relax disponibles para que se relajen y disfruten de la tarde.\n</p>\n\n<p>\nEsta será nuestra oportunidad para brindar por última vez y despedirnos de George e Iluminada, quienes partirán de luna de miel a la mañana siguiente.\n</p>",
+      "fr": "<p>\n\nNous conclurons les festivités de notre mariage par un brunch décontracté sur la plage, l'occasion idéale de se détendre\n\net de profiter d'un dernier moment ensemble au bord de la mer. Ce dernier événement offre une ambiance paisible pour se remémorer\nles festivités et passer du temps avec vos proches avant de vous dire au revoir.\n\n</p>\n\n<strong>Tenue vestimentaire :</strong> Tenue blanche et vêtements de plage chics et décontractés — confortables, élégants et adaptés au cadre.\n\nDes boissons, des cocktails et des apéritifs seront servis, et des transats ainsi que des espaces détente seront à votre disposition pour\nvous relaxer et profiter de l'après-midi.\n\n</p>\n\n<p>\n\nCe sera l'occasion de porter un dernier toast et de dire au revoir à George et Iluminada, qui partiront en\nlune de miel le lendemain matin.\n\n</p>"
     },
     "end": {"$date": "2026-06-07T16:00:00.000Z"},
-    "image": null,
+    "image": {"$oid": "693c08da7a297e80483a2d64"},
     "locationAddress": "P.º Marítimo, num 2, 29600 Marbella, Málaga",
-    "locationLatitude": 36.50704566918498,
-    "locationLongitude": -4.892851492688078,
-    "name": "Wedding Brunch",
+    "locationLatitude": 36.50691657465937,
+    "locationLongitude": -4.892926221656817,
+    "name": {
+      "en": "Wedding Brunch",
+      "de": "Hochzeitsbrunch",
+      "es": "Brunch de boda",
+      "fr": "Brunch de mariage"
+    },
     "sub_events": [
       {
-        "name": "Eat A lot",
+        "name": {
+          "en": "Welcome Cocktails",
+          "de": "Begrüßungscocktails",
+          "fr": "Cocktails de bienvenue",
+          "es": "Cócteles de bienvenida"
+        },
         "date": {"$date": "2026-06-07T12:30:00.000Z"},
-        "end": {"$date": "2026-06-07T16:00:00.000Z"},
-        "description": "Eat and drink, play in the sand, take an ice cream.  Wave goodbye as we leave on our honeymoon",
+        "end": {"$date": "2026-06-07T13:00:00.000Z"},
+        "description": {
+          "en": "<p>\n  The afternoon will begin with welcome cocktails, as guests arrive, settle in, and ease into the\n  relaxed beach atmosphere. This is the perfect moment to greet one another, enjoy a first drink, and transition\n  smoothly into the final celebrations of the weekend.\n</p>\n",
+          "de": "<p>\nDer Nachmittag beginnt mit Begrüßungscocktails, während die Gäste eintreffen, sich einrichten und die entspannte Strandatmosphäre genießen.\n\nDies ist der perfekte Moment, um sich kennenzulernen, einen ersten Drink zu genießen und sanft in die abschließenden Feierlichkeiten des Wochenendes überzugehen.\n\n</p>",
+          "fr": "<p>\n\nL'après-midi débutera par un cocktail de bienvenue, le temps que les invités arrivent, s'installent et profitent de l'ambiance décontractée de la plage.\n\nC'est le moment idéal pour faire connaissance, savourer un premier verre et entamer en douceur les festivités de fin de week-end.\n\n</p>",
+          "es": "La tarde comenzará con un cóctel de bienvenida, mientras los invitados llegan, se instalan y se relajan en el relajado ambiente playero. Este es el momento perfecto para saludarse, disfrutar de una primera copa y dar paso a las celebraciones finales del fin de semana.\n\n</p>"
+        },
+        "icon": "cocktails"
+      },
+      {
+        "name": {
+          "en": "Beach Brunch & Canapés",
+          "de": "Strandbrunch & Canapés",
+          "fr": "Brunch sur la plage et canapés",
+          "es": "Brunch y canapés en la playa"
+        },
+        "date": {"$date": "2026-06-07T13:00:00.000Z"},
+        "end": {"$date": "2026-06-07T14:30:00.000Z"},
+        "description": {
+          "en": "Guests are invited to settle in, relax, and enjoy a flowing beach brunch with a selection of hot and cold canapés served throughout the afternoon. Drinks, cocktails, and apéritifs will be available as live music sets the mood, creating an easygoing atmosphere to lounge, chat, and soak up the sun together.\n",
+          "de": "Gäste sind herzlich eingeladen, sich niederzulassen, zu entspannen und einen ausgiebigen Strandbrunch mit einer Auswahl an warmen und kalten Canapés zu genießen, der den ganzen Nachmittag über serviert wird. Getränke, Cocktails und Aperitifs stehen bereit, während Live-Musik für die richtige Stimmung sorgt und eine entspannte Atmosphäre zum Verweilen, Plaudern und gemeinsamen Sonnenbaden schafft.",
+          "fr": "Les convives sont invités à s'installer confortablement, à se détendre et à savourer un brunch de plage copieux, agrémenté d'une sélection de canapés chauds et froids servis tout au long de l'après-midi. Boissons, cocktails et apéritifs seront proposés, tandis qu'une musique live créera une ambiance décontractée, propice à la détente, aux échanges et au farniente au soleil.",
+          "es": "Estáis invitados a relajaros y disfrutar de un brunch playero con una selección de canapés fríos y calientes durante toda la tarde. Se ofrecerán bebidas, canapés, y aperitivos, mientras la música en vivo nos ambienta y relaja, para charlar y tomar el sol juntos."
+        },
         "icon": "reception"
+      },
+      {
+        "name": {
+          "en": "Farewell Toasts & Dancing",
+          "de": "Abschiedsreden und Tanz",
+          "fr": "Toasts d'adieu et danse",
+          "es": "Brindis de despedida y baile"
+        },
+        "date": {"$date": "2026-06-07T14:30:00.000Z"},
+        "end": {"$date": "2026-06-07T15:00:00.000Z"},
+        "description": {
+          "en": "As the afternoon unfolds, the energy will gently rise with music and dancing on the beach. This final chapter of the celebrations is a chance to share a few farewell toasts, dance barefoot if you wish, and say goodbye to George and Iluminada before they depart for their honeymoon the following morning.\n",
+          "de": "Im Laufe des Nachmittags steigt die Stimmung mit Musik und Tanz am Strand. Dieser letzte Teil der Feierlichkeiten bietet die Gelegenheit, ein paar Abschiedsgrüße auszutauschen, barfuß zu tanzen, wenn man möchte, und George und Iluminada zu verabschieden, bevor sie am nächsten Morgen in die Flitterwochen aufbrechen.",
+          "fr": "Au fil de l'après-midi, l'ambiance montera doucement au rythme de la musique et des danses sur la plage. Ce dernier moment des festivités sera l'occasion de porter quelques toasts d'adieu, de danser pieds nus si le cœur vous en dit, et de dire au revoir à George et Iluminada avant leur départ en lune de miel le lendemain matin.",
+          "es": "A medida que avanza la tarde, la energía se irá animando con la música y el baile en la playa. Este último capítulo de las celebraciones es una oportunidad para compartir algunos brindis de despedida, bailar descalzos si lo desean y despedirse de George e Iluminada antes de que partan de luna de miel a la mañana siguiente."
+        },
+        "icon": "dancing"
       }
     ],
     "title": {
-      "en": "Bocana Beach"
+      "en": "Bocana Beach",
+      "de": "Bocana Beach",
+      "es": "Bocana Beach",
+      "fr": "Bocana Beach"
     },
-    "updatedAt": {"$date": "2025-11-26T10:05:51.260Z"}
+    "updatedAt": {"$date": "2025-12-13T17:33:45.082Z"}
+  },
+  {
+    "_id": {"$oid": "692381ef76402958d7ee1977"},
+    "__v": 19,
+    "createdAt": {"$date": "2025-11-23T21:51:43.758Z"},
+    "date": {"$date": "2026-06-05T19:00:00.000Z"},
+    "description": {
+      "en": "<p>\n  Join us for a relaxed and festive welcome soirée on the evening before the wedding. This informal gathering is the perfect opportunity to meet fellow guests, reconnect with friends, and ease into the celebrations together.\n</p>\n<p>\n  We’ll be enjoying cocktails and an apéritif, with music and dancing in a laid-back atmosphere — a chance to unwind, share a few laughs, and get to know everyone in the wedding party before the big day.\n  <strong>Smart attire is required.</strong>\n</p>\n<p>\n  Whether you’re arriving early or already nearby, we’d love for you to join us for this first celebration together.\n</p>\n",
+      "es": "<p>\nAcompáñenos a una relajada y festiva velada de bienvenida la noche anterior a la boda. Esta reunión informal es la oportunidad perfecta para conocer a otros invitados, reencontrarse con amigos y disfrutar juntos de la celebración.\n</p>\n<p>\nDisfrutaremos de cócteles y un aperitivo, con música y baile en un ambiente relajado: una oportunidad para desconectar, reír y conocer a todos los invitados antes del gran día.\n<strong>Se requiere vestimenta elegante.</strong>\n</p>\n<p>\nTanto si llegas antes de la boda como si vives en la zona, nos encantaría que nos acompañaras en esta primera celebración juntos.\n</p>",
+      "de": "<p>\nSeien Sie am Abend vor der Hochzeit bei unserem entspannten und festlichen Willkommensempfang dabei. Dieses ungezwungene Treffen ist die perfekte Gelegenheit, andere Gäste kennenzulernen, Freunde wiederzusehen und gemeinsam in die Feierlichkeiten einzustimmen.\n\n</p>\n<p>\nWir genießen Cocktails und einen Aperitif, Musik und Tanz in lockerer Atmosphäre – eine Chance, zu entspannen, gemeinsam zu lachen und alle Mitglieder der Hochzeitsgesellschaft vor dem großen Tag kennenzulernen.\n\n<strong>Gepflegte Kleidung ist erwünscht.</strong>\n</p>\n<p>\nOb Sie schon früh anreisen oder bereits in der Nähe sind, wir würden uns freuen, Sie bei diesem ersten gemeinsamen Fest begrüßen zu dürfen.\n\n</p>",
+      "fr": "<p>\n\nRejoignez-nous pour une soirée de bienvenue conviviale et festive la veille du mariage. Ce moment informel est l'occasion idéale de rencontrer les autres invités, de retrouver vos amis et de vous mettre dans l'ambiance des festivités.\n\n</p>\n<p>\nNous dégusterons des cocktails et un apéritif, avec de la musique et de la danse dans une atmosphère détendue. L'occasion de se relaxer, de partager quelques rires et de faire connaissance avec tous les membres du cortège avant le grand jour.\n\n<strong>Tenue élégante exigée.</strong>\n\n</p>\n<p>\n\nQue vous arriviez en avance ou que vous soyez déjà dans les environs, nous serions ravis de vous accueillir pour cette première célébration ensemble.\n\n</p>"
+    },
+    "end": {"$date": "2026-06-05T22:00:00.000Z"},
+    "image": {"$oid": "693c0886ce72759284d54fbc"},
+    "locationAddress": "Playa Padron, Carr. de Cadiz, Km 159, 29680 Estepona, Málaga",
+    "locationLatitude": 36.438354134601,
+    "locationLongitude": -5.104264180418514,
+    "name": {
+      "en": "Welcome Cocktails",
+      "es": "Cócteles de bienvenida",
+      "de": "Begrüßungscocktails",
+      "fr": "Cocktails de bienvenue"
+    },
+    "sub_events": [
+      {
+        "name": {
+          "en": "Welcome",
+          "de": "Willkommen",
+          "es": "Bienvenida",
+          "fr": "Bienvenue"
+        },
+        "date": {"$date": "2026-06-05T19:00:00.000Z"},
+        "end": {"$date": "2026-06-05T19:30:00.000Z"},
+        "description": {
+          "en": "We’ll start the evening with a warm welcome as guests arrive, collect a drink, and have time to greet one another and settle into the atmosphere.",
+          "de": "Wir beginnen den Abend mit einem herzlichen Willkommen, wenn die Gäste eintreffen, sich ein Getränk holen und Zeit haben, sich kennenzulernen und in die Atmosphäre einzufinden.",
+          "es": "Comenzaremos la velada con una cálida bienvenida de nuestros invitados.  Con una bebida y así tener tiempo para saludarse y acomodarse al ambiente.",
+          "fr": "Nous commencerons la soirée par un accueil chaleureux : les invités arriveront, prendront un verre et auront le temps de faire connaissance et de s'imprégner de l'ambiance."
+        },
+        "icon": "cocktails"
+      },
+      {
+        "name": {
+          "en": "Cocktail Dinner",
+          "de": "Cocktail-Dinner",
+          "es": "Cena cóctel",
+          "fr": "Dîner cocktail"
+        },
+        "date": {"$date": "2026-06-05T19:30:00.000Z"},
+        "end": {"$date": "2026-06-05T21:30:00.000Z"},
+        "description": {
+          "en": "A cocktail-style dinner will be served, offering a selection of substantial finger foods along with drinks throughout the evening, designed to replace a seated meal.",
+          "de": "Es wird ein Abendessen im Cocktail-Stil serviert, bei dem eine Auswahl an reichhaltigen Fingerfood-Gerichten sowie Getränke den ganzen Abend über angeboten werden, um ein gesetztes Essen zu ersetzen.",
+          "es": "Se servirá una cena estilo cóctel, que ofrecerá una selección de abundantes canapés y aperitivos junto con bebidas durante toda la noche, diseñadas para reemplazar una comida sentada.",
+          "fr": "Un dîner façon cocktail sera servi, proposant une sélection de copieux amuse-bouche accompagnés de boissons tout au long de la soirée, conçu pour remplacer un repas assis."
+        },
+        "icon": "reception"
+      },
+      {
+        "name": {
+          "en": "Dancing",
+          "de": "Tanzen",
+          "es": "Baile",
+          "fr": "Dansante"
+        },
+        "date": {"$date": "2026-06-05T08:00:00.000Z"},
+        "end": {"$date": "2026-06-04T22:00:00.000Z"},
+        "description": {
+          "en": "As the night continues, music and dancing will begin and carry on until midnight, creating a lively and celebratory atmosphere for everyone to enjoy together.",
+          "de": "Im Laufe der Nacht beginnen Musik und Tanz und dauern bis Mitternacht an, wodurch eine lebhafte und festliche Atmosphäre entsteht, die alle gemeinsam genießen können.",
+          "es": "A medida que avanza la noche, la música y el baile comenzarán y continuarán hasta la medianoche, creando un ambiente animado y festivo para que todos disfrutemos juntos.",
+          "fr": "Au fil de la nuit, la musique et la danse commenceront et se poursuivront jusqu'à minuit, créant une ambiance festive et animée dont chacun pourra profiter ensemble."
+        },
+        "icon": "dancing"
+      }
+    ],
+    "title": {
+      "en": "Sublim Beach",
+      "es": "Sublim Beach",
+      "de": "Sublim Beach",
+      "fr": "Sublim Beach"
+    },
+    "updatedAt": {"$date": "2025-12-13T17:56:27.597Z"}
   }
 ]
