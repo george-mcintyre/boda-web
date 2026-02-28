@@ -313,11 +313,6 @@ class CommentsSystem {
         }
     }
 
-    escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
 
     formatDate(dateStr) {
         const date = new Date(dateStr);
@@ -413,15 +408,15 @@ class CommentsSystem {
             <div class="willow-comment" data-id="${comment.id}">
                 <div class="willow-comment-header">
                     <div class="willow-avatar">
-                        <span>${this.escapeHtml(comment.author.charAt(0).toUpperCase())}</span>
+                        <span>${window.escapeHtml(comment.author.charAt(0).toUpperCase())}</span>
                     </div>
                     <div class="willow-meta">
-                        <span class="willow-author">${this.escapeHtml(comment.author)}</span>
+                        <span class="willow-author">${window.escapeHtml(comment.author)}</span>
                         <span class="willow-date">${this.formatDate(comment.createdAt)}</span>
                     </div>
                     ${deleteBtn}
                 </div>
-                <div class="willow-comment-body">${this.escapeHtml(comment.body)}</div>
+                <div class="willow-comment-body">${window.escapeHtml(comment.body)}</div>
                 <div class="willow-comment-footer">
                     ${reactionsHtml}
                     <div class="willow-add-reaction">

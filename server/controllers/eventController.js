@@ -1,49 +1,7 @@
-const fs = require('fs');
-const path = require('path');
 const { Event, EventChoice } = require('../models');
-const { localize, getLang, mergeLocalizedString } = require('../utils/localized');
+const { getLang, mergeLocalizedString } = require('../utils/localized');
+const { formatEventForApi } = require('../utils/formatters');
 
-// Format event for API response according to README specification
-function formatEventForApi(event, lang = 'en') {
-  // Format image data for display
-  let imageData = null;
-  if (event.image && event.image.data) {
-    // Database-stored image with populated data
-    const base64Data = event.image.data.toString('base64');
-    imageData = `data:${event.image.contentType};base64,${base64Data}`;
-  } else if (typeof event.image === 'string' && event.image.startsWith('/')) {
-    // Legacy URL-based image
-    imageData = event.image;
-  } else if (event.image && event.image._id) {
-    // Image reference (will be populated separately in admin calls)
-    if (event.image.data) {
-      const base64Data = event.image.data.toString('base64');
-      imageData = `data:${event.image.contentType};base64,${base64Data}`;
-    }
-  }
-
-  return {
-    id: event._id.toString(),
-    name: localize(event.name, lang),
-    date: event.date ? event.date.toISOString() : null,
-    end: event.end ? event.end.toISOString() : null,
-    locationAddress: event.locationAddress || '',
-    locationLatitude: event.locationLatitude || null,
-    locationLongitude: event.locationLongitude || null,
-    // Legacy location field for backward compatibility
-    location: event.location || event.locationAddress || '',
-    title: event.title ? localize(event.title, lang) : null,
-    description: event.description ? localize(event.description, lang) : null,
-    image: imageData,
-    sub_events: (event.sub_events || []).map(sub => ({
-      name: localize(sub.name, lang),
-      date: sub.date ? sub.date.toISOString() : null,
-      end: sub.end ? sub.end.toISOString() : null,
-      description: localize(sub.description, lang) || null,
-      icon: sub.icon
-    }))
-  };
-}
 
 // Guest: List events
 async function listEvents(req, res, next) {
@@ -208,12 +166,4 @@ module.exports = {
   createEvent,
   updateEvent,
   deleteEvent,
-  // Legacy endpoints (for backward compatibility)
-  getEvents: listEventsAdmin,
-  postEvents: createEvent,
-  createEventsItem: createEvent,
-  updateEventsItem: updateEvent,
-  deleteEventsItem: deleteEvent,
-  listEvents: listEvents,
-  listEventsGuest: listEvents
 };

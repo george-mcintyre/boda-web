@@ -281,6 +281,82 @@ window.escapeHtml = function(text) {
   return div.innerHTML;
 }
 
+// Date formatting utilities that adapt to user's language preference
+window.getUserLanguage = function() {
+  return localStorage.getItem('i18nextLng') || 'es';
+}
+
+window.formatDate = function(isoString) {
+  if (!isoString) return '';
+  try {
+    const date = new Date(isoString);
+    const userLang = window.getUserLanguage();
+    return date.toLocaleDateString(userLang, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'Europe/Madrid'
+    });
+  } catch (e) {
+    return isoString;
+  }
+}
+
+window.formatTime = function(isoString) {
+  if (!isoString) return '';
+  try {
+    const date = new Date(isoString);
+    const userLang = window.getUserLanguage();
+    return date.toLocaleTimeString(userLang, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: 'Europe/Madrid'
+    });
+  } catch (e) {
+    return isoString;
+  }
+}
+
+window.extractDateFromISO = function(isoString) {
+  if (!isoString) return '';
+  try {
+    const date = new Date(isoString);
+    const formatter = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Madrid',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    const parts = formatter.formatToParts(date);
+    const year  = parts.find(p => p.type === 'year').value;
+    const month = parts.find(p => p.type === 'month').value;
+    const day   = parts.find(p => p.type === 'day').value;
+    return `${year}-${month}-${day}`;
+  } catch (e) {
+    return '';
+  }
+}
+
+window.extractTimeFromISO = function(isoString) {
+  if (!isoString) return '';
+  try {
+    const date = new Date(isoString);
+    const formatter = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Madrid',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const parts = formatter.formatToParts(date);
+    const hour   = parts.find(p => p.type === 'hour').value;
+    const minute = parts.find(p => p.type === 'minute').value;
+    return `${hour}:${minute}`;
+  } catch (e) {
+    return '';
+  }
+}
+
    // Global logout function
 window.logoutGuest = () => {
   localStorage.removeItem('token');

@@ -62,16 +62,6 @@ async function loadGiftsContent() {
     }
     gifts = await giftsRes.json();
 
-    // Helper to escape HTML
-    const escapeHtml = (str) => {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    };
 
     // Format date helper
     const formatDate = (dateString) => {

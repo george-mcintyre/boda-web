@@ -61,16 +61,6 @@ try {
     if (menuChoicesResponse.ok) menuChoices = await menuChoicesResponse.json();
     if (giftChoicesResponse.ok) giftChoices = await giftChoicesResponse.json();
     
-    // Helper to escape HTML
-    const escapeHtml = (str) => {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    };
     
     // Date/time formatting helpers
     const formatEventDate = (dateString) => {

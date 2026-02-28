@@ -1,5 +1,5 @@
-const { MenuCourse, MenuChoice, Guest, Course, CourseOption, CourseOptionImage } = require('../models');
-const { formatCourseForApi, formatCourseOptionForApi } = require('../controllers/adminController');
+const { MenuChoice, Guest, Course, CourseOption } = require('../models');
+const { formatCourseForApi, formatCourseOptionForApi } = require('../utils/formatters');
 const { generateSelectionIconHTML, generateDietaryIconsHTML } = require('../utils/menuIcons');
 const { getLang, mergeLocalizedString, localize } = require('../utils/localized');
 
@@ -385,54 +385,6 @@ async function deleteCourseOption(req, res, next) {
     const { optionId } = req.params;
     await CourseOption.findByIdAndDelete(optionId);
     res.json({ status: 'ok' });
-  } catch (e) {
-    next(e);
-  }
-}
-
-// Admin: get menu overview per guest (supports both new and legacy format)
-async function getMenuChoicesOverview(req, res, next) {
-  try {
-    const menuChoices = await MenuChoice.find({}).populate('guestId', 'name email').lean();
-    
-    const overview = [];
-    
-    for (const menuChoice of menuChoices) {
-      const guest = menuChoice.guestId;
-      if (!guest) continue;
-      
-      for (const partyChoice of menuChoice.partyChoices) {
-        const choices = (partyChoice.choices || []).map(choice => {
-          // Handle new format (courseId + optionId)
-          if (choice.courseId && choice.optionId) {
-            return {
-              courseId: choice.courseId.toString(),
-              optionId: choice.optionId.toString()
-            };
-          }
-          // Handle legacy format (menuPartId + legacyOptionId)
-          if (choice.menuPartId && choice.legacyOptionId) {
-            return {
-              courseId: choice.menuPartId,
-              optionId: choice.legacyOptionId
-            };
-          }
-          return choice;
-        });
-        
-        overview.push({
-          guestId: guest._id.toString(),
-          guestName: guest.name || 'Unknown Guest',
-          partyGuestId: partyChoice.partyGuestId,
-          partyGuestName: partyChoice.partyGuestId.startsWith('primary-') ? guest.name : 'Party Member',
-          choices: choices,
-          specialRequest: partyChoice.specialRequests || [],  // Fixed: map specialRequests to specialRequest for API compatibility
-          specialRequestDetail: partyChoice.specialRequestDetail
-        });
-      }
-    }
-    
-    res.json(overview);
   } catch (e) {
     next(e);
   }

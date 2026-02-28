@@ -80,16 +80,6 @@ async function loadMenuSelections() {
       }
     });
 
-    // Helper to escape HTML
-    const escapeHtml = (str) => {
-      if (!str) return '';
-      return String(str)
-        .replace(/&/g, '&')
-        .replace(/</g, '<')
-        .replace(/>/g, '>')
-        .replace(/"/g, '"')
-        .replace(/'/g, '&#039;');
-    };
 
     // Helper to get image URL for option
     const getOptionImageUrl = (option) => {

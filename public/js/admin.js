@@ -36,89 +36,6 @@
     tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
   }
 
-  // Date formatting utilities that adapt to user's language preference
-  function getUserLanguage() {
-    return localStorage.getItem('i18nextLng') || 'es';
-  }
-
-  function formatDate(isoString) {
-    if (!isoString) return '';
-    try {
-      const date = new Date(isoString);
-      const userLang = getUserLanguage();
-      return date.toLocaleDateString(userLang, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        timeZone: 'Europe/Madrid'
-      });
-    } catch (e) {
-      return isoString;
-    }
-  }
-
-  function formatTime(isoString) {
-    if (!isoString) return '';
-    try {
-      const date = new Date(isoString);
-      const userLang = getUserLanguage();
-      return date.toLocaleTimeString(userLang, {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-        timeZone: 'Europe/Madrid'
-      });
-    } catch (e) {
-      return isoString;
-    }
-  }
-
-  function extractDateFromISO(isoString) {
-    if (!isoString) return '';
-    try {
-      const date = new Date(isoString); // uses the +01:00/+02:00 in the string
-  
-      const formatter = new Intl.DateTimeFormat('en-GB', {
-        timeZone: 'Europe/Madrid',
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      });
-  
-      // en-CA gives YYYY-MM-DD, but use formatToParts so we’re explicit
-      const parts = formatter.formatToParts(date);
-      const year  = parts.find(p => p.type === 'year').value;
-      const month = parts.find(p => p.type === 'month').value;
-      const day   = parts.find(p => p.type === 'day').value;
-  
-      return `${year}-${month}-${day}`;
-    } catch (e) {
-      return '';
-    }
-  }
-  
-  function extractTimeFromISO(isoString) {
-    if (!isoString) return '';
-    try {
-      const date = new Date(isoString);
-  
-      const formatter = new Intl.DateTimeFormat('en-GB', {
-        timeZone: 'Europe/Madrid',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
-  
-      const parts = formatter.formatToParts(date);
-      const hour   = parts.find(p => p.type === 'hour').value;
-      const minute = parts.find(p => p.type === 'minute').value;
-  
-      return `${hour}:${minute}`;
-    } catch (e) {
-      return '';
-    }
-  }
-
   // Sub-event icon utilities
   function getSubEventIcon(iconType) {
     const icons = {
@@ -1896,13 +1813,6 @@
     });
   }
 
-  // Escape HTML to prevent XSS
-  function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
 
 
 
