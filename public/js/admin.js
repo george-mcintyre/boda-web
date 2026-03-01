@@ -523,6 +523,36 @@
       });
       const guests = allGuests.filter(g => banquetGuestIds.has(g.id));
 
+      // Build assignment lookup early so head-table injection affects card rendering
+      const assignmentMap = {};
+      assignments.forEach(a => {
+        const key = a.partyMemberName ? `${a.guestId}_${a.partyMemberName}` : a.guestId;
+        assignmentMap[key] = a;
+      });
+
+      // Bride & Groom: auto-assign to Head Table on first visit, then lock
+      const HEAD_TABLE_NAMES = ['george mcintyre', 'iluminada'];
+      const headTable = tables.find(t => t.isHeadTable);
+      const fixedGuestIds = new Set();
+      let needsRefresh = false;
+      if (headTable) {
+        for (const g of guests) {
+          if (HEAD_TABLE_NAMES.some(n => (g.name || '').toLowerCase().includes(n))) {
+            fixedGuestIds.add(g.id);
+            if (!assignmentMap[g.id]) {
+              // First time: create real assignment
+              await api('/api/admin/table-assignments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tableId: headTable.id, guestId: g.id })
+              });
+              needsRefresh = true;
+            }
+          }
+        }
+        if (needsRefresh) { showTableAllocation(); return; }
+      }
+
       if (tables.length === 0) {
         target.innerHTML = `
           <div class="admin-content">
@@ -542,13 +572,15 @@
       }
 
       const totalCapacity = tables.reduce((sum, t) => sum + (t.capacity || 0), 0);
-      const totalAssigned = tables.reduce((sum, t) => sum + (t.assignedCount || 0), 0);
+      let totalAssigned = tables.reduce((sum, t) => sum + (t.assignedCount || 0), 0);
 
       const tableCards = tables.map(t => {
         const pct = t.capacity > 0 ? Math.round((t.assignedCount / t.capacity) * 100) : 0;
         const barColor = pct >= 100 ? '#dc3545' : pct >= 75 ? '#ffc107' : '#28a745';
+        const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        const fixedNames = new Set((t.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg))));
         const assignedNames = (t.fixedGuests || []).map(fg => `<span class="badge badge-primary" style="margin:2px;">${typeof fg === 'string' ? fg : (fg.name || fg)}</span>`).join('') +
-          (t.assignments || []).map(a => `<span class="badge badge-secondary" style="margin:2px;">${a.guestName}${a.partyMemberName ? ' (' + a.partyMemberName + ')' : ''}</span>`).join('');
+          (t.assignments || []).filter(a => !fixedNames.has(norm(a.guestName))).map(a => `<span class="badge badge-secondary" style="margin:2px;">${a.guestName}${a.partyMemberName ? ' (' + a.partyMemberName + ')' : ''}</span>`).join('');
 
         return `
           <div class="admin-card" style="margin-bottom:10px;">
@@ -610,12 +642,6 @@
           </div>
         </div>`;
 
-      // Build assignment lookup: key = guestId or guestId+partyMemberName
-      const assignmentMap = {};
-      assignments.forEach(a => {
-        const key = a.partyMemberName ? `${a.guestId}_${a.partyMemberName}` : a.guestId;
-        assignmentMap[key] = a;
-      });
 
       // Table options for dropdown
       const tableOptions = tables.map(t => `<option value="${t.id}">${getTableDisplayName(t)}</option>`).join('');
@@ -627,19 +653,20 @@
       guests.forEach(g => {
         // Primary guest row
         const primaryAssignment = assignmentMap[g.id];
+        const isFixed = fixedGuestIds.has(g.id);
         const primaryTableId = primaryAssignment ? primaryAssignment.tableId : '';
         const primaryAssignId = primaryAssignment ? primaryAssignment.id : '';
         allRows.push({
           isAssigned: !!primaryAssignment,
           html: `<tr class="assignment-row" data-guest-id="${g.id}" data-assigned="${!!primaryAssignment}">
-            <td><strong>${g.name}</strong></td>
+            <td><strong>${g.name}</strong>${isFixed ? ' <i class="fas fa-crown" style="color:gold;font-size:0.75em;" title="Head Table"></i>' : ''}</td>
             <td>—</td>
             <td>${primaryAssignment ? getTableDisplayName(tables.find(t => t.id === primaryAssignment.tableId) || {number: '?'}) : '<span style="color:var(--text-light);">' + translate('admin:tables.unassigned') + '</span>'}</td>
             <td>
-              <select class="table-assign-select" data-guest-id="${g.id}" data-party-member="" data-assignment-id="${primaryAssignId}">
+              ${isFixed ? '<span style="color:var(--text-light);font-size:0.85em;"><i class="fas fa-lock"></i></span>' : `<select class="table-assign-select" data-guest-id="${g.id}" data-party-member="" data-assignment-id="${primaryAssignId}">
                 <option value="">${translate('admin:tables.unassigned')}</option>
                 ${tableOptions}
-              </select>
+              </select>`}
             </td>
           </tr>`
         });
