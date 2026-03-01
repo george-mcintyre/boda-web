@@ -13,7 +13,8 @@
 
   // Show loading placeholder
   function setLoading(msg){
-    content.innerHTML = `<div class="admin-loading"><i class="fas fa-spinner fa-spin"></i><p >${msg||'Loading...'}</p></div>`;
+    const target = getContentTarget();
+    target.innerHTML = `<div class="admin-loading"><i class="fas fa-spinner fa-spin"></i><p >${msg||'Loading...'}</p></div>`;
   }
 
   // Simple logger/notification (can be replaced with UI toasts)
@@ -34,6 +35,481 @@
   // Tab activation helper
   function activate(tab){
     tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  }
+
+  // ========== Two-Level Navigation (Sub-tabs) ==========
+  const SUB_TABS = {
+    guests: [
+      { id: 'summary', i18nKey: 'admin:subtab.guestSummary', icon: 'fa-chart-bar' },
+      { id: 'management', i18nKey: 'admin:subtab.guestManagement', icon: 'fa-users-cog' }
+    ],
+    menu: [
+      { id: 'banquet', i18nKey: 'admin:subtab.banquetMenu', icon: 'fa-utensils' },
+      { id: 'day1', i18nKey: 'admin:subtab.day1Menu', icon: 'fa-sun' },
+      { id: 'day3', i18nKey: 'admin:subtab.day3Menu', icon: 'fa-glass-cheers' },
+      { id: 'tables', i18nKey: 'admin:subtab.tableAllocation', icon: 'fa-th' },
+      { id: 'responses', i18nKey: 'admin:subtab.menuResponses', icon: 'fa-clipboard-list' }
+    ],
+    gifts: [
+      { id: 'list', i18nKey: 'admin:subtab.giftList', icon: 'fa-gift' },
+      { id: 'purchases', i18nKey: 'admin:subtab.giftPurchases', icon: 'fa-shopping-cart' }
+    ]
+  };
+
+  function getContentTarget() {
+    return document.getElementById('sub-tab-content') || content;
+  }
+
+  function renderSubTabs(primaryTab) {
+    const tabConfig = SUB_TABS[primaryTab];
+    if (!tabConfig) return '';
+    const savedSubTab = localStorage.getItem('adminSubPage_' + primaryTab) || tabConfig[0].id;
+    const buttons = tabConfig.map(st => {
+      const isActive = st.id === savedSubTab ? ' active' : '';
+      return `<button class="sub-tab${isActive}" data-subtab="${st.id}"><i class="fas ${st.icon}"></i> <span>${translate(st.i18nKey)}</span></button>`;
+    }).join('');
+    return `<div class="sub-tab-bar">${buttons}</div><div id="sub-tab-content"></div>`;
+  }
+
+  function showSubTab(primaryTab, subTab) {
+    localStorage.setItem('adminSubPage_' + primaryTab, subTab);
+    // Update active class on sub-tab buttons
+    document.querySelectorAll('.sub-tab').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.subtab === subTab);
+    });
+    // Dispatch to the appropriate show function
+    switch (primaryTab + '/' + subTab) {
+      case 'guests/summary': return showGuestSummary();
+      case 'guests/management': return showGuests();
+      case 'menu/banquet': return showMenu();
+      case 'menu/day1': return showDayMenu('day1');
+      case 'menu/day3': return showDayMenu('day3');
+      case 'menu/tables': return showTableAllocation();
+      case 'menu/responses': return showMenuResponses();
+      case 'gifts/list': return showGifts();
+      case 'gifts/purchases': return showGiftPurchases();
+      default:
+        getContentTarget().innerHTML = '<div class="admin-content"><p>' + translate('admin:comingSoon') + '</p></div>';
+    }
+  }
+
+  // ========== Sub-tab View Implementations ==========
+
+  // Guest Summary sub-tab
+  async function showGuestSummary() {
+    const target = getContentTarget();
+    setLoading(translate('admin:loadingGuests'));
+    try {
+      const res = await api('/api/admin/guest-summary');
+      if (!res.ok) throw new Error('Failed to load guest summary');
+      const data = await res.json();
+
+      const eventRows = (data.perEventAttendance || []).map(e => `
+        <tr>
+          <td>${e.eventName}</td>
+          <td><strong>${e.count}</strong></td>
+        </tr>`).join('');
+
+      target.innerHTML = `
+        <div class="admin-content">
+          <h3><i class="fas fa-chart-bar"></i> ${translate('admin:subtab.guestSummary')}</h3>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-number">${data.totalGuests}</div>
+              <div class="stat-label">${translate('admin:guests.totalGuests')}</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">${data.totalAdults}</div>
+              <div class="stat-label">${translate('admin:guests.adult')}s</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">${data.totalChildren}</div>
+              <div class="stat-label">${translate('admin:guests.child')}s</div>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;">
+            <div class="admin-card">
+              <h4><i class="fas fa-calendar-check"></i> Event Attendance</h4>
+              <table class="data-table">
+                <thead><tr><th>Event</th><th>Attending</th></tr></thead>
+                <tbody>${eventRows || '<tr><td colspan="2">No events configured</td></tr>'}</tbody>
+              </table>
+            </div>
+            <div class="admin-card">
+              <h4><i class="fas fa-exclamation-circle"></i> Action Required</h4>
+              <ul style="list-style:none;padding:0;">
+                <li style="padding:8px 0;border-bottom:1px solid var(--gray-200);">
+                  <i class="fas fa-utensils" style="color:var(--primary-color);width:20px;"></i>
+                  <strong>${data.guestsWithoutMenuChoices}</strong> guests without menu choices
+                </li>
+                <li style="padding:8px 0;border-bottom:1px solid var(--gray-200);">
+                  <i class="fas fa-calendar" style="color:var(--primary-color);width:20px;"></i>
+                  <strong>${data.guestsWithoutEventChoices}</strong> guests without event responses
+                </li>
+                <li style="padding:8px 0;">
+                  <i class="fas fa-users" style="color:var(--primary-color);width:20px;"></i>
+                  <strong>${data.guestsWithoutPartyMembers}</strong> guests without party members
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>`;
+    } catch(e) {
+      console.error('Error loading guest summary:', e);
+      target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
+    }
+  }
+
+  // Day Menu sub-tab (day1 or day3)
+  async function showDayMenu(day) {
+    const target = getContentTarget();
+    setLoading(translate('admin:subtab.' + day + 'Menu'));
+    try {
+      const res = await api(`/api/admin/day-menus?lang=${getUserLanguage()}`);
+      const menus = res.ok ? await res.json() : [];
+      const menu = menus.find(m => m.day === day);
+
+      if (!menu) {
+        target.innerHTML = `
+          <div class="admin-content">
+            <h3><i class="fas fa-utensils"></i> ${translate('admin:subtab.' + day + 'Menu')}</h3>
+            <div style="text-align:center;padding:40px;">
+              <i class="fas fa-plus-circle" style="font-size:3em;color:var(--gray-300);margin-bottom:15px;"></i>
+              <p style="color:var(--text-light);">No menu configured for this day yet.</p>
+              <button class="btn btn-primary" id="createDayMenuBtn"><i class="fas fa-plus"></i> Create Menu</button>
+            </div>
+          </div>`;
+        target.querySelector('#createDayMenuBtn')?.addEventListener('click', async () => {
+          const r = await api('/api/admin/day-menus', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ day, sections: [{title:'Section 1',content:''},{title:'Section 2',content:''},{title:'Section 3',content:''}] }) });
+          if (r.ok) showDayMenu(day);
+        });
+        return;
+      }
+
+      const sections = (menu.sections || []).map((s, i) => `
+        <div class="admin-card" style="margin-bottom:15px;">
+          <h4>${s.title || 'Section ' + (i + 1)}</h4>
+          <p>${s.content || '<em style="color:var(--text-light);">No content yet</em>'}</p>
+          ${s.imageUrl ? '<img src="' + s.imageUrl + '" alt="Section image" style="max-width:200px;border-radius:8px;margin-top:8px;">' : ''}
+        </div>`).join('');
+
+      const chefHtml = menu.chefProfile ? `
+        <div class="admin-card" style="margin-bottom:20px;background:var(--gray-50);">
+          <h4><i class="fas fa-hat-chef"></i> Chef</h4>
+          <p><strong>${menu.chefProfile.name}</strong></p>
+          <p>${menu.chefProfile.bio || ''}</p>
+        </div>` : '';
+
+      target.innerHTML = `
+        <div class="admin-content">
+          <h3><i class="fas fa-utensils"></i> ${translate('admin:subtab.' + day + 'Menu')}</h3>
+          ${chefHtml}
+          ${sections || '<p style="color:var(--text-light);">No sections configured.</p>'}
+        </div>`;
+    } catch(e) {
+      console.error('Error loading day menu:', e);
+      target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
+    }
+  }
+
+  // Table Allocation sub-tab
+  async function showTableAllocation() {
+    const target = getContentTarget();
+    setLoading(translate('admin:subtab.tableAllocation'));
+    try {
+      // Fetch tables, guests, and assignments in parallel
+      const [tablesRes, guestsRes, assignmentsRes] = await Promise.all([
+        api('/api/admin/tables'),
+        api('/api/admin/guests?limit=999'),
+        api('/api/admin/table-assignments')
+      ]);
+      const tables = tablesRes.ok ? await tablesRes.json() : [];
+      const guestsData = guestsRes.ok ? await guestsRes.json() : { items: [] };
+      const guests = guestsData.items || [];
+      const assignments = assignmentsRes.ok ? await assignmentsRes.json() : [];
+
+      if (tables.length === 0) {
+        target.innerHTML = `
+          <div class="admin-content">
+            <h3><i class="fas fa-th"></i> ${translate('admin:subtab.tableAllocation')}</h3>
+            <div style="text-align:center;padding:40px;">
+              <i class="fas fa-chair" style="font-size:3em;color:var(--gray-300);margin-bottom:15px;"></i>
+              <p style="color:var(--text-light);">No tables configured yet.</p>
+              <button class="btn btn-primary" id="seedTablesBtn"><i class="fas fa-magic"></i> Seed Default Tables</button>
+            </div>
+          </div>`;
+        target.querySelector('#seedTablesBtn')?.addEventListener('click', async () => {
+          const r = await api('/api/admin/tables/seed', { method: 'POST' });
+          if (r.ok) showTableAllocation();
+          else notify('Failed to seed tables', 'error');
+        });
+        return;
+      }
+
+      const totalCapacity = tables.reduce((sum, t) => sum + (t.capacity || 0), 0);
+      const totalAssigned = tables.reduce((sum, t) => sum + (t.assignedCount || 0), 0);
+
+      const tableCards = tables.map(t => {
+        const pct = t.capacity > 0 ? Math.round((t.assignedCount / t.capacity) * 100) : 0;
+        const barColor = pct >= 100 ? '#dc3545' : pct >= 75 ? '#ffc107' : '#28a745';
+        const assignedNames = (t.fixedGuests || []).map(fg => `<span class="badge badge-primary" style="margin:2px;">${typeof fg === 'string' ? fg : (fg.name || fg)}</span>`).join('') +
+          (t.assignments || []).map(a => `<span class="badge badge-secondary" style="margin:2px;">${a.guestName}${a.partyMemberName ? ' (' + a.partyMemberName + ')' : ''}</span>`).join('');
+
+        return `
+          <div class="admin-card" style="margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <h4 style="margin:0;">${t.isHeadTable ? '<i class="fas fa-crown" style="color:gold;"></i> ' : ''}Table ${t.number} ${t.name ? '(' + t.name + ')' : ''}</h4>
+              <span style="font-size:0.85em;color:var(--text-light);">${t.assignedCount}/${t.capacity}</span>
+            </div>
+            <div style="background:var(--gray-200);border-radius:4px;height:6px;margin:8px 0;">
+              <div style="background:${barColor};width:${Math.min(pct, 100)}%;height:100%;border-radius:4px;"></div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:2px;">${assignedNames || '<span style="color:var(--text-light);font-size:0.85em;">No guests assigned</span>'}</div>
+          </div>`;
+      }).join('');
+
+      target.innerHTML = `
+        <div class="admin-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="margin:0;"><i class="fas fa-th"></i> ${translate('admin:subtab.tableAllocation')}</h3>
+          </div>
+          <div class="stats-grid" style="margin-bottom:20px;">
+            <div class="stat-card">
+              <div class="stat-number">${tables.length}</div>
+              <div class="stat-label">Tables</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">${totalCapacity}</div>
+              <div class="stat-label">Total Capacity</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">${totalAssigned}</div>
+              <div class="stat-label">Assigned</div>
+            </div>
+          </div>
+          ${tableCards}
+
+          <!-- Guest Assignment Grid -->
+          <div style="margin-top:30px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+              <h4 style="margin:0;"><i class="fas fa-users"></i> ${translate('admin:tables.guestAssignments')}</h4>
+              <button class="filter-btn" id="filterUnassignedBtn">${translate('admin:tables.showUnassigned')}</button>
+            </div>
+            <div class="assignment-grid">
+              <table class="data-table" id="assignmentTable">
+                <thead>
+                  <tr>
+                    <th>${translate('admin:tables.guest')}</th>
+                    <th>${translate('admin:tables.partyMember')}</th>
+                    <th>${translate('admin:tables.currentTable')}</th>
+                    <th>${translate('admin:tables.action')}</th>
+                  </tr>
+                </thead>
+                <tbody id="assignmentBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>`;
+
+      // Build assignment lookup: key = guestId or guestId+partyMemberName
+      const assignmentMap = {};
+      assignments.forEach(a => {
+        const key = a.partyMemberName ? `${a.guestId}_${a.partyMemberName}` : a.guestId;
+        assignmentMap[key] = a;
+      });
+
+      // Table options for dropdown
+      const tableOptions = tables.map(t => `<option value="${t.id}">${t.isHeadTable ? 'Head Table' : 'Table ' + t.number}${t.name ? ' (' + t.name + ')' : ''}</option>`).join('');
+
+      // Build guest rows
+      const tbody = target.querySelector('#assignmentBody');
+      let allRows = [];
+
+      guests.forEach(g => {
+        // Primary guest row
+        const primaryAssignment = assignmentMap[g.id];
+        const primaryTableId = primaryAssignment ? primaryAssignment.tableId : '';
+        const primaryAssignId = primaryAssignment ? primaryAssignment.id : '';
+        allRows.push({
+          isAssigned: !!primaryAssignment,
+          html: `<tr class="assignment-row" data-guest-id="${g.id}" data-assigned="${!!primaryAssignment}">
+            <td><strong>${g.name}</strong></td>
+            <td>—</td>
+            <td>${primaryAssignment ? (tables.find(t => t.id === primaryAssignment.tableId)?.name || 'Table ' + (tables.find(t => t.id === primaryAssignment.tableId)?.number || '?')) : '<span style="color:var(--text-light);">' + translate('admin:tables.unassigned') + '</span>'}</td>
+            <td>
+              <select class="table-assign-select" data-guest-id="${g.id}" data-party-member="" data-assignment-id="${primaryAssignId}">
+                <option value="">${translate('admin:tables.unassigned')}</option>
+                ${tableOptions}
+              </select>
+            </td>
+          </tr>`
+        });
+      });
+
+      if (tbody) {
+        tbody.innerHTML = allRows.map(r => r.html).join('');
+
+        // Set selected values for dropdowns
+        target.querySelectorAll('.table-assign-select').forEach(sel => {
+          const guestId = sel.dataset.guestId;
+          const partyMember = sel.dataset.partyMember;
+          const key = partyMember ? `${guestId}_${partyMember}` : guestId;
+          const assignment = assignmentMap[key];
+          if (assignment) sel.value = assignment.tableId;
+        });
+
+        // Handle dropdown changes
+        target.querySelectorAll('.table-assign-select').forEach(sel => {
+          sel.addEventListener('change', async function() {
+            const guestId = this.dataset.guestId;
+            const partyMember = this.dataset.partyMember || null;
+            const assignmentId = this.dataset.assignmentId;
+            const newTableId = this.value;
+
+            try {
+              if (!newTableId && assignmentId) {
+                // Unassign
+                await api(`/api/admin/table-assignments/${assignmentId}`, { method: 'DELETE' });
+              } else if (newTableId && !assignmentId) {
+                // New assignment
+                const body = { tableId: newTableId, guestId };
+                if (partyMember) body.partyMemberName = partyMember;
+                await api('/api/admin/table-assignments', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(body)
+                });
+              } else if (newTableId && assignmentId) {
+                // Move to different table
+                await api(`/api/admin/table-assignments/${assignmentId}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ tableId: newTableId })
+                });
+              }
+              showTableAllocation();
+            } catch (e) {
+              notify('Error updating assignment: ' + e.message, 'error');
+            }
+          });
+        });
+      }
+
+      // Filter button
+      let showUnassignedOnly = false;
+      target.querySelector('#filterUnassignedBtn')?.addEventListener('click', function() {
+        showUnassignedOnly = !showUnassignedOnly;
+        this.textContent = showUnassignedOnly ? translate('admin:tables.showAll') : translate('admin:tables.showUnassigned');
+        this.classList.toggle('active', showUnassignedOnly);
+        target.querySelectorAll('.assignment-row').forEach(row => {
+          if (showUnassignedOnly && row.dataset.assigned === 'true') {
+            row.style.display = 'none';
+          } else {
+            row.style.display = '';
+          }
+        });
+      });
+    } catch(e) {
+      console.error('Error loading tables:', e);
+      target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
+    }
+  }
+
+  // Menu Responses sub-tab
+  async function showMenuResponses() {
+    const target = getContentTarget();
+    setLoading(translate('admin:subtab.menuResponses'));
+    try {
+      const res = await api(`/api/admin/menu-responses?lang=${getUserLanguage()}`);
+      const tableGroups = res.ok ? await res.json() : [];
+
+      if (tableGroups.length === 0) {
+        target.innerHTML = `
+          <div class="admin-content">
+            <h3><i class="fas fa-clipboard-list"></i> ${translate('admin:subtab.menuResponses')}</h3>
+            <div style="text-align:center;padding:40px;">
+              <i class="fas fa-clipboard" style="font-size:3em;color:var(--gray-300);margin-bottom:15px;"></i>
+              <p style="color:var(--text-light);">No menu responses yet.</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      let totalResponses = 0;
+      const groupHtml = tableGroups.map(group => {
+        totalResponses += group.guests.length;
+        const guestRows = group.guests.map(g => {
+          const choiceLabels = (g.choices || []).map(c => c.optionLabel).filter(l => l && l !== '—').join(', ') || '—';
+          const specReq = g.specialRequest ? `<span class="badge badge-info">${g.specialRequest}</span>` : '';
+          return `<tr><td>${g.guestName}${g.partyMemberName ? ' <small>(' + g.partyMemberName + ')</small>' : ''}</td><td>${choiceLabels}</td><td>${specReq}${g.specialRequestDetail ? ' ' + g.specialRequestDetail : ''}</td></tr>`;
+        }).join('');
+
+        return `
+          <div class="admin-card" style="margin-bottom:15px;">
+            <h4>${group.tableName} ${group.tableNumber !== null ? '(#' + group.tableNumber + ')' : ''}</h4>
+            <table class="data-table">
+              <thead><tr><th>Guest</th><th>Menu Choices</th><th>Special Requests</th></tr></thead>
+              <tbody>${guestRows}</tbody>
+            </table>
+          </div>`;
+      }).join('');
+
+      target.innerHTML = `
+        <div class="admin-content">
+          <h3><i class="fas fa-clipboard-list"></i> ${translate('admin:subtab.menuResponses')} <span class="count-badge">${totalResponses}</span></h3>
+          ${groupHtml}
+        </div>`;
+    } catch(e) {
+      console.error('Error loading menu responses:', e);
+      target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
+    }
+  }
+
+  // Gift Purchases sub-tab
+  async function showGiftPurchases() {
+    const target = getContentTarget();
+    setLoading(translate('admin:subtab.giftPurchases'));
+    try {
+      const res = await api(`/api/admin/gift-purchases?lang=${getUserLanguage()}`);
+      const data = res.ok ? await res.json() : { purchases: [], totalAmount: 0 };
+
+      if (data.purchases.length === 0) {
+        target.innerHTML = `
+          <div class="admin-content">
+            <h3><i class="fas fa-shopping-cart"></i> ${translate('admin:subtab.giftPurchases')}</h3>
+            <div style="text-align:center;padding:40px;">
+              <i class="fas fa-gift" style="font-size:3em;color:var(--gray-300);margin-bottom:15px;"></i>
+              <p style="color:var(--text-light);">No gift purchases yet.</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const rows = data.purchases.map(p => {
+        const date = p.date ? new Date(p.date).toLocaleDateString() : '—';
+        return `<tr><td>${p.guestName}</td><td>${p.giftTitle}</td><td>€${p.giftAmount}</td><td>${date}</td><td>${p.message || '—'}</td></tr>`;
+      }).join('');
+
+      target.innerHTML = `
+        <div class="admin-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="margin:0;"><i class="fas fa-shopping-cart"></i> ${translate('admin:subtab.giftPurchases')}</h3>
+            <div class="stat-card" style="margin:0;">
+              <div class="stat-number">€${data.totalAmount}</div>
+              <div class="stat-label">Total</div>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead><tr><th>Guest</th><th>Gift</th><th>Amount</th><th>Date</th><th>Message</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>`;
+    } catch(e) {
+      console.error('Error loading gift purchases:', e);
+      target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
+    }
   }
 
   // Sub-event icon utilities
@@ -820,7 +1296,6 @@
 
   // ========== Guests ==========
   async function showGuests(){
-    activate('guests');
     setLoading(translate('admin:loadingGuests'));
     try {
       // Use pagination for large guest lists
@@ -856,7 +1331,7 @@
           </td>
         </tr>`).join('');
       
-      content.innerHTML = `
+      getContentTarget().innerHTML = `
         <div class="admin-content">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <div class="guest-summary" style="background:#f8f9fa;padding:15px;border-radius:8px;margin-top:15px;border-left:4px solid #28a745;">
@@ -889,7 +1364,7 @@
           </div>
         </div>`;
       
-      const tbody = content.querySelector('tbody');
+      const tbody = getContentTarget().querySelector('tbody');
       tbody.addEventListener('click', async (e)=>{
         const btn = e.target.closest('button'); if(!btn) return;
         const id = btn.dataset.id; const action = btn.dataset.action;
@@ -937,7 +1412,7 @@
         }
       });
       
-      content.querySelector('#addGuest').addEventListener('click', async ()=>{
+      getContentTarget().querySelector('#addGuest').addEventListener('click', async ()=>{
         openFormModal({
           title: translate('admin:guests.addTitle'),
           submitText: translate('admin:guests.add'),
@@ -968,7 +1443,7 @@
       });
 
       // Bulk upload CSV handler
-      content.querySelector('#bulkUploadGuests').addEventListener('click', async ()=>{
+      getContentTarget().querySelector('#bulkUploadGuests').addEventListener('click', async ()=>{
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.csv';
@@ -1029,7 +1504,7 @@
     } catch(e){ 
       console.error('Error loading guests:', e); 
       notify(translateWithVars('admin:guests.error.failed', { error: e.message }), 'error'); 
-      content.innerHTML = `
+      getContentTarget().innerHTML = `
         <div class="admin-content">
           <h3><div data-i18n="admin:tab.guests">
           ${translate('admin:tab.guests')}</div></h3>
@@ -1049,7 +1524,6 @@
 
   // ========== Party Management ==========
   async function showPartyManager(guestId, guestName){
-    activate('guests');
     setLoading(translate('admin:loadingPartyMembers'));
     
     try {
@@ -1092,7 +1566,7 @@
           <p><div data-i18n="admin:party.noMembers">${translate('admin:party.noMembers')}</div></p>
         </div>`;
       
-      content.innerHTML = `
+      getContentTarget().innerHTML = `
         <div class="admin-content">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
             <div>
@@ -1163,7 +1637,7 @@
       });
       
       // Handle party member actions
-      const tbody = content.querySelector('tbody');
+      const tbody = getContentTarget().querySelector('tbody');
       if (tbody) {
         tbody.addEventListener('click', async (e)=>{
           const btn = e.target.closest('button'); if(!btn) return;
@@ -1226,7 +1700,7 @@
     } catch(e){ 
       console.error('Error loading party:', e); 
       notify(translateWithVars('admin:party.error.loadingError', { error: e.message }), 'error'); 
-      content.innerHTML = `
+      getContentTarget().innerHTML = `
         <div class="admin-content">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
             <h3><div data-i18n="admin:party.title">${translateWithVars('admin:party.title', { guestName: guestName })}</div></h3>
@@ -1249,7 +1723,6 @@
 
   // ========== Gift list ==========
   async function showGifts(){
-    activate('gifts');
     setLoading(translate('admin:loadingGiftList'));
     
     // Load gifts 
@@ -1317,7 +1790,7 @@
     
     const allRows = rows + grandTotalRow;
       
-    content.innerHTML = renderTable({
+    getContentTarget().innerHTML = renderTable({
       title: `<div data-i18n="admin:gifts.title">${translate('admin:gifts.title')}</div>`, 
       columns:[
         `<div data-i18n="admin:gifts.table.title">${translate('admin:gifts.table.title')}</div>`,
@@ -1330,7 +1803,7 @@
       ]
     }, allRows, `<button id="addGift" class="admin-action"><i class="fas fa-plus"></i> <span data-i18n="admin:gifts.add">${translate('admin:gifts.add')}</span></button>`);
     
-    const tbody = content.querySelector('tbody');
+    const tbody = getContentTarget().querySelector('tbody');
     tbody.addEventListener('click', async (e)=>{
       const btn = e.target.closest('button'); if(!btn) return; 
       const id = btn.dataset.id; 
@@ -1474,7 +1947,7 @@
       }
     });
     
-    content.querySelector('#addGift').addEventListener('click', async ()=>{
+    getContentTarget().querySelector('#addGift').addEventListener('click', async ()=>{
       openFormModal({
         title: `<div data-i18n="admin:gifts.add">${translate('admin:gifts.add')}</div>`, 
         submitText: `<span data-i18n="admin:gifts.add">${translate('admin:gifts.add')}</span>`,
@@ -2256,11 +2729,16 @@
 
   // ========== Menu management ==========
   async function showMenu(){
-    activate('menu');
     setLoading(translate('admin:loadingCourses'));
     
     try {
-      const res = await api(`/api/admin/courseData?lang=${getUserLanguage()}`);
+      // Fetch chef profiles and course data in parallel
+      const [chefRes, res] = await Promise.all([
+        api(`/api/admin/chef-profiles?lang=${getUserLanguage()}`),
+        api(`/api/admin/courseData?lang=${getUserLanguage()}`)
+      ]);
+      const chefProfiles = chefRes.ok ? await chefRes.json() : [];
+      const banquetChef = chefProfiles.find(p => p.menuType === 'banquet') || null;
       const data = res.ok ? await res.json() : [];
       
       // Group by course type for better organization
@@ -2291,12 +2769,41 @@
         drinks: translate('admin:menu.courseType.drinks')
       };
       
+      // Build chef profile section
+      let chefSection = '';
+      if (banquetChef) {
+        chefSection = `
+          <div class="chef-profile-card">
+            <div class="chef-profile-header">
+              <h4><i class="fas fa-hat-chef"></i> ${translate('admin:chef.title')}</h4>
+              <div class="chef-profile-actions">
+                <button class="admin-action" onclick="openChefProfileForm('${banquetChef.id}')"><i class="fas fa-edit"></i></button>
+                <button class="admin-action danger" onclick="deleteChefProfile('${banquetChef.id}')"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>
+            <div class="chef-profile-body">
+              ${banquetChef.imageUrl ? `<img src="${banquetChef.imageUrl}" alt="${banquetChef.name}" class="chef-profile-photo">` : ''}
+              <div class="chef-profile-info">
+                <strong>${banquetChef.name}</strong>
+                <p>${banquetChef.bio || ''}</p>
+              </div>
+            </div>
+          </div>`;
+      } else {
+        chefSection = `
+          <div class="chef-profile-card" style="text-align:center;padding:20px;">
+            <i class="fas fa-hat-chef" style="font-size:2em;color:var(--gray-300);margin-bottom:10px;"></i>
+            <p style="color:var(--text-light);margin-bottom:10px;">${translate('admin:chef.title')}</p>
+            <button class="btn btn-primary" onclick="openChefProfileForm(null)"><i class="fas fa-plus"></i> ${translate('admin:chef.addProfile')}</button>
+          </div>`;
+      }
+
       let menuContent = `
         <div class="admin-content">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
             <h3 style="margin:0;"><div data-i18n="admin:menu.title">${translate('admin:menu.title')}</div></h3>
           </div>
-          
+          ${chefSection}
           <div class="menu-overview">
       `;
       
@@ -2385,17 +2892,17 @@
         </div>
       `;
       
-      content.innerHTML = menuContent;
+      getContentTarget().innerHTML = menuContent;
       
       // Add global add button handler
-      content.querySelector('#addMenuCourse')?.addEventListener('click', () => {
+      getContentTarget().querySelector('#addMenuCourse')?.addEventListener('click', () => {
         openAddMenuForm();
       });
       
     } catch(e) { 
       console.error('Error loading menu:', e); 
       notify('Error loading menu: ' + e.message, 'error'); 
-      content.innerHTML = `
+      getContentTarget().innerHTML = `
         <div class="admin-content">
           <div class="error-message">
             <i class="fas fa-exclamation-triangle"></i>
@@ -2449,6 +2956,88 @@
       }
     } catch (error) {
       notify(translateWithVars('admin:menu.errorDeletingOption', { error: error.message }), 'error');
+    }
+  };
+
+  // Chef profile management
+  window.openChefProfileForm = function(existingId) {
+    const loadAndShow = async () => {
+      let existing = null;
+      if (existingId) {
+        try {
+          const res = await api(`/api/admin/chef-profiles?lang=${getUserLanguage()}`);
+          if (res.ok) {
+            const profiles = await res.json();
+            existing = profiles.find(p => p.id === existingId) || null;
+          }
+        } catch (e) { console.error('Error loading chef profile:', e); }
+      }
+
+      openFormModal({
+        title: existing ? translate('admin:chef.editProfile') : translate('admin:chef.addProfile'),
+        submitText: existing ? translate('admin:menu.save') : translate('admin:menu.add'),
+        fields: [
+          { name: 'name', label: translate('admin:chef.name'), required: true },
+          { name: 'bio', label: translate('admin:chef.bio'), type: 'textarea', rows: 4 },
+          { name: 'image', label: translate('admin:chef.photo'), type: 'file' }
+        ],
+        initialValues: {
+          name: existing?.name || '',
+          bio: existing?.bio || ''
+        },
+        onSubmit: async (values, close) => {
+          try {
+            // Handle image upload if a file was selected
+            let imageRef = null;
+            const imageFile = document.getElementById('f_image')?.files[0];
+            if (imageFile) {
+              const formData = new FormData();
+              formData.append('image', imageFile);
+              const uploadRes = await fetch('/api/admin/chef-profiles/upload-image', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+              });
+              if (uploadRes.ok) {
+                const uploadData = await uploadRes.json();
+                imageRef = { imageId: uploadData.imageId };
+              }
+            }
+
+            const body = { name: values.name, bio: values.bio, menuType: 'banquet' };
+            if (imageRef) body.image = imageRef;
+
+            const url = existing ? `/api/admin/chef-profiles/${existing.id}` : '/api/admin/chef-profiles';
+            const method = existing ? 'PUT' : 'POST';
+
+            const r = await api(url, {
+              method,
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body)
+            });
+
+            if (!r.ok) {
+              const errData = await r.json().catch(() => ({}));
+              throw new Error(errData.error || 'Failed to save chef profile');
+            }
+
+            close();
+            showMenu();
+          } catch (error) { throw error; }
+        }
+      });
+    };
+    loadAndShow();
+  };
+
+  window.deleteChefProfile = async function(id) {
+    if (!confirm(translate('admin:chef.deleteConfirm'))) return;
+    try {
+      const r = await api(`/api/admin/chef-profiles/${id}`, { method: 'DELETE' });
+      if (r.ok) showMenu();
+      else notify('Failed to delete chef profile', 'error');
+    } catch (e) {
+      notify('Error deleting chef profile: ' + e.message, 'error');
     }
   };
 
@@ -2819,14 +3408,25 @@
   // Router for tabs
   function showTab(tab){
     localStorage.setItem('adminPage', tab);
+    activate(tab);
 
-    
+    // Tabs with sub-tabs: render sub-tab bar then dispatch
+    if (SUB_TABS[tab]) {
+      content.innerHTML = renderSubTabs(tab);
+      // Attach click handlers to sub-tab buttons
+      document.querySelectorAll('.sub-tab').forEach(btn => {
+        btn.addEventListener('click', () => showSubTab(tab, btn.dataset.subtab));
+      });
+      // Show the saved or default sub-tab
+      const savedSubTab = localStorage.getItem('adminSubPage_' + tab) || SUB_TABS[tab][0].id;
+      showSubTab(tab, savedSubTab);
+      return;
+    }
+
+    // Tabs without sub-tabs: direct dispatch
     switch(tab){
-      case 'guests': return showGuests();
-      case 'gifts': return showGifts();
       case 'messages': return showMessages();
       case 'event': return showEvent();
-      case 'menu': return showMenu();
       case 'configuration': return showSettings();
       default:
         setLoading(translate('admin:loading'));

@@ -1,0 +1,674 @@
+const { Guest, Event, EventChoice, MenuChoice, ChefProfile, ChefProfileImage, DayMenu, DayMenuImage, Table, TableAssignment, GiftChoice, Gift, Course, CourseOption } = require('../models');
+const { mergeLocalizedString, localize, getLang } = require('../utils/localized');
+const fs = require('fs');
+const path = require('path');
+
+// ========== Guest Summary ==========
+async function getGuestSummary(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const guests = await Guest.find({}).lean();
+    const events = await Event.find({}).lean();
+    const eventChoices = await EventChoice.find({}).lean();
+    const menuChoices = await MenuChoice.find({}).lean();
+
+    // Total guests = primary guests + all their party members
+    let totalGuests = 0;
+    let totalAdults = 0;
+    let totalChildren = 0;
+    const guestIds = new Set();
+
+    guests.forEach(g => {
+      guestIds.add(g._id.toString());
+      // Count primary guest
+      totalGuests++;
+      if (g.adult !== false) totalAdults++;
+      else totalChildren++;
+      // Count party members
+      if (g.partyMembers && g.partyMembers.length > 0) {
+        g.partyMembers.forEach(pm => {
+          totalGuests++;
+          if (pm.adult !== false) totalAdults++;
+          else totalChildren++;
+        });
+      }
+    });
+
+    // Per-event attendance
+    const perEventAttendance = events.map(event => {
+      let count = 0;
+      eventChoices.forEach(ec => {
+        if (ec.partyChoices) {
+          ec.partyChoices.forEach(pc => {
+            if (pc.choices) {
+              pc.choices.forEach(c => {
+                if (c.eventId && c.eventId.toString() === event._id.toString() && c.attending) {
+                  count++;
+                }
+              });
+            }
+          });
+        }
+      });
+      return {
+        eventId: event._id.toString(),
+        eventName: localize(event.name, lang),
+        count
+      };
+    });
+
+    // Guests without menu choices
+    const guestsWithMenuChoices = new Set(menuChoices.map(mc => mc.guestId.toString()));
+    const guestsWithoutMenuChoices = guests.filter(g => !guestsWithMenuChoices.has(g._id.toString())).length;
+
+    // Guests without party members
+    const guestsWithoutPartyMembers = guests.filter(g => !g.partyMembers || g.partyMembers.length === 0).length;
+
+    // Guests without event choices
+    const guestsWithEventChoices = new Set(eventChoices.map(ec => ec.guestId.toString()));
+    const guestsWithoutEventChoices = guests.filter(g => !guestsWithEventChoices.has(g._id.toString())).length;
+
+    res.json({
+      totalGuests,
+      totalAdults,
+      totalChildren,
+      perEventAttendance,
+      guestsWithoutMenuChoices,
+      guestsWithoutPartyMembers,
+      guestsWithoutEventChoices
+    });
+  } catch (e) { next(e); }
+}
+
+// ========== Chef Profiles ==========
+async function listChefProfiles(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const profiles = await ChefProfile.find({}).populate('image').lean();
+    const items = profiles.map(p => ({
+      id: p._id.toString(),
+      name: localize(p.name, lang),
+      bio: localize(p.bio, lang),
+      menuType: p.menuType,
+      imageUrl: p.image ? `/api/admin/chef-profiles/${p._id}/image` : null
+    }));
+    res.json(items);
+  } catch (e) { next(e); }
+}
+
+async function createChefProfile(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const { name, bio, menuType, image } = req.body;
+
+    if (!name || !menuType) {
+      return res.status(400).json({ error: 'name and menuType are required' });
+    }
+
+    let imageRef;
+    if (image && image.imageId) {
+      imageRef = image.imageId;
+    }
+
+    const profile = new ChefProfile({ menuType, image: imageRef });
+    profile.name = mergeLocalizedString(undefined, name, lang);
+    profile.bio = mergeLocalizedString(undefined, bio, lang);
+    await profile.save();
+
+    res.status(201).json({
+      id: profile._id.toString(),
+      name: localize(profile.name, lang),
+      bio: localize(profile.bio, lang),
+      menuType: profile.menuType,
+      imageUrl: profile.image ? `/api/admin/chef-profiles/${profile._id}/image` : null
+    });
+  } catch (e) { next(e); }
+}
+
+async function updateChefProfile(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const { id } = req.params;
+    const { name, bio, menuType, image } = req.body;
+
+    const profile = await ChefProfile.findById(id);
+    if (!profile) return res.status(404).json({ error: 'ChefProfile not found' });
+
+    if (name !== undefined) profile.name = mergeLocalizedString(profile.name, name, lang);
+    if (bio !== undefined) profile.bio = mergeLocalizedString(profile.bio, bio, lang);
+    if (menuType !== undefined) profile.menuType = menuType;
+    if (image !== undefined) {
+      if (image && image.imageId) profile.image = image.imageId;
+      else if (!image) profile.image = undefined;
+    }
+
+    await profile.save();
+    res.json({
+      id: profile._id.toString(),
+      name: localize(profile.name, lang),
+      bio: localize(profile.bio, lang),
+      menuType: profile.menuType,
+      imageUrl: profile.image ? `/api/admin/chef-profiles/${profile._id}/image` : null
+    });
+  } catch (e) { next(e); }
+}
+
+async function deleteChefProfile(req, res, next) {
+  try {
+    const { id } = req.params;
+    await ChefProfile.findByIdAndDelete(id);
+    res.json({ status: 'ok' });
+  } catch (e) { next(e); }
+}
+
+async function uploadChefProfileImage(req, res, next) {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No image file provided' });
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(req.file.mimetype)) {
+      return res.status(400).json({ error: 'Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.' });
+    }
+
+    const imageData = fs.readFileSync(req.file.path);
+    fs.unlinkSync(req.file.path);
+
+    const img = await ChefProfileImage.create({
+      data: imageData,
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+
+    res.json({
+      imageId: img._id.toString(),
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+  } catch (e) { next(e); }
+}
+
+async function getChefProfileImage(req, res, next) {
+  try {
+    const { id } = req.params;
+    const profile = await ChefProfile.findById(id).populate('image').lean();
+    if (!profile || !profile.image || !profile.image.data) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+    res.setHeader('Content-Type', profile.image.contentType);
+    res.setHeader('Content-Length', profile.image.data.length);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(profile.image.data);
+  } catch (e) { next(e); }
+}
+
+// ========== Day Menus ==========
+async function listDayMenus(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const menus = await DayMenu.find({}).populate('chefProfile').lean();
+    const items = menus.map(m => ({
+      id: m._id.toString(),
+      day: m.day,
+      sections: (m.sections || []).map((s, i) => ({
+        title: localize(s.title, lang),
+        content: localize(s.content, lang),
+        imageUrl: s.image ? `/api/admin/day-menus/${m._id}/section-image/${i}` : null
+      })),
+      chefProfile: m.chefProfile ? {
+        id: m.chefProfile._id.toString(),
+        name: localize(m.chefProfile.name, lang),
+        bio: localize(m.chefProfile.bio, lang)
+      } : null
+    }));
+    res.json(items);
+  } catch (e) { next(e); }
+}
+
+async function getDayMenu(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const { id } = req.params;
+    const m = await DayMenu.findById(id).populate('chefProfile').lean();
+    if (!m) return res.status(404).json({ error: 'DayMenu not found' });
+    res.json({
+      id: m._id.toString(),
+      day: m.day,
+      sections: (m.sections || []).map((s, i) => ({
+        title: localize(s.title, lang),
+        content: localize(s.content, lang),
+        imageUrl: s.image ? `/api/admin/day-menus/${m._id}/section-image/${i}` : null
+      })),
+      chefProfile: m.chefProfile ? {
+        id: m.chefProfile._id.toString(),
+        name: localize(m.chefProfile.name, lang),
+        bio: localize(m.chefProfile.bio, lang)
+      } : null
+    });
+  } catch (e) { next(e); }
+}
+
+async function createDayMenu(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const { day, sections, chefProfile } = req.body;
+
+    if (!day) return res.status(400).json({ error: 'day is required' });
+
+    const menuSections = (sections || []).slice(0, 3).map(s => {
+      const sec = {};
+      sec.title = mergeLocalizedString(undefined, s.title, lang);
+      sec.content = mergeLocalizedString(undefined, s.content, lang);
+      if (s.image && s.image.imageId) sec.image = s.image.imageId;
+      return sec;
+    });
+
+    const menu = await DayMenu.create({
+      day,
+      sections: menuSections,
+      chefProfile: chefProfile || undefined
+    });
+
+    res.status(201).json({
+      id: menu._id.toString(),
+      day: menu.day,
+      sections: (menu.sections || []).map((s, i) => ({
+        title: localize(s.title, lang),
+        content: localize(s.content, lang),
+        imageUrl: s.image ? `/api/admin/day-menus/${menu._id}/section-image/${i}` : null
+      }))
+    });
+  } catch (e) { next(e); }
+}
+
+async function updateDayMenu(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const { id } = req.params;
+    const { day, sections, chefProfile } = req.body;
+
+    const menu = await DayMenu.findById(id);
+    if (!menu) return res.status(404).json({ error: 'DayMenu not found' });
+
+    if (day !== undefined) menu.day = day;
+    if (chefProfile !== undefined) menu.chefProfile = chefProfile || undefined;
+
+    if (Array.isArray(sections)) {
+      const existingSections = Array.isArray(menu.sections) ? menu.sections : [];
+      menu.sections = sections.slice(0, 3).map((s, i) => {
+        const existing = existingSections[i];
+        const base = existing && existing.toObject ? existing.toObject() : (existing || {});
+        return {
+          title: mergeLocalizedString(base.title, s.title, lang),
+          content: mergeLocalizedString(base.content, s.content, lang),
+          image: s.image && s.image.imageId ? s.image.imageId : base.image
+        };
+      });
+    }
+
+    await menu.save();
+    res.json({
+      id: menu._id.toString(),
+      day: menu.day,
+      sections: (menu.sections || []).map((s, i) => ({
+        title: localize(s.title, lang),
+        content: localize(s.content, lang),
+        imageUrl: s.image ? `/api/admin/day-menus/${menu._id}/section-image/${i}` : null
+      }))
+    });
+  } catch (e) { next(e); }
+}
+
+async function deleteDayMenu(req, res, next) {
+  try {
+    const { id } = req.params;
+    await DayMenu.findByIdAndDelete(id);
+    res.json({ status: 'ok' });
+  } catch (e) { next(e); }
+}
+
+async function uploadDayMenuImage(req, res, next) {
+  try {
+    if (!req.file) return res.status(400).json({ error: 'No image file provided' });
+
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(req.file.mimetype)) {
+      return res.status(400).json({ error: 'Invalid file type.' });
+    }
+
+    const imageData = fs.readFileSync(req.file.path);
+    fs.unlinkSync(req.file.path);
+
+    const img = await DayMenuImage.create({
+      data: imageData,
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+
+    res.json({
+      imageId: img._id.toString(),
+      contentType: req.file.mimetype,
+      originalName: req.file.originalname,
+      size: req.file.size
+    });
+  } catch (e) { next(e); }
+}
+
+async function getDayMenuImage(req, res, next) {
+  try {
+    const { dayMenuId } = req.params;
+    const img = await DayMenuImage.findById(dayMenuId).lean();
+    if (!img || !img.data) return res.status(404).json({ error: 'Image not found' });
+    res.setHeader('Content-Type', img.contentType);
+    res.setHeader('Content-Length', img.data.length);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(img.data);
+  } catch (e) { next(e); }
+}
+
+// ========== Tables ==========
+async function listTables(req, res, next) {
+  try {
+    const tables = await Table.find({}).sort({ number: 1 }).lean();
+    const assignments = await TableAssignment.find({}).populate('guestId', 'name email').lean();
+
+    const items = tables.map(t => {
+      const tableAssignments = assignments.filter(a => a.tableId.toString() === t._id.toString());
+      return {
+        id: t._id.toString(),
+        number: t.number,
+        name: t.name,
+        capacity: t.capacity,
+        isHeadTable: t.isHeadTable,
+        fixedGuests: t.fixedGuests || [],
+        assignedCount: tableAssignments.length + (t.fixedGuests ? t.fixedGuests.length : 0),
+        assignments: tableAssignments.map(a => ({
+          id: a._id.toString(),
+          guestName: a.guestId ? a.guestId.name : 'Unknown',
+          partyMemberName: a.partyMemberName
+        }))
+      };
+    });
+    res.json(items);
+  } catch (e) { next(e); }
+}
+
+async function createTable(req, res, next) {
+  try {
+    const { number, name, capacity, isHeadTable, fixedGuests } = req.body;
+    const table = await Table.create({ number, name, capacity, isHeadTable, fixedGuests });
+    res.status(201).json({
+      id: table._id.toString(),
+      number: table.number,
+      name: table.name,
+      capacity: table.capacity,
+      isHeadTable: table.isHeadTable,
+      fixedGuests: table.fixedGuests || []
+    });
+  } catch (e) { next(e); }
+}
+
+async function updateTable(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { number, name, capacity, isHeadTable, fixedGuests } = req.body;
+    const table = await Table.findById(id);
+    if (!table) return res.status(404).json({ error: 'Table not found' });
+
+    if (number !== undefined) table.number = number;
+    if (name !== undefined) table.name = name;
+    if (capacity !== undefined) table.capacity = capacity;
+    if (isHeadTable !== undefined) table.isHeadTable = isHeadTable;
+    if (fixedGuests !== undefined) table.fixedGuests = fixedGuests;
+
+    await table.save();
+    res.json({
+      id: table._id.toString(),
+      number: table.number,
+      name: table.name,
+      capacity: table.capacity,
+      isHeadTable: table.isHeadTable,
+      fixedGuests: table.fixedGuests || []
+    });
+  } catch (e) { next(e); }
+}
+
+async function deleteTable(req, res, next) {
+  try {
+    const { id } = req.params;
+    await Table.findByIdAndDelete(id);
+    await TableAssignment.deleteMany({ tableId: id });
+    res.json({ status: 'ok' });
+  } catch (e) { next(e); }
+}
+
+async function seedTables(req, res, next) {
+  try {
+    const count = await Table.countDocuments();
+    if (count > 0) {
+      return res.status(400).json({ error: 'Tables already exist. Delete all tables first to re-seed.' });
+    }
+
+    const dataPath = path.join(__dirname, '../data/Tables.json');
+    const data = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+    await Table.insertMany(data);
+    res.json({ status: 'ok', seeded: data.length });
+  } catch (e) { next(e); }
+}
+
+// ========== Table Assignments ==========
+async function listTableAssignments(req, res, next) {
+  try {
+    const assignments = await TableAssignment.find({})
+      .populate('guestId', 'name email')
+      .populate('tableId', 'number name')
+      .lean();
+
+    const items = assignments.map(a => ({
+      id: a._id.toString(),
+      tableId: a.tableId ? a.tableId._id.toString() : null,
+      tableNumber: a.tableId ? a.tableId.number : null,
+      tableName: a.tableId ? a.tableId.name : null,
+      guestId: a.guestId ? a.guestId._id.toString() : null,
+      guestName: a.guestId ? a.guestId.name : 'Unknown',
+      partyMemberName: a.partyMemberName || null
+    }));
+    res.json(items);
+  } catch (e) { next(e); }
+}
+
+async function createTableAssignment(req, res, next) {
+  try {
+    const { tableId, guestId, partyMemberName } = req.body;
+    if (!tableId || !guestId) {
+      return res.status(400).json({ error: 'tableId and guestId are required' });
+    }
+
+    const assignment = await TableAssignment.create({
+      tableId,
+      guestId,
+      partyMemberName: partyMemberName || null
+    });
+
+    res.status(201).json({
+      id: assignment._id.toString(),
+      tableId: assignment.tableId.toString(),
+      guestId: assignment.guestId.toString(),
+      partyMemberName: assignment.partyMemberName
+    });
+  } catch (e) { next(e); }
+}
+
+async function updateTableAssignment(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { tableId, guestId, partyMemberName } = req.body;
+
+    const assignment = await TableAssignment.findById(id);
+    if (!assignment) return res.status(404).json({ error: 'Assignment not found' });
+
+    if (tableId !== undefined) assignment.tableId = tableId;
+    if (guestId !== undefined) assignment.guestId = guestId;
+    if (partyMemberName !== undefined) assignment.partyMemberName = partyMemberName || null;
+
+    await assignment.save();
+    res.json({
+      id: assignment._id.toString(),
+      tableId: assignment.tableId.toString(),
+      guestId: assignment.guestId.toString(),
+      partyMemberName: assignment.partyMemberName
+    });
+  } catch (e) { next(e); }
+}
+
+async function deleteTableAssignment(req, res, next) {
+  try {
+    const { id } = req.params;
+    await TableAssignment.findByIdAndDelete(id);
+    res.json({ status: 'ok' });
+  } catch (e) { next(e); }
+}
+
+async function bulkAssignTables(req, res, next) {
+  try {
+    const { assignments } = req.body;
+    if (!Array.isArray(assignments)) {
+      return res.status(400).json({ error: 'assignments array is required' });
+    }
+
+    const results = [];
+    for (const a of assignments) {
+      try {
+        const created = await TableAssignment.create({
+          tableId: a.tableId,
+          guestId: a.guestId,
+          partyMemberName: a.partyMemberName || null
+        });
+        results.push({ id: created._id.toString(), status: 'ok' });
+      } catch (err) {
+        results.push({ guestId: a.guestId, error: err.message });
+      }
+    }
+    res.json({ results });
+  } catch (e) { next(e); }
+}
+
+// ========== Menu Responses ==========
+async function getMenuResponses(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const menuChoices = await MenuChoice.find({}).populate('guestId', 'name email').lean();
+    const assignments = await TableAssignment.find({}).populate('tableId', 'number name').lean();
+    const courses = await Course.find({}).lean();
+    const courseOptions = await CourseOption.find({}).lean();
+
+    // Build option label lookup
+    const optionLabelMap = {};
+    courseOptions.forEach(o => {
+      optionLabelMap[o._id.toString()] = localize(o.label, lang);
+    });
+
+    // Build assignment lookup: guestId+partyMemberName -> table
+    const assignmentMap = {};
+    assignments.forEach(a => {
+      const key = a.guestId.toString() + '|' + (a.partyMemberName || '');
+      assignmentMap[key] = a.tableId ? {
+        tableNumber: a.tableId.number,
+        tableName: a.tableId.name
+      } : null;
+    });
+
+    // Group by table
+    const tableGroups = {};
+
+    menuChoices.forEach(mc => {
+      if (!mc.guestId) return;
+      const guestName = mc.guestId.name || mc.guestId.email;
+
+      (mc.partyChoices || []).forEach(pc => {
+        const isGuest = pc.partyGuestId === mc.guestId._id.toString();
+        const pmName = isGuest ? null : pc.partyGuestId;
+        const key = mc.guestId._id.toString() + '|' + (pmName || '');
+        const table = assignmentMap[key] || { tableNumber: null, tableName: 'Unassigned' };
+        const tableKey = table.tableNumber !== null ? String(table.tableNumber) : 'unassigned';
+
+        if (!tableGroups[tableKey]) {
+          tableGroups[tableKey] = {
+            tableNumber: table.tableNumber,
+            tableName: table.tableName || (table.tableNumber !== null ? 'Table ' + table.tableNumber : 'Unassigned'),
+            guests: []
+          };
+        }
+
+        const choices = (pc.choices || []).map(c => ({
+          courseId: c.courseId ? c.courseId.toString() : null,
+          optionId: c.optionId ? c.optionId.toString() : null,
+          optionLabel: c.optionId ? (optionLabelMap[c.optionId.toString()] || '—') : '—'
+        }));
+
+        const specialReqs = (pc.specialRequests || []).filter(sr => sr.selected).map(sr => sr.name);
+
+        tableGroups[tableKey].guests.push({
+          guestName: isGuest ? guestName : guestName,
+          partyMemberName: pmName,
+          choices,
+          specialRequest: specialReqs.join(', ') || null,
+          specialRequestDetail: pc.specialRequestDetail || null
+        });
+      });
+    });
+
+    // Sort: numbered tables first, then unassigned
+    const result = Object.values(tableGroups).sort((a, b) => {
+      if (a.tableNumber === null) return 1;
+      if (b.tableNumber === null) return -1;
+      return a.tableNumber - b.tableNumber;
+    });
+
+    res.json(result);
+  } catch (e) { next(e); }
+}
+
+// ========== Gift Purchases ==========
+async function getGiftPurchases(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const giftChoices = await GiftChoice.find({})
+      .populate('giftId', 'title amount')
+      .populate('guestId', 'name email')
+      .sort({ date: -1 })
+      .lean();
+
+    let totalAmount = 0;
+    const purchases = giftChoices.map(choice => {
+      const amount = choice.giftId ? choice.giftId.amount : 0;
+      totalAmount += amount;
+      return {
+        guestId: choice.guestId ? choice.guestId._id.toString() : null,
+        guestName: choice.guestId ? (choice.guestId.name || choice.guestId.email) : 'Unknown',
+        guestEmail: choice.guestId ? choice.guestId.email : null,
+        giftId: choice.giftId ? choice.giftId._id.toString() : null,
+        giftTitle: choice.giftId ? localize(choice.giftId.title, lang) : 'Unknown',
+        giftAmount: amount,
+        date: choice.date ? choice.date.toISOString() : null,
+        message: choice.message || null
+      };
+    });
+
+    res.json({ purchases, totalAmount });
+  } catch (e) { next(e); }
+}
+
+module.exports = {
+  getGuestSummary,
+  listChefProfiles, createChefProfile, updateChefProfile, deleteChefProfile,
+  uploadChefProfileImage, getChefProfileImage,
+  listDayMenus, getDayMenu, createDayMenu, updateDayMenu, deleteDayMenu,
+  uploadDayMenuImage, getDayMenuImage,
+  listTables, createTable, updateTable, deleteTable, seedTables,
+  listTableAssignments, createTableAssignment, updateTableAssignment, deleteTableAssignment, bulkAssignTables,
+  getMenuResponses,
+  getGiftPurchases
+};

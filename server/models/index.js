@@ -14,4 +14,10 @@ module.exports = {
   GiftImage: require('./GiftImage'),
   GiftChoice: require('./GiftChoice'),
   Config: require('./Config'),
+  ChefProfile: require('./ChefProfile'),
+  ChefProfileImage: require('./ChefProfileImage'),
+  DayMenu: require('./DayMenu'),
+  DayMenuImage: require('./DayMenuImage'),
+  Table: require('./Table'),
+  TableAssignment: require('./TableAssignment'),
 };

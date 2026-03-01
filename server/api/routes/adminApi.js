@@ -3,6 +3,7 @@ const { auth } = require('../../auth/middleware');
 const guestCtrl = require('../../controllers/guestController');
 const adminCtrl = require('../../controllers/adminController');
 const messageCtrl = require('../../controllers/messageController');
+const adminExpCtrl = require('../../controllers/adminExpansionController');
 const multer = require('multer');
 const os = require('os');
 
@@ -247,5 +248,47 @@ router.get('/gift-choices', auth('admin'), adminCtrl.getGiftChoices);
 // Settings / Feature Toggles - GET is public, PUT requires admin
 router.get('/settings', adminCtrl.getSettings);
 router.put('/settings', auth('admin'), adminCtrl.updateSettings);
+
+// ========== Admin Expansion Routes ==========
+
+// Guest Summary
+router.get('/guest-summary', auth('admin'), adminExpCtrl.getGuestSummary);
+
+// Chef Profiles
+router.get('/chef-profiles', auth('admin'), adminExpCtrl.listChefProfiles);
+router.post('/chef-profiles', auth('admin'), adminExpCtrl.createChefProfile);
+router.put('/chef-profiles/:id', auth('admin'), adminExpCtrl.updateChefProfile);
+router.delete('/chef-profiles/:id', auth('admin'), adminExpCtrl.deleteChefProfile);
+router.post('/chef-profiles/upload-image', auth('admin'), upload.single('image'), adminExpCtrl.uploadChefProfileImage);
+router.get('/chef-profiles/:id/image', auth('admin'), adminExpCtrl.getChefProfileImage);
+
+// Day Menus
+router.get('/day-menus', auth('admin'), adminExpCtrl.listDayMenus);
+router.get('/day-menus/:id', auth('admin'), adminExpCtrl.getDayMenu);
+router.post('/day-menus', auth('admin'), adminExpCtrl.createDayMenu);
+router.put('/day-menus/:id', auth('admin'), adminExpCtrl.updateDayMenu);
+router.delete('/day-menus/:id', auth('admin'), adminExpCtrl.deleteDayMenu);
+router.post('/day-menus/upload-image', auth('admin'), upload.single('image'), adminExpCtrl.uploadDayMenuImage);
+router.get('/day-menus/:dayMenuId/image', auth('admin'), adminExpCtrl.getDayMenuImage);
+
+// Tables
+router.get('/tables', auth('admin'), adminExpCtrl.listTables);
+router.post('/tables', auth('admin'), adminExpCtrl.createTable);
+router.put('/tables/:id', auth('admin'), adminExpCtrl.updateTable);
+router.delete('/tables/:id', auth('admin'), adminExpCtrl.deleteTable);
+router.post('/tables/seed', auth('admin'), adminExpCtrl.seedTables);
+
+// Table Assignments
+router.get('/table-assignments', auth('admin'), adminExpCtrl.listTableAssignments);
+router.post('/table-assignments', auth('admin'), adminExpCtrl.createTableAssignment);
+router.put('/table-assignments/:id', auth('admin'), adminExpCtrl.updateTableAssignment);
+router.delete('/table-assignments/:id', auth('admin'), adminExpCtrl.deleteTableAssignment);
+router.post('/table-assignments/bulk', auth('admin'), adminExpCtrl.bulkAssignTables);
+
+// Menu Responses
+router.get('/menu-responses', auth('admin'), adminExpCtrl.getMenuResponses);
+
+// Gift Purchases
+router.get('/gift-purchases', auth('admin'), adminExpCtrl.getGiftPurchases);
 
 module.exports = router;

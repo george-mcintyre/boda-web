@@ -14,9 +14,13 @@ async function ensureCollectionsAndIndexes() {
   const desired = {
     Admin: models.Admin,
     Config: models.Config,
+    ChefProfile: models.ChefProfile,
+    ChefProfileImage: models.ChefProfileImage,
     Course: models.Course,
     CourseOption: models.CourseOption,
     CourseOptionImage: models.CourseOptionImage,
+    DayMenu: models.DayMenu,
+    DayMenuImage: models.DayMenuImage,
     Event: models.Event,
     EventChoice: models.EventChoice,
     EventImage: models.EventImage,
@@ -26,6 +30,8 @@ async function ensureCollectionsAndIndexes() {
     Guest: models.Guest,
     MenuChoice: models.MenuChoice,
     Message: models.Message,
+    Table: models.Table,
+    TableAssignment: models.TableAssignment,
   };
 
   // Map model names to collection names as Mongoose would create them
