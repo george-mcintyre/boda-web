@@ -596,7 +596,8 @@ async function getMenuResponses(req, res, next) {
       const key = a.guestId.toString() + '|' + (a.partyMemberName || '');
       assignmentMap[key] = a.tableId ? {
         tableNumber: a.tableId.number,
-        tableName: a.tableId.name
+        tableName: a.tableId.name,
+        isHeadTable: a.tableId.isHeadTable || false
       } : null;
     });
 
@@ -611,13 +612,14 @@ async function getMenuResponses(req, res, next) {
         const isGuest = pc.partyGuestId === mc.guestId._id.toString();
         const pmName = isGuest ? null : pc.partyGuestId;
         const key = mc.guestId._id.toString() + '|' + (pmName || '');
-        const table = assignmentMap[key] || { tableNumber: null, tableName: null };
+        const table = assignmentMap[key] || { tableNumber: null, tableName: null, isHeadTable: false };
         const tableKey = table.tableNumber !== null ? String(table.tableNumber) : 'unassigned';
 
         if (!tableGroups[tableKey]) {
           tableGroups[tableKey] = {
             tableNumber: table.tableNumber,
             tableName: table.tableName || null,
+            isHeadTable: table.isHeadTable || false,
             guests: []
           };
         }

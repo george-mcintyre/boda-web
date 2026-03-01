@@ -297,6 +297,17 @@ const translations = {
     'guests:menuErrorTitle': 'Error Loading Menu',
     'guests:menuErrorMessage': 'Unable to load menu data. Please try again later.',
     'guests:menuErrorMessage2': 'There was a problem loading the menu. Please try again.',
+    
+    // Menu Sub-navigation
+    'guests:mainBanquet': 'Main Banquet',
+    'guests:welcomeCocktails': 'Welcome Cocktails',
+    'guests:weddingBrunch': 'Wedding Brunch',
+    
+    // Menu titles and descriptions
+    'guests:mainBanquetTitle': 'Main Banquet - Make Your Selections',
+    'guests:mainBanquetDescription': 'Please select your meal preferences for each course. Drag and drop guests to their chosen options.',
+    'guests:meetTheChef': 'Meet The Chef',
+    'guests:menuInfoNotAvailable': 'Menu information not yet available.',
     'guests:retry': 'Retry',
     'guests:courseGroupWelcomeCocktails': 'Welcome Cocktails',
     'guests:courseGroupStarters': 'Starters',
@@ -587,6 +598,8 @@ const translations = {
     'admin:menu.field.helpSpicy': 'This option contains spicy ingredients',
     'admin:menu.field.helpNuts': 'This option may contain nuts',
 
+    // Admin Day Menus
+    'admin:dayMenu.noMenuConfigured': 'No menu configured for this day yet.',
     //--------------------------------
     // Admin Gifts Section
     //--------------------------------
@@ -1012,6 +1025,17 @@ const translations = {
     'guests:menuErrorMessage': 'No se pueden cargar los datos del menú. Por favor, inténtalo de nuevo más tarde.',
     'guests:menuErrorMessage2': 'Ha habido un problema al cargar el menú. Por favor, inténtalo de nuevo.',
     'guests:retry': 'Reintentar',
+    
+    // Menu Sub-navigation
+    'guests:mainBanquet': 'Banquete Principal',
+    'guests:welcomeCocktails': 'Cóctel de Bienvenida',
+    'guests:weddingBrunch': 'Brunch de Boda',
+    
+    // Menu titles and descriptions
+    'guests:mainBanquetTitle': 'Banquete Principal - Haz Tus Selecciones',
+    'guests:mainBanquetDescription': 'Por favor, selecciona tus preferencias de menú para cada plato. Arrastra y suelta a los invitados en sus opciones elegidas.',
+    'guests:meetTheChef': 'Conoce al Chef',
+    'guests:menuInfoNotAvailable': 'Información del menú aún no disponible.',
     'guests:courseGroupWelcomeCocktails': 'Cóctel de Bienvenida',
     'guests:courseGroupStarters': 'Entrantes',
     'guests:courseGroupMainCourses': 'Platos principales',
@@ -1301,6 +1325,8 @@ const translations = {
     'admin:menu.field.helpSpicy': 'Esta opción contiene ingredientes picantes',
     'admin:menu.field.helpNuts': 'Esta opción puede contener frutos secos',
 
+    // Admin Day Menus
+    'admin:dayMenu.noMenuConfigured': 'Todavía no hay menú configurado para este día.',
     //--------------------------------
     // Admin Gifts Section
     //--------------------------------
@@ -1726,6 +1752,17 @@ const translations = {
     'guests:menuErrorMessage': 'Impossible de charger les données du menu. Veuillez réessayer plus tard.',
     'guests:menuErrorMessage2': 'Un problème est survenu lors du chargement du menu. Veuillez réessayer.',
     'guests:retry': 'Réessayer',
+    
+    // Menu Sub-navigation
+    'guests:mainBanquet': 'Banquet Principal',
+    'guests:welcomeCocktails': 'Cocktail de Bienvenue',
+    'guests:weddingBrunch': 'Brunch de Mariage',
+    
+    // Menu titles and descriptions
+    'guests:mainBanquetTitle': 'Banquet Principal - Faites Vos Sélections',
+    'guests:mainBanquetDescription': 'Veuillez sélectionner vos préférences de menu pour chaque plat. Glissez et déposez les invités sur leurs options choisies.',
+    'guests:meetTheChef': 'Rencontrez le Chef',
+    'guests:menuInfoNotAvailable': 'Informations sur le menu pas encore disponibles.',
     'guests:courseGroupWelcomeCocktails': 'Cocktail de Bienvenue',
     'guests:courseGroupStarters': 'Entrées',
     'guests:courseGroupMainCourses': 'Plats principaux',
@@ -2015,6 +2052,8 @@ const translations = {
     'admin:menu.field.helpSpicy': 'Cette option contient des ingrédients épicés',
     'admin:menu.field.helpNuts': 'Cette option peut contenir des fruits à coque',
 
+    // Admin Day Menus
+    'admin:dayMenu.noMenuConfigured': 'Aucun menu configuré pour ce jour pour le moment.',
     //--------------------------------
     // Admin Gifts Section
     //--------------------------------
@@ -2440,6 +2479,17 @@ const translations = {
     'guests:menuErrorMessage': 'Menüdaten können nicht geladen werden. Bitte versuche es später noch einmal.',
     'guests:menuErrorMessage2': 'Beim Laden des Menüs ist ein Problem aufgetreten. Bitte versuche es erneut.',
     'guests:retry': 'Erneut versuchen',
+    
+    // Menu Sub-navigation
+    'guests:mainBanquet': 'Hauptbankett',
+    'guests:welcomeCocktails': 'Willkommenscocktail',
+    'guests:weddingBrunch': 'Hochzeitsbrunch',
+    
+    // Menu titles and descriptions
+    'guests:mainBanquetTitle': 'Hauptbankett - Triff Deine Auswahl',
+    'guests:mainBanquetDescription': 'Bitte wähle deine Menüpräferenzen für jeden Gang. Ziehe die Gäste per Drag-and-Drop auf ihre gewählten Optionen.',
+    'guests:meetTheChef': 'Triff den Koch',
+    'guests:menuInfoNotAvailable': 'Menüinformationen noch nicht verfügbar.',
     'guests:courseGroupWelcomeCocktails': 'Willkommenscocktail',
     'guests:courseGroupStarters': 'Vorspeisen',
     'guests:courseGroupMainCourses': 'Hauptgerichte',
@@ -2729,6 +2779,8 @@ const translations = {
     'admin:menu.field.helpSpicy': 'Diese Option enthält scharfe Zutaten',
     'admin:menu.field.helpNuts': 'Diese Option kann Nüsse enthalten',
 
+    // Admin Day Menus
+    'admin:dayMenu.noMenuConfigured': 'Noch kein Menü für diesen Tag konfiguriert.',
     //--------------------------------
     // Admin Gifts Section
     //--------------------------------

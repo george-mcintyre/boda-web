@@ -1,5 +1,5 @@
 const guestService = require('../services/guestService');
-const { Guest, Gift, GiftChoice } = require('../models');
+const { Guest, Gift, GiftChoice, ChefProfile, DayMenu } = require('../models');
 const stripe = require('../config/stripe');
 const { APP_URL } = require('../config/env');
 const { getLang, localize } = require('../utils/localized');
@@ -410,6 +410,61 @@ async function handleStripeWebhook(req, res) {
   res.json({ received: true });
 }
 
+// Day Menu endpoints for guest-facing info pages
+async function getDayMenus(req, res, next) {
+  const lang = getLang(req);
+  try {
+    const dayMenus = await DayMenu.find()
+      .populate('chefProfile')
+      .populate('sections.image')
+      .lean();
+
+    const result = dayMenus.map(menu => {
+      const sections = (menu.sections || []).map(section => ({
+        title: localize(section.title, lang),
+        content: localize(section.content, lang),
+        imageUrl: section.image ? `/api/guest/day-menus/images/${section.image._id || section.image}` : null
+      }));
+
+      let chefProfile = null;
+      if (menu.chefProfile) {
+        chefProfile = {
+          name: localize(menu.chefProfile.name, lang),
+          bio: localize(menu.chefProfile.bio, lang),
+          imageUrl: menu.chefProfile.image ? `/api/guest/chef-profiles/${menu.chefProfile.image}/image` : null
+        };
+      }
+
+      return {
+        day: menu.day,
+        sections,
+        chefProfile
+      };
+    });
+
+    res.json(result);
+  } catch (e) { next(e); }
+}
+
+// Get chef profile for banquet menu
+async function getBanquetChefProfile(req, res, next) {
+  const lang = getLang(req);
+  try {
+    const chefProfile = await ChefProfile.findOne({ menuType: 'banquet' })
+      .lean();
+
+    if (!chefProfile) {
+      return res.json(null);
+    }
+
+    res.json({
+      name: localize(chefProfile.name, lang),
+      bio: localize(chefProfile.bio, lang),
+      imageUrl: chefProfile.image ? `/api/guest/chef-profiles/${chefProfile.image.toString()}/image` : null
+    });
+  } catch (e) { next(e); }
+}
+
 
 module.exports = {
   getMe,
@@ -426,5 +481,7 @@ module.exports = {
   getGifts,
   getGiftChoices,
   createPaymentSession,
-  handleStripeWebhook
+  handleStripeWebhook,
+  getDayMenus,
+  getBanquetChefProfile
 };

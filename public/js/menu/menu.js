@@ -3,8 +3,11 @@
 
 // Global variables that need to be available from the main scope
 let draggedChip = null;
+let currentMenuView = 'banquet'; // Track which menu is currently shown
+let dayMenusData = []; // Store day menus data
+let banquetChefData = null; // Store banquet chef data
 
-// Load and menu selections - New unified menu layout with drag-drop support
+// Main menu loader - sets up sub-navigation and loads initial view
 async function loadMenuSelections() {
   const menuContent = document.getElementById('menu');
 
@@ -12,6 +15,91 @@ async function loadMenuSelections() {
   
   // Show loading state
   menuContent.innerHTML = `
+    <div class="loading-state">
+      <i class="fas fa-spinner fa-spin fa-3x"></i>
+      <p><div data-i18n="guests:menuLoading">${translate('guests:menuLoading')}</div></p>
+    </div>
+  `;
+  
+  // Load day menus data in parallel
+  try {
+    const [dayMenusResponse, banquetChefResponse] = await Promise.all([
+      fetch(`/api/guest/day-menus?lang=${window.currentLanguage}`, {
+        method: 'GET',
+        headers: { 'Authorization': window.token }
+      }),
+      fetch(`/api/guest/banquet-chef?lang=${window.currentLanguage}`, {
+        method: 'GET',
+        headers: { 'Authorization': window.token }
+      })
+    ]);
+    
+    if (dayMenusResponse.ok) {
+      dayMenusData = await dayMenusResponse.json();
+    }
+    if (banquetChefResponse.ok) {
+      banquetChefData = await banquetChefResponse.json();
+    }
+  } catch (err) {
+    console.error('Error loading day menus:', err);
+  }
+  
+  // Create sub-navigation
+  menuContent.innerHTML = `
+    <div class="menu-sub-nav">
+      <button class="menu-sub-btn active" data-menu="banquet">
+        <i class="fas fa-utensils"></i>
+        <span data-i18n="guests:mainBanquet">Main Banquet</span>
+      </button>
+      <button class="menu-sub-btn" data-menu="day1">
+        <i class="fas fa-glass-cheers"></i>
+        <span data-i18n="guests:welcomeCocktails">Welcome Cocktails</span>
+      </button>
+      <button class="menu-sub-btn" data-menu="day3">
+        <i class="fas fa-sun"></i>
+        <span data-i18n="guests:weddingBrunch">Wedding Brunch</span>
+      </button>
+    </div>
+    <div id="menu-view-container"></div>
+  `;
+  
+  // Add click handlers for sub-navigation
+  document.querySelectorAll('.menu-sub-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const menuType = btn.dataset.menu;
+      switchMenuView(menuType);
+    });
+  });
+  
+  // Load initial banquet view
+  await loadBanquetMenu();
+}
+
+// Switch between menu views
+function switchMenuView(menuType) {
+  currentMenuView = menuType;
+  
+  // Update active button
+  document.querySelectorAll('.menu-sub-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.menu === menuType);
+  });
+  
+  // Load appropriate view
+  if (menuType === 'banquet') {
+    loadBanquetMenu();
+  } else {
+    loadDayMenu(menuType);
+  }
+}
+
+// Load banquet menu (original functionality)
+async function loadBanquetMenu() {
+  const viewContainer = document.getElementById('menu-view-container');
+  
+  if (!viewContainer) return;
+  
+  // Show loading state
+  viewContainer.innerHTML = `
     <div class="loading-state">
       <i class="fas fa-spinner fa-spin fa-3x"></i>
       <p><div data-i18n="guests:menuLoading">${translate('guests:menuLoading')}</div></p>
@@ -99,27 +187,17 @@ async function loadMenuSelections() {
 
     // Build HTML for the unified menu
     let html = '<div class="unified-menu-container">';
-
     html += `
       <div class="intro-card intro-section">
         <h2 class="card-title">
-          <div data-i18n="guests:menuPageTitle">${translate('guests:menuPageTitle')}</div>
+          <div data-i18n="guests:mainBanquetTitle">Main Banquet - Make Your Selections</div>
         </h2>
         <p class="card-description">
-          <div data-i18n="guests:menuPageDescription">${translate('guests:menuPageDescription')}</div>
+          <div data-i18n="guests:mainBanquetDescription">Please select your meal preferences for each course. Drag and drop guests to their chosen options.</div>
         </p>
       </div>
     `;
     
-    // Add save button
-    html += `
-      <div class="action-container">
-        <button type="button" id="saveMenuChoicesBtn" class="btn-base btn-primary btn-lg">
-          <i class="fas fa-save"></i>
-          <span data-i18n="guests:saveMenuSelections">${translate("guests:saveMenuSelections")}</span>
-        </button>
-      </div>
-    `;
 
     // Iterate through course groups
     const groupOrder = ['welcome_cocktails', 'starter', 'main', 'dessert', 'late_night_snacks', 'drinks'];
@@ -317,24 +395,44 @@ async function loadMenuSelections() {
         </div>
       </div>
     `;
+    
+    // Add chef profile section at the bottom (after special requests)
+    if (banquetChefData) {
+      html += `
+        <div class="chef-profile-section">
+          <div class="chef-profile-header">
+            <i class="fas fa-user-chef"></i>
+            <h3><div data-i18n="guests:meetTheChef">Meet The Chef</div></h3>
+          </div>
+          <div class="chef-profile-card">
+            ${banquetChefData.imageUrl ? `
+              <div class="chef-photo">
+                <img data-auth-src="${banquetChefData.imageUrl}" alt="${escapeHtml(banquetChefData.name)}" onerror="this.style.display='none';">
+                <span style="display:none;"></span>
+              </div>
+            ` : ''}
+            <div class="chef-info">
+              <h4 class="chef-name">${escapeHtml(banquetChefData.name)}</h4>
+              <p class="chef-bio">${escapeHtml(banquetChefData.bio)}</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
 
-    // Add save button
-    html += `
-      <div class="action-container">
-        <button type="button" id="saveMenuChoicesBtnBelow" class="btn-base btn-primary btn-lg">
-          <i class="fas fa-save"></i>
-          <span data-i18n="guests:saveMenuSelections">${translate("guests:saveMenuSelections")}</span>
-        </button>
-      </div>
-    `;
 
     html += '</div>'; // Close unified-menu-container
 
-    menuContent.innerHTML = html;
+    viewContainer.innerHTML = html;
 
     // Translate the newly loaded content
     if (typeof updatePageContent === 'function') {
       updatePageContent();
+    }
+    
+    // Load auth-protected images
+    if (typeof loadAuthImages === 'function') {
+      loadAuthImages();
     }
 
     // Initialize drag and drop functionality
@@ -343,24 +441,30 @@ async function loadMenuSelections() {
     // Initialize image zoom functionality
     initImageZoom();
 
-    // Attach save button handler
-    let saveBtn = document.getElementById('saveMenuChoicesBtn');
-    if (saveBtn) {
-      saveBtn.addEventListener('click', saveAllMenuChoices);
-    }
-    saveBtn = document.getElementById('saveMenuChoicesBtnBelow');
-    if (saveBtn) {
-      saveBtn.addEventListener('click', saveAllMenuChoices);
-    }
+    // Attach auto-save to special request textareas
+    document.querySelectorAll('.special-request-detail textarea').forEach(textarea => {
+      // Save on blur (when user clicks away)
+      textarea.addEventListener('blur', () => {
+        autoSaveMenuChoices();
+      });
+      
+      // Save on Enter key (but don't prevent default - allow newlines)
+      textarea.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+          // Ctrl+Enter or Cmd+Enter saves immediately
+          autoSaveMenuChoices();
+        }
+      });
+    });
 
   } catch (err) {
-    console.error('Error loading menu selections:', err);
-    menuContent.innerHTML = `
+    console.error('Error loading banquet menu:', err);
+    viewContainer.innerHTML = `
       <div class="error-state">
         <i class="fas fa-exclamation-triangle"></i>
         <h3><div data-i18n="guests:menuErrorTitle">Error Loading Menu</div></h3>
         <p><div data-i18n="guests:menuErrorMessage2">There was a problem loading the menu. Please try again.</div></p>
-        <button class="btn-retry" onclick="loadMenuSelections()">
+        <button class="btn-retry" onclick="loadBanquetMenu()">
           <i class="fas fa-redo"></i> <div data-i18n="guests:retry">Retry</div>
         </button>
       </div>
@@ -370,6 +474,94 @@ async function loadMenuSelections() {
     if (typeof updatePageContent === 'function') {
       updatePageContent();
     }
+  }
+}
+
+// Load day menu (informational only - day1 or day3)
+async function loadDayMenu(day) {
+  const viewContainer = document.getElementById('menu-view-container');
+  
+  if (!viewContainer) return;
+  
+  const dayMenu = dayMenusData.find(m => m.day === day);
+  
+  if (!dayMenu) {
+    viewContainer.innerHTML = `
+      <div class="info-card">
+        <p><div data-i18n="guests:menuInfoNotAvailable">Menu information not yet available.</div></p>
+      </div>
+    `;
+    return;
+  }
+  
+  let html = '<div class="day-menu-container">';
+  
+  // Title based on day
+  const title = day === 'day1' ? 'Welcome Cocktails Menu' : 'Wedding Brunch Menu';
+  const titleKey = day === 'day1' ? 'guests:welcomeCocktailsMenuTitle' : 'guests:weddingBrunchMenuTitle';
+  
+  html += `
+    <div class="intro-card intro-section">
+      <h2 class="card-title">
+        <div data-i18n="${titleKey}">${title}</div>
+      </h2>
+      <p class="card-description">
+        <div data-i18n="guests:dayMenuDescription">Information about the menu for this event.</div>
+      </p>
+    </div>
+  `;
+  
+  // Render sections
+  dayMenu.sections.forEach(section => {
+    html += `
+      <div class="day-menu-section">
+        <h3 class="section-title">${escapeHtml(section.title)}</h3>
+        ${section.imageUrl ? `
+          <div class="section-image">
+            <img data-auth-src="${section.imageUrl}" alt="${escapeHtml(section.title)}" onerror="this.style.display='none';">
+          </div>
+        ` : ''}
+        <div class="section-content">${escapeHtml(section.content)}</div>
+      </div>
+    `;
+  });
+  
+  // Add chef profile at the bottom
+  if (dayMenu.chefProfile) {
+    html += `
+      <div class="chef-profile-section">
+        <div class="chef-profile-header">
+          <i class="fas fa-user-chef"></i>
+          <h3><div data-i18n="guests:meetTheChef">Meet The Chef</div></h3>
+        </div>
+        <div class="chef-profile-card">
+          ${dayMenu.chefProfile.imageUrl ? `
+            <div class="chef-photo">
+              <img data-auth-src="${dayMenu.chefProfile.imageUrl}" alt="${escapeHtml(dayMenu.chefProfile.name)}" onerror="this.style.display='none';">
+              <span style="display:none;"></span>
+            </div>
+          ` : ''}
+          <div class="chef-info">
+            <h4 class="chef-name">${escapeHtml(dayMenu.chefProfile.name)}</h4>
+            <p class="chef-bio">${escapeHtml(dayMenu.chefProfile.bio)}</p>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+  
+  html += '</div>'; // Close day-menu-container
+  
+  viewContainer.innerHTML = html;
+  
+  // Translate the newly loaded content
+  if (typeof updatePageContent === 'function') {
+    updatePageContent();
+  }
+  
+  // Load auth-protected images
+  if (typeof loadAuthImages === 'function') {
+    loadAuthImages();
   }
 }
 
@@ -537,8 +729,8 @@ function handleDrop(e) {
   // Update the member counts
   updateMemberCounts(targetCourseId);
   
-  // Show unsaved changes indicator
-  markMenuAsUnsaved();
+  // Auto-save the change
+  autoSaveMenuChoices();
 }
 
 function updateMemberCounts(courseId) {
@@ -555,15 +747,18 @@ function updateMemberCounts(courseId) {
   });
 }
 
-function markMenuAsUnsaved() {
-  const saveBtn = document.getElementById('saveMenuChoicesBtn');
-  if (saveBtn && !saveBtn.classList.contains('unsaved')) {
-    saveBtn.classList.add('unsaved');
-    saveBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="guests:saveMenuSelections">${translate("guests:saveMenuSelections")}</span> *`;
+// Auto-save function - saves with user notification
+async function autoSaveMenuChoices() {
+  // Debounce to avoid too many saves
+  if (window.autoSaveTimeout) {
+    clearTimeout(window.autoSaveTimeout);
   }
+  window.autoSaveTimeout = setTimeout(async () => {
+    await saveAllMenuChoices(false); // false = show notification
+  }, 500); // Wait 500ms after last change
 }
 
-// Update dietary checkbox visual state
+// Update dietary checkbox visual state and auto-save
 window.updateDietaryCheckbox = function(checkbox) {
   const label = checkbox.closest('.dietary-checkbox');
   if (label) {
@@ -573,16 +768,13 @@ window.updateDietaryCheckbox = function(checkbox) {
       label.classList.remove('checked');
     }
   }
-  markMenuAsUnsaved();
+  autoSaveMenuChoices();
 };
 
-// Save all menu choices
-async function saveAllMenuChoices() {
-  console.log('Saving menu selections...');
-  const saveBtn = document.getElementById('saveMenuChoicesBtn');
-  if (saveBtn) {
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <div data-i18n="common:menu.saving">'+ translate('common:menu.saving') +'</div>';
+// Save all menu choices (silent = true for auto-save, false for manual save)
+async function saveAllMenuChoices(silent = false) {
+  if (!silent) {
+    console.log('Saving menu selections...');
   }
 
   try {
@@ -683,10 +875,8 @@ async function saveAllMenuChoices() {
     });
 
     if (response.ok) {
-      showToast(`<div data-i18n="common:menu.selections.saved">${translate('common:menu.selections.saved')}</div>`, 'success');
-      if (saveBtn) {
-        saveBtn.classList.remove('unsaved');
-        saveBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="guests:saveMenuSelections">${translate('guests:saveMenuSelections')}</span>`;
+      if (!silent) {
+        showToast(`<div data-i18n="common:menu.selections.saved">${translate('common:menu.selections.saved')}</div>`, 'success');
       }
     } else {
       const data = await response.json();
@@ -694,13 +884,8 @@ async function saveAllMenuChoices() {
     }
   } catch (err) {
     console.error('Error saving menu choices:', err);
-    showToast(`<div data-i18n="common:error.saving.menu.selections">${translate('common:error.saving.menu.selections')}</div>`, 'error');
-  } finally {
-    if (saveBtn) {
-      saveBtn.disabled = false;
-      if (!saveBtn.classList.contains('unsaved')) {
-        saveBtn.innerHTML = `<i class="fas fa-save"></i> <span data-i18n="guests:saveMenuSelections">${translate('guests:saveMenuSelections')}</span>`;
-      }
+    if (!silent) {
+      showToast(`<div data-i18n="common:error.saving.menu.selections">${translate('common:error.saving.menu.selections')}</div>`, 'error');
     }
   }
 }
@@ -800,3 +985,6 @@ if (document.readyState === 'loading') {
 } else {
   initializeLightbox();
 }
+
+// Expose main loader function to window for guests.js
+window.loadMenuSelections = loadMenuSelections;

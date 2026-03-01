@@ -382,6 +382,48 @@ window.makeObjectIdLike = function() {
   return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Load images that require auth headers (blob URL approach)
+window.loadAuthImages = function(container) {
+  // If no container specified, use document body
+  const target = container || document.body;
+  
+  target.querySelectorAll('img[data-auth-src]').forEach(async (img) => {
+    const url = img.getAttribute('data-auth-src');
+    if (!url) return;
+    
+    try {
+      const res = await fetch(url, {
+        headers: { 'Authorization': window.token }
+      });
+      
+      if (res.ok) {
+        const blob = await res.blob();
+        img.src = URL.createObjectURL(blob);
+        img.style.display = '';
+        
+        // Hide "no image" sibling if present
+        const noImgSibling = img.nextElementSibling;
+        if (noImgSibling && noImgSibling.tagName === 'SPAN') {
+          noImgSibling.style.display = 'none';
+        }
+      } else {
+        img.style.display = 'none';
+        const noImgSibling = img.nextElementSibling;
+        if (noImgSibling && noImgSibling.tagName === 'SPAN') {
+          noImgSibling.style.display = '';
+        }
+      }
+    } catch(e) {
+      console.error('Error loading auth image:', url, e);
+      img.style.display = 'none';
+      const noImgSibling = img.nextElementSibling;
+      if (noImgSibling && noImgSibling.tagName === 'SPAN') {
+        noImgSibling.style.display = '';
+      }
+    }
+  });
+};
+
 // Function to switch to a specific tab
 window.switchToTab = function(tabName, updateUrl = true) {
   console.log(`Switching to: ${tabName} tab in the Guests Zone` )
@@ -419,7 +461,9 @@ window.switchToTab = function(tabName, updateUrl = true) {
   if (tabName === 'party') {
     loadPartyContent();
   } else if (tabName === 'menu') {
-    loadMenuSelections();
+    if (typeof loadMenuSelections === 'function') {
+      loadMenuSelections();
+    }
   } else if (tabName === 'events') {
     loadEventsContent();
   } else if (tabName === 'gifts') {

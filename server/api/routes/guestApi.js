@@ -30,6 +30,50 @@ router.put('/menu/:courseId/menu-choices/:optionId', auth('guest'), require('../
 router.get('/menu-choices', auth('guest'), require('../../controllers/menuController').listGuestCourseOption);
 router.put('/menu-choices', auth('guest'), require('../../controllers/menuController').updateGuestCourseOption);
 
+// Day Menus (for informational pages - Welcome Cocktails, Wedding Brunch)
+router.get('/day-menus', auth('guest'), guestCtrl.getDayMenus);
+router.get('/banquet-chef', auth('guest'), guestCtrl.getBanquetChefProfile);
+
+// Chef Profile image serving endpoint (guest-accessible)
+router.get('/chef-profiles/:id/image', async (req, res, next) => {
+  try {
+    const { ChefProfileImage } = require('../../models');
+    const image = await ChefProfileImage.findById(req.params.id);
+    
+    if (!image) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+    
+    const imageBuffer = Buffer.isBuffer(image.data) ? image.data : Buffer.from(image.data);
+    res.setHeader('Content-Type', image.contentType);
+    res.setHeader('Content-Length', String(imageBuffer.length));
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(imageBuffer);
+  } catch (e) {
+    next(e);
+  }
+});
+
+// Day Menu image serving endpoint (guest-accessible)
+router.get('/day-menus/images/:id', async (req, res, next) => {
+  try {
+    const { DayMenuImage } = require('../../models');
+    const image = await DayMenuImage.findById(req.params.id);
+    
+    if (!image) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+    
+    const imageBuffer = Buffer.isBuffer(image.data) ? image.data : Buffer.from(image.data);
+    res.setHeader('Content-Type', image.contentType);
+    res.setHeader('Content-Length', String(imageBuffer.length));
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(imageBuffer);
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Gifts
 router.get('/gifts', auth('guest'), guestCtrl.getGifts);
 router.get('/gift-choices', auth('guest'), guestCtrl.getGiftChoices);

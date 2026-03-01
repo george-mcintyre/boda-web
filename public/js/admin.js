@@ -255,7 +255,7 @@
             <h3><i class="fas fa-utensils"></i> ${translate('admin:subtab.' + day + 'Menu')}</h3>
             <div style="text-align:center;padding:40px;">
               <i class="fas fa-plus-circle" style="font-size:3em;color:var(--gray-300);margin-bottom:15px;"></i>
-              <p style="color:var(--text-light);">No menu configured for this day yet.</p>
+              <p style="color:var(--text-light);" data-i18n="admin:dayMenu.noMenuConfigured">No menu configured for this day yet.</p>
               <button class="btn btn-primary" id="createDayMenuBtn"><i class="fas fa-plus"></i> Create Menu</button>
             </div>
           </div>`;
@@ -280,6 +280,7 @@
       // Build chef profile section (same pattern as banquet menu)
       let chefSection = '';
       if (dayChef) {
+        console.log('DEBUG: dayChef data:', dayChef);
         chefSection = `
           <div class="chef-profile-card">
             <div class="chef-profile-header">
@@ -290,10 +291,10 @@
               </div>
             </div>
             <div class="chef-profile-body">
-              ${dayChef.imageUrl ? `<img data-auth-src="${dayChef.imageUrl}" alt="${dayChef.name}" class="chef-profile-photo">` : ''}
+              ${dayChef.imageUrl ? `<img data-auth-src="${dayChef.imageUrl}" alt="${dayChef.name}" class="chef-profile-photo"><span style="display:none;"></span>` : ''}
               <div class="chef-profile-info">
-                <strong>${dayChef.name}</strong>
-                <p>${dayChef.bio || ''}</p>
+                <strong>${dayChef.name || 'No name'}</strong>
+                <p style="white-space: pre-line;">${dayChef.bio || 'No bio available'}</p>
               </div>
             </div>
           </div>`;
@@ -659,7 +660,7 @@
         allRows.push({
           isAssigned: !!primaryAssignment,
           html: `<tr class="assignment-row" data-guest-id="${g.id}" data-assigned="${!!primaryAssignment}">
-            <td><strong>${g.name}</strong>${isFixed ? ' <i class="fas fa-crown" style="color:gold;font-size:0.75em;" title="Head Table"></i>' : ''}</td>
+            <td><strong>${g.name}</strong>${isFixed ? ' <i class="fas fa-crown" style="color:gold;font-size:0.75em;" title="' + translate('admin:tables.headTable') + '"></i>' : ''}</td>
             <td>—</td>
             <td>${primaryAssignment ? getTableDisplayName(tables.find(t => t.id === primaryAssignment.tableId) || {number: '?'}) : '<span style="color:var(--text-light);">' + translate('admin:tables.unassigned') + '</span>'}</td>
             <td>
@@ -772,7 +773,7 @@
 
         return `
           <div class="admin-card" style="margin-bottom:15px;">
-            <h4>${group.tableName || (group.tableNumber !== null ? translate('admin:tables.tableLabel') + ' ' + group.tableNumber : translate('admin:tables.unassigned'))} ${group.tableNumber !== null ? '(#' + group.tableNumber + ')' : ''}</h4>
+            <h4>${group.isHeadTable ? '<i class="fas fa-crown" style="color:gold;"></i> ' + translate('admin:tables.headTable') : (group.tableName || (group.tableNumber !== null ? translate('admin:tables.tableLabel') + ' ' + group.tableNumber : translate('admin:tables.unassigned')))} ${group.tableNumber !== null && !group.isHeadTable ? '(#' + group.tableNumber + ')' : ''}</h4>
             <table class="data-table">
               <thead><tr><th>${translate('admin:menuResponses.guest')}</th><th>${translate('admin:menuResponses.menuChoices')}</th><th>${translate('admin:menuResponses.specialRequests')}</th></tr></thead>
               <tbody>${guestRows}</tbody>
@@ -3109,6 +3110,7 @@
       // Build chef profile section
       let chefSection = '';
       if (banquetChef) {
+        console.log('DEBUG: banquetChef data:', banquetChef);
         chefSection = `
           <div class="chef-profile-card">
             <div class="chef-profile-header">
@@ -3119,10 +3121,10 @@
               </div>
             </div>
             <div class="chef-profile-body">
-              ${banquetChef.imageUrl ? `<img data-auth-src="${banquetChef.imageUrl}" alt="${banquetChef.name}" class="chef-profile-photo">` : ''}
+              ${banquetChef.imageUrl ? `<img data-auth-src="${banquetChef.imageUrl}" alt="${banquetChef.name}" class="chef-profile-photo"><span style="display:none;"></span>` : ''}
               <div class="chef-profile-info">
-                <strong>${banquetChef.name}</strong>
-                <p>${banquetChef.bio || ''}</p>
+                <strong>${banquetChef.name || 'No name'}</strong>
+                <p style="white-space: pre-line;">${banquetChef.bio || 'No bio available'}</p>
               </div>
             </div>
           </div>`;
