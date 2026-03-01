@@ -192,14 +192,15 @@ async function uploadChefProfileImage(req, res, next) {
 async function getChefProfileImage(req, res, next) {
   try {
     const { id } = req.params;
-    const profile = await ChefProfile.findById(id).populate('image').lean();
+    const profile = await ChefProfile.findById(id).populate('image');
     if (!profile || !profile.image || !profile.image.data) {
       return res.status(404).json({ error: 'Image not found' });
     }
+    const imgData = Buffer.isBuffer(profile.image.data) ? profile.image.data : Buffer.from(profile.image.data.buffer || profile.image.data);
     res.setHeader('Content-Type', profile.image.contentType);
-    res.setHeader('Content-Length', profile.image.data.length);
+    res.setHeader('Content-Length', imgData.length);
     res.setHeader('Cache-Control', 'public, max-age=3600');
-    res.send(profile.image.data);
+    res.send(imgData);
   } catch (e) { next(e); }
 }
 
@@ -359,12 +360,13 @@ async function uploadDayMenuImage(req, res, next) {
 async function getDayMenuImage(req, res, next) {
   try {
     const { dayMenuId } = req.params;
-    const img = await DayMenuImage.findById(dayMenuId).lean();
+    const img = await DayMenuImage.findById(dayMenuId);
     if (!img || !img.data) return res.status(404).json({ error: 'Image not found' });
+    const imgData = Buffer.isBuffer(img.data) ? img.data : Buffer.from(img.data.buffer || img.data);
     res.setHeader('Content-Type', img.contentType);
-    res.setHeader('Content-Length', img.data.length);
+    res.setHeader('Content-Length', imgData.length);
     res.setHeader('Cache-Control', 'public, max-age=3600');
-    res.send(img.data);
+    res.send(imgData);
   } catch (e) { next(e); }
 }
 
@@ -376,12 +378,13 @@ async function getDayMenuSectionImage(req, res, next) {
     const idx = parseInt(sectionIndex, 10);
     const section = (menu.sections || [])[idx];
     if (!section || !section.image) return res.status(404).json({ error: 'Section image not found' });
-    const img = await DayMenuImage.findById(section.image).lean();
+    const img = await DayMenuImage.findById(section.image);
     if (!img || !img.data) return res.status(404).json({ error: 'Image not found' });
+    const imgData = Buffer.isBuffer(img.data) ? img.data : Buffer.from(img.data.buffer || img.data);
     res.setHeader('Content-Type', img.contentType);
-    res.setHeader('Content-Length', img.data.length);
+    res.setHeader('Content-Length', imgData.length);
     res.setHeader('Cache-Control', 'public, max-age=3600');
-    res.send(img.data);
+    res.send(imgData);
   } catch (e) { next(e); }
 }
 

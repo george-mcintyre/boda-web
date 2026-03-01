@@ -364,7 +364,7 @@ const translations = {
     'admin:tab.guests': 'Guests',
     'admin:tab.gifts': 'Gift List',
     'admin:tab.messages': 'Messages',
-    'admin:tab.events': 'Event Schedule',
+    'admin:tab.events': 'Events Management',
     'admin:tab.menus': 'Menu Management',
     'admin:tab.settings': 'Settings',
 
@@ -649,6 +649,8 @@ const translations = {
     'admin:subtab.menuResponses': 'Menu Responses',
     'admin:subtab.giftList': 'Gift List',
     'admin:subtab.giftPurchases': 'Gift Purchases',
+    'admin:subtab.eventSchedule': 'Event Schedule',
+    'admin:subtab.eventAttendance': 'Event Attendance',
     'admin:comingSoon': 'Coming soon...',
     // Chef profile
     'admin:chef.title': 'Chef Profile',
@@ -1031,7 +1033,7 @@ const translations = {
     'admin:tab.guests': 'Invitados',
     'admin:tab.gifts': 'Lista de regalos',
     'admin:tab.messages': 'Mensajes',
-    'admin:tab.events': 'Programa de eventos',
+    'admin:tab.events': 'Gestión de eventos',
     'admin:tab.menus': 'Gestión del menú',
     'admin:tab.settings': 'Configuración',
 
@@ -1316,6 +1318,8 @@ const translations = {
     'admin:subtab.menuResponses': 'Respuestas de menú',
     'admin:subtab.giftList': 'Lista de regalos',
     'admin:subtab.giftPurchases': 'Regalos ofrecidos',
+    'admin:subtab.eventSchedule': 'Programa de eventos',
+    'admin:subtab.eventAttendance': 'Asistencia a eventos',
     'admin:comingSoon': 'Próximamente...',
     // Chef profile
     'admin:chef.title': 'Perfil del Chef',
@@ -1698,7 +1702,7 @@ const translations = {
     'admin:tab.guests': 'Invités',
     'admin:tab.gifts': 'Liste de cadeaux',
     'admin:tab.messages': 'Messages',
-    'admin:tab.events': 'Programme des événements',
+    'admin:tab.events': 'Gestion des événements',
     'admin:tab.menus': 'Gestion du menu',
     'admin:tab.settings': 'Paramètres',
 
@@ -1983,6 +1987,8 @@ const translations = {
     'admin:subtab.menuResponses': 'Réponses au menu',
     'admin:subtab.giftList': 'Liste de cadeaux',
     'admin:subtab.giftPurchases': 'Cadeaux offerts',
+    'admin:subtab.eventSchedule': 'Programme des événements',
+    'admin:subtab.eventAttendance': 'Participation aux événements',
     'admin:comingSoon': 'Bientôt disponible...',
     // Chef profile
     'admin:chef.title': 'Profil du Chef',
@@ -2365,7 +2371,7 @@ const translations = {
     'admin:tab.guests': 'Gäste',
     'admin:tab.gifts': 'Geschenkliste',
     'admin:tab.messages': 'Nachrichten',
-    'admin:tab.events': 'Veranstaltungskalender',
+    'admin:tab.events': 'Veranstaltungsverwaltung',
     'admin:tab.menus': 'Menüverwaltung',
     'admin:tab.settings': 'Einstellungen',
 
@@ -2650,6 +2656,8 @@ const translations = {
     'admin:subtab.menuResponses': 'Menüantworten',
     'admin:subtab.giftList': 'Geschenkliste',
     'admin:subtab.giftPurchases': 'Geschenkkäufe',
+    'admin:subtab.eventSchedule': 'Veranstaltungsplan',
+    'admin:subtab.eventAttendance': 'Veranstaltungsteilnahme',
     'admin:comingSoon': 'Demnächst verfügbar...',  
     // Chef profile
     'admin:chef.title': 'Chefprofil',

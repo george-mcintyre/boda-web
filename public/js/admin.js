@@ -32,6 +32,34 @@
     return fetch(path + sep + `_t=${Date.now()}`, options);
   }
 
+  // Load images that require auth headers (blob URL approach)
+  function loadAuthImages(container) {
+    if (!container) return;
+    container.querySelectorAll('img[data-auth-src]').forEach(async (img) => {
+      const url = img.getAttribute('data-auth-src');
+      if (!url) return;
+      try {
+        const res = await api(url);
+        if (res.ok) {
+          const blob = await res.blob();
+          img.src = URL.createObjectURL(blob);
+          img.style.display = '';
+          // Hide "no image" sibling if present
+          const noImgSibling = img.nextElementSibling;
+          if (noImgSibling) noImgSibling.style.display = 'none';
+        } else {
+          img.style.display = 'none';
+          const noImgSibling = img.nextElementSibling;
+          if (noImgSibling) noImgSibling.style.display = '';
+        }
+      } catch(e) {
+        img.style.display = 'none';
+        const noImgSibling = img.nextElementSibling;
+        if (noImgSibling) noImgSibling.style.display = '';
+      }
+    });
+  }
+
   // Tab activation helper
   function activate(tab){
     tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
@@ -49,6 +77,10 @@
       { id: 'day3', i18nKey: 'admin:subtab.day3Menu', icon: 'fa-glass-cheers' },
       { id: 'tables', i18nKey: 'admin:subtab.tableAllocation', icon: 'fa-th' },
       { id: 'responses', i18nKey: 'admin:subtab.menuResponses', icon: 'fa-clipboard-list' }
+    ],
+    event: [
+      { id: 'schedule', i18nKey: 'admin:subtab.eventSchedule', icon: 'fa-calendar-alt' },
+      { id: 'attendance', i18nKey: 'admin:subtab.eventAttendance', icon: 'fa-chart-bar' }
     ],
     gifts: [
       { id: 'list', i18nKey: 'admin:subtab.giftList', icon: 'fa-gift' },
@@ -88,6 +120,8 @@
       case 'menu/responses': return showMenuResponses();
       case 'gifts/list': return showGifts();
       case 'gifts/purchases': return showGiftPurchases();
+      case 'event/schedule': return showEvent();
+      case 'event/attendance': return showEventAttendance();
       default:
         getContentTarget().innerHTML = '<div class="admin-content"><p>' + translate('admin:comingSoon') + '</p></div>';
     }
@@ -104,11 +138,6 @@
       if (!res.ok) throw new Error('Failed to load guest summary');
       const data = await res.json();
 
-      const eventRows = (data.perEventAttendance || []).map(e => `
-        <tr>
-          <td>${e.eventName}</td>
-          <td><strong>${e.count}</strong></td>
-        </tr>`).join('');
 
       target.innerHTML = `
         <div class="admin-content">
@@ -127,14 +156,7 @@
               <div class="stat-label">${translate('admin:guests.children')}</div>
             </div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;">
-            <div class="admin-card">
-              <h4><i class="fas fa-calendar-check"></i> Event Attendance</h4>
-              <table class="data-table">
-                <thead><tr><th>Event</th><th>Attending</th></tr></thead>
-                <tbody>${eventRows || '<tr><td colspan="2">No events configured</td></tr>'}</tbody>
-              </table>
-            </div>
+          <div style="margin-top:20px;">
             <div class="admin-card">
               <h4><i class="fas fa-exclamation-circle"></i> Action Required</h4>
               <ul style="list-style:none;padding:0;">
@@ -156,6 +178,37 @@
         </div>`;
     } catch(e) {
       console.error('Error loading guest summary:', e);
+      target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
+    }
+  }
+
+  // Event Attendance sub-tab (under Events Management)
+  async function showEventAttendance() {
+    const target = getContentTarget();
+    setLoading(translate('admin:subtab.eventAttendance'));
+    try {
+      const res = await api('/api/admin/guest-summary');
+      if (!res.ok) throw new Error('Failed to load attendance data');
+      const data = await res.json();
+
+      const eventRows = (data.perEventAttendance || []).map(e => `
+        <tr>
+          <td>${e.eventName}</td>
+          <td><strong>${e.count}</strong></td>
+        </tr>`).join('');
+
+      target.innerHTML = `
+        <div class="admin-content">
+          <h3><i class="fas fa-chart-bar"></i> ${translate('admin:subtab.eventAttendance')}</h3>
+          <div class="admin-card">
+            <table class="data-table">
+              <thead><tr><th>Event</th><th>Attending</th></tr></thead>
+              <tbody>${eventRows || '<tr><td colspan="2">No events configured</td></tr>'}</tbody>
+            </table>
+          </div>
+        </div>`;
+    } catch(e) {
+      console.error('Error loading event attendance:', e);
       target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
     }
   }
@@ -201,7 +254,7 @@
             <button class="admin-action edit-section-btn" data-index="${i}" title="Edit Section"><i class="fas fa-edit"></i></button>
           </div>
           <p style="margin-top:8px;">${s.content || '<em style="color:var(--text-light);">No content yet</em>'}</p>
-          ${s.imageUrl ? '<img src="' + s.imageUrl + '" alt="Section image" style="max-width:200px;border-radius:8px;margin-top:8px;">' : '<p style="color:var(--text-light);font-size:0.85em;margin-top:8px;"><i class="fas fa-image"></i> No image</p>'}
+          ${s.imageUrl ? '<img data-auth-src="' + s.imageUrl + '" alt="Section image" style="max-width:200px;border-radius:8px;margin-top:8px;">' : '<p style="color:var(--text-light);font-size:0.85em;margin-top:8px;"><i class="fas fa-image"></i> No image</p>'}
         </div>`).join('');
 
       // Build chef profile section (same pattern as banquet menu)
@@ -217,7 +270,7 @@
               </div>
             </div>
             <div class="chef-profile-body">
-              ${dayChef.imageUrl ? `<img src="${dayChef.imageUrl}" alt="${dayChef.name}" class="chef-profile-photo">` : ''}
+              ${dayChef.imageUrl ? `<img data-auth-src="${dayChef.imageUrl}" alt="${dayChef.name}" class="chef-profile-photo">` : ''}
               <div class="chef-profile-info">
                 <strong>${dayChef.name}</strong>
                 <p>${dayChef.bio || ''}</p>
@@ -244,6 +297,9 @@
           ${deleteMenuHtml}
         </div>`;
 
+      // Load auth-protected images
+      loadAuthImages(target);
+
       // Wire up section edit buttons
       target.querySelectorAll('.edit-section-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -255,7 +311,7 @@
             fields: [
               { name: 'title', label: 'Title', required: true },
               { name: 'content', label: 'Content', type: 'textarea', rows: 5 },
-              { name: 'image', label: 'Image', type: 'file' }
+              { name: 'image', label: 'Image', type: 'file', help: section.imageUrl ? '<img data-auth-src="' + section.imageUrl + '" style="max-width:150px;border-radius:6px;margin-top:6px;">' : 'No image uploaded' }
             ],
             initialValues: {
               title: section.title || '',
@@ -329,7 +385,7 @@
             fields: [
               { name: 'name', label: translate('admin:chef.name'), required: true },
               { name: 'bio', label: translate('admin:chef.bio'), type: 'textarea', rows: 4 },
-              { name: 'image', label: translate('admin:chef.photo'), type: 'file' }
+              { name: 'image', label: translate('admin:chef.photo'), type: 'file', help: existing?.imageUrl ? '<img data-auth-src="' + existing.imageUrl + '" style="max-width:150px;border-radius:6px;margin-top:6px;">' : '' }
             ],
             initialValues: {
               name: existing?.name || '',
@@ -430,7 +486,9 @@
       const eventChoices = eventChoicesRes.ok ? await eventChoicesRes.json() : [];
 
       // Build set of guestIds where at least one party member is attending the banquet
+      // Also count total confirmed attendees (individual people attending)
       const banquetGuestIds = new Set();
+      let totalConfirmed = 0;
       eventChoices.forEach(ec => {
         const gId = ec.guestId && ec.guestId.toString ? ec.guestId.toString() : ec.guestId;
         (ec.partyChoices || []).forEach(pc => {
@@ -438,6 +496,7 @@
             const eId = c.eventId && c.eventId.toString ? c.eventId.toString() : c.eventId;
             if (eId === BANQUET_EVENT_ID && c.attending) {
               banquetGuestIds.add(gId);
+              totalConfirmed++;
             }
           });
         });
@@ -497,6 +556,10 @@
             <div class="stat-card">
               <div class="stat-number">${totalCapacity}</div>
               <div class="stat-label">Total Capacity</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-number">${totalConfirmed}</div>
+              <div class="stat-label">Total Confirmed</div>
             </div>
             <div class="stat-card">
               <div class="stat-number">${totalAssigned}</div>
@@ -1381,6 +1444,8 @@
       </form>`;
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
+    // Load auth-protected images in modal (e.g. chef photo, section image previews)
+    loadAuthImages(modal);
 
     function close(){ document.body.removeChild(overlay); }
     modal.querySelector('#mfClose').addEventListener('click', close);
@@ -2557,7 +2622,7 @@
         <td>${formatTime(ev.end) || ''}</td>
         <td>${ev.title || ''}</td>
         <td>
-          ${imageUrl ? `<img src="${imageUrl}" alt="Event image" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;"><div data-i18n="admin:events.noImage">${translate('admin:events.noImage')}</div></span>` : '<span style="color: #999;"><div data-i18n="admin:events.noImage">' + translate('admin:events.noImage') + '</div></span>'}
+          ${imageUrl ? (imageUrl.startsWith('data:') || imageUrl.startsWith('/assets') ? `<img src="${imageUrl}" alt="Event image" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;"><div data-i18n="admin:events.noImage">${translate('admin:events.noImage')}</div></span>` : `<img data-auth-src="${imageUrl}" alt="Event image" style="width: 50px; height: 30px; object-fit: cover; border-radius: 4px;"><span style="color: #999; display: none;"><div data-i18n="admin:events.noImage">${translate('admin:events.noImage')}</div></span>`) : '<span style="color: #999;"><div data-i18n="admin:events.noImage">' + translate('admin:events.noImage') + '</div></span>'}
         </td>
         <td>
           <button class="admin-action" data-action="edit-subevents" data-id="${ev.id}" title="Edit Sub-events">
@@ -2573,7 +2638,7 @@
       </tr>`;
     }).join('');
     
-    content.innerHTML = renderTable({
+    getContentTarget().innerHTML = renderTable({
       title: `<div data-i18n="admin:events.title">${translate('admin:events.title')}</div>`, 
       columns:[
         `<div data-i18n="admin:events.table.name">${translate('admin:events.table.name')}</div>`,
@@ -2586,7 +2651,8 @@
       ]
     }, rows, `<button id="addEvent" class="admin-action"><i class="fas fa-plus"></i> <span data-i18n="admin:events.addEvent">${translate('admin:events.addEvent')}</span></button>`);
     
-    const tbody = content.querySelector('tbody');
+    const target = getContentTarget();
+    const tbody = target.querySelector('tbody');
     tbody.addEventListener('click', async (e)=>{
       const btn = e.target.closest('button'); if(!btn) return; 
       const id = btn.dataset.id; 
@@ -2604,9 +2670,11 @@
       }
     });
     
-    content.querySelector('#addEvent').addEventListener('click', async ()=>{
+    target.querySelector('#addEvent').addEventListener('click', async ()=>{
       openEventForm({}, true);
     });
+    // Load auth-protected event images
+    loadAuthImages(target);
   }
 
   // Helper function to get image URL for form display
@@ -2998,7 +3066,7 @@
               </div>
             </div>
             <div class="chef-profile-body">
-              ${banquetChef.imageUrl ? `<img src="${banquetChef.imageUrl}" alt="${banquetChef.name}" class="chef-profile-photo">` : ''}
+              ${banquetChef.imageUrl ? `<img data-auth-src="${banquetChef.imageUrl}" alt="${banquetChef.name}" class="chef-profile-photo">` : ''}
               <div class="chef-profile-info">
                 <strong>${banquetChef.name}</strong>
                 <p>${banquetChef.bio || ''}</p>
@@ -3109,6 +3177,9 @@
       `;
       
       getContentTarget().innerHTML = menuContent;
+
+      // Load auth-protected images (chef profile photo)
+      loadAuthImages(getContentTarget());
       
       // Add global add button handler
       getContentTarget().querySelector('#addMenuCourse')?.addEventListener('click', () => {
@@ -3195,7 +3266,7 @@
         fields: [
           { name: 'name', label: translate('admin:chef.name'), required: true },
           { name: 'bio', label: translate('admin:chef.bio'), type: 'textarea', rows: 4 },
-          { name: 'image', label: translate('admin:chef.photo'), type: 'file' }
+          { name: 'image', label: translate('admin:chef.photo'), type: 'file', help: existing?.imageUrl ? '<img data-auth-src="' + existing.imageUrl + '" style="max-width:150px;border-radius:6px;margin-top:6px;">' : '' }
         ],
         initialValues: {
           name: existing?.name || '',
@@ -3642,7 +3713,6 @@
     // Tabs without sub-tabs: direct dispatch
     switch(tab){
       case 'messages': return showMessages();
-      case 'event': return showEvent();
       case 'configuration': return showSettings();
       default:
         setLoading(translate('admin:loading'));

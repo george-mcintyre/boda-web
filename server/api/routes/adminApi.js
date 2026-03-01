@@ -49,7 +49,7 @@ router.get('/events/:eventId/image', auth('admin'), async (req, res, next) => {
   try {
     const { eventId } = req.params;
     const { Event, EventImage } = require('../../models');
-    const event = await Event.findById(eventId).populate('image').lean();
+    const event = await Event.findById(eventId).populate('image');
     
     if (!event) {
       return res.status(404).json({ error: 'Event not found' });
@@ -62,10 +62,11 @@ router.get('/events/:eventId/image', auth('admin'), async (req, res, next) => {
     // Handle both new format (EventImage reference) and legacy format (URL)
     if (event.image.data && event.image.contentType) {
       // New format - database-stored image
+      const imgData = Buffer.isBuffer(event.image.data) ? event.image.data : Buffer.from(event.image.data.buffer || event.image.data);
       res.setHeader('Content-Type', event.image.contentType);
-      res.setHeader('Content-Length', event.image.data.length);
+      res.setHeader('Content-Length', imgData.length);
       res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
-      res.send(event.image.data);
+      res.send(imgData);
     } else if (typeof event.image === 'string' && event.image.startsWith('/')) {
       // Legacy format - redirect to file system
       res.redirect(event.image);
@@ -81,7 +82,7 @@ router.get('/events/:eventId/image/thumbnail', auth('admin'), async (req, res, n
   try {
     const { eventId } = req.params;
     const { Event, EventImage } = require('../../models');
-    const event = await Event.findById(eventId).populate('image').lean();
+    const event = await Event.findById(eventId).populate('image');
     
     if (!event) {
       return res.status(404).json({ error: 'Event not found' });
@@ -94,10 +95,11 @@ router.get('/events/:eventId/image/thumbnail', auth('admin'), async (req, res, n
     // Handle both formats
     if (event.image.data && event.image.contentType) {
       // New format - for now return full image (could implement thumbnail generation)
+      const imgData = Buffer.isBuffer(event.image.data) ? event.image.data : Buffer.from(event.image.data.buffer || event.image.data);
       res.setHeader('Content-Type', event.image.contentType);
-      res.setHeader('Content-Length', event.image.data.length);
+      res.setHeader('Content-Length', imgData.length);
       res.setHeader('Cache-Control', 'public, max-age=3600');
-      res.send(event.image.data);
+      res.send(imgData);
     } else if (typeof event.image === 'string' && event.image.startsWith('/')) {
       // Legacy format - redirect to file system
       res.redirect(event.image);
@@ -114,16 +116,17 @@ router.get('/images/:imageId', auth('admin'), async (req, res, next) => {
   try {
     const { imageId } = req.params;
     const { EventImage } = require('../../models');
-    const image = await EventImage.findById(imageId).lean();
+    const image = await EventImage.findById(imageId);
     
     if (!image) {
       return res.status(404).json({ error: 'Image not found' });
     }
 
+    const imgData = Buffer.isBuffer(image.data) ? image.data : Buffer.from(image.data.buffer || image.data);
     res.setHeader('Content-Type', image.contentType);
-    res.setHeader('Content-Length', image.data.length);
+    res.setHeader('Content-Length', imgData.length);
     res.setHeader('Cache-Control', 'public, max-age=3600');
-    res.send(image.data);
+    res.send(imgData);
   } catch (e) {
     next(e);
   }
@@ -162,7 +165,7 @@ router.get('/gifts/:giftId/image', auth('admin'), async (req, res, next) => {
   try {
     const { giftId } = req.params;
     const { Gift, GiftImage } = require('../../models');
-    const gift = await Gift.findById(giftId).populate('image').lean();
+    const gift = await Gift.findById(giftId).populate('image');
     
     if (!gift) {
       return res.status(404).json({ error: 'Gift not found' });
@@ -175,10 +178,11 @@ router.get('/gifts/:giftId/image', auth('admin'), async (req, res, next) => {
     // Handle both new format (GiftImage reference) and legacy format (URL)
     if (gift.image.data && gift.image.contentType) {
       // New format - database-stored image
+      const imgData = Buffer.isBuffer(gift.image.data) ? gift.image.data : Buffer.from(gift.image.data.buffer || gift.image.data);
       res.setHeader('Content-Type', gift.image.contentType);
-      res.setHeader('Content-Length', gift.image.data.length);
+      res.setHeader('Content-Length', imgData.length);
       res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
-      res.send(gift.image.data);
+      res.send(imgData);
     } else if (typeof gift.image === 'string' && gift.image.startsWith('/')) {
       // Legacy format - redirect to file system
       res.redirect(gift.image);
@@ -194,7 +198,7 @@ router.get('/gifts/:giftId/image/thumbnail', auth('admin'), async (req, res, nex
   try {
     const { giftId } = req.params;
     const { Gift, GiftImage } = require('../../models');
-    const gift = await Gift.findById(giftId).populate('image').lean();
+    const gift = await Gift.findById(giftId).populate('image');
     
     if (!gift) {
       return res.status(404).json({ error: 'Gift not found' });
@@ -207,10 +211,11 @@ router.get('/gifts/:giftId/image/thumbnail', auth('admin'), async (req, res, nex
     // Handle both formats
     if (gift.image.data && gift.image.contentType) {
       // New format - for now return full image (could implement thumbnail generation)
+      const imgData = Buffer.isBuffer(gift.image.data) ? gift.image.data : Buffer.from(gift.image.data.buffer || gift.image.data);
       res.setHeader('Content-Type', gift.image.contentType);
-      res.setHeader('Content-Length', gift.image.data.length);
+      res.setHeader('Content-Length', imgData.length);
       res.setHeader('Cache-Control', 'public, max-age=3600');
-      res.send(gift.image.data);
+      res.send(imgData);
     } else if (typeof gift.image === 'string' && gift.image.startsWith('/')) {
       // Legacy format - redirect to file system
       res.redirect(gift.image);
@@ -227,16 +232,17 @@ router.get('/gift-images/:imageId', auth('admin'), async (req, res, next) => {
   try {
     const { imageId } = req.params;
     const { GiftImage } = require('../../models');
-    const image = await GiftImage.findById(imageId).lean();
+    const image = await GiftImage.findById(imageId);
     
     if (!image) {
       return res.status(404).json({ error: 'Image not found' });
     }
 
+    const imgData = Buffer.isBuffer(image.data) ? image.data : Buffer.from(image.data.buffer || image.data);
     res.setHeader('Content-Type', image.contentType);
-    res.setHeader('Content-Length', image.data.length);
+    res.setHeader('Content-Length', imgData.length);
     res.setHeader('Cache-Control', 'public, max-age=3600');
-    res.send(image.data);
+    res.send(imgData);
   } catch (e) {
     next(e);
   }

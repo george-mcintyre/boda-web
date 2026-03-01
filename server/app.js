@@ -60,7 +60,7 @@ app.use(helmet({
         "https://unpkg.com",
         "https://fonts.googleapis.com",
       ],
-      "img-src": ["'self'", "data:", "https:", "http://staticmap.openstreetmap.de"],
+      "img-src": ["'self'", "data:", "blob:", "https:", "http://staticmap.openstreetmap.de"],
       "font-src": ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
       "connect-src": ["'self'", "*"],
       "frame-src": ["'self'", "https://*.tile.openstreetmap.org"],
