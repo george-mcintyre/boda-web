@@ -8,7 +8,7 @@ async function getGuestSummary(req, res, next) {
   try {
     const lang = getLang(req);
     const guests = await Guest.find({}).lean();
-    const events = await Event.find({}).lean();
+    const events = await Event.find({}).sort({ date: 1 }).lean();
     const eventChoices = await EventChoice.find({}).lean();
     const menuChoices = await MenuChoice.find({}).lean();
 
@@ -611,13 +611,13 @@ async function getMenuResponses(req, res, next) {
         const isGuest = pc.partyGuestId === mc.guestId._id.toString();
         const pmName = isGuest ? null : pc.partyGuestId;
         const key = mc.guestId._id.toString() + '|' + (pmName || '');
-        const table = assignmentMap[key] || { tableNumber: null, tableName: 'Unassigned' };
+        const table = assignmentMap[key] || { tableNumber: null, tableName: null };
         const tableKey = table.tableNumber !== null ? String(table.tableNumber) : 'unassigned';
 
         if (!tableGroups[tableKey]) {
           tableGroups[tableKey] = {
             tableNumber: table.tableNumber,
-            tableName: table.tableName || (table.tableNumber !== null ? 'Table ' + table.tableNumber : 'Unassigned'),
+            tableName: table.tableName || null,
             guests: []
           };
         }

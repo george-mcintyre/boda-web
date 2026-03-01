@@ -60,6 +60,26 @@
     });
   }
 
+  // Translate dietary/allergy badge values
+  function translateDietary(value) {
+    const map = {
+      'vegetarian': 'admin:dietary.vegetarian',
+      'lactose-intolerant': 'admin:dietary.lactoseIntolerant',
+      'gluten-intolerant': 'admin:dietary.glutenIntolerant',
+      'nut-allergy': 'admin:dietary.nutAllergy',
+      'other': 'admin:dietary.other'
+    };
+    return map[value] ? translate(map[value]) : value;
+  }
+
+  // Get table display name
+  function getTableDisplayName(t) {
+    if (t.isHeadTable) return translate('admin:tables.headTable');
+    // If name is just the default "Table N" pattern, use translated label instead
+    if (!t.name || /^Table\s+\d+$/i.test(t.name)) return translate('admin:tables.tableLabel') + ' ' + t.number;
+    return t.name;
+  }
+
   // Tab activation helper
   function activate(tab){
     tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
@@ -158,19 +178,19 @@
           </div>
           <div style="margin-top:20px;">
             <div class="admin-card">
-              <h4><i class="fas fa-exclamation-circle"></i> Action Required</h4>
+              <h4><i class="fas fa-exclamation-circle"></i> ${translate('admin:guests.actionRequired')}</h4>
               <ul style="list-style:none;padding:0;">
                 <li style="padding:8px 0;border-bottom:1px solid var(--gray-200);">
                   <i class="fas fa-utensils" style="color:var(--primary-color);width:20px;"></i>
-                  <strong>${data.guestsWithoutMenuChoices}</strong> guests without menu choices
+                  <strong>${data.guestsWithoutMenuChoices}</strong> ${translate('admin:guests.withoutMenuChoices')}
                 </li>
                 <li style="padding:8px 0;border-bottom:1px solid var(--gray-200);">
                   <i class="fas fa-calendar" style="color:var(--primary-color);width:20px;"></i>
-                  <strong>${data.guestsWithoutEventChoices}</strong> guests without event responses
+                  <strong>${data.guestsWithoutEventChoices}</strong> ${translate('admin:guests.withoutEventResponses')}
                 </li>
                 <li style="padding:8px 0;">
                   <i class="fas fa-users" style="color:var(--primary-color);width:20px;"></i>
-                  <strong>${data.guestsWithoutPartyMembers}</strong> guests without party members
+                  <strong>${data.guestsWithoutPartyMembers}</strong> ${translate('admin:guests.withoutPartyMembers')}
                 </li>
               </ul>
             </div>
@@ -187,7 +207,7 @@
     const target = getContentTarget();
     setLoading(translate('admin:subtab.eventAttendance'));
     try {
-      const res = await api('/api/admin/guest-summary');
+      const res = await api(`/api/admin/guest-summary?lang=${getUserLanguage()}`);
       if (!res.ok) throw new Error('Failed to load attendance data');
       const data = await res.json();
 
@@ -202,8 +222,8 @@
           <h3><i class="fas fa-chart-bar"></i> ${translate('admin:subtab.eventAttendance')}</h3>
           <div class="admin-card">
             <table class="data-table">
-              <thead><tr><th>Event</th><th>Attending</th></tr></thead>
-              <tbody>${eventRows || '<tr><td colspan="2">No events configured</td></tr>'}</tbody>
+              <thead><tr><th>${translate('admin:attendance.event')}</th><th>${translate('admin:attendance.attending')}</th></tr></thead>
+              <tbody>${eventRows || '<tr><td colspan="2">' + translate('admin:attendance.noEvents') + '</td></tr>'}</tbody>
             </table>
           </div>
         </div>`;
@@ -253,8 +273,8 @@
             <h4 style="margin:0;">${s.title || 'Section ' + (i + 1)}</h4>
             <button class="admin-action edit-section-btn" data-index="${i}" title="Edit Section"><i class="fas fa-edit"></i></button>
           </div>
-          <p style="margin-top:8px;">${s.content || '<em style="color:var(--text-light);">No content yet</em>'}</p>
-          ${s.imageUrl ? '<img data-auth-src="' + s.imageUrl + '" alt="Section image" style="max-width:200px;border-radius:8px;margin-top:8px;">' : '<p style="color:var(--text-light);font-size:0.85em;margin-top:8px;"><i class="fas fa-image"></i> No image</p>'}
+          <p style="margin-top:8px;">${s.content || '<em style="color:var(--text-light);">' + translate('admin:menu.noContentYet') + '</em>'}</p>
+          ${s.imageUrl ? '<img data-auth-src="' + s.imageUrl + '" alt="Section image" style="max-width:200px;border-radius:8px;margin-top:8px;">' : '<p style="color:var(--text-light);font-size:0.85em;margin-top:8px;"><i class="fas fa-image"></i> ' + translate('admin:menu.noImage') + '</p>'}
         </div>`).join('');
 
       // Build chef profile section (same pattern as banquet menu)
@@ -287,13 +307,13 @@
       }
 
       // Build delete menu button
-      const deleteMenuHtml = `<button class="btn btn-secondary" id="deleteDayMenuBtn" style="margin-top:20px;"><i class="fas fa-trash"></i> Delete Menu</button>`;
+      const deleteMenuHtml = `<button class="btn btn-secondary" id="deleteDayMenuBtn" style="margin-top:20px;"><i class="fas fa-trash"></i> ${translate('admin:menu.deleteMenu')}</button>`;
 
       target.innerHTML = `
         <div class="admin-content">
           <h3><i class="fas fa-utensils"></i> ${translate('admin:subtab.' + day + 'Menu')}</h3>
           ${chefSection}
-          ${sectionsHtml || '<p style="color:var(--text-light);">No sections configured.</p>'}
+          ${sectionsHtml || '<p style="color:var(--text-light);">' + translate('admin:menu.noSections') + '</p>'}
           ${deleteMenuHtml}
         </div>`;
 
@@ -306,12 +326,12 @@
           const idx = parseInt(btn.dataset.index, 10);
           const section = menu.sections[idx];
           openFormModal({
-            title: `Edit ${section.title || 'Section ' + (idx + 1)}`,
+            title: translateWithVars('admin:menu.editSection', { title: section.title || 'Section ' + (idx + 1) }),
             submitText: translate('admin:menu.save'),
             fields: [
-              { name: 'title', label: 'Title', required: true },
-              { name: 'content', label: 'Content', type: 'textarea', rows: 5 },
-              { name: 'image', label: 'Image', type: 'file', help: section.imageUrl ? '<img data-auth-src="' + section.imageUrl + '" style="max-width:150px;border-radius:6px;margin-top:6px;">' : 'No image uploaded' }
+              { name: 'title', label: translate('admin:menu.sectionTitle'), required: true },
+              { name: 'content', label: translate('admin:menu.sectionContent'), type: 'textarea', rows: 5 },
+              { name: 'image', label: translate('admin:menu.sectionImage'), type: 'file', help: section.imageUrl ? '<img data-auth-src="' + section.imageUrl + '" style="max-width:150px;border-radius:6px;margin-top:6px;">' : translate('admin:menu.noImageUploaded') }
             ],
             initialValues: {
               title: section.title || '',
@@ -450,7 +470,7 @@
 
       // Wire up delete menu button
       target.querySelector('#deleteDayMenuBtn')?.addEventListener('click', async () => {
-        if (!confirm('Are you sure you want to delete this menu?')) return;
+        if (!confirm(translate('admin:menu.confirmDeleteMenu'))) return;
         try {
           const r = await api(`/api/admin/day-menus/${menu.id}`, { method: 'DELETE' });
           if (r.ok) showDayMenu(day);
@@ -509,8 +529,8 @@
             <h3><i class="fas fa-th"></i> ${translate('admin:subtab.tableAllocation')}</h3>
             <div style="text-align:center;padding:40px;">
               <i class="fas fa-chair" style="font-size:3em;color:var(--gray-300);margin-bottom:15px;"></i>
-              <p style="color:var(--text-light);">No tables configured yet.</p>
-              <button class="btn btn-primary" id="seedTablesBtn"><i class="fas fa-magic"></i> Seed Default Tables</button>
+              <p style="color:var(--text-light);">${translate('admin:tables.noTablesConfigured')}</p>
+              <button class="btn btn-primary" id="seedTablesBtn"><i class="fas fa-magic"></i> ${translate('admin:tables.seedTables')}</button>
             </div>
           </div>`;
         target.querySelector('#seedTablesBtn')?.addEventListener('click', async () => {
@@ -533,13 +553,13 @@
         return `
           <div class="admin-card" style="margin-bottom:10px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
-              <h4 style="margin:0;">${t.isHeadTable ? '<i class="fas fa-crown" style="color:gold;"></i> ' : ''}Table ${t.number} ${t.name ? '(' + t.name + ')' : ''}</h4>
+              <h4 style="margin:0;">${t.isHeadTable ? '<i class="fas fa-crown" style="color:gold;"></i> ' : ''}${getTableDisplayName(t)}</h4>
               <span style="font-size:0.85em;color:var(--text-light);">${t.assignedCount}/${t.capacity}</span>
             </div>
             <div style="background:var(--gray-200);border-radius:4px;height:6px;margin:8px 0;">
               <div style="background:${barColor};width:${Math.min(pct, 100)}%;height:100%;border-radius:4px;"></div>
             </div>
-            <div style="display:flex;flex-wrap:wrap;gap:2px;">${assignedNames || '<span style="color:var(--text-light);font-size:0.85em;">No guests assigned</span>'}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:2px;">${assignedNames || '<span style="color:var(--text-light);font-size:0.85em;">' + translate('admin:tables.noGuestsAssigned') + '</span>'}</div>
           </div>`;
       }).join('');
 
@@ -551,19 +571,19 @@
           <div class="stats-grid" style="margin-bottom:20px;">
             <div class="stat-card">
               <div class="stat-number">${tables.length}</div>
-              <div class="stat-label">Tables</div>
+              <div class="stat-label">${translate('admin:tables.tables')}</div>
             </div>
             <div class="stat-card">
               <div class="stat-number">${totalCapacity}</div>
-              <div class="stat-label">Total Capacity</div>
+              <div class="stat-label">${translate('admin:tables.totalCapacity')}</div>
             </div>
             <div class="stat-card">
               <div class="stat-number">${totalConfirmed}</div>
-              <div class="stat-label">Total Confirmed</div>
+              <div class="stat-label">${translate('admin:tables.totalConfirmed')}</div>
             </div>
             <div class="stat-card">
               <div class="stat-number">${totalAssigned}</div>
-              <div class="stat-label">Assigned</div>
+              <div class="stat-label">${translate('admin:tables.assigned')}</div>
             </div>
           </div>
           ${tableCards}
@@ -598,7 +618,7 @@
       });
 
       // Table options for dropdown
-      const tableOptions = tables.map(t => `<option value="${t.id}">${t.isHeadTable ? 'Head Table' : 'Table ' + t.number}${t.name ? ' (' + t.name + ')' : ''}</option>`).join('');
+      const tableOptions = tables.map(t => `<option value="${t.id}">${getTableDisplayName(t)}</option>`).join('');
 
       // Build guest rows
       const tbody = target.querySelector('#assignmentBody');
@@ -614,7 +634,7 @@
           html: `<tr class="assignment-row" data-guest-id="${g.id}" data-assigned="${!!primaryAssignment}">
             <td><strong>${g.name}</strong></td>
             <td>—</td>
-            <td>${primaryAssignment ? (tables.find(t => t.id === primaryAssignment.tableId)?.name || 'Table ' + (tables.find(t => t.id === primaryAssignment.tableId)?.number || '?')) : '<span style="color:var(--text-light);">' + translate('admin:tables.unassigned') + '</span>'}</td>
+            <td>${primaryAssignment ? getTableDisplayName(tables.find(t => t.id === primaryAssignment.tableId) || {number: '?'}) : '<span style="color:var(--text-light);">' + translate('admin:tables.unassigned') + '</span>'}</td>
             <td>
               <select class="table-assign-select" data-guest-id="${g.id}" data-party-member="" data-assignment-id="${primaryAssignId}">
                 <option value="">${translate('admin:tables.unassigned')}</option>
@@ -708,7 +728,7 @@
             <h3><i class="fas fa-clipboard-list"></i> ${translate('admin:subtab.menuResponses')}</h3>
             <div style="text-align:center;padding:40px;">
               <i class="fas fa-clipboard" style="font-size:3em;color:var(--gray-300);margin-bottom:15px;"></i>
-              <p style="color:var(--text-light);">No menu responses yet.</p>
+              <p style="color:var(--text-light);">${translate('admin:menuResponses.noResponses')}</p>
             </div>
           </div>`;
         return;
@@ -719,15 +739,15 @@
         totalResponses += group.guests.length;
         const guestRows = group.guests.map(g => {
           const choiceLabels = (g.choices || []).map(c => c.optionLabel).filter(l => l && l !== '—').join(', ') || '—';
-          const specReq = g.specialRequest ? `<span class="badge badge-info">${g.specialRequest}</span>` : '';
+          const specReq = g.specialRequest ? `<span class="badge badge-info">${g.specialRequest.split(', ').map(s => translateDietary(s.trim())).join(', ')}</span>` : '';
           return `<tr><td>${g.guestName}${g.partyMemberName ? ' <small>(' + g.partyMemberName + ')</small>' : ''}</td><td>${choiceLabels}</td><td>${specReq}${g.specialRequestDetail ? ' ' + g.specialRequestDetail : ''}</td></tr>`;
         }).join('');
 
         return `
           <div class="admin-card" style="margin-bottom:15px;">
-            <h4>${group.tableName} ${group.tableNumber !== null ? '(#' + group.tableNumber + ')' : ''}</h4>
+            <h4>${group.tableName || (group.tableNumber !== null ? translate('admin:tables.tableLabel') + ' ' + group.tableNumber : translate('admin:tables.unassigned'))} ${group.tableNumber !== null ? '(#' + group.tableNumber + ')' : ''}</h4>
             <table class="data-table">
-              <thead><tr><th>Guest</th><th>Menu Choices</th><th>Special Requests</th></tr></thead>
+              <thead><tr><th>${translate('admin:menuResponses.guest')}</th><th>${translate('admin:menuResponses.menuChoices')}</th><th>${translate('admin:menuResponses.specialRequests')}</th></tr></thead>
               <tbody>${guestRows}</tbody>
             </table>
           </div>`;
@@ -1342,7 +1362,7 @@
     modal.innerHTML = `
       <div style="padding:22px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
         <h3 style="margin:0;color:#333;">${title}</h3>
-        <button id="mfClose" class="btn btn-secondary">Close</button>
+        <button id="mfClose" class="btn btn-secondary">${translate('admin:form.close')}</button>
       </div>
       <form id="mfForm" style="padding:18px 24px;">
         <div id="mfError" style="display:none;margin-bottom:10px;color:#dc3545;font-weight:600;"></div>
@@ -1438,7 +1458,7 @@
           }
         }).join('')}
         <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px;">
-          <button type="button" id="mfCancel" class="btn btn-secondary">Cancel</button>
+          <button type="button" id="mfCancel" class="btn btn-secondary">${translate('admin:form.cancel')}</button>
           <button type="submit" class="btn btn-success">${submitText}</button>
         </div>
       </form>`;
