@@ -32,6 +32,19 @@ async function askConfirm(question) {
 
 async function main() {
   try {
+    // SAFETY CHECK: Prevent accidental production deletion
+    if (MONGODB_URI.includes('mongodb.net') || MONGODB_URI.includes('cloud.mongodb.com')) {
+      console.error('❌ DANGER: This appears to be a production/cloud MongoDB URI!');
+      console.error('MONGODB_URI:', MONGODB_URI);
+      console.error('\nTo clean production, you must:');
+      console.error('1. Set ALLOW_PRODUCTION_DELETE=true in environment');
+      console.error('2. Run this script again\n');
+      if (process.env.ALLOW_PRODUCTION_DELETE !== 'true') {
+        throw new Error('Production database deletion prevented. Set ALLOW_PRODUCTION_DELETE=true to override.');
+      }
+      console.warn('⚠️  ALLOW_PRODUCTION_DELETE is set. Proceeding with production deletion...\n');
+    }
+
     if (!MONGODB_URI) throw new Error('MONGODB_URI not configured');
     console.log(`Connecting to MongoDB (${MONGODB_DB})...`);
     await mongoose.connect(MONGODB_URI, { dbName: MONGODB_DB });
@@ -45,7 +58,9 @@ async function main() {
       const res = await db.dropDatabase();
       console.log('Database dropped:', res);
     } else {
-      const list = Object.values(models);
+      const list = Object.entries(models)
+        .filter(([name, model]) => name !== 'LocalizedString' && typeof model.estimatedDocumentCount === 'function')
+        .map(([name, model]) => model);
       const countsBefore = await Promise.all(list.map(m => m.estimatedDocumentCount()));
       const names = list.map(m => m.collection.name);
 

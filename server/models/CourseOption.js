@@ -13,12 +13,23 @@ const courseOptionSchema = new Schema({
     ref: 'CourseOptionImage'
   },
   description: { ...LocalizedString, default: null },
-  // Special Dietary Indicators
+  // Dietary Flags
   isVegetarian: { type: Boolean, default: false },
-  containsAllergens: { type: Boolean, default: false },
-  containsLactose: { type: Boolean, default: false },
+  isVegan: { type: Boolean, default: false },
   isSpicy: { type: Boolean, default: false },
-  containsNuts: { type: Boolean, default: false }
+  
+  // Specific Allergen Flags
+  containsGluten: { type: Boolean, default: false },
+  containsEggs: { type: Boolean, default: false },
+  containsFish: { type: Boolean, default: false },
+  containsShellfish: { type: Boolean, default: false },
+  containsSoy: { type: Boolean, default: false },
+  containsSesame: { type: Boolean, default: false },
+  containsLactose: { type: Boolean, default: false },
+  containsNuts: { type: Boolean, default: false },
+  
+  // Deprecated - replaced by specific allergen flags above
+  containsAllergens: { type: Boolean, default: false }
 }, { timestamps: true });
 
 module.exports = model('CourseOption', courseOptionSchema);

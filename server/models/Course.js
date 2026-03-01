@@ -4,7 +4,7 @@ const { LocalizedString } = require('./LocalizedString');
 const courseSchema = new Schema({
   course: { 
     type: String, 
-    enum: ['starter', 'main', 'dessert', 'drinks'], 
+    enum: ['welcome_cocktails', 'starter', 'main', 'dessert', 'late_night_snacks', 'drinks'],
     required: true 
   },
   label: { ...LocalizedString, required: true },

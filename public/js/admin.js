@@ -3074,9 +3074,11 @@
       
       // Group by course type for better organization
       const courseGroups = {
+        welcome_cocktails: [],
         starter: [],
         main: [],
         dessert: [],
+        late_night_snacks: [],
         drinks: []
       };
       
@@ -3087,16 +3089,20 @@
       });
       
       const courseIcons = {
+        welcome_cocktails: 'fa-glass-cheers',
         starter: 'fa-utensils',
         main: 'fa-drumstick-bite',
         dessert: 'fa-birthday-cake',
+        late_night_snacks: 'fa-moon',
         drinks: 'fa-wine-glass-alt'
       };
       
       const courseNames = {
+        welcome_cocktails: translate('admin:menu.courseType.welcome_cocktails'),
         starter: translate('admin:menu.courseType.starter'),
         main: translate('admin:menu.courseType.main'),
         dessert: translate('admin:menu.courseType.dessert'),
+        late_night_snacks: translate('admin:menu.courseType.late_night_snacks'),
         drinks: translate('admin:menu.courseType.drinks')
       };
       
@@ -3406,9 +3412,11 @@
             type: 'select', 
             required: true,
             options: [
+              { value: 'welcome_cocktails', label: translate('admin:menu.option.welcome_cocktails') },
               { value: 'starter', label: translate('admin:menu.option.starter') },
               { value: 'main', label: translate('admin:menu.option.main') },
               { value: 'dessert', label: translate('admin:menu.option.dessert') },
+              { value: 'late_night_snacks', label: translate('admin:menu.option.late_night_snacks') },
               { value: 'drinks', label: translate('admin:menu.option.drinks') }
             ]
           },
@@ -3501,6 +3509,7 @@
           { name: 'description', label: translate('admin:menu.field.optionDescription'), type: 'textarea', required: false, help: translate('admin:menu.field.optionDescriptionHelp') },
           // Special Dietary Indicators
           { name: 'isVegetarian', label: translate('admin:menu.field.isVegetarian'), type: 'checkbox', help: translate('admin:menu.field.helpVegetarian') },
+          { name: 'isVegan', label: translate('admin:menu.field.isVegan'), type: 'checkbox', help: translate('admin:menu.field.helpVegan') },
           { name: 'containsAllergens', label: translate('admin:menu.field.containsAllergens'), type: 'checkbox', help: translate('admin:menu.field.helpAllergens') },
           { name: 'containsLactose', label: translate('admin:menu.field.containsLactose'), type: 'checkbox', help: translate('admin:menu.field.helpLactose') },
           { name: 'isSpicy', label: translate('admin:menu.field.isSpicy'), type: 'checkbox', help: translate('admin:menu.field.helpSpicy') },
@@ -3511,6 +3520,7 @@
           image: existingData?.image || '',
           description: existingData?.description || '',
           isVegetarian: existingData?.isVegetarian || false,
+          isVegan: existingData?.isVegan || false,
           containsAllergens: existingData?.containsAllergens || false,
           containsLactose: existingData?.containsLactose || false,
           isSpicy: existingData?.isSpicy || false,
@@ -3569,6 +3579,7 @@
               image: imageReference,
               description: values.description,
               isVegetarian: values.isVegetarian || false,
+              isVegan: values.isVegan || false,
               containsAllergens: values.containsAllergens || false,
               containsLactose: values.containsLactose || false,
               isSpicy: values.isSpicy || false,

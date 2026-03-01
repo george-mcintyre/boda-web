@@ -800,21 +800,34 @@ main.main-content-full {
 
 .course-group-content {
   padding: 20px;
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 20px;
 }
 
-/* Two-column layout for course cards on tablet and up when there's enough space */
+/* Course card takes full width */
+.menu-course-group .card {
+  width: 100%;
+}
+
+/* Card content inside each course uses responsive grid for menu options */
+.menu-course-group .card .card-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  padding: 15px;
+}
+
+/* Two-column layout for menu options on tablet */
 @media (min-width: 768px) {
-  .course-group-content {
+  .menu-course-group .card .card-content {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* Three-column layout for course cards on larger desktop screens */
+/* Three-column layout for menu options on desktop */
 @media (min-width: 1200px) {
-  .course-group-content {
+  .menu-course-group .card .card-content {
     grid-template-columns: repeat(3, 1fr);
   }
 }
@@ -918,10 +931,7 @@ main.main-content-full {
   color: var(--text-dark);
 }
 
-.dietary-icons {
-  font-size: 0.9em;
-  color: var(--text-light);
-}
+
 
 .option-description-text {
   margin: 0;
@@ -946,9 +956,20 @@ main.main-content-full {
   font-weight: 500;
 }
 
+/* Allow inline icon colors to show through */
+.dietary-badge i {
+  /* Color set via inline styles */
+}
+
 .dietary-badge.vegetarian {
   background: var(--success-light);
   color: var(--success-color);
+}
+
+.dietary-badge.vegan {
+  background: #e8f5e9;
+  color: #22bb33;
+  font-weight: 600;
 }
 
 .dietary-badge.allergens {
@@ -970,6 +991,7 @@ main.main-content-full {
   background: #fff3e0;
   color: #f57c00;
 }
+
 
 .dietary-requirements-list {
   display:flex;
@@ -3227,5 +3249,100 @@ main.main-content-full {
 
   .willow-comment-body {
     font-size: 0.9em;
+  }
+}
+
+/* ============================================================================
+   Image Lightbox
+   ============================================================================ */
+
+.lightbox {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  cursor: zoom-out;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 95%;
+  max-height: 95%;
+  z-index: 10000;
+}
+
+.lightbox-image {
+  max-width: 100%;
+  max-height: 95vh;
+  width: auto;
+  height: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-close {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .lightbox-content {
+    max-width: 100%;
+    max-height: 100%;
+    padding: 20px;
+  }
+  
+  .lightbox-image {
+    max-height: 90vh;
+    border-radius: var(--radius-md);
+  }
+  
+  .lightbox-close {
+    top: 10px;
+    right: 10px;
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid rgba(255, 255, 255, 0.8);
+  }
+  
+  /* Make image container cursor indicate it's tappable */
+  .option-image-container {
+    cursor: pointer;
   }
 }

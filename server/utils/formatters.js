@@ -1,3 +1,4 @@
+// Force module reload - vegan bug fix
 const { localize } = require('./localized');
 const { generateDietaryIconsHTML, generateSelectionIconHTML } = require('./menuIcons');
 
@@ -76,18 +77,39 @@ function formatCourseOptionForApi(option, lang) {
     }
   }
 
+  // Debug logging for vegan field issue
+  if (option.label && option.label.en && option.label.en.includes('Gazpacho')) {
+    console.log('[FORMATTER DEBUG] Gazpacho option:', {
+      id: option._id,
+      label: option.label.en,
+      isVegan: option.isVegan,
+      isVegetarian: option.isVegetarian,
+      type_isVegan: typeof option.isVegan
+    });
+  }
+  
   return {
     id: option._id.toString(),
     courseId: option.courseId.toString(),
     label: localize(option.label, lang),
     image: imageData,
     description: localize(option.description, lang) || null,
-    // Special Dietary Indicators
+    // Dietary Flags
+    isVegan: option.isVegan || false,
     isVegetarian: option.isVegetarian || false,
-    containsAllergens: option.containsAllergens || false,
-    containsLactose: option.containsLactose || false,
     isSpicy: option.isSpicy || false,
+    // Specific Allergen Flags
+    containsGluten: option.containsGluten || false,
+    containsEggs: option.containsEggs || false,
+    containsFish: option.containsFish || false,
+    containsShellfish: option.containsShellfish || false,
+    containsSoy: option.containsSoy || false,
+    containsSesame: option.containsSesame || false,
+    containsLactose: option.containsLactose || false,
     containsNuts: option.containsNuts || false,
+    // Deprecated
+    containsAllergens: option.containsAllergens || false,
+    // Generated HTML with icons
     dietaryIcons: generateDietaryIconsHTML(option)
   };
 }

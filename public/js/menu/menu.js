@@ -56,9 +56,11 @@ async function loadMenuSelections() {
 
     // Group courses by type (starter, main, dessert, drinks)
     const courseGroups = {
+      welcome_cocktails: { label: 'guests:courseGroupWelcomeCocktails', icon: 'fa-glass-cheers', courses: [] },
       starter: { label: 'guests:courseGroupStarters', icon: 'fa-seedling', courses: [] },
       main: { label: 'guests:courseGroupMainCourses', icon: 'fa-drumstick-bite', courses: [] },
       dessert: { label: 'guests:courseGroupDesserts', icon: 'fa-ice-cream', courses: [] },
+      late_night_snacks: { label: 'guests:courseGroupLateNightSnacks', icon: 'fa-moon', courses: [] },
       drinks: { label: 'guests:courseGroupDrinks', icon: 'fa-cocktail', courses: [] }
     };
 
@@ -120,7 +122,7 @@ async function loadMenuSelections() {
     `;
 
     // Iterate through course groups
-    const groupOrder = ['starter', 'main', 'dessert', 'drinks'];
+    const groupOrder = ['welcome_cocktails', 'starter', 'main', 'dessert', 'late_night_snacks', 'drinks'];
     
     groupOrder.forEach(groupKey => {
       const group = courseGroups[groupKey];
@@ -173,7 +175,7 @@ async function loadMenuSelections() {
           html += `
             <div class="menu-option-card" data-option-id="${option.id}" data-course-id="${course.id}">
               <div class="option-card-main">
-                <div class="option-image-container">
+                <div class="option-image-container" data-lightbox-url="${imageUrl}">
                   ${imageUrl ? `
                     <img src="${imageUrl}" alt="${escapeHtml(option.label)}" class="option-thumbnail" onerror="this.style.display='none'; this.parentElement.classList.add('no-image');">
                   ` : `
@@ -185,18 +187,22 @@ async function loadMenuSelections() {
                 <div class="option-details">
                   <div class="option-header-row">
                     <h5 class="option-name">${escapeHtml(option.label)}</h5>
-                    ${option.dietaryIcons ? `<span class="dietary-icons">${option.dietaryIcons}</span>` : ''}
                   </div>
                   ${option.description ? `
                     <p class="option-description-text">${option.description}</p>
                   ` : ''}
                   <div class="dietary-badges">
-                    ${option.isVegetarian ? '<span class="dietary-badge vegetarian"><i class="fas fa-leaf"></i> Vegetarian</span>' : ''}
-                    ${option.containsAllergens ? '<span class="dietary-badge allergens"><i class="fas fa-exclamation-triangle"></i> Allergens</span>' : ''}
-                    ${option.containsLactose ? '<span class="dietary-badge lactose"><i class="fas fa-cheese"></i> Lactose</span>' : ''}
-                    ${option.isSpicy ? '<span class="dietary-badge spicy"><i class="fas fa-pepper-hot"></i> Spicy</span>' : ''}
-                    ${option.containsNuts ? '<span class="dietary-badge contains-nuts"><i class="fas fa-seedling"></i> Contains Nuts</span>' : ''}
-                  </div>
+                    ${option.isVegan ? '<span class="dietary-badge vegan"><i class="fas fa-seedling" style="color: #22bb33;"></i> Vegan</span>' : option.isVegetarian ? '<span class="dietary-badge vegetarian"><i class="fas fa-leaf" style="color: #28a745;"></i> Vegetarian</span>' : ''}
+                    ${option.isSpicy ? '<span class="dietary-badge spicy"><i class="fas fa-pepper-hot" style="color: #dc3545;"></i> Spicy</span>' : ''}
+                    ${option.containsGluten ? '<span class="dietary-badge allergens"><i class="fas fa-bread-slice" style="color: #f39c12;"></i> Contains Gluten</span>' : ''}
+                    ${option.containsEggs ? '<span class="dietary-badge allergens"><i class="fas fa-egg" style="color: #f39c12;"></i> Contains Eggs</span>' : ''}
+                    ${option.containsFish ? '<span class="dietary-badge allergens"><i class="fas fa-fish" style="color: #3498db;"></i> Contains Fish</span>' : ''}
+                    ${option.containsShellfish ? '<span class="dietary-badge allergens"><i class="fas fa-shrimp" style="color: #e74c3c;"></i> Contains Shellfish</span>' : ''}
+                    ${option.containsSoy ? '<span class="dietary-badge allergens"><i class="fas fa-seedling" style="color: #95a5a6;"></i> Contains Soy</span>' : ''}
+                    ${option.containsSesame ? '<span class="dietary-badge allergens"><i class="fas fa-circle" style="color: #d68910;"></i> Contains Sesame</span>' : ''}
+                    ${option.containsLactose ? '<span class="dietary-badge lactose"><i class="fas fa-cheese" style="color: #fd7e14;"></i> Contains Dairy</span>' : ''}
+                    ${option.containsNuts ? '<span class="dietary-badge contains-nuts"><i class="fas fa-dot-circle" style="color: #8b4513;"></i> Contains Nuts</span>' : ''}
+                </div>
                 </div>
               </div>
               ${isSelectable ? `
@@ -701,3 +707,96 @@ async function saveAllMenuChoices() {
 
 // Make menu functions globally accessible
 window.loadMenuSelections = loadMenuSelections;
+
+// ============================================================================
+// Image Lightbox Functionality
+// ============================================================================
+
+function initializeLightbox() {
+  // Create lightbox HTML if it doesn't exist
+  if (!document.getElementById('image-lightbox')) {
+    const lightboxHTML = `
+      <div id="image-lightbox" class="lightbox" style="display: none;">
+        <div class="lightbox-backdrop"></div>
+        <div class="lightbox-content">
+          <button class="lightbox-close" aria-label="Close">
+            <i class="fas fa-times"></i>
+          </button>
+          <img src="" alt="" class="lightbox-image">
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', lightboxHTML);
+  }
+
+  const lightbox = document.getElementById('image-lightbox');
+  const lightboxImg = lightbox.querySelector('.lightbox-image');
+  const closeBtn = lightbox.querySelector('.lightbox-close');
+  const backdrop = lightbox.querySelector('.lightbox-backdrop');
+
+  // Function to open lightbox
+  function openLightbox(imageUrl, altText) {
+    lightboxImg.src = imageUrl;
+    lightboxImg.alt = altText;
+    lightbox.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  }
+
+  // Function to close lightbox
+  function closeLightbox() {
+    lightbox.style.display = 'none';
+    document.body.style.overflow = ''; // Restore scrolling
+    lightboxImg.src = ''; // Clear image
+  }
+
+  // Add click handlers to all menu images
+  document.addEventListener('click', (e) => {
+    const imageContainer = e.target.closest('.option-image-container');
+    if (imageContainer && imageContainer.dataset.lightboxUrl) {
+      const imageUrl = imageContainer.dataset.lightboxUrl;
+      const altText = imageContainer.querySelector('img')?.alt || 'Menu item';
+      openLightbox(imageUrl, altText);
+    }
+  });
+
+  // Close button
+  closeBtn.addEventListener('click', closeLightbox);
+
+  // Click backdrop to close
+  backdrop.addEventListener('click', closeLightbox);
+
+  // Escape key to close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && lightbox.style.display === 'flex') {
+      closeLightbox();
+    }
+  });
+
+  // Mobile touch support: swipe down to close
+  let touchStartY = 0;
+  let touchEndY = 0;
+
+  lightbox.addEventListener('touchstart', (e) => {
+    touchStartY = e.changedTouches[0].screenY;
+  });
+
+  lightbox.addEventListener('touchend', (e) => {
+    touchEndY = e.changedTouches[0].screenY;
+    handleSwipe();
+  });
+
+  function handleSwipe() {
+    const swipeDistance = touchEndY - touchStartY;
+    // If swiped down more than 100px, close
+    if (swipeDistance > 100) {
+      closeLightbox();
+    }
+  }
+}
+
+// Initialize lightbox when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeLightbox);
+} else {
+  initializeLightbox();
+}

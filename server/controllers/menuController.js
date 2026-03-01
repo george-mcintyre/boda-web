@@ -39,7 +39,27 @@ async function listCourses(req, res, next) {
         label: localize(course.label, lang),
         selectionRequired: course.selectionRequired !== undefined ? course.selectionRequired : true,
         options: options.map(option => {
+          // Debug logging for vegan field
+          if (option.label && option.label.en && option.label.en.includes('Gazpacho')) {
+            console.log('[CONTROLLER DEBUG] Before formatting:', {
+              label: option.label.en,
+              isVegan: option.isVegan,
+              isVegetarian: option.isVegetarian,
+              type_isVegan: typeof option.isVegan
+            });
+          }
+          
           const formattedOption = formatCourseOptionForApi(option, lang);
+          
+          // Debug after formatting
+          if (option.label && option.label.en && option.label.en.includes('Gazpacho')) {
+            console.log('[CONTROLLER DEBUG] After formatting:', {
+              label: formattedOption.label,
+              isVegan: formattedOption.isVegan,
+              isVegetarian: formattedOption.isVegetarian
+            });
+          }
+          
           // Ensure dietary icons are generated
           formattedOption.dietaryIcons = generateDietaryIconsHTML(option);
           return formattedOption;

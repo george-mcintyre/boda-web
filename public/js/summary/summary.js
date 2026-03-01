@@ -273,8 +273,8 @@ try {
         <div class="menu-choice-items">
         `;
 
-        // Sort menu courses by the correct order: starter, main, dessert, drinks
-        const courseOrder = { starter: 1, main: 2, dessert: 3, drinks: 4 };
+        // Sort menu courses by the correct order
+        const courseOrder = { welcome_cocktails: 1, starter: 2, main: 3, dessert: 4, late_night_snacks: 5, drinks: 6 };
         const sortedMenu = menu.slice().sort((a, b) => (courseOrder[a.course] || 999) - (courseOrder[b.course] || 999));
         
         sortedMenu.forEach(course => {

@@ -1,0 +1,644 @@
+{
+  "courses": [
+    {
+      "tempId": "course-1",
+      "course": "welcome_cocktails",
+      "label": {
+        "es": "Cóctel de Bienvenida",
+        "en": "Welcome Cocktails",
+        "fr": "Cocktail de Bienvenue",
+        "de": "Willkommenscocktail"
+      },
+      "selectionRequired": false,
+      "options": [
+        {
+          "label": {
+            "es": "Tabla de Ibéricos",
+            "en": "Iberian Charcuterie Board",
+            "fr": "Planche de Charcuterie Ibérique",
+            "de": "Iberische Aufschnittplatte"
+          },
+          "description": {
+            "es": "Una exquisita selección de embutidos ibéricos artesanales, incluyendo jamón de bellota, chorizo curado y salchichón, cortados finamente y presentados con maestría para comenzar la celebración con auténticos sabores de España.",
+            "en": "An exquisite selection of artisanal Iberian cured meats, including acorn-fed ham, cured chorizo, and salchichón, thinly sliced and masterfully presented to begin the celebration with authentic flavors of Spain.",
+            "fr": "Une sélection exquise de charcuterie ibérique artisanale, comprenant du jambon de gland, du chorizo affiné et du salchichón, finement tranchés et présentés avec maîtrise pour commencer la célébration avec des saveurs authentiques d'Espagne.",
+            "de": "Eine exquisite Auswahl handwerklich hergestellter iberischer Wurstwaren, darunter Eichel-Schinken, gereifter Chorizo und Salchichón, fein geschnitten und meisterhaft präsentiert, um die Feier mit authentischen Aromen Spaniens zu beginnen."
+          },
+          "isVegetarian": false,
+          "containsAllergens": false,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": false
+        },
+        {
+          "label": {
+            "es": "Tablas de Quesos con Frutos Secos y Frutos Rojos",
+            "en": "Cheese Board with Nuts and Red Berries",
+            "fr": "Plateau de Fromages avec Fruits Secs et Fruits Rouges",
+            "de": "Käseplatte mit Nüssen und Roten Beeren"
+          },
+          "description": {
+            "es": "Generosa tabla de quesos españoles seleccionados, desde suaves a intensos, acompañados de frutos secos tostados y frutos rojos frescos que complementan perfectamente la cremosidad y riqueza de cada variedad de queso.",
+            "en": "Generous board of selected Spanish cheeses, from mild to intense, accompanied by toasted nuts and fresh red berries that perfectly complement the creaminess and richness of each cheese variety.",
+            "fr": "Généreux plateau de fromages espagnols sélectionnés, des plus doux aux plus intenses, accompagnés de fruits secs grillés et de fruits rouges frais qui complètent parfaitement le crémeux et la richesse de chaque variété de fromage.",
+            "de": "Großzügige Platte ausgewählter spanischer Käsesorten, von mild bis intensiv, begleitet von gerösteten Nüssen und frischen roten Beeren, die die Cremigkeit und den Reichtum jeder Käsesorte perfekt ergänzen."
+          },
+          "isVegetarian": true,
+          "containsAllergens": false,
+          "containsLactose": true,
+          "isSpicy": false,
+          "containsNuts": true,
+          "isVegan": false
+        },
+        {
+          "label": {
+            "es": "Gazpacho de Fresa y Frambuesa",
+            "en": "Strawberry and Raspberry Gazpacho",
+            "fr": "Gaspacho aux Fraises et Framboises",
+            "de": "Erdbeer-Himbeer-Gazpacho"
+          },
+          "description": {
+            "es": "Refrescante reinterpretación del clásico andaluz, combinando fresas maduras y frambuesas vibrantes en una sopa fría aterciopelada, perfectamente equilibrada entre dulzor natural y notas sutilmente ácidas. Una experiencia vegana ligera y elegante.",
+            "en": "Refreshing reinterpretation of the Andalusian classic, combining ripe strawberries and vibrant raspberries in a velvety cold soup, perfectly balanced between natural sweetness and subtly tart notes. A light and elegant vegan experience.",
+            "fr": "Réinterprétation rafraîchissante du classique andalou, combinant des fraises mûres et des framboises vibrantes dans une soupe froide veloutée, parfaitement équilibrée entre douceur naturelle et notes subtilement acidulées. Une expérience végétalienne légère et élégante.",
+            "de": "Erfrischende Neuinterpretation des andalusischen Klassikers, die reife Erdbeeren und lebendige Himbeeren in einer samtigen kalten Suppe kombiniert, perfekt ausbalanciert zwischen natürlicher Süße und subtil säuerlichen Noten. Ein leichtes und elegantes veganes Erlebnis."
+          },
+          "isVegetarian": true,
+          "containsAllergens": false,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": true
+        },
+        {
+          "label": {
+            "es": "Croquetas de Setas con Alioli",
+            "en": "Mushroom Croquettes with Aioli",
+            "fr": "Croquettes de Champignons à l'Aïoli",
+            "de": "Pilz-Kroketten mit Aioli"
+          },
+          "description": {
+            "es": "Croquetas artesanales crujientes por fuera y cremosas por dentro, elaboradas con una mezcla de setas silvestres y shiitake, envueltas en bechamel vegana sedosa. Servidas con alioli tradicional vegano para realzar los profundos sabores terrosos.",
+            "en": "Artisanal croquettes crispy on the outside and creamy inside, made with a blend of wild mushrooms and shiitake, wrapped in silky vegan béchamel. Served with traditional vegan aioli to enhance the deep earthy flavors.",
+            "fr": "Croquettes artisanales croustillantes à l'extérieur et crémeuses à l'intérieur, préparées avec un mélange de champignons sauvages et de shiitake, enrobées d'une béchamel végétalienne soyeuse. Servies avec un aïoli traditionnel végétalien pour rehausser les saveurs terreuses profondes.",
+            "de": "Handwerklich hergestellte Kroketten, außen knusprig und innen cremig, zubereitet mit einer Mischung aus Wildpilzen und Shiitake, umhüllt von seidiger veganer Béchamel. Serviert mit traditioneller veganer Aioli, um die tiefen erdigen Aromen zu verstärken."
+          },
+          "isVegetarian": true,
+          "containsAllergens": true,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": true
+        },
+        {
+          "label": {
+            "es": "Ajoblanco con Reducción de Vino Moscatel y Pasas",
+            "en": "Ajoblanco with Moscatel Wine Reduction and Raisins",
+            "fr": "Ajoblanco avec Réduction de Vin Muscat et Raisins",
+            "de": "Ajoblanco mit Moscatel-Weinreduktion und Rosinen"
+          },
+          "description": {
+            "es": "Sopa fría malagueña de almendras y ajo, suave como el terciopelo, coronada con una reducción dulce de vino moscatel y pasas hidratadas. Un contraste sofisticado de texturas y sabores que celebra la tradición culinaria mediterránea en su forma más refinada.",
+            "en": "Málaga-style cold soup of almonds and garlic, smooth as velvet, crowned with a sweet moscatel wine reduction and hydrated raisins. A sophisticated contrast of textures and flavors celebrating Mediterranean culinary tradition in its most refined form.",
+            "fr": "Soupe froide de Málaga aux amandes et à l'ail, douce comme du velours, couronnée d'une réduction sucrée de vin muscat et de raisins secs réhydratés. Un contraste sophistiqué de textures et de saveurs célébrant la tradition culinaire méditerranéenne dans sa forme la plus raffinée.",
+            "de": "Kalte Suppe aus Málaga mit Mandeln und Knoblauch, weich wie Samt, gekrönt mit einer süßen Moscatel-Weinreduktion und hydrierten Rosinen. Ein raffinierter Kontrast von Texturen und Aromen, der die mediterrane kulinarische Tradition in ihrer raffiniertesten Form feiert."
+          },
+          "isVegetarian": true,
+          "containsAllergens": false,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": true,
+          "isVegan": true
+        },
+        {
+          "label": {
+            "es": "Patatas Bravas con Salsa Oyana",
+            "en": "Patatas Bravas with Oyana Sauce",
+            "fr": "Patatas Bravas à la Sauce Oyana",
+            "de": "Patatas Bravas mit Oyana-Sauce"
+          },
+          "description": {
+            "es": "El icónico tapeo español reinventado: patatas cortadas a mano, fritas hasta alcanzar la textura perfecta crujiente-cremosa, generosamente cubiertas con la legendaria salsa Oyana picante y ahumada. Una delicia vegana que rinde homenaje a la cultura de las tapas.",
+            "en": "The iconic Spanish tapa reinvented: hand-cut potatoes, fried to achieve the perfect crispy-creamy texture, generously topped with the legendary spicy and smoky Oyana sauce. A vegan delight that pays homage to tapas culture.",
+            "fr": "Le tapas espagnol iconique réinventé : pommes de terre coupées à la main, frites pour atteindre la texture parfaite croustillante-crémeuse, généreusement nappées de la légendaire sauce Oyana épicée et fumée. Un délice végétalien qui rend hommage à la culture des tapas.",
+            "de": "Die ikonische spanische Tapa neu erfunden: handgeschnittene Kartoffeln, frittiert bis zur perfekten knusprig-cremigen Textur, großzügig belegt mit der legendären würzigen und rauchigen Oyana-Sauce. Ein veganer Genuss, der der Tapas-Kultur huldigt."
+          },
+          "isVegetarian": true,
+          "containsAllergens": false,
+          "containsLactose": false,
+          "isSpicy": true,
+          "containsNuts": false,
+          "isVegan": true
+        },
+        {
+          "label": {
+            "es": "Bebidas Alcohólicas",
+            "en": "Alcoholic Beverages",
+            "fr": "Boissons Alcoolisées",
+            "de": "Alkoholische Getränke"
+          },
+          "description": {
+            "es": "Selección ilimitada de cava burbujeante, vinos blancos y tintos españoles cuidadosamente seleccionados, cervezas artesanales, y cócteles clásicos elaborados por nuestros expertos bartenders, disponibles durante todo el cóctel de bienvenida para brindar por esta celebración especial.",
+            "en": "Unlimited selection of sparkling cava, carefully curated Spanish white and red wines, craft beers, and classic cocktails crafted by our expert bartenders, available throughout the welcome reception to toast this special celebration.",
+            "fr": "Sélection illimitée de cava pétillant, vins blancs et rouges espagnols soigneusement sélectionnés, bières artisanales, et cocktails classiques préparés par nos barmans experts, disponibles tout au long de la réception de bienvenue pour porter un toast à cette célébration spéciale.",
+            "de": "Unbegrenzte Auswahl an prickelndem Cava, sorgfältig ausgewählten spanischen Weiß- und Rotweinen, handwerklichen Bieren und klassischen Cocktails, zubereitet von unseren erfahrenen Barkeepern, während des gesamten Willkommensempfangs zum Anstoßen auf diese besondere Feier."
+          },
+          "isVegetarian": true,
+          "isVegan": true,
+          "containsAllergens": false,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": false,
+          "containsGluten": false,
+          "containsEggs": false,
+          "containsFish": false,
+          "containsShellfish": false,
+          "containsSoy": false,
+          "containsSesame": false,
+          "image": "21-alcoholic-beverages.png"
+        },
+        {
+          "label": {
+            "es": "Bebidas Sin Alcohol",
+            "en": "Non-Alcoholic Beverages",
+            "fr": "Boissons Sans Alcool",
+            "de": "Alkoholfreie Getränke"
+          },
+          "description": {
+            "es": "Amplia variedad de zumos naturales recién exprimidos, refrescos premium, agua mineral con y sin gas, y aguas aromatizadas con frutas frescas y hierbas, servidas frías para refrescar y acompañar perfectamente las delicias del cóctel de bienvenida.",
+            "en": "Wide variety of freshly squeezed natural juices, premium soft drinks, still and sparkling mineral water, and infused waters with fresh fruits and herbs, served chilled to refresh and perfectly complement the welcome reception delights.",
+            "fr": "Large variété de jus naturels fraîchement pressés, sodas premium, eau minérale plate et gazeuse, et eaux aromatisées aux fruits frais et herbes, servies fraîches pour rafraîchir et accompagner parfaitement les délices de la réception de bienvenue.",
+            "de": "Große Auswahl an frisch gepressten Natursäften, Premium-Erfrischungsgetränken, stillem und sprudelndem Mineralwasser sowie aromatisierten Wassern mit frischen Früchten und Kräutern, gekühlt serviert zur Erfrischung und perfekten Ergänzung der Köstlichkeiten des Willkommensempfangs."
+          },
+          "isVegetarian": true,
+          "isVegan": true,
+          "containsAllergens": false,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": false,
+          "containsGluten": false,
+          "containsEggs": false,
+          "containsFish": false,
+          "containsShellfish": false,
+          "containsSoy": false,
+          "containsSesame": false,
+          "image": "22-non-alcoholic-beverages.png"
+        }
+      ]
+    },
+    {
+      "tempId": "course-2",
+      "course": "starter",
+      "label": {
+        "es": "Para Compartir",
+        "en": "To Share",
+        "fr": "À Partager",
+        "de": "Zum Teilen"
+      },
+      "selectionRequired": false,
+      "options": [
+        {
+          "label": {
+            "es": "Ceviche de Dorada con Boniato Asado",
+            "en": "Sea Bream Ceviche with Roasted Sweet Potato",
+            "fr": "Ceviche de Dorade avec Patate Douce Rôtie",
+            "de": "Dorade-Ceviche mit gerösteter Süßkartoffel"
+          },
+          "description": {
+            "es": "Delicados trozos de dorada marinados en cítricos frescos, combinados con boniato asado caramelizado que aporta dulzor terroso. Cada bocado ofrece un juego vibrante entre la acidez refrescante del pescado y la cremosidad dulce del boniato, adornado con cilantro fresco y un toque de ají.",
+            "en": "Delicate pieces of sea bream marinated in fresh citrus, combined with caramelized roasted sweet potato that provides earthy sweetness. Each bite offers a vibrant interplay between the refreshing acidity of the fish and the sweet creaminess of the sweet potato, garnished with fresh cilantro and a touch of chili.",
+            "fr": "Délicats morceaux de dorade marinés aux agrumes frais, combinés avec de la patate douce rôtie caramélisée qui apporte une douceur terreuse. Chaque bouchée offre une interaction vibrante entre l'acidité rafraîchissante du poisson et le crémeux sucré de la patate douce, garnie de coriandre fraîche et d'une touche de piment.",
+            "de": "Zarte Stücke von Dorade, mariniert in frischen Zitrusfrüchten, kombiniert mit karamellisierter gerösteter Süßkartoffel, die erdige Süße verleiht. Jeder Bissen bietet ein lebendiges Zusammenspiel zwischen der erfrischenden Säure des Fisches und der süßen Cremigkeit der Süßkartoffel, garniert mit frischem Koriander und einem Hauch Chili."
+          },
+          "isVegetarian": false,
+          "containsAllergens": true,
+          "containsLactose": false,
+          "isSpicy": true,
+          "containsNuts": false,
+          "isVegan": false
+        },
+        {
+          "label": {
+            "es": "Pollo Karaage con Emulsión de Algas",
+            "en": "Chicken Karaage with Seaweed Emulsion",
+            "fr": "Poulet Karaage avec Émulsion d'Algues",
+            "de": "Hühnchen Karaage mit Algen-Emulsion"
+          },
+          "description": {
+            "es": "Bocados de muslo de pollo marinado al estilo japonés, rebozados con una mezcla ligera de harinas y fritos hasta alcanzar un dorado perfecto ultra-crujiente. Acompañados de una innovadora emulsión de algas marinas que añade profundidad umami y un sutil toque oceánico a cada bocado.",
+            "en": "Japanese-style marinated chicken thigh bites, coated in a light flour blend and fried to ultra-crispy golden perfection. Accompanied by an innovative seaweed emulsion that adds umami depth and a subtle oceanic touch to each bite.",
+            "fr": "Bouchées de cuisse de poulet marinées à la japonaise, enrobées d'un mélange léger de farines et frites jusqu'à atteindre une perfection dorée ultra-croustillante. Accompagnées d'une émulsion innovante d'algues marines qui ajoute une profondeur umami et une touche océanique subtile à chaque bouchée.",
+            "de": "Japanisch marinierte Hühnchenschenkel-Häppchen, umhüllt von einer leichten Mehlmischung und frittiert bis zur ultra-knusprigen goldenen Perfektion. Begleitet von einer innovativen Algen-Emulsion, die jedem Bissen Umami-Tiefe und eine subtile ozeanische Note verleiht."
+          },
+          "isVegetarian": false,
+          "containsAllergens": true,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": false
+        },
+        {
+          "label": {
+            "es": "Ensalada de Sandía y Pistachos con Helado de Tomillo y Limón",
+            "en": "Watermelon and Pistachio Salad with Thyme and Lemon Ice Cream",
+            "fr": "Salade de Pastèque et Pistaches avec Glace au Thym et Citron",
+            "de": "Wassermelonen-Pistazien-Salat mit Thymian-Zitronen-Eis"
+          },
+          "description": {
+            "es": "Composición refrescante de sandía jugosa en cubos, pistachos tostados crujientes y queso feta desmenuzado, realzada con un sorprendente helado vegano de tomillo y limón que derrite gradualmente, creando un aderezo aromático único. Una sinfonía de texturas y temperaturas que despierta el paladar.",
+            "en": "Refreshing composition of juicy cubed watermelon, crunchy toasted pistachios and crumbled feta cheese, enhanced with a surprising vegan thyme and lemon ice cream that gradually melts, creating a unique aromatic dressing. A symphony of textures and temperatures that awakens the palate.",
+            "fr": "Composition rafraîchissante de pastèque juteuse en cubes, pistaches grillées croquantes et feta émiettée, rehaussée d'une surprenante glace végétalienne au thym et citron qui fond progressivement, créant une vinaigrette aromatique unique. Une symphonie de textures et de températures qui éveille le palais.",
+            "de": "Erfrischende Komposition aus saftigen Wassermelonenwürfeln, knusprig gerösteten Pistazien und zerbröckeltem Feta-Käse, verfeinert mit einem überraschenden veganen Thymian-Zitronen-Eis, das allmählich schmilzt und ein einzigartiges aromatisches Dressing kreiert. Eine Symphonie aus Texturen und Temperaturen, die den Gaumen erweckt."
+          },
+          "isVegetarian": true,
+          "containsAllergens": false,
+          "containsLactose": true,
+          "isSpicy": false,
+          "containsNuts": true,
+          "isVegan": false
+        },
+        {
+          "label": {
+            "es": "Berenjenas Fritas con Miel de Caña",
+            "en": "Fried Eggplant with Cane Honey",
+            "fr": "Aubergines Frites au Miel de Canne",
+            "de": "Frittierte Auberginen mit Rohrzucker-Honig"
+          },
+          "description": {
+            "es": "Finas rodajas de berenjena, ligeramente rebozadas y fritas hasta conseguir un exterior dorado y crujiente mientras mantienen su interior sedoso. Bañadas con miel de caña andaluza que aporta dulzor meloso y caramelizado, creando un contraste irresistible entre lo salado y lo dulce. Un clásico vegano de la gastronomía del sur de España.",
+            "en": "Thin slices of eggplant, lightly battered and fried until achieving a golden, crispy exterior while maintaining their silky interior. Drizzled with Andalusian cane honey that provides honeyed and caramelized sweetness, creating an irresistible contrast between savory and sweet. A vegan classic from southern Spanish cuisine.",
+            "fr": "Fines tranches d'aubergine, légèrement panées et frites jusqu'à obtenir un extérieur doré et croustillant tout en maintenant leur intérieur soyeux. Arrosées de miel de canne andalou qui apporte une douceur miellée et caramélisée, créant un contraste irrésistible entre le salé et le sucré. Un classique végétalien de la gastronomie du sud de l'Espagne.",
+            "de": "Dünne Auberginenscheiben, leicht paniert und frittiert, bis sie eine goldene, knusprige Außenseite erreichen, während sie ihr seidiges Inneres behalten. Beträufelt mit andalusischem Rohrzucker-Honig, der honigartige und karamellisierte Süße verleiht und einen unwiderstehlichen Kontrast zwischen herzhaft und süß schafft. Ein veganer Klassiker aus der südspanischen Küche."
+          },
+          "isVegetarian": true,
+          "containsAllergens": true,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": true
+        }
+      ]
+    },
+    {
+      "tempId": "course-3",
+      "course": "main",
+      "label": {
+        "es": "Plato Principal",
+        "en": "Main Course",
+        "fr": "Plat Principal",
+        "de": "Hauptgericht"
+      },
+      "selectionRequired": true,
+      "options": [
+        {
+          "label": {
+            "es": "Solomillo a la Parrilla",
+            "en": "Grilled Beef Tenderloin",
+            "fr": "Filet de Bœuf Grillé",
+            "de": "Gegrilltes Rinderfilet"
+          },
+          "description": {
+            "es": "Medallón de solomillo de ternera premium, asado a la parrilla al punto perfecto, con un exterior caramelizado y un interior jugoso y tierno. Acompañado de patatas fritas artesanales crujientes, pimientos baby asados que aportan dulzor ahumado, y una salsa de pimienta negra aterciopelada que realza la nobleza de la carne.",
+            "en": "Premium beef tenderloin medallion, grilled to perfect doneness, with a caramelized exterior and juicy, tender interior. Accompanied by crispy artisanal French fries, roasted baby peppers that provide smoky sweetness, and a velvety black pepper sauce that enhances the nobility of the meat.",
+            "fr": "Médaillon de filet de bœuf premium, grillé à la cuisson parfaite, avec un extérieur caramélisé et un intérieur juteux et tendre. Accompagné de frites artisanales croustillantes, de poivrons baby rôtis qui apportent une douceur fumée, et d'une sauce au poivre noir veloutée qui rehausse la noblesse de la viande.",
+            "de": "Premium-Rinderfilet-Medaillon, gegrillt auf perfekte Garstufe, mit karamellisierter Außenseite und saftigem, zartem Inneren. Begleitet von knusprigen handwerklichen Pommes Frites, gerösteten Baby-Paprika, die rauchige Süße verleihen, und einer samtigen schwarzen Pfeffersauce, die die Edelmut des Fleisches unterstreicht."
+          },
+          "isVegetarian": false,
+          "containsAllergens": false,
+          "containsLactose": true,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": false
+        },
+        {
+          "label": {
+            "es": "Lubina Teriyaki",
+            "en": "Teriyaki Sea Bass",
+            "fr": "Bar Teriyaki",
+            "de": "Teriyaki-Wolfsbarsch"
+          },
+          "description": {
+            "es": "Filete de lubina de alta calidad glaseado con salsa teriyaki casera, creando una capa brillante y caramelizada llena de umami. Servido sobre un suave puré de coliflor sedoso como la seda y coronado con sésamo tostado que añade textura crujiente y notas a nuez. Un encuentro armonioso entre la cocina japonesa y mediterránea.",
+            "en": "High-quality sea bass fillet glazed with homemade teriyaki sauce, creating a shiny, caramelized layer full of umami. Served on smooth cauliflower purée silky as silk and crowned with toasted sesame that adds crunchy texture and nutty notes. A harmonious encounter between Japanese and Mediterranean cuisine.",
+            "fr": "Filet de bar de haute qualité glacé à la sauce teriyaki maison, créant une couche brillante et caramélisée pleine d'umami. Servi sur une purée de chou-fleur lisse comme de la soie et couronné de sésame grillé qui ajoute une texture croquante et des notes de noisette. Une rencontre harmonieuse entre la cuisine japonaise et méditerranéenne.",
+            "de": "Hochwertiges Wolfsbarsch-Filet, glasiert mit hausgemachter Teriyaki-Sauce, das eine glänzende, karamellisierte Schicht voller Umami erzeugt. Serviert auf glattem Blumenkohl-Püree seidig wie Seide und gekrönt mit geröstetem Sesam, der knusprige Textur und nussige Noten hinzufügt. Eine harmonische Begegnung zwischen japanischer und mediterraner Küche."
+          },
+          "isVegetarian": false,
+          "containsAllergens": true,
+          "containsLactose": true,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": false
+        },
+        {
+          "label": {
+            "es": "Filete de Coliflor con Salsa Romescu",
+            "en": "Cauliflower Steak with Romesco Sauce",
+            "fr": "Steak de Chou-Fleur à la Sauce Romesco",
+            "de": "Blumenkohl-Steak mit Romesco-Sauce"
+          },
+          "description": {
+            "es": "Grueso corte de coliflor asado al horno hasta desarrollar bordes caramelizados y un centro tierno, servido con la icónica salsa romesco catalana elaborada con tomates asados, pimientos rojos, almendras y avellanas. Terminado con una arena de aceitunas negras que aporta salinidad mediterránea y profundidad. Una obra maestra vegana que celebra los sabores de Cataluña.",
+            "en": "Thick cauliflower steak roasted until developing caramelized edges and tender center, served with the iconic Catalan romesco sauce made with roasted tomatoes, red peppers, almonds and hazelnuts. Finished with black olive dust that provides Mediterranean salinity and depth. A vegan masterpiece celebrating the flavors of Catalonia.",
+            "fr": "Épais steak de chou-fleur rôti jusqu'à développer des bords caramélisés et un centre tendre, servi avec l'iconique sauce romesco catalane préparée avec des tomates rôties, des poivrons rouges, des amandes et des noisettes. Terminé avec une poudre d'olives noires qui apporte la salinité méditerranéenne et la profondeur. Un chef-d'œuvre végétalien célébrant les saveurs de la Catalogne.",
+            "de": "Dickes Blumenkohl-Steak, geröstet bis karamellisierte Ränder und zartes Zentrum entstehen, serviert mit der ikonischen katalanischen Romesco-Sauce aus gerösteten Tomaten, roten Paprika, Mandeln und Haselnüssen. Abgerundet mit schwarzem Olivenstaub, der mediterrane Salzigkeit und Tiefe verleiht. Ein veganes Meisterwerk, das die Aromen Kataloniens feiert."
+          },
+          "isVegetarian": true,
+          "containsAllergens": false,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": true,
+          "isVegan": true
+        },
+        {
+          "label": {
+            "es": "Arroz Meloso de Verduras Asadas y Setas",
+            "en": "Creamy Rice with Roasted Vegetables and Mushrooms",
+            "fr": "Riz Crémeux aux Légumes Rôtis et Champignons",
+            "de": "Cremiger Reis mit geröstetem Gemüse und Pilzen"
+          },
+          "description": {
+            "es": "Arroz bomba cocinado lentamente hasta alcanzar la textura melosa perfecta, similar al risotto pero respetando la tradición del arroz español. Repleto de verduras de temporada asadas que aportan dulzor caramelizado y una generosa mezcla de setas silvestres que añaden profundidad terrosa. Un plato vegano reconfortante que abraza con cada cucharada.",
+            "en": "Bomba rice slowly cooked until achieving the perfect creamy texture, similar to risotto but respecting Spanish rice tradition. Filled with roasted seasonal vegetables that provide caramelized sweetness and a generous mix of wild mushrooms that add earthy depth. A comforting vegan dish that embraces with every spoonful.",
+            "fr": "Riz bomba cuit lentement jusqu'à atteindre la texture crémeuse parfaite, similaire au risotto mais respectant la tradition du riz espagnol. Rempli de légumes de saison rôtis qui apportent une douceur caramélisée et un généreux mélange de champignons sauvages qui ajoutent une profondeur terreuse. Un plat végétalien réconfortant qui vous enveloppe à chaque cuillerée.",
+            "de": "Bomba-Reis langsam gekocht, bis die perfekte cremige Textur erreicht ist, ähnlich wie Risotto, aber die spanische Reis-Tradition respektierend. Gefüllt mit geröstetem Saisongemüse, das karamellisierte Süße bietet, und einer großzügigen Mischung wilder Pilze, die erdige Tiefe verleihen. Ein wohltuendes veganes Gericht, das mit jedem Löffel umarmt."
+          },
+          "isVegetarian": true,
+          "containsAllergens": false,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": true
+        }
+      ]
+    },
+    {
+      "tempId": "course-4",
+      "course": "dessert",
+      "label": {
+        "es": "Postres",
+        "en": "Desserts",
+        "fr": "Desserts",
+        "de": "Desserts"
+      },
+      "selectionRequired": false,
+      "options": [
+        {
+          "label": {
+            "es": "Tarta de Queso",
+            "en": "Cheesecake",
+            "fr": "Cheesecake",
+            "de": "Käsekuchen"
+          },
+          "description": {
+            "es": "Clásica tarta de queso cremosa al estilo Nueva York, con una textura increíblemente suave y densa, reposando sobre una base de galleta crujiente. El equilibrio perfecto entre dulzor delicado y la rica tanginess del queso crema de calidad.",
+            "en": "Classic New York-style creamy cheesecake, with an incredibly smooth and dense texture, resting on a crunchy cookie base. The perfect balance between delicate sweetness and the rich tanginess of quality cream cheese.",
+            "fr": "Cheesecake crémeux classique de style New York, avec une texture incroyablement lisse et dense, reposant sur une base de biscuit croustillante. L'équilibre parfait entre douceur délicate et la riche acidité du fromage à la crème de qualité.",
+            "de": "Klassischer cremiger Käsekuchen im New Yorker Stil, mit einer unglaublich glatten und dichten Textur, ruhend auf einem knusprigen Keksboden. Die perfekte Balance zwischen zarter Süße und der reichen Säure von hochwertigem Frischkäse."
+          },
+          "isVegetarian": true,
+          "containsAllergens": true,
+          "containsLactose": true,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": false
+        },
+        {
+          "label": {
+            "es": "Brownie",
+            "en": "Brownie",
+            "fr": "Brownie",
+            "de": "Brownie"
+          },
+          "description": {
+            "es": "Decadente brownie de chocolate belga, con una textura fudgy ultra húmeda y bordes ligeramente crujientes. Intenso sabor a cacao profundo con trozos generosos de chocolate que se derriten en cada bocado. Un clásico irresistible para los amantes del chocolate.",
+            "en": "Decadent Belgian chocolate brownie, with an ultra-moist fudgy texture and slightly crispy edges. Intense deep cocoa flavor with generous chocolate chunks that melt in every bite. An irresistible classic for chocolate lovers.",
+            "fr": "Brownie au chocolat belge décadent, avec une texture fudgy ultra-humide et des bords légèrement croustillants. Saveur intense de cacao profond avec de généreux morceaux de chocolat qui fondent à chaque bouchée. Un classique irrésistible pour les amateurs de chocolat.",
+            "de": "Dekadenter belgischer Schokoladen-Brownie mit ultra-feuchter Fudge-Textur und leicht knusprigen Kanten. Intensiver tiefer Kakaogeschmack mit großzügigen Schokoladenstückchen, die bei jedem Bissen schmelzen. Ein unwiderstehlicher Klassiker für Schokoladenliebhaber."
+          },
+          "isVegetarian": true,
+          "containsAllergens": true,
+          "containsLactose": true,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": false
+        },
+        {
+          "label": {
+            "es": "Lima Cake",
+            "en": "Lime Cake",
+            "fr": "Gâteau au Citron Vert",
+            "de": "Limettenkuchen"
+          },
+          "description": {
+            "es": "Bizcocho esponjoso y aromático de lima, impregnado de un glaseado cítrico brillante que aporta frescura vibrante. Cada bocado ofrece un equilibrio perfecto entre dulzor y acidez refrescante, con intensas notas de lima que despiertan el paladar. Un final ligero y elegante para la comida.",
+            "en": "Fluffy and aromatic lime sponge cake, soaked with a bright citrus glaze that provides vibrant freshness. Each bite offers a perfect balance between sweetness and refreshing acidity, with intense lime notes that awaken the palate. A light and elegant finale to the meal.",
+            "fr": "Gâteau éponge moelleux et aromatique au citron vert, imbibé d'un glaçage aux agrumes brillant qui apporte une fraîcheur vibrante. Chaque bouchée offre un équilibre parfait entre douceur et acidité rafraîchissante, avec des notes intenses de citron vert qui éveillent le palais. Une finale légère et élégante pour le repas.",
+            "de": "Fluffiger und aromatischer Limetten-Biskuitkuchen, getränkt mit einer leuchtenden Zitrusglasur, die lebendige Frische bietet. Jeder Bissen bietet eine perfekte Balance zwischen Süße und erfrischender Säure, mit intensiven Limetten-Noten, die den Gaumen erwecken. Ein leichtes und elegantes Finale für das Essen."
+          },
+          "isVegetarian": true,
+          "containsAllergens": true,
+          "containsLactose": true,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": false
+        },
+        {
+          "label": {
+            "es": "Tarta de Zanahoria con Crema de Queso",
+            "en": "Carrot Cake with Cream Cheese Frosting",
+            "fr": "Gâteau aux Carottes avec Glaçage au Fromage Frais",
+            "de": "Karottenkuchen mit Frischkäse-Glasur"
+          },
+          "description": {
+            "es": "Bizcocho especiado de zanahoria increíblemente húmedo, enriquecido con nueces tostadas y pasas jugosas, generosamente cubierto con una suave crema de queso dulce. Las cálidas especias de canela y nuez moscada complementan perfectamente el dulzor natural de las zanahorias, creando un postre reconfortante y sofisticado.",
+            "en": "Incredibly moist spiced carrot cake, enriched with toasted walnuts and juicy raisins, generously covered with smooth sweet cream cheese frosting. Warm cinnamon and nutmeg spices perfectly complement the natural sweetness of carrots, creating a comforting and sophisticated dessert.",
+            "fr": "Gâteau aux carottes épicé incroyablement moelleux, enrichi de noix grillées et de raisins secs juteux, généreusement recouvert d'un glaçage onctueux au fromage frais sucré. Les épices chaudes de cannelle et de muscade complètent parfaitement la douceur naturelle des carottes, créant un dessert réconfortant et sophistiqué.",
+            "de": "Unglaublich saftiger gewürzter Karottenkuchen, angereichert mit gerösteten Walnüssen und saftigen Rosinen, großzügig mit glatter süßer Frischkäse-Glasur überzogen. Warme Zimt- und Muskatnuss-Gewürze ergänzen perfekt die natürliche Süße der Karotten und schaffen ein wohltuendes und raffiniertes Dessert."
+          },
+          "isVegetarian": true,
+          "containsAllergens": true,
+          "containsLactose": true,
+          "isSpicy": false,
+          "containsNuts": true,
+          "isVegan": false
+        }
+      ]
+    },
+    {
+      "tempId": "course-5",
+      "course": "late_night_snacks",
+      "label": {
+        "es": "Snacks Nocturnos",
+        "en": "Late Night Snacks",
+        "fr": "Collations de Nuit",
+        "de": "Spätnacht-Snacks"
+      },
+      "selectionRequired": false,
+      "options": [
+        {
+          "label": {
+            "es": "Mini Burger",
+            "en": "Mini Burger",
+            "fr": "Mini Burger",
+            "de": "Mini-Burger"
+          },
+          "description": {
+            "es": "Hamburguesa gourmet en tamaño mini, perfecta para recargar energías al final de la noche. Jugosa carne de ternera premium, queso fundido, cebolla caramelizada y salsa especial de la casa, todo en un pan brioche suave y ligeramente tostado. Un bocado indulgente que satisface.",
+            "en": "Gourmet mini-sized burger, perfect for recharging energy at the end of the night. Juicy premium beef, melted cheese, caramelized onions and special house sauce, all in a soft, lightly toasted brioche bun. An indulgent bite that satisfies.",
+            "fr": "Burger gourmet en format mini, parfait pour recharger les batteries en fin de soirée. Bœuf juteux premium, fromage fondu, oignons caramélisés et sauce spéciale maison, le tout dans un pain brioche moelleux et légèrement grillé. Une bouchée gourmande qui satisfait.",
+            "de": "Gourmet-Mini-Burger, perfekt zum Aufladen am Ende der Nacht. Saftiges Premium-Rindfleisch, geschmolzener Käse, karamellisierte Zwiebeln und spezielle Haussauce, alles in einem weichen, leicht gerösteten Brioche-Brötchen. Ein verwöhnender Bissen, der sättigt."
+          },
+          "isVegetarian": false,
+          "containsAllergens": true,
+          "containsLactose": true,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": false
+        },
+        {
+          "label": {
+            "es": "Mini Burger Vegano",
+            "en": "Vegan Mini Burger",
+            "fr": "Mini Burger Vegan",
+            "de": "Veganer Mini-Burger"
+          },
+          "description": {
+            "es": "Versión completamente vegana de nuestra mini burger, con hamburguesa plant-based jugosa y sabrosa que imita perfectamente la textura de la carne. Queso vegano fundido, cebolla caramelizada, lechuga fresca y salsa especial vegana, servida en pan brioche vegano. Delicioso, sostenible y completamente libre de productos animales.",
+            "en": "Completely vegan version of our mini burger, with juicy and flavorful plant-based patty that perfectly mimics meat texture. Melted vegan cheese, caramelized onions, fresh lettuce and special vegan sauce, served on vegan brioche bun. Delicious, sustainable and completely animal-product free.",
+            "fr": "Version entièrement végétalienne de notre mini burger, avec un steak végétal juteux et savoureux qui imite parfaitement la texture de la viande. Fromage végétalien fondu, oignons caramélisés, laitue fraîche et sauce spéciale végétalienne, servi dans un pain brioche végétalien. Délicieux, durable et totalement exempt de produits animaux.",
+            "de": "Vollständig vegane Version unseres Mini-Burgers mit saftigem und schmackhaftem pflanzlichem Patty, das die Fleischtextur perfekt nachahmt. Geschmolzener veganer Käse, karamellisierte Zwiebeln, frischer Salat und spezielle vegane Sauce, serviert auf veganem Brioche-Brötchen. Lecker, nachhaltig und völlig frei von tierischen Produkten."
+          },
+          "isVegetarian": true,
+          "containsAllergens": true,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": false,
+          "isVegan": true
+        }
+      ]
+    },
+    {
+      "tempId": "course-6",
+      "course": "drinks",
+      "label": {
+        "es": "Bebidas",
+        "en": "Drinks",
+        "fr": "Boissons",
+        "de": "Getränke"
+      },
+      "selectionRequired": false,
+      "options": [
+        {
+          "label": {
+            "es": "Selección de Vinos Tintos y Blancos",
+            "en": "Selection of Red and White Wines",
+            "fr": "Sélection de Vins Rouges et Blancs",
+            "de": "Auswahl an Rot- und Weißweinen"
+          },
+          "description": {
+            "es": "Exquisita selección de vinos tintos con cuerpo y vinos blancos frescos de las mejores bodegas españolas, incluyendo Ribera del Duero, Rioja, Rías Baixas y Rueda, maridados expertamente para complementar cada plato del banquete, servidos a temperatura perfecta por nuestro sommelier.",
+            "en": "Exquisite selection of full-bodied red wines and crisp white wines from Spain's finest wineries, including Ribera del Duero, Rioja, Rías Baixas, and Rueda, expertly paired to complement each course of the banquet, served at perfect temperature by our sommelier.",
+            "fr": "Sélection exquise de vins rouges corsés et de vins blancs vifs des meilleures caves espagnoles, notamment Ribera del Duero, Rioja, Rías Baixas et Rueda, expertement accordés pour accompagner chaque plat du banquet, servis à température parfaite par notre sommelier.",
+            "de": "Erlesene Auswahl vollmundiger Rotweine und frischer Weißweine aus Spaniens besten Weingütern, darunter Ribera del Duero, Rioja, Rías Baixas und Rueda, fachmännisch kombiniert zur Ergänzung jedes Gangs des Banketts, vom Sommelier bei perfekter Temperatur serviert."
+          },
+          "isVegetarian": true,
+          "isVegan": true,
+          "containsAllergens": false,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": false,
+          "containsGluten": false,
+          "containsEggs": false,
+          "containsFish": false,
+          "containsShellfish": false,
+          "containsSoy": false,
+          "containsSesame": false,
+          "image": "23-wines.png"
+        },
+        {
+          "label": {
+            "es": "Licores, Combinados y Cervezas",
+            "en": "Spirits, Mixed Drinks, and Beers",
+            "fr": "Spiritueux, Cocktails et Bières",
+            "de": "Spirituosen, Mixgetränke und Biere"
+          },
+          "description": {
+            "es": "Barra completa con licores premium (whisky, vodka, gin, ron), combinados clásicos y modernos preparados por bartenders profesionales, y selección de cervezas artesanales españolas y internacionales, disponibles durante toda la celebración para disfrutar al máximo de esta noche inolvidable.",
+            "en": "Full bar featuring premium spirits (whiskey, vodka, gin, rum), classic and contemporary mixed drinks crafted by professional bartenders, and a selection of Spanish and international craft beers, available throughout the celebration to fully enjoy this unforgettable evening.",
+            "fr": "Bar complet proposant des spiritueux premium (whisky, vodka, gin, rhum), cocktails classiques et contemporains préparés par des barmans professionnels, et une sélection de bières artisanales espagnoles et internationales, disponibles tout au long de la célébration pour profiter pleinement de cette soirée inoubliable.",
+            "de": "Vollständige Bar mit Premium-Spirituosen (Whisky, Wodka, Gin, Rum), klassischen und zeitgenössischen Mixgetränken, zubereitet von professionellen Barkeepern, und einer Auswahl spanischer und internationaler Craft-Biere, während der gesamten Feier verfügbar, um diesen unvergesslichen Abend voll zu genießen."
+          },
+          "isVegetarian": true,
+          "isVegan": true,
+          "containsAllergens": false,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": false,
+          "containsGluten": true,
+          "containsEggs": false,
+          "containsFish": false,
+          "containsShellfish": false,
+          "containsSoy": false,
+          "containsSesame": false,
+          "image": "24-spirits-beers.png"
+        },
+        {
+          "label": {
+            "es": "Zumos Recién Exprimidos y Refrescos",
+            "en": "Freshly Squeezed Juices and Soft Drinks",
+            "fr": "Jus Fraîchement Pressés et Sodas",
+            "de": "Frisch Gepresste Säfte und Erfrischungsgetränke"
+          },
+          "description": {
+            "es": "Zumos naturales recién exprimidos de naranja, pomelo y frutas de temporada, refrescos premium, agua mineral con y sin gas, y aguas aromatizadas con ingredientes frescos, ofreciendo opciones refrescantes y saludables para todos los invitados durante el banquete.",
+            "en": "Freshly squeezed natural juices of orange, grapefruit, and seasonal fruits, premium soft drinks, still and sparkling mineral water, and infused waters with fresh ingredients, offering refreshing and healthy options for all guests throughout the banquet.",
+            "fr": "Jus naturels fraîchement pressés d'orange, de pamplemousse et de fruits de saison, sodas premium, eau minérale plate et gazeuse, et eaux aromatisées aux ingrédients frais, offrant des options rafraîchissantes et saines pour tous les invités tout au long du banquet.",
+            "de": "Frisch gepresste Natursäfte aus Orangen, Grapefruits und saisonalen Früchten, Premium-Erfrischungsgetränke, stilles und sprudelndes Mineralwasser sowie aromatisierte Wasser mit frischen Zutaten, die allen Gästen während des Banketts erfrischende und gesunde Optionen bieten."
+          },
+          "isVegetarian": true,
+          "isVegan": true,
+          "containsAllergens": false,
+          "containsLactose": false,
+          "isSpicy": false,
+          "containsNuts": false,
+          "containsGluten": false,
+          "containsEggs": false,
+          "containsFish": false,
+          "containsShellfish": false,
+          "containsSoy": false,
+          "containsSesame": false,
+          "image": "25-juices-soft-drinks.png"
+        },
+        {
+          "label": {
+            "es": "Bebidas Calientes: Té y Café",
+            "en": "Hot Beverages: Tea and Coffee",
+            "fr": "Boissons Chaudes: Thé et Café",
+            "de": "Heiße Getränke: Tee und Kaffee"
+          },
+          "description": {
+            "es": "Servicio completo de café espresso recién preparado, cappuccino con arte latte, café americano, y selección premium de tés e infusiones (negro, verde, herbal, frutal), acompañados de azúcar, edulcorantes y leche, perfectos para culminar la velada con un toque cálido y reconfortante.",
+            "en": "Full coffee service featuring freshly brewed espresso, cappuccino with latte art, americano, and premium selection of teas and infusions (black, green, herbal, fruit), accompanied by sugar, sweeteners, and milk, perfect for concluding the evening with a warm and comforting touch.",
+            "fr": "Service de café complet comprenant espresso fraîchement préparé, cappuccino avec art latte, americano, et sélection premium de thés et infusions (noir, vert, herbal, fruité), accompagnés de sucre, édulcorants et lait, parfaits pour conclure la soirée avec une touche chaleureuse et réconfortante.",
+            "de": "Vollständiger Kaffeeservice mit frisch gebrühtem Espresso, Cappuccino mit Latte Art, Americano und Premium-Auswahl an Tees und Aufgüssen (schwarz, grün, Kräuter, Frucht), begleitet von Zucker, Süßstoffen und Milch, perfekt, um den Abend mit einer warmen und wohltuenden Note abzuschließen."
+          },
+          "isVegetarian": true,
+          "isVegan": false,
+          "containsAllergens": false,
+          "containsLactose": true,
+          "isSpicy": false,
+          "containsNuts": false,
+          "containsGluten": false,
+          "containsEggs": false,
+          "containsFish": false,
+          "containsShellfish": false,
+          "containsSoy": false,
+          "containsSesame": false,
+          "image": "26-hot-beverages.png"
+        }
+      ]
+    }
+  ]
+}
