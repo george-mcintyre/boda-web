@@ -270,6 +270,7 @@ router.put('/day-menus/:id', auth('admin'), adminExpCtrl.updateDayMenu);
 router.delete('/day-menus/:id', auth('admin'), adminExpCtrl.deleteDayMenu);
 router.post('/day-menus/upload-image', auth('admin'), upload.single('image'), adminExpCtrl.uploadDayMenuImage);
 router.get('/day-menus/:dayMenuId/image', auth('admin'), adminExpCtrl.getDayMenuImage);
+router.get('/day-menus/:dayMenuId/section-image/:sectionIndex', auth('admin'), adminExpCtrl.getDayMenuSectionImage);
 
 // Tables
 router.get('/tables', auth('admin'), adminExpCtrl.listTables);
@@ -290,5 +291,8 @@ router.get('/menu-responses', auth('admin'), adminExpCtrl.getMenuResponses);
 
 // Gift Purchases
 router.get('/gift-purchases', auth('admin'), adminExpCtrl.getGiftPurchases);
+
+// Event Choices (for table assignment filtering)
+router.get('/event-choices', auth('admin'), adminExpCtrl.getAdminEventChoices);
 
 module.exports = router;

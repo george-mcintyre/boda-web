@@ -368,6 +368,23 @@ async function getDayMenuImage(req, res, next) {
   } catch (e) { next(e); }
 }
 
+async function getDayMenuSectionImage(req, res, next) {
+  try {
+    const { dayMenuId, sectionIndex } = req.params;
+    const menu = await DayMenu.findById(dayMenuId).lean();
+    if (!menu) return res.status(404).json({ error: 'DayMenu not found' });
+    const idx = parseInt(sectionIndex, 10);
+    const section = (menu.sections || [])[idx];
+    if (!section || !section.image) return res.status(404).json({ error: 'Section image not found' });
+    const img = await DayMenuImage.findById(section.image).lean();
+    if (!img || !img.data) return res.status(404).json({ error: 'Image not found' });
+    res.setHeader('Content-Type', img.contentType);
+    res.setHeader('Content-Length', img.data.length);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.send(img.data);
+  } catch (e) { next(e); }
+}
+
 // ========== Tables ==========
 async function listTables(req, res, next) {
   try {
@@ -661,14 +678,23 @@ async function getGiftPurchases(req, res, next) {
   } catch (e) { next(e); }
 }
 
+// ========== Event Choices (Admin) ==========
+async function getAdminEventChoices(req, res, next) {
+  try {
+    const eventChoices = await EventChoice.find({}).lean();
+    res.json(eventChoices);
+  } catch (e) { next(e); }
+}
+
 module.exports = {
   getGuestSummary,
   listChefProfiles, createChefProfile, updateChefProfile, deleteChefProfile,
   uploadChefProfileImage, getChefProfileImage,
   listDayMenus, getDayMenu, createDayMenu, updateDayMenu, deleteDayMenu,
-  uploadDayMenuImage, getDayMenuImage,
+  uploadDayMenuImage, getDayMenuImage, getDayMenuSectionImage,
   listTables, createTable, updateTable, deleteTable, seedTables,
   listTableAssignments, createTableAssignment, updateTableAssignment, deleteTableAssignment, bulkAssignTables,
   getMenuResponses,
-  getGiftPurchases
+  getGiftPurchases,
+  getAdminEventChoices
 };

@@ -67,7 +67,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   text-decoration: none;
-  color: var(--text-medium);
+  color: var(--text-muted);
 }
 
 .adminTab:hover {
@@ -259,7 +259,7 @@
 }
 
 .message-content {
-  color: var(--text-medium);
+  color: var(--text-muted);
   line-height: 1.6;
   margin-bottom: var(--spacing-lg);
   font-size: 1em;
@@ -1093,7 +1093,7 @@
 }
 .chef-profile-header h4 {
   margin: 0;
-  color: var(--dark-text, #2C1810);
+  color: var(--text-dark);
 }
 .chef-profile-body {
   display: flex;

@@ -120,11 +120,11 @@
             </div>
             <div class="stat-card">
               <div class="stat-number">${data.totalAdults}</div>
-              <div class="stat-label">${translate('admin:guests.adult')}s</div>
+              <div class="stat-label">${translate('admin:guests.adults')}</div>
             </div>
             <div class="stat-card">
               <div class="stat-number">${data.totalChildren}</div>
-              <div class="stat-label">${translate('admin:guests.child')}s</div>
+              <div class="stat-label">${translate('admin:guests.children')}</div>
             </div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;">
@@ -163,11 +163,18 @@
   // Day Menu sub-tab (day1 or day3)
   async function showDayMenu(day) {
     const target = getContentTarget();
+    const menuType = day; // 'day1' or 'day3'
     setLoading(translate('admin:subtab.' + day + 'Menu'));
     try {
-      const res = await api(`/api/admin/day-menus?lang=${getUserLanguage()}`);
-      const menus = res.ok ? await res.json() : [];
+      // Fetch day menus and chef profiles in parallel
+      const [menuRes, chefRes] = await Promise.all([
+        api(`/api/admin/day-menus?lang=${getUserLanguage()}`),
+        api(`/api/admin/chef-profiles?lang=${getUserLanguage()}`)
+      ]);
+      const menus = menuRes.ok ? await menuRes.json() : [];
+      const chefProfiles = chefRes.ok ? await chefRes.json() : [];
       const menu = menus.find(m => m.day === day);
+      const dayChef = chefProfiles.find(p => p.menuType === menuType) || null;
 
       if (!menu) {
         target.innerHTML = `
@@ -186,26 +193,217 @@
         return;
       }
 
-      const sections = (menu.sections || []).map((s, i) => `
+      // Build section cards with edit buttons
+      const sectionsHtml = (menu.sections || []).map((s, i) => `
         <div class="admin-card" style="margin-bottom:15px;">
-          <h4>${s.title || 'Section ' + (i + 1)}</h4>
-          <p>${s.content || '<em style="color:var(--text-light);">No content yet</em>'}</p>
-          ${s.imageUrl ? '<img src="' + s.imageUrl + '" alt="Section image" style="max-width:200px;border-radius:8px;margin-top:8px;">' : ''}
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <h4 style="margin:0;">${s.title || 'Section ' + (i + 1)}</h4>
+            <button class="admin-action edit-section-btn" data-index="${i}" title="Edit Section"><i class="fas fa-edit"></i></button>
+          </div>
+          <p style="margin-top:8px;">${s.content || '<em style="color:var(--text-light);">No content yet</em>'}</p>
+          ${s.imageUrl ? '<img src="' + s.imageUrl + '" alt="Section image" style="max-width:200px;border-radius:8px;margin-top:8px;">' : '<p style="color:var(--text-light);font-size:0.85em;margin-top:8px;"><i class="fas fa-image"></i> No image</p>'}
         </div>`).join('');
 
-      const chefHtml = menu.chefProfile ? `
-        <div class="admin-card" style="margin-bottom:20px;background:var(--gray-50);">
-          <h4><i class="fas fa-hat-chef"></i> Chef</h4>
-          <p><strong>${menu.chefProfile.name}</strong></p>
-          <p>${menu.chefProfile.bio || ''}</p>
-        </div>` : '';
+      // Build chef profile section (same pattern as banquet menu)
+      let chefSection = '';
+      if (dayChef) {
+        chefSection = `
+          <div class="chef-profile-card">
+            <div class="chef-profile-header">
+              <h4><i class="fas fa-hat-chef"></i> ${translate('admin:chef.title')}</h4>
+              <div class="chef-profile-actions">
+                <button class="admin-action" id="editDayChefBtn"><i class="fas fa-edit"></i></button>
+                <button class="admin-action danger" id="deleteDayChefBtn"><i class="fas fa-trash"></i></button>
+              </div>
+            </div>
+            <div class="chef-profile-body">
+              ${dayChef.imageUrl ? `<img src="${dayChef.imageUrl}" alt="${dayChef.name}" class="chef-profile-photo">` : ''}
+              <div class="chef-profile-info">
+                <strong>${dayChef.name}</strong>
+                <p>${dayChef.bio || ''}</p>
+              </div>
+            </div>
+          </div>`;
+      } else {
+        chefSection = `
+          <div class="chef-profile-card" style="text-align:center;padding:20px;">
+            <i class="fas fa-hat-chef" style="font-size:2em;color:var(--gray-300);margin-bottom:10px;"></i>
+            <p style="color:var(--text-light);margin-bottom:10px;">${translate('admin:chef.title')}</p>
+            <button class="btn btn-primary" id="addDayChefBtn"><i class="fas fa-plus"></i> ${translate('admin:chef.addProfile')}</button>
+          </div>`;
+      }
+
+      // Build delete menu button
+      const deleteMenuHtml = `<button class="btn btn-secondary" id="deleteDayMenuBtn" style="margin-top:20px;"><i class="fas fa-trash"></i> Delete Menu</button>`;
 
       target.innerHTML = `
         <div class="admin-content">
           <h3><i class="fas fa-utensils"></i> ${translate('admin:subtab.' + day + 'Menu')}</h3>
-          ${chefHtml}
-          ${sections || '<p style="color:var(--text-light);">No sections configured.</p>'}
+          ${chefSection}
+          ${sectionsHtml || '<p style="color:var(--text-light);">No sections configured.</p>'}
+          ${deleteMenuHtml}
         </div>`;
+
+      // Wire up section edit buttons
+      target.querySelectorAll('.edit-section-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.index, 10);
+          const section = menu.sections[idx];
+          openFormModal({
+            title: `Edit ${section.title || 'Section ' + (idx + 1)}`,
+            submitText: translate('admin:menu.save'),
+            fields: [
+              { name: 'title', label: 'Title', required: true },
+              { name: 'content', label: 'Content', type: 'textarea', rows: 5 },
+              { name: 'image', label: 'Image', type: 'file' }
+            ],
+            initialValues: {
+              title: section.title || '',
+              content: section.content || ''
+            },
+            onSubmit: async (values, close) => {
+              try {
+                // Handle image upload if a file was selected
+                let imageRef = null;
+                const imageFile = document.getElementById('f_image')?.files[0];
+                if (imageFile) {
+                  const formData = new FormData();
+                  formData.append('image', imageFile);
+                  const uploadRes = await fetch('/api/admin/day-menus/upload-image', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                  });
+                  if (uploadRes.ok) {
+                    const uploadData = await uploadRes.json();
+                    imageRef = { imageId: uploadData.imageId };
+                  }
+                }
+
+                // Build updated sections array
+                const updatedSections = menu.sections.map((s, si) => {
+                  if (si === idx) {
+                    const updated = { title: values.title, content: values.content };
+                    if (imageRef) updated.image = imageRef;
+                    return updated;
+                  }
+                  return { title: s.title, content: s.content };
+                });
+
+                const r = await api(`/api/admin/day-menus/${menu.id}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ sections: updatedSections })
+                });
+
+                if (!r.ok) {
+                  const errData = await r.json().catch(() => ({}));
+                  throw new Error(errData.error || 'Failed to update section');
+                }
+
+                close();
+                showDayMenu(day);
+              } catch (error) { throw error; }
+            }
+          });
+        });
+      });
+
+      // Wire up chef profile buttons
+      const openDayChefForm = (existingId) => {
+        const loadAndShow = async () => {
+          let existing = null;
+          if (existingId) {
+            try {
+              const res = await api(`/api/admin/chef-profiles?lang=${getUserLanguage()}`);
+              if (res.ok) {
+                const profiles = await res.json();
+                existing = profiles.find(p => p.id === existingId) || null;
+              }
+            } catch (e) { console.error('Error loading chef profile:', e); }
+          }
+
+          openFormModal({
+            title: existing ? translate('admin:chef.editProfile') : translate('admin:chef.addProfile'),
+            submitText: existing ? translate('admin:menu.save') : translate('admin:menu.add'),
+            fields: [
+              { name: 'name', label: translate('admin:chef.name'), required: true },
+              { name: 'bio', label: translate('admin:chef.bio'), type: 'textarea', rows: 4 },
+              { name: 'image', label: translate('admin:chef.photo'), type: 'file' }
+            ],
+            initialValues: {
+              name: existing?.name || '',
+              bio: existing?.bio || ''
+            },
+            onSubmit: async (values, close) => {
+              try {
+                let imageRef = null;
+                const imageFile = document.getElementById('f_image')?.files[0];
+                if (imageFile) {
+                  const formData = new FormData();
+                  formData.append('image', imageFile);
+                  const uploadRes = await fetch('/api/admin/chef-profiles/upload-image', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                  });
+                  if (uploadRes.ok) {
+                    const uploadData = await uploadRes.json();
+                    imageRef = { imageId: uploadData.imageId };
+                  }
+                }
+
+                const body = { name: values.name, bio: values.bio, menuType };
+                if (imageRef) body.image = imageRef;
+
+                const url = existing ? `/api/admin/chef-profiles/${existing.id}` : '/api/admin/chef-profiles';
+                const method = existing ? 'PUT' : 'POST';
+
+                const r = await api(url, {
+                  method,
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(body)
+                });
+
+                if (!r.ok) {
+                  const errData = await r.json().catch(() => ({}));
+                  throw new Error(errData.error || 'Failed to save chef profile');
+                }
+
+                close();
+                showDayMenu(day);
+              } catch (error) { throw error; }
+            }
+          });
+        };
+        loadAndShow();
+      };
+
+      target.querySelector('#addDayChefBtn')?.addEventListener('click', () => openDayChefForm(null));
+      target.querySelector('#editDayChefBtn')?.addEventListener('click', () => openDayChefForm(dayChef.id));
+      target.querySelector('#deleteDayChefBtn')?.addEventListener('click', async () => {
+        if (!confirm(translate('admin:chef.deleteConfirm'))) return;
+        try {
+          const r = await api(`/api/admin/chef-profiles/${dayChef.id}`, { method: 'DELETE' });
+          if (r.ok) showDayMenu(day);
+          else notify('Failed to delete chef profile', 'error');
+        } catch (e) {
+          notify('Error deleting chef profile: ' + e.message, 'error');
+        }
+      });
+
+      // Wire up delete menu button
+      target.querySelector('#deleteDayMenuBtn')?.addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to delete this menu?')) return;
+        try {
+          const r = await api(`/api/admin/day-menus/${menu.id}`, { method: 'DELETE' });
+          if (r.ok) showDayMenu(day);
+          else notify('Failed to delete menu', 'error');
+        } catch (e) {
+          notify('Error deleting menu: ' + e.message, 'error');
+        }
+      });
+
     } catch(e) {
       console.error('Error loading day menu:', e);
       target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
@@ -217,16 +415,34 @@
     const target = getContentTarget();
     setLoading(translate('admin:subtab.tableAllocation'));
     try {
-      // Fetch tables, guests, and assignments in parallel
-      const [tablesRes, guestsRes, assignmentsRes] = await Promise.all([
+      // Fetch tables, guests, assignments, and event choices in parallel
+      const BANQUET_EVENT_ID = '69237e6b76402958d7ee1956';
+      const [tablesRes, guestsRes, assignmentsRes, eventChoicesRes] = await Promise.all([
         api('/api/admin/tables'),
         api('/api/admin/guests?limit=999'),
-        api('/api/admin/table-assignments')
+        api('/api/admin/table-assignments'),
+        api('/api/admin/event-choices')
       ]);
       const tables = tablesRes.ok ? await tablesRes.json() : [];
       const guestsData = guestsRes.ok ? await guestsRes.json() : { items: [] };
-      const guests = guestsData.items || [];
+      const allGuests = guestsData.items || [];
       const assignments = assignmentsRes.ok ? await assignmentsRes.json() : [];
+      const eventChoices = eventChoicesRes.ok ? await eventChoicesRes.json() : [];
+
+      // Build set of guestIds where at least one party member is attending the banquet
+      const banquetGuestIds = new Set();
+      eventChoices.forEach(ec => {
+        const gId = ec.guestId && ec.guestId.toString ? ec.guestId.toString() : ec.guestId;
+        (ec.partyChoices || []).forEach(pc => {
+          (pc.choices || []).forEach(c => {
+            const eId = c.eventId && c.eventId.toString ? c.eventId.toString() : c.eventId;
+            if (eId === BANQUET_EVENT_ID && c.attending) {
+              banquetGuestIds.add(gId);
+            }
+          });
+        });
+      });
+      const guests = allGuests.filter(g => banquetGuestIds.has(g.id));
 
       if (tables.length === 0) {
         target.innerHTML = `
