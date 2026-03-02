@@ -292,6 +292,26 @@ router.put('/table-assignments/:id', auth('admin'), adminExpCtrl.updateTableAssi
 router.delete('/table-assignments/:id', auth('admin'), adminExpCtrl.deleteTableAssignment);
 router.post('/table-assignments/bulk', auth('admin'), adminExpCtrl.bulkAssignTables);
 
+// Seating plan QR code (static public URL — no auth needed, used in admin <img> tags)
+router.get('/seating-qr', async (req, res, next) => {
+  try {
+    const QRCode = require('qrcode');
+    const url = 'https://george-and-iluminada.com/guests.html?tab=menu&seating=show';
+    const buffer = await QRCode.toBuffer(url, {
+      type: 'png',
+      width: 360,
+      margin: 2,
+      color: { dark: '#8B5A96', light: '#FDFBF7' }
+    });
+    res.setHeader('Content-Type', 'image/png');
+    res.setHeader('Content-Length', String(buffer.length));
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    res.send(buffer);
+  } catch (e) {
+    next(e);
+  }
+});
+
 // Menu Responses
 router.get('/menu-responses', auth('admin'), adminExpCtrl.getMenuResponses);
 
@@ -300,5 +320,10 @@ router.get('/gift-purchases', auth('admin'), adminExpCtrl.getGiftPurchases);
 
 // Event Choices (for table assignment filtering)
 router.get('/event-choices', auth('admin'), adminExpCtrl.getAdminEventChoices);
+
+// Guests without choices/party
+router.get('/guests-without-event-choices', auth('admin'), adminExpCtrl.getGuestsWithoutEventChoices);
+router.get('/guests-without-menu-choices', auth('admin'), adminExpCtrl.getGuestsWithoutMenuChoices);
+router.get('/guests-without-party', auth('admin'), adminExpCtrl.getGuestsWithoutParty);
 
 module.exports = router;

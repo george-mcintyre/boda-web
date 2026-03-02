@@ -302,6 +302,16 @@ const translations = {
     'guests:mainBanquet': 'Main Banquet',
     'guests:welcomeCocktails': 'Welcome Cocktails',
     'guests:weddingBrunch': 'Wedding Brunch',
+    'guests:seating': 'Seating',
+    'guests:seatingTitle': 'Your Seating Plan',
+    'guests:seatingDescription': 'Click on a party member below to see where they are seated.',
+    'guests:selectPartyMember': 'Select a party member:',
+    'guests:headTable': 'Head Table',
+    'guests:table': 'Table',
+    'guests:notAssigned': 'Not yet assigned',
+    'guests:seatingQrLabel': 'Scan to view on your phone:',
+    'guests:yourTableCompanions': 'Your table companions',
+
     
     // Menu titles and descriptions
     'guests:mainBanquetTitle': 'Main Banquet - Make Your Selections',
@@ -672,6 +682,9 @@ const translations = {
     'admin:subtab.giftPurchases': 'Gift Purchases',
     'admin:subtab.eventSchedule': 'Event Schedule',
     'admin:subtab.eventAttendance': 'Event Attendance',
+    'admin:subtab.eventNoChoices': 'No Event Choices',
+    'admin:subtab.menuNoChoices': 'No Menu Choices',
+    'admin:subtab.guestsNoParty': 'Incomplete Party Names',
     'admin:comingSoon': 'Coming soon...',
     // Chef profile
     'admin:chef.title': 'Chef Profile',
@@ -718,6 +731,7 @@ const translations = {
     'admin:tables.noGuestsAssigned': 'No guests assigned',
     'admin:tables.noTablesConfigured': 'No tables configured yet.',
     'admin:tables.seedTables': 'Seed Default Tables',
+    'admin:tables.qrDeepLink': 'Guest Seating Deep Link',
     'admin:menuResponses.guest': 'Guest',
     'admin:menuResponses.menuChoices': 'Menu Choices',
     'admin:menuResponses.specialRequests': 'Special Requests',
@@ -1030,6 +1044,16 @@ const translations = {
     'guests:mainBanquet': 'Banquete Principal',
     'guests:welcomeCocktails': 'Cóctel de Bienvenida',
     'guests:weddingBrunch': 'Brunch de Boda',
+    'guests:seating': 'Asientos',
+    'guests:seatingTitle': 'Tu Plan de Asientos',
+    'guests:seatingDescription': 'Haz clic en un miembro del grupo para ver dónde está sentado.',
+    'guests:selectPartyMember': 'Selecciona un miembro del grupo:',
+    'guests:headTable': 'Mesa Principal',
+    'guests:table': 'Mesa',
+    'guests:notAssigned': 'Aún no asignado',
+    'guests:seatingQrLabel': 'Escanea para ver en tu teléfono:',
+    'guests:yourTableCompanions': 'Tus compañeros de mesa',
+
     
     // Menu titles and descriptions
     'guests:mainBanquetTitle': 'Banquete Principal - Haz Tus Selecciones',
@@ -1399,6 +1423,9 @@ const translations = {
     'admin:subtab.giftPurchases': 'Regalos ofrecidos',
     'admin:subtab.eventSchedule': 'Programa de eventos',
     'admin:subtab.eventAttendance': 'Asistencia a eventos',
+    'admin:subtab.eventNoChoices': 'Sin Selección de Eventos',
+    'admin:subtab.menuNoChoices': 'Sin Selección de Menú',
+    'admin:subtab.guestsNoParty': 'Nombres de Acompañantes Incompletos',
     'admin:comingSoon': 'Próximamente...',
     // Chef profile
     'admin:chef.title': 'Perfil del Chef',
@@ -1445,6 +1472,7 @@ const translations = {
     'admin:tables.noGuestsAssigned': 'Sin invitados asignados',
     'admin:tables.noTablesConfigured': 'No hay mesas configuradas aún.',
     'admin:tables.seedTables': 'Crear Mesas por Defecto',
+    'admin:tables.qrDeepLink': 'Enlace al Plan de Asientos',
     'admin:menuResponses.guest': 'Invitado',
     'admin:menuResponses.menuChoices': 'Selección de Menú',
     'admin:menuResponses.specialRequests': 'Solicitudes Especiales',
@@ -1757,6 +1785,16 @@ const translations = {
     'guests:mainBanquet': 'Banquet Principal',
     'guests:welcomeCocktails': 'Cocktail de Bienvenue',
     'guests:weddingBrunch': 'Brunch de Mariage',
+    'guests:seating': 'Places Assises',
+    'guests:seatingTitle': 'Votre Plan de Table',
+    'guests:seatingDescription': 'Cliquez sur un membre du groupe pour voir où il est assis.',
+    'guests:selectPartyMember': 'Sélectionnez un membre du groupe :',
+    'guests:headTable': 'Table d\'Honneur',
+    'guests:table': 'Table',
+    'guests:notAssigned': 'Pas encore assigné',
+    'guests:seatingQrLabel': 'Scannez pour voir sur votre téléphone :',
+    'guests:yourTableCompanions': 'Vos compagnons de table',
+
     
     // Menu titles and descriptions
     'guests:mainBanquetTitle': 'Banquet Principal - Faites Vos Sélections',
@@ -2126,6 +2164,9 @@ const translations = {
     'admin:subtab.giftPurchases': 'Cadeaux offerts',
     'admin:subtab.eventSchedule': 'Programme des événements',
     'admin:subtab.eventAttendance': 'Participation aux événements',
+    'admin:subtab.eventNoChoices': 'Sans Choix d\'Événements',
+    'admin:subtab.menuNoChoices': 'Sans Choix de Menu',
+    'admin:subtab.guestsNoParty': 'Noms d\'Accompagnants Incomplets',
     'admin:comingSoon': 'Bientôt disponible...',
     // Chef profile
     'admin:chef.title': 'Profil du Chef',
@@ -2172,6 +2213,7 @@ const translations = {
     'admin:tables.noGuestsAssigned': 'Aucun invité assigné',
     'admin:tables.noTablesConfigured': 'Aucune table configurée pour le moment.',
     'admin:tables.seedTables': 'Créer des Tables par Défaut',
+    'admin:tables.qrDeepLink': 'Lien vers le Plan de Table',
     'admin:menuResponses.guest': 'Invité',
     'admin:menuResponses.menuChoices': 'Choix du Menu',
     'admin:menuResponses.specialRequests': 'Demandes Spéciales',
@@ -2484,6 +2526,16 @@ const translations = {
     'guests:mainBanquet': 'Hauptbankett',
     'guests:welcomeCocktails': 'Willkommenscocktail',
     'guests:weddingBrunch': 'Hochzeitsbrunch',
+    'guests:seating': 'Sitzplan',
+    'guests:seatingTitle': 'Dein Sitzplan',
+    'guests:seatingDescription': 'Klicke auf ein Gruppenmitglied, um zu sehen, wo es sitzt.',
+    'guests:selectPartyMember': 'Wähle ein Gruppenmitglied:',
+    'guests:headTable': 'Ehrentisch',
+    'guests:table': 'Tisch',
+    'guests:notAssigned': 'Noch nicht zugewiesen',
+    'guests:seatingQrLabel': 'Zum Ansehen auf dem Handy scannen:',
+    'guests:yourTableCompanions': 'Deine Tischbegleiter',
+
     
     // Menu titles and descriptions
     'guests:mainBanquetTitle': 'Hauptbankett - Triff Deine Auswahl',
@@ -2853,6 +2905,9 @@ const translations = {
     'admin:subtab.giftPurchases': 'Geschenkkäufe',
     'admin:subtab.eventSchedule': 'Veranstaltungsplan',
     'admin:subtab.eventAttendance': 'Veranstaltungsteilnahme',
+    'admin:subtab.eventNoChoices': 'Keine Veranstaltungsauswahl',
+    'admin:subtab.menuNoChoices': 'Keine Menüauswahl',
+    'admin:subtab.guestsNoParty': 'Unvollständige Begleiternamen',
     'admin:comingSoon': 'Demnächst verfügbar...',  
     // Chef profile
     'admin:chef.title': 'Chefprofil',
@@ -2899,6 +2954,7 @@ const translations = {
     'admin:tables.noGuestsAssigned': 'Keine Gäste zugewiesen',
     'admin:tables.noTablesConfigured': 'Noch keine Tische konfiguriert.',
     'admin:tables.seedTables': 'Standardtische Erstellen',
+    'admin:tables.qrDeepLink': 'Link zum Sitzplan',
     'admin:menuResponses.guest': 'Gast',
     'admin:menuResponses.menuChoices': 'Menüauswahl',
     'admin:menuResponses.specialRequests': 'Sonderwünsche',

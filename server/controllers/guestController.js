@@ -1,5 +1,5 @@
 const guestService = require('../services/guestService');
-const { Guest, Gift, GiftChoice, ChefProfile, DayMenu } = require('../models');
+const { Guest, Gift, GiftChoice, ChefProfile, DayMenu, Table, TableAssignment } = require('../models');
 const stripe = require('../config/stripe');
 const { APP_URL } = require('../config/env');
 const { getLang, localize } = require('../utils/localized');
@@ -465,6 +465,64 @@ async function getBanquetChefProfile(req, res, next) {
   } catch (e) { next(e); }
 }
 
+// Get table assignments for the authenticated guest's party
+async function getTableAssignments(req, res, next) {
+  try {
+    const me = await guestService.getByEmail(req.user.email);
+    if (!me) return res.status(404).json({ error: 'Guest not found' });
+
+    const assignments = await TableAssignment.find({ guestId: me._id })
+      .populate('tableId', 'number name isHeadTable')
+      .lean();
+
+    const items = assignments.map(a => ({
+      tableNumber: a.tableId ? a.tableId.number : null,
+      tableName: a.tableId ? a.tableId.name : null,
+      isHeadTable: a.tableId ? a.tableId.isHeadTable : false,
+      partyMemberName: a.partyMemberName || null
+    }));
+
+    res.json(items);
+  } catch (e) { next(e); }
+}
+
+// Get all people assigned to a specific table (by table number)
+async function getTableCompanions(req, res, next) {
+  try {
+    const tableNumber = parseInt(req.params.tableNumber, 10);
+    if (isNaN(tableNumber)) return res.status(400).json({ error: 'Invalid table number' });
+
+    const Table = require('../models/Table');
+    const table = await Table.findOne({ number: tableNumber }).lean();
+    if (!table) return res.status(404).json({ error: 'Table not found' });
+
+    const assignments = await TableAssignment.find({ tableId: table._id })
+      .populate('guestId', 'name')
+      .lean();
+
+    // Build list: start with fixedGuests (e.g. bride/groom on Head Table)
+    const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const fixedNames = new Set((table.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg))));
+    const companions = (table.fixedGuests || []).map(fg => ({
+      name: typeof fg === 'string' ? fg : (fg.name || fg)
+    }));
+    // Add assignments, skipping any that duplicate a fixedGuest name
+    for (const a of assignments) {
+      const displayName = a.partyMemberName || (a.guestId ? a.guestId.name : 'Unknown');
+      if (!fixedNames.has(norm(a.guestId ? a.guestId.name : ''))) {
+        companions.push({ name: displayName });
+      }
+    }
+
+    res.json({
+      tableNumber,
+      tableName: table.name || null,
+      isHeadTable: table.isHeadTable || false,
+      companions
+    });
+  } catch (e) { next(e); }
+}
+
 
 module.exports = {
   getMe,
@@ -483,5 +541,7 @@ module.exports = {
   createPaymentSession,
   handleStripeWebhook,
   getDayMenus,
-  getBanquetChefProfile
+  getBanquetChefProfile,
+  getTableAssignments,
+  getTableCompanions
 };

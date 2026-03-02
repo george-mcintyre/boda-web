@@ -57,9 +57,31 @@ async function getGuestSummary(req, res, next) {
       };
     });
 
-    // Guests without menu choices
-    const guestsWithMenuChoices = new Set(menuChoices.map(mc => mc.guestId.toString()));
-    const guestsWithoutMenuChoices = guests.filter(g => !guestsWithMenuChoices.has(g._id.toString())).length;
+    // Count individuals without menu choices
+    // For each guest and party member, check if they have any menu choices
+    let individualsWithoutMenuChoices = 0;
+    
+    guests.forEach(g => {
+      const menuChoice = menuChoices.find(mc => mc.guestId.toString() === g._id.toString());
+      
+      // Check primary guest
+      const primaryChoice = menuChoice?.partyChoices?.find(pc => pc.partyGuestId === g._id.toString());
+      if (!primaryChoice || !primaryChoice.choices || primaryChoice.choices.length === 0) {
+        individualsWithoutMenuChoices++;
+      }
+      
+      // Check each party member
+      if (g.partyMembers && g.partyMembers.length > 0) {
+        g.partyMembers.forEach(pm => {
+          const pmChoice = menuChoice?.partyChoices?.find(pc => pc.partyGuestId === pm.name);
+          if (!pmChoice || !pmChoice.choices || pmChoice.choices.length === 0) {
+            individualsWithoutMenuChoices++;
+          }
+        });
+      }
+    });
+    
+    const guestsWithoutMenuChoices = individualsWithoutMenuChoices;
 
     // Guests without party members
     const guestsWithoutPartyMembers = guests.filter(g => !g.partyMembers || g.partyMembers.length === 0).length;
@@ -396,6 +418,13 @@ async function listTables(req, res, next) {
 
     const items = tables.map(t => {
       const tableAssignments = assignments.filter(a => a.tableId.toString() === t._id.toString());
+      // Deduplicate: don't count assignments whose guestName matches a fixedGuest
+      const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const fixedNames = new Set((t.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg))));
+      const uniqueAssignmentCount = tableAssignments.filter(a => {
+        const name = a.guestId ? a.guestId.name : '';
+        return !fixedNames.has(norm(name));
+      }).length;
       return {
         id: t._id.toString(),
         number: t.number,
@@ -403,7 +432,7 @@ async function listTables(req, res, next) {
         capacity: t.capacity,
         isHeadTable: t.isHeadTable,
         fixedGuests: t.fixedGuests || [],
-        assignedCount: tableAssignments.length + (t.fixedGuests ? t.fixedGuests.length : 0),
+        assignedCount: uniqueAssignmentCount + (t.fixedGuests ? t.fixedGuests.length : 0),
         assignments: tableAssignments.map(a => ({
           id: a._id.toString(),
           guestName: a.guestId ? a.guestId.name : 'Unknown',
@@ -691,6 +720,95 @@ async function getAdminEventChoices(req, res, next) {
   } catch (e) { next(e); }
 }
 
+
+// ========== Guests Without Event Choices ==========
+async function getGuestsWithoutEventChoices(req, res, next) {
+  try {
+    const guests = await Guest.find({}).lean();
+    const eventChoices = await EventChoice.find({}).lean();
+    const guestsWithEventChoices = new Set(eventChoices.map(ec => ec.guestId.toString()));
+    const guestsWithout = guests
+      .filter(g => !guestsWithEventChoices.has(g._id.toString()))
+      .map(g => ({
+        id: g._id.toString(),
+        name: g.name,
+        email: g.email
+      }));
+    res.json(guestsWithout);
+  } catch (e) { next(e); }
+}
+
+// ========== Guests Without Menu Choices ==========
+async function getGuestsWithoutMenuChoices(req, res, next) {
+  try {
+    const guests = await Guest.find({}).lean();
+    const menuChoices = await MenuChoice.find({}).lean();
+    
+    const guestsWithout = [];
+    
+    guests.forEach(g => {
+      const menuChoice = menuChoices.find(mc => mc.guestId.toString() === g._id.toString());
+      
+      // Check if primary guest has choices
+      const primaryChoice = menuChoice?.partyChoices?.find(pc => pc.partyGuestId === g._id.toString());
+      const hasChoices = primaryChoice && primaryChoice.choices && primaryChoice.choices.length > 0;
+      
+      if (!hasChoices) {
+        guestsWithout.push({
+          id: g._id.toString(),
+          name: g.name,
+          email: g.email
+        });
+      }
+    });
+    
+    res.json(guestsWithout);
+  } catch (e) { next(e); }
+}
+
+// ========== Guests With Incomplete Party Names ==========
+async function getGuestsWithoutParty(req, res, next) {
+  try {
+    const guests = await Guest.find({}).lean();
+    const guestsWithIncompleteParty = [];
+    
+    guests.forEach(g => {
+      // Only check if they have party members (at least 1)
+      if (g.partyMembers && g.partyMembers.length > 0) {
+        const incompleteMembers = [];
+        
+        g.partyMembers.forEach((pm, index) => {
+          const name = pm.name || '';
+          // Check if name is blank or follows placeholder pattern like "<anything> - Guest N"
+          const isBlank = name.trim() === '';
+          // Match pattern: anything followed by " - Guest " and a number
+          const isPlaceholder = /\s-\sGuest\s+\d+$/i.test(name.trim());
+          
+          if (isBlank || isPlaceholder) {
+            incompleteMembers.push({
+              index: index + 1,
+              currentName: name || '(blank)'
+            });
+          }
+        });
+        
+        if (incompleteMembers.length > 0) {
+          guestsWithIncompleteParty.push({
+            id: g._id.toString(),
+            name: g.name,
+            email: g.email,
+            totalPartyMembers: g.partyMembers.length,
+            incompleteCount: incompleteMembers.length,
+            incompleteMembers
+          });
+        }
+      }
+    });
+    
+    res.json(guestsWithIncompleteParty);
+  } catch (e) { next(e); }
+}
+
 module.exports = {
   getGuestSummary,
   listChefProfiles, createChefProfile, updateChefProfile, deleteChefProfile,
@@ -701,5 +819,8 @@ module.exports = {
   listTableAssignments, createTableAssignment, updateTableAssignment, deleteTableAssignment, bulkAssignTables,
   getMenuResponses,
   getGiftPurchases,
-  getAdminEventChoices
+  getAdminEventChoices,
+  getGuestsWithoutEventChoices,
+  getGuestsWithoutMenuChoices,
+  getGuestsWithoutParty
 };

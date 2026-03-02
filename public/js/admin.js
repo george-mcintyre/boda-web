@@ -89,18 +89,21 @@
   const SUB_TABS = {
     guests: [
       { id: 'summary', i18nKey: 'admin:subtab.guestSummary', icon: 'fa-chart-bar' },
-      { id: 'management', i18nKey: 'admin:subtab.guestManagement', icon: 'fa-users-cog' }
+      { id: 'management', i18nKey: 'admin:subtab.guestManagement', icon: 'fa-users-cog' },
+      { id: 'noParty', i18nKey: 'admin:subtab.guestsNoParty', icon: 'fa-user-slash' }
     ],
     menu: [
       { id: 'banquet', i18nKey: 'admin:subtab.banquetMenu', icon: 'fa-utensils' },
       { id: 'day1', i18nKey: 'admin:subtab.day1Menu', icon: 'fa-sun' },
       { id: 'day3', i18nKey: 'admin:subtab.day3Menu', icon: 'fa-glass-cheers' },
       { id: 'tables', i18nKey: 'admin:subtab.tableAllocation', icon: 'fa-th' },
-      { id: 'responses', i18nKey: 'admin:subtab.menuResponses', icon: 'fa-clipboard-list' }
+      { id: 'responses', i18nKey: 'admin:subtab.menuResponses', icon: 'fa-clipboard-list' },
+      { id: 'noChoices', i18nKey: 'admin:subtab.menuNoChoices', icon: 'fa-times-circle' }
     ],
     event: [
       { id: 'schedule', i18nKey: 'admin:subtab.eventSchedule', icon: 'fa-calendar-alt' },
-      { id: 'attendance', i18nKey: 'admin:subtab.eventAttendance', icon: 'fa-chart-bar' }
+      { id: 'attendance', i18nKey: 'admin:subtab.eventAttendance', icon: 'fa-chart-bar' },
+      { id: 'noChoices', i18nKey: 'admin:subtab.eventNoChoices', icon: 'fa-user-times' }
     ],
     gifts: [
       { id: 'list', i18nKey: 'admin:subtab.giftList', icon: 'fa-gift' },
@@ -133,15 +136,18 @@
     switch (primaryTab + '/' + subTab) {
       case 'guests/summary': return showGuestSummary();
       case 'guests/management': return showGuests();
+      case 'guests/noParty': return showGuestsNoParty();
       case 'menu/banquet': return showMenu();
       case 'menu/day1': return showDayMenu('day1');
       case 'menu/day3': return showDayMenu('day3');
       case 'menu/tables': return showTableAllocation();
       case 'menu/responses': return showMenuResponses();
+      case 'menu/noChoices': return showMenuNoChoices();
       case 'gifts/list': return showGifts();
       case 'gifts/purchases': return showGiftPurchases();
       case 'event/schedule': return showEvent();
       case 'event/attendance': return showEventAttendance();
+      case 'event/noChoices': return showEventNoChoices();
       default:
         getContentTarget().innerHTML = '<div class="admin-content"><p>' + translate('admin:comingSoon') + '</p></div>';
     }
@@ -577,11 +583,11 @@
 
       const tableCards = tables.map(t => {
         const pct = t.capacity > 0 ? Math.round((t.assignedCount / t.capacity) * 100) : 0;
-        const barColor = pct >= 100 ? '#dc3545' : pct >= 75 ? '#ffc107' : '#28a745';
+        const barColor = pct > 100 ? '#dc3545' : pct >= 100 ? '#28a745' : pct >= 50 ? '#ffc107' : 'var(--gray-300)';
         const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
         const fixedNames = new Set((t.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg))));
         const assignedNames = (t.fixedGuests || []).map(fg => `<span class="badge badge-primary" style="margin:2px;">${typeof fg === 'string' ? fg : (fg.name || fg)}</span>`).join('') +
-          (t.assignments || []).filter(a => !fixedNames.has(norm(a.guestName))).map(a => `<span class="badge badge-secondary" style="margin:2px;">${a.guestName}${a.partyMemberName ? ' (' + a.partyMemberName + ')' : ''}</span>`).join('');
+          (t.assignments || []).filter(a => !fixedNames.has(norm(a.guestName))).map(a => `<span class="badge badge-secondary" style="margin:2px;">${a.partyMemberName || a.guestName}</span>`).join('');
 
         return `
           <div class="admin-card" style="margin-bottom:10px;">
@@ -619,7 +625,25 @@
               <div class="stat-label">${translate('admin:tables.assigned')}</div>
             </div>
           </div>
-          ${tableCards}
+          
+          <!-- Floor Plan and Table Cards Container -->
+          <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:30px;">
+            <!-- Left: Table Cards -->
+            <div style="flex:1;min-width:300px;">
+              ${tableCards}
+            </div>
+            
+            <!-- Right: Floor Plan -->
+            <div style="flex:1;min-width:400px;max-width:600px;">
+              <div class="admin-card" style="padding:0;overflow:hidden;">
+                <img src="/assets/images/seating plan.png" alt="Banquet Seating Plan" style="width:100%;height:auto;display:block;border-radius:8px;">
+              </div>
+              <div class="admin-card" style="text-align:center;margin-top:12px;padding:16px;">
+                <p style="margin:0 0 8px;font-size:0.85em;color:var(--text-light);"><i class="fas fa-qrcode"></i> ${translate('admin:tables.qrDeepLink')}</p>
+                <img src="/api/admin/seating-qr" alt="Seating QR Code" style="width:180px;height:180px;" />
+                <p style="margin:8px 0 0;font-size:0.75em;color:var(--text-light);word-break:break-all;">george-and-iluminada.com/guests.html?tab=menu&seating=show</p>
+            </div>
+          </div>
 
           <!-- Guest Assignment Grid -->
           <div style="margin-top:30px;">
@@ -655,13 +679,13 @@
         // Primary guest row
         const primaryAssignment = assignmentMap[g.id];
         const isFixed = fixedGuestIds.has(g.id);
-        const primaryTableId = primaryAssignment ? primaryAssignment.tableId : '';
         const primaryAssignId = primaryAssignment ? primaryAssignment.id : '';
+        const partyCount = (g.partyMembers || []).length;
         allRows.push({
           isAssigned: !!primaryAssignment,
           html: `<tr class="assignment-row" data-guest-id="${g.id}" data-assigned="${!!primaryAssignment}">
             <td><strong>${g.name}</strong>${isFixed ? ' <i class="fas fa-crown" style="color:gold;font-size:0.75em;" title="' + translate('admin:tables.headTable') + '"></i>' : ''}</td>
-            <td>—</td>
+            <td><i class="fas fa-user" style="color:var(--primary);font-size:0.8em;"></i> ${g.name}</td>
             <td>${primaryAssignment ? getTableDisplayName(tables.find(t => t.id === primaryAssignment.tableId) || {number: '?'}) : '<span style="color:var(--text-light);">' + translate('admin:tables.unassigned') + '</span>'}</td>
             <td>
               ${isFixed ? '<span style="color:var(--text-light);font-size:0.85em;"><i class="fas fa-lock"></i></span>' : `<select class="table-assign-select" data-guest-id="${g.id}" data-party-member="" data-assignment-id="${primaryAssignId}">
@@ -670,6 +694,27 @@
               </select>`}
             </td>
           </tr>`
+        });
+
+        // Party member rows
+        (g.partyMembers || []).forEach(pm => {
+          const pmKey = `${g.id}_${pm.name}`;
+          const pmAssignment = assignmentMap[pmKey];
+          const pmAssignId = pmAssignment ? pmAssignment.id : '';
+          allRows.push({
+            isAssigned: !!pmAssignment,
+            html: `<tr class="assignment-row" data-guest-id="${g.id}" data-assigned="${!!pmAssignment}" style="background:var(--gray-50);">
+              <td></td>
+              <td style="padding-left:24px;"><i class="fas fa-user-friends" style="color:var(--text-light);font-size:0.8em;"></i> ${pm.name}${pm.adult === false ? ' <span style="color:var(--text-light);font-size:0.75em;">(child)</span>' : ''}</td>
+              <td>${pmAssignment ? getTableDisplayName(tables.find(t => t.id === pmAssignment.tableId) || {number: '?'}) : '<span style="color:var(--text-light);">' + translate('admin:tables.unassigned') + '</span>'}</td>
+              <td>
+                <select class="table-assign-select" data-guest-id="${g.id}" data-party-member="${pm.name}" data-assignment-id="${pmAssignId}">
+                  <option value="">${translate('admin:tables.unassigned')}</option>
+                  ${tableOptions}
+                </select>
+              </td>
+            </tr>`
+          });
         });
       });
 
@@ -838,6 +883,165 @@
       target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
     }
   }
+
+  // Event No Choices sub-tab
+  async function showEventNoChoices() {
+    const target = getContentTarget();
+    setLoading(translate('admin:subtab.eventNoChoices'));
+    try {
+      const res = await api('/api/admin/guests-without-event-choices');
+      if (!res.ok) throw new Error('Failed to load guests without event choices');
+      const guests = await res.json();
+
+      if (guests.length === 0) {
+        target.innerHTML = `
+          <div class="admin-content">
+            <h3><i class="fas fa-user-times"></i> ${translate('admin:subtab.eventNoChoices')}</h3>
+            <div style="text-align:center;padding:40px;">
+              <i class="fas fa-check-circle" style="font-size:3em;color:var(--success-color);margin-bottom:15px;"></i>
+              <p style="color:var(--text-light);">All guests have made event choices!</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const rows = guests.map(g => {
+        return `<tr>
+          <td>${g.name}</td>
+          <td><a href="mailto:${g.email}">${g.email}</a></td>
+        </tr>`;
+      }).join('');
+
+      target.innerHTML = `
+        <div class="admin-content">
+          <h3><i class="fas fa-user-times"></i> ${translate('admin:subtab.eventNoChoices')} <span class="count-badge">${guests.length}</span></h3>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>`;
+    } catch(e) {
+      console.error('Error loading guests without event choices:', e);
+      target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
+    }
+  }
+
+  // Menu No Choices sub-tab
+  async function showMenuNoChoices() {
+    const target = getContentTarget();
+    setLoading(translate('admin:subtab.menuNoChoices'));
+    try {
+      const res = await api('/api/admin/guests-without-menu-choices');
+      if (!res.ok) throw new Error('Failed to load guests without menu choices');
+      const guests = await res.json();
+
+      if (guests.length === 0) {
+        target.innerHTML = `
+          <div class="admin-content">
+            <h3><i class="fas fa-times-circle"></i> ${translate('admin:subtab.menuNoChoices')}</h3>
+            <div style="text-align:center;padding:40px;">
+              <i class="fas fa-check-circle" style="font-size:3em;color:var(--success-color);margin-bottom:15px;"></i>
+              <p style="color:var(--text-light);">All guests have made menu choices!</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const rows = guests.map(g => {
+        return `<tr>
+          <td>${g.name}</td>
+          <td><a href="mailto:${g.email}">${g.email}</a></td>
+        </tr>`;
+      }).join('');
+
+      target.innerHTML = `
+        <div class="admin-content">
+          <h3><i class="fas fa-times-circle"></i> ${translate('admin:subtab.menuNoChoices')} <span class="count-badge">${guests.length}</span></h3>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>`;
+    } catch(e) {
+      console.error('Error loading guests without menu choices:', e);
+      target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
+    }
+  }
+
+  // Guests No Party sub-tab
+  async function showGuestsNoParty() {
+    const target = getContentTarget();
+    setLoading(translate('admin:subtab.guestsNoParty'));
+    try {
+      const res = await api('/api/admin/guests-without-party');
+      if (!res.ok) throw new Error('Failed to load guests with incomplete party names');
+      const guests = await res.json();
+
+      if (guests.length === 0) {
+        target.innerHTML = `
+          <div class="admin-content">
+            <h3><i class="fas fa-user-slash"></i> ${translate('admin:subtab.guestsNoParty')}</h3>
+            <div style="text-align:center;padding:40px;">
+              <i class="fas fa-check-circle" style="font-size:3em;color:var(--success-color);margin-bottom:15px;"></i>
+              <p style="color:var(--text-light);">All guests have completed party member names!</p>
+            </div>
+          </div>`;
+        return;
+      }
+
+      const rows = guests.map(g => {
+        const escapedName = g.name.replace(/'/g, "&#39;");
+        return `<tr>
+          <td>${g.name}</td>
+          <td><a href="mailto:${g.email}">${g.email}</a></td>
+          <td>${g.incompleteCount} of ${g.totalPartyMembers}</td>
+          <td><button class="btn-icon" onclick="managePartyForGuest('${g.id}', '${escapedName}')" title="Manage Party"><i class="fas fa-users"></i></button></td>
+        </tr>`;
+      }).join('');
+
+      target.innerHTML = `
+        <div class="admin-content">
+          <h3><i class="fas fa-user-slash"></i> ${translate('admin:subtab.guestsNoParty')} <span class="count-badge">${guests.length}</span></h3>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Guest Name</th>
+                  <th>Email</th>
+                  <th>Incomplete</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>`;
+    } catch(e) {
+      console.error('Error loading guests with incomplete party:', e);
+      target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
+    }
+  }
+
+  // Helper function to manage party for a specific guest
+  window.managePartyForGuest = async function(guestId, guestName) {
+    // Call showPartyManager directly with the guest ID and name
+    showPartyManager(guestId, guestName || '');
+  };
+
 
   // Sub-event icon utilities
   function getSubEventIcon(iconType) {

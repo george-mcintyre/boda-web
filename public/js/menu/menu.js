@@ -59,6 +59,10 @@ async function loadMenuSelections() {
         <i class="fas fa-sun"></i>
         <span data-i18n="guests:weddingBrunch">Wedding Brunch</span>
       </button>
+      <button class="menu-sub-btn" data-menu="seating">
+        <i class="fas fa-chair"></i>
+        <span data-i18n="guests:seating">Seating</span>
+      </button>
     </div>
     <div id="menu-view-container"></div>
   `;
@@ -71,8 +75,13 @@ async function loadMenuSelections() {
     });
   });
   
-  // Load initial banquet view
-  await loadBanquetMenu();
+  // Check for seating deep link
+  if (typeof checkSeatingDeepLink === 'function' && checkSeatingDeepLink()) {
+    switchMenuView('seating');
+  } else {
+    // Load initial banquet view
+    await loadBanquetMenu();
+  }
 }
 
 // Switch between menu views
@@ -87,6 +96,10 @@ function switchMenuView(menuType) {
   // Load appropriate view
   if (menuType === 'banquet') {
     loadBanquetMenu();
+  } else if (menuType === 'seating') {
+    if (typeof loadSeatingView === 'function') {
+      loadSeatingView();
+    }
   } else {
     loadDayMenu(menuType);
   }

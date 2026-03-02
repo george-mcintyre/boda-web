@@ -79,6 +79,9 @@ router.get('/gifts', auth('guest'), guestCtrl.getGifts);
 router.get('/gift-choices', auth('guest'), guestCtrl.getGiftChoices);
 router.post('/create-payment-session', auth('guest'), guestCtrl.createPaymentSession);
 
+// Table Assignments (for seating plan)
+router.get('/table-assignments', auth('guest'), guestCtrl.getTableAssignments);
+router.get('/table-companions/:tableNumber', auth('guest'), guestCtrl.getTableCompanions);
 // Gift image serving endpoint (public - no auth required for CSS background-image loading)
 router.get('/gifts/:giftId/image', async (req, res, next) => {
   try {
