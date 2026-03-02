@@ -326,4 +326,6 @@ router.get('/guests-without-event-choices', auth('admin'), adminExpCtrl.getGuest
 router.get('/guests-without-menu-choices', auth('admin'), adminExpCtrl.getGuestsWithoutMenuChoices);
 router.get('/guests-without-party', auth('admin'), adminExpCtrl.getGuestsWithoutParty);
 
+router.get('/guest-list-print', auth('admin'), adminExpCtrl.getGuestListPrint);
+
 module.exports = router;

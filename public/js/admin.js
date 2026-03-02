@@ -1881,6 +1881,8 @@
               <span data-i18n="admin:guests.addGuest">${translate('admin:guests.addGuest')}</span></button>
               <button id="bulkUploadGuests" class="btn btn-info" style="margin-left:8px;"><i class="fas fa-file-upload"></i> 
               <span data-i18n="admin:guests.bulkUploadCsv">${translate('admin:guests.bulkUploadCsv')}</span></button>
+              <button onclick="window.open('admin-guest-list-print.html','_blank')" class="btn" style="margin-left:8px;background:var(--gray-200);color:var(--text-dark);"><i class="fas fa-print"></i> 
+              <span data-i18n="admin:guests.printList">${translate('admin:guests.printList')}</span></button>
             </div>
           </div>
           <div class="table-container">

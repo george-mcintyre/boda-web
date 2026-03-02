@@ -809,6 +809,110 @@ async function getGuestsWithoutParty(req, res, next) {
   } catch (e) { next(e); }
 }
 
+// ========== Printable Guest List ==========
+async function getGuestListPrint(req, res, next) {
+  try {
+    const guests = await Guest.find({}).lean();
+    const events = await Event.find({}).sort({ date: 1 }).lean();
+    const eventChoices = await EventChoice.find({}).lean();
+    const menuChoices = await MenuChoice.find({}).lean();
+
+    const eventIds = events.map(e => e._id.toString());
+    const rows = [];
+
+    guests.forEach(g => {
+      const guestId = g._id.toString();
+      const ec = eventChoices.find(c => c.guestId.toString() === guestId);
+      const mc = menuChoices.find(c => c.guestId.toString() === guestId);
+
+      const findPartyChoice = (collection, ...candidates) => {
+        const doc = collection === 'ec' ? ec : mc;
+        if (!doc?.partyChoices) return null;
+        for (const id of candidates) {
+          const match = doc.partyChoices.find(p => p.partyGuestId === id)
+            || doc.partyChoices.find(p => p.partyGuestId === String(id));
+          if (match) return match;
+        }
+        return null;
+      };
+
+      const getAttendance = (...ids) => {
+        const pc = findPartyChoice('ec', ...ids);
+        return eventIds.map(eid => {
+          const choice = pc?.choices?.find(c => c.eventId?.toString() === eid);
+          return choice?.attending || false;
+        });
+      };
+
+      const hasAnyRsvp = (...ids) => {
+        const pc = findPartyChoice('ec', ...ids);
+        return pc?.choices?.some(c => c.attending) || false;
+      };
+
+      const hasMenuChoices = (...ids) => {
+        const pc = findPartyChoice('mc', ...ids);
+        return pc?.choices?.length > 0;
+      };
+
+      const getAllergies = (...ids) => {
+        const pc = findPartyChoice('mc', ...ids);
+        const badges = (pc?.specialRequests || []).filter(sr => sr.selected).map(sr => sr.name);
+        const detail = pc?.specialRequestDetail || '';
+        return { badges, detail };
+      };
+
+      const attendance = getAttendance(guestId);
+      const allergies = getAllergies(guestId);
+      rows.push({
+        name: g.name,
+        principalName: g.name,
+        email: g.email || '',
+        isChild: g.adult === false,
+        isPrincipal: true,
+        attendance,
+        hasRsvp: hasAnyRsvp(guestId),
+        isUnnamed: false,
+        hasMenu: hasMenuChoices(guestId),
+        allergies
+      });
+
+      (g.partyMembers || []).forEach(pm => {
+        const candidates = [pm.id, pm.name, `member-${pm.id}`];
+        const unnamed = /- Guest \d+$/.test(pm.name);
+        rows.push({
+          name: pm.name,
+          principalName: g.name,
+          email: '',
+          isChild: pm.adult === false,
+          isPrincipal: false,
+          attendance: getAttendance(...candidates),
+          hasRsvp: hasAnyRsvp(...candidates),
+          isUnnamed: unnamed,
+          hasMenu: hasMenuChoices(...candidates),
+          allergies: getAllergies(...candidates)
+        });
+      });
+    });
+
+    rows.sort((a, b) => {
+      const pc = a.principalName.localeCompare(b.principalName);
+      if (pc !== 0) return pc;
+      if (a.isPrincipal && !b.isPrincipal) return -1;
+      if (!a.isPrincipal && b.isPrincipal) return 1;
+      return a.name.localeCompare(b.name);
+    });
+
+    res.json({
+      events: events.map(e => ({
+        id: e._id.toString(),
+        name: e.name,
+        date: e.date
+      })),
+      rows
+    });
+  } catch (e) { next(e); }
+}
+
 module.exports = {
   getGuestSummary,
   listChefProfiles, createChefProfile, updateChefProfile, deleteChefProfile,
@@ -822,5 +926,6 @@ module.exports = {
   getAdminEventChoices,
   getGuestsWithoutEventChoices,
   getGuestsWithoutMenuChoices,
-  getGuestsWithoutParty
+  getGuestsWithoutParty,
+  getGuestListPrint
 };
