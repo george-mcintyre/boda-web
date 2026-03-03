@@ -327,5 +327,7 @@ router.get('/guests-without-menu-choices', auth('admin'), adminExpCtrl.getGuests
 router.get('/guests-without-party', auth('admin'), adminExpCtrl.getGuestsWithoutParty);
 
 router.get('/guest-list-print', auth('admin'), adminExpCtrl.getGuestListPrint);
+router.get('/banquet-seating-print', auth('admin'), adminExpCtrl.getBanquetSeatingPrint);
+router.post('/table-seats/reorder', auth('admin'), adminExpCtrl.reorderTableSeats);
 
 module.exports = router;

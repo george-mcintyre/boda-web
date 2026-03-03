@@ -586,11 +586,21 @@
         const barColor = pct > 100 ? '#dc3545' : pct >= 100 ? '#28a745' : pct >= 50 ? '#ffc107' : 'var(--gray-300)';
         const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
         const fixedNames = new Set((t.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg))));
-        const assignedNames = (t.fixedGuests || []).map(fg => `<span class="badge badge-primary" style="margin:2px;">${typeof fg === 'string' ? fg : (fg.name || fg)}</span>`).join('') +
-          (t.assignments || []).filter(a => !fixedNames.has(norm(a.guestName))).map(a => `<span class="badge badge-secondary" style="margin:2px;">${a.partyMemberName || a.guestName}</span>`).join('');
+        const fixedBadges = (t.fixedGuests || []).map((fg, i) => {
+          const name = typeof fg === 'string' ? fg : (fg.name || fg);
+          return `<span class="badge badge-primary" style="margin:2px;cursor:default;" title="Seat ${i + 1}"><small style="opacity:.5">${i + 1}.</small> ${name}</span>`;
+        }).join('');
+        const draggableBadges = (t.assignments || [])
+          .filter(a => !fixedNames.has(norm(a.guestName)))
+          .map((a, i) => {
+            const seatIdx = (t.fixedGuests || []).length + i + 1;
+            const sn = a.seatNumber || seatIdx;
+            return `<span class="badge badge-secondary seat-badge" draggable="true" data-assignment-id="${a.id}" data-table-id="${t.id}" style="margin:2px;cursor:grab;" title="Seat ${sn}"><small style="opacity:.5">${sn}.</small> ${a.partyMemberName || a.guestName}</span>`;
+          }).join('');
+        const assignedNames = fixedBadges + draggableBadges;
 
         return `
-          <div class="admin-card" style="margin-bottom:10px;">
+          <div class="admin-card seat-drop-zone" data-table-id="${t.id}" style="margin-bottom:10px;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <h4 style="margin:0;">${t.isHeadTable ? '<i class="fas fa-crown" style="color:gold;"></i> ' : ''}${getTableDisplayName(t)}</h4>
               <span style="font-size:0.85em;color:var(--text-light);">${t.assignedCount}/${t.capacity}</span>
@@ -598,7 +608,7 @@
             <div style="background:var(--gray-200);border-radius:4px;height:6px;margin:8px 0;">
               <div style="background:${barColor};width:${Math.min(pct, 100)}%;height:100%;border-radius:4px;"></div>
             </div>
-            <div style="display:flex;flex-wrap:wrap;gap:2px;">${assignedNames || '<span style="color:var(--text-light);font-size:0.85em;">' + translate('admin:tables.noGuestsAssigned') + '</span>'}</div>
+            <div class="seat-list" data-table-id="${t.id}" style="display:flex;flex-wrap:wrap;gap:2px;">${assignedNames || '<span style="color:var(--text-light);font-size:0.85em;">' + translate('admin:tables.noGuestsAssigned') + '</span>'}</div>
           </div>`;
       }).join('');
 
@@ -606,6 +616,7 @@
         <div class="admin-content">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <h3 style="margin:0;"><i class="fas fa-th"></i> ${translate('admin:subtab.tableAllocation')}</h3>
+            <button onclick="window.open('admin-banquet-print.html','_blank')" class="btn" style="background:var(--gray-200);color:var(--text-dark);"><i class="fas fa-print"></i> <span data-i18n="admin:tables.printBanquet">${translate('admin:tables.printBanquet')}</span></button>
           </div>
           <div class="stats-grid" style="margin-bottom:20px;">
             <div class="stat-card">
@@ -766,6 +777,53 @@
           });
         });
       }
+
+      // Drag/drop seat reordering
+      target.querySelectorAll('.seat-list').forEach(container => {
+        let dragEl = null;
+        container.addEventListener('dragstart', e => {
+          const badge = e.target.closest('.seat-badge');
+          if (!badge) return;
+          dragEl = badge;
+          badge.style.opacity = '0.4';
+          e.dataTransfer.effectAllowed = 'move';
+        });
+        container.addEventListener('dragend', e => {
+          if (dragEl) dragEl.style.opacity = '1';
+          dragEl = null;
+        });
+        container.addEventListener('dragover', e => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+        });
+        container.addEventListener('drop', async e => {
+          e.preventDefault();
+          if (!dragEl) return;
+          const dropTarget = e.target.closest('.seat-badge');
+          if (!dropTarget || dropTarget === dragEl) return;
+          const tableId = container.dataset.tableId;
+          const badges = [...container.querySelectorAll('.seat-badge')];
+          const fromIdx = badges.indexOf(dragEl);
+          const toIdx = badges.indexOf(dropTarget);
+          if (fromIdx < 0 || toIdx < 0) return;
+          if (fromIdx < toIdx) {
+            dropTarget.after(dragEl);
+          } else {
+            dropTarget.before(dragEl);
+          }
+          const orderedIds = [...container.querySelectorAll('.seat-badge')].map(b => b.dataset.assignmentId);
+          try {
+            await api('/api/admin/table-seats/reorder', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ tableId, orderedIds })
+            });
+            showTableAllocation();
+          } catch (err) {
+            notify('Error reordering seats: ' + err.message, 'error');
+          }
+        });
+      });
 
       // Filter button
       let showUnassignedOnly = false;

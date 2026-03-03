@@ -433,11 +433,14 @@ async function listTables(req, res, next) {
         isHeadTable: t.isHeadTable,
         fixedGuests: t.fixedGuests || [],
         assignedCount: uniqueAssignmentCount + (t.fixedGuests ? t.fixedGuests.length : 0),
-        assignments: tableAssignments.map(a => ({
-          id: a._id.toString(),
-          guestName: a.guestId ? a.guestId.name : 'Unknown',
-          partyMemberName: a.partyMemberName
-        }))
+        assignments: tableAssignments
+          .sort((a, b) => (a.seatNumber || 999) - (b.seatNumber || 999))
+          .map(a => ({
+            id: a._id.toString(),
+            guestName: a.guestId ? a.guestId.name : 'Unknown',
+            partyMemberName: a.partyMemberName,
+            seatNumber: a.seatNumber || null
+          }))
       };
     });
     res.json(items);
@@ -513,6 +516,7 @@ async function listTableAssignments(req, res, next) {
     const assignments = await TableAssignment.find({})
       .populate('guestId', 'name email')
       .populate('tableId', 'number name')
+      .sort({ seatNumber: 1 })
       .lean();
 
     const items = assignments.map(a => ({
@@ -522,7 +526,8 @@ async function listTableAssignments(req, res, next) {
       tableName: a.tableId ? a.tableId.name : null,
       guestId: a.guestId ? a.guestId._id.toString() : null,
       guestName: a.guestId ? a.guestId.name : 'Unknown',
-      partyMemberName: a.partyMemberName || null
+      partyMemberName: a.partyMemberName || null,
+      seatNumber: a.seatNumber || null
     }));
     res.json(items);
   } catch (e) { next(e); }
@@ -535,17 +540,22 @@ async function createTableAssignment(req, res, next) {
       return res.status(400).json({ error: 'tableId and guestId are required' });
     }
 
+    const maxSeat = await TableAssignment.findOne({ tableId }).sort({ seatNumber: -1 }).lean();
+    const seatNumber = (maxSeat?.seatNumber || 0) + 1;
+
     const assignment = await TableAssignment.create({
       tableId,
       guestId,
-      partyMemberName: partyMemberName || null
+      partyMemberName: partyMemberName || null,
+      seatNumber
     });
 
     res.status(201).json({
       id: assignment._id.toString(),
       tableId: assignment.tableId.toString(),
       guestId: assignment.guestId.toString(),
-      partyMemberName: assignment.partyMemberName
+      partyMemberName: assignment.partyMemberName,
+      seatNumber: assignment.seatNumber
     });
   } catch (e) { next(e); }
 }
@@ -580,20 +590,42 @@ async function deleteTableAssignment(req, res, next) {
   } catch (e) { next(e); }
 }
 
+async function reorderTableSeats(req, res, next) {
+  try {
+    const { tableId, orderedIds } = req.body;
+    if (!tableId || !Array.isArray(orderedIds)) {
+      return res.status(400).json({ error: 'tableId and orderedIds array are required' });
+    }
+    const ops = orderedIds.map((id, idx) =>
+      TableAssignment.updateOne({ _id: id, tableId }, { seatNumber: idx + 1 })
+    );
+    await Promise.all(ops);
+    res.json({ status: 'ok' });
+  } catch (e) { next(e); }
+}
+
 async function bulkAssignTables(req, res, next) {
   try {
-    const { assignments } = req.body;
-    if (!Array.isArray(assignments)) {
+    const { assignments: assignList } = req.body;
+    if (!Array.isArray(assignList)) {
       return res.status(400).json({ error: 'assignments array is required' });
     }
 
+    const seatCounters = {};
+    for (const tid of [...new Set(assignList.map(a => a.tableId))]) {
+      const max = await TableAssignment.findOne({ tableId: tid }).sort({ seatNumber: -1 }).lean();
+      seatCounters[tid] = max?.seatNumber || 0;
+    }
+
     const results = [];
-    for (const a of assignments) {
+    for (const a of assignList) {
       try {
+        seatCounters[a.tableId] = (seatCounters[a.tableId] || 0) + 1;
         const created = await TableAssignment.create({
           tableId: a.tableId,
           guestId: a.guestId,
-          partyMemberName: a.partyMemberName || null
+          partyMemberName: a.partyMemberName || null,
+          seatNumber: seatCounters[a.tableId]
         });
         results.push({ id: created._id.toString(), status: 'ok' });
       } catch (err) {
@@ -913,6 +945,142 @@ async function getGuestListPrint(req, res, next) {
   } catch (e) { next(e); }
 }
 
+// ========== Banquet Seating Print ==========
+async function getBanquetSeatingPrint(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const tables = await Table.find({}).sort({ number: 1 }).lean();
+    const assignments = await TableAssignment.find({}).populate('guestId', 'name email partyMembers').sort({ seatNumber: 1 }).lean();
+    const menuChoices = await MenuChoice.find({}).lean();
+    const selectableCourses = await Course.find({ selectionRequired: true }).lean();
+    const courseOptions = await CourseOption.find({
+      courseId: { $in: selectableCourses.map(c => c._id) }
+    }).lean();
+
+    const optionMap = {};
+    courseOptions.forEach(o => { optionMap[o._id.toString()] = localize(o.label, lang); });
+    const courseMap = {};
+    selectableCourses.forEach(c => { courseMap[c._id.toString()] = localize(c.label, lang); });
+
+    const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+    const findPartyChoice = (mc, ...candidates) => {
+      if (!mc?.partyChoices) return null;
+      for (const id of candidates) {
+        const match = mc.partyChoices.find(p => p.partyGuestId === id)
+          || mc.partyChoices.find(p => p.partyGuestId === String(id));
+        if (match) return match;
+      }
+      return null;
+    };
+
+    const result = tables.map(t => {
+      const tableAssignments = assignments.filter(a => a.tableId.toString() === t._id.toString());
+      const fixedNames = new Set((t.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg))));
+
+      const seats = [];
+
+      (t.fixedGuests || []).forEach(fg => {
+        const fgName = typeof fg === 'string' ? fg : (fg.name || fg);
+        const matchAssign = tableAssignments.find(a => fixedNames.has(norm(a.guestId?.name || '')));
+        const guestId = matchAssign?.guestId?._id?.toString();
+        const mc = guestId ? menuChoices.find(m => m.guestId.toString() === guestId) : null;
+        const pc = mc ? findPartyChoice(mc, guestId) : null;
+
+        const mealChoices = [];
+        selectableCourses.forEach(c => {
+          const cid = c._id.toString();
+          const choice = pc?.choices?.find(ch => ch.courseId?.toString() === cid);
+          mealChoices.push({
+            course: courseMap[cid],
+            selected: choice ? (optionMap[choice.optionId?.toString()] || null) : null
+          });
+        });
+
+        const badges = (pc?.specialRequests || []).filter(sr => sr.selected).map(sr => sr.name);
+        const detail = pc?.specialRequestDetail || '';
+
+        seats.push({
+          seat: 0,
+          name: fgName,
+          isFixed: true,
+          mealChoices,
+          hasChosen: mealChoices.some(m => m.selected),
+          allergies: { badges, detail }
+        });
+      });
+
+      tableAssignments
+        .filter(a => !fixedNames.has(norm(a.guestId?.name || '')))
+        .forEach(a => {
+          const displayName = a.partyMemberName || (a.guestId ? a.guestId.name : 'Unknown');
+          const guestId = a.guestId?._id?.toString();
+          const mc = guestId ? menuChoices.find(m => m.guestId.toString() === guestId) : null;
+
+          const pmId = a.partyMemberName || guestId;
+          const guest = a.guestId;
+          const pmObj = a.partyMemberName && guest?.partyMembers
+            ? guest.partyMembers.find(pm => pm.name === a.partyMemberName)
+            : null;
+          const candidates = a.partyMemberName
+            ? [pmObj?.id, a.partyMemberName, `member-${pmObj?.id}`]
+            : [guestId];
+          const pc = mc ? findPartyChoice(mc, ...candidates) : null;
+
+          const mealChoices = [];
+          selectableCourses.forEach(c => {
+            const cid = c._id.toString();
+            const choice = pc?.choices?.find(ch => ch.courseId?.toString() === cid);
+            mealChoices.push({
+              course: courseMap[cid],
+              selected: choice ? (optionMap[choice.optionId?.toString()] || null) : null
+            });
+          });
+
+          const badges = (pc?.specialRequests || []).filter(sr => sr.selected).map(sr => sr.name);
+          const detail = pc?.specialRequestDetail || '';
+
+          seats.push({
+            seat: 0,
+            name: displayName,
+            isFixed: false,
+            mealChoices,
+            hasChosen: mealChoices.some(m => m.selected),
+            allergies: { badges, detail }
+          });
+        });
+
+      const emptySeats = Math.max(0, t.capacity - seats.length);
+      for (let i = 0; i < emptySeats; i++) {
+        seats.push({
+          seat: 0,
+          name: null,
+          isFixed: false,
+          mealChoices: selectableCourses.map(c => ({ course: courseMap[c._id.toString()], selected: null })),
+          hasChosen: false,
+          allergies: { badges: [], detail: '' }
+        });
+      }
+
+      seats.forEach((s, i) => { s.seat = i + 1; });
+
+      return {
+        number: t.number,
+        name: t.name,
+        isHeadTable: t.isHeadTable,
+        capacity: t.capacity,
+        filledCount: seats.filter(s => s.name).length,
+        seats
+      };
+    });
+
+    res.json({
+      courses: selectableCourses.map(c => ({ id: c._id.toString(), label: courseMap[c._id.toString()] })),
+      tables: result
+    });
+  } catch (e) { next(e); }
+}
+
 module.exports = {
   getGuestSummary,
   listChefProfiles, createChefProfile, updateChefProfile, deleteChefProfile,
@@ -921,11 +1089,13 @@ module.exports = {
   uploadDayMenuImage, getDayMenuImage, getDayMenuSectionImage,
   listTables, createTable, updateTable, deleteTable, seedTables,
   listTableAssignments, createTableAssignment, updateTableAssignment, deleteTableAssignment, bulkAssignTables,
+  reorderTableSeats,
   getMenuResponses,
   getGiftPurchases,
   getAdminEventChoices,
   getGuestsWithoutEventChoices,
   getGuestsWithoutMenuChoices,
   getGuestsWithoutParty,
-  getGuestListPrint
+  getGuestListPrint,
+  getBanquetSeatingPrint
 };

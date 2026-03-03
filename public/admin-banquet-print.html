@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banquet Seating Plan - Wedding of Iluminada & George</title>
+  <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="/js/i18n.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 11px; color: #2C1810; background: #fff; padding: 20px; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 18px; color: #8B5A96; margin-bottom: 4px; }
+    .subtitle { font-size: 11px; color: #6B4E3D; margin-bottom: 16px; }
+    .print-btn { background: #8B5A96; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-bottom: 16px; }
+    .print-btn:hover { background: #7a4d85; }
+
+    .table-block { margin-bottom: 24px; break-inside: avoid; }
+    .table-header {
+      background: #f3eff5; padding: 8px 12px; border-radius: 6px 6px 0 0;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 2px solid #d4b8dd;
+    }
+    .table-header h2 { font-size: 14px; color: #8B5A96; margin: 0; font-family: 'Playfair Display', serif; }
+    .table-header .count { font-size: 11px; color: #6B4E3D; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; }
+    thead th {
+      background: #faf7fb; color: #8B5A96; font-weight: 600; padding: 5px 6px;
+      border-bottom: 1px solid #e8dced; text-align: left; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    thead th.center { text-align: center; }
+    tbody td { padding: 4px 6px; border-bottom: 1px solid #f0ecf2; vertical-align: top; overflow: hidden; text-overflow: ellipsis; }
+    tbody td.center { text-align: center; }
+    tbody tr.empty td { color: #ccc; font-style: italic; }
+    tbody tr.no-choice td { background: #fff9f0; }
+
+    .seat-num { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #e8dced; color: #8B5A96; font-weight: 700; font-size: 9px; margin-right: 4px; }
+    .seat-num.fixed { background: #d4a5a5; color: #fff; }
+
+    .allergy-badges { display: flex; flex-wrap: wrap; gap: 2px; }
+    .allergy-badge { display: inline-block; background: #fff3cd; color: #856404; border-radius: 3px; padding: 1px 4px; font-size: 8px; font-weight: 500; white-space: nowrap; }
+    .allergy-detail { font-size: 8px; color: #666; margin-top: 1px; font-style: italic; }
+
+    .check { color: #28a745; }
+    .pending { color: #ffc107; }
+
+    @media print {
+      .print-btn, .no-print { display: none !important; }
+      body { padding: 0; font-size: 9px; }
+      table { font-size: 8px; }
+      .table-block { break-inside: avoid; }
+      @page { size: portrait; margin: 10mm; }
+    }
+  </style>
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()"><i class="fas fa-print"></i> <span id="printLabel"></span></button>
+  <h1><i class="fas fa-utensils" style="color:#D4A5A5;"></i> <span id="pageTitle"></span></h1>
+  <div class="subtitle" id="generated"></div>
+  <div id="error" style="display:none;color:#dc3545;padding:20px;"></div>
+  <div id="content"></div>
+
+  <script>
+    // Apply i18n to static elements
+    document.getElementById('printLabel').textContent = translate('admin:banquetPrint.print');
+    document.getElementById('pageTitle').textContent = translate('admin:banquetPrint.title');
+    document.title = translate('admin:banquetPrint.title');
+
+    const token = localStorage.getItem('adminToken') || '';
+    if (!token) {
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('error').textContent = 'Not authenticated. Please log in as admin first.';
+    } else {
+      load();
+    }
+
+    async function load() {
+      try {
+        const res = await fetch('/api/admin/banquet-seating-print?lang=' + currentLanguage, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('API error: ' + res.status);
+        render(await res.json());
+      } catch (e) {
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = 'Failed to load: ' + e.message;
+      }
+    }
+
+    function render(data) {
+      const { courses, tables } = data;
+      const dateStr = new Date().toLocaleDateString(currentLanguage, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      document.getElementById('generated').textContent = translate('admin:banquetPrint.generated') + ': ' + dateStr;
+
+      const badgeLabels = {
+        'vegetarian': translate('admin:dietary.vegetarian'),
+        'lactose-intolerant': translate('admin:dietary.lactoseIntolerant'),
+        'gluten-intolerant': translate('admin:dietary.glutenIntolerant'),
+        'nut-allergy': translate('admin:dietary.nutAllergy'),
+        'other': translate('admin:dietary.other')
+      };
+      const ck = '<i class="fas fa-check check"></i>';
+      const pend = '<i class="fas fa-clock pending"></i>';
+
+      const courseHeaders = courses.map(c => `<th class="center">${c.label}</th>`).join('');
+      // Build colgroup for consistent column widths across all tables
+      // Columns: Seat/name 20% | meal courses 12% each | status 5% | allergy takes remainder
+      const colgroup = `<colgroup>
+        <col style="width: 20%;">
+        ${courses.map(() => `<col style="width: 12%;">`).join('')}
+        <col style="width: 5%;">
+        <col>
+      </colgroup>`;
+
+      let html = '';
+      tables.forEach(t => {
+        const tableName = t.isHeadTable ? `<i class="fas fa-crown" style="color:gold;"></i> ${translate('admin:tables.headTable')}` : `${translate('admin:banquetPrint.table')} ${t.number}`;
+        const rows = t.seats.map(s => {
+          if (!s.name) {
+            const emptyCols = courses.map(() => '<td class="center"></td>').join('');
+            return `<tr class="empty"><td><span class="seat-num">${s.seat}</span> &mdash;</td>${emptyCols}<td></td><td></td></tr>`;
+          }
+
+          const mealCols = s.mealChoices.map(m =>
+            `<td class="center">${m.selected ? m.selected : (s.isFixed ? '' : pend)}</td>`
+          ).join('');
+
+          let allergyHtml = '';
+          if (s.allergies.badges.length > 0 || s.allergies.detail) {
+            allergyHtml = '<div class="allergy-badges">' +
+              s.allergies.badges.map(b => `<span class="allergy-badge">${badgeLabels[b] || b}</span>`).join('') + '</div>';
+            if (s.allergies.detail) allergyHtml += `<div class="allergy-detail">${s.allergies.detail}</div>`;
+          }
+
+          const chosenCol = s.isFixed ? '' : (s.hasChosen ? ck : pend);
+          const trClass = (!s.isFixed && !s.hasChosen && s.name) ? ' class="no-choice"' : '';
+
+          return `<tr${trClass}>` +
+            `<td><span class="seat-num${s.isFixed ? ' fixed' : ''}">${s.seat}</span> ${s.name}</td>` +
+            mealCols +
+            `<td class="center">${chosenCol}</td>` +
+            `<td>${allergyHtml}</td>` +
+            `</tr>`;
+        }).join('');
+
+        html += `<div class="table-block">
+          <div class="table-header">
+            <h2>${tableName}</h2>
+            <span class="count">${t.filledCount}/${t.capacity} ${translate('admin:banquetPrint.seats')}</span>
+          </div>
+          <table>
+            ${colgroup}
+            <thead><tr>
+              <th><i class="fas fa-chair"></i> ${translate('admin:banquetPrint.seat')}</th>
+              ${courseHeaders}
+              <th class="center"><i class="fas fa-utensils"></i></th>
+              <th><i class="fas fa-exclamation-triangle"></i> ${translate('admin:banquetPrint.allergy')}</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+      });
+
+      document.getElementById('content').innerHTML = html;
+    }
+  </script>
+</body>
+</html>
