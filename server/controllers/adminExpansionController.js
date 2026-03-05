@@ -1081,6 +1081,29 @@ async function getBanquetSeatingPrint(req, res, next) {
   } catch (e) { next(e); }
 }
 
+// ========== Admin Event Choices Update ==========
+async function updateAdminEventChoices(req, res, next) {
+  try {
+    const { guestId } = req.params;
+    const { partyChoices } = req.body;
+
+    if (!Array.isArray(partyChoices)) {
+      return res.status(400).json({ error: 'partyChoices must be an array' });
+    }
+
+    const guest = await Guest.findById(guestId).lean();
+    if (!guest) return res.status(404).json({ error: 'Guest not found' });
+
+    const eventChoice = await EventChoice.findOneAndUpdate(
+      { guestId },
+      { partyChoices },
+      { upsert: true, new: true }
+    );
+
+    res.json(eventChoice);
+  } catch (e) { next(e); }
+}
+
 module.exports = {
   getGuestSummary,
   listChefProfiles, createChefProfile, updateChefProfile, deleteChefProfile,
@@ -1093,6 +1116,7 @@ module.exports = {
   getMenuResponses,
   getGiftPurchases,
   getAdminEventChoices,
+  updateAdminEventChoices,
   getGuestsWithoutEventChoices,
   getGuestsWithoutMenuChoices,
   getGuestsWithoutParty,

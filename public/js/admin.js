@@ -17,9 +17,8 @@
     target.innerHTML = `<div class="admin-loading"><i class="fas fa-spinner fa-spin"></i><p >${msg||'Loading...'}</p></div>`;
   }
 
-  // Simple logger/notification (can be replaced with UI toasts)
   function notify(msg, type){
-    console[type==='error'?'error':'log'](msg);
+    showToast(msg, type || 'success');
   }
 
   // Fetch helper with auth header and cache-busting
@@ -213,15 +212,63 @@
     const target = getContentTarget();
     setLoading(translate('admin:subtab.eventAttendance'));
     try {
-      const res = await api(`/api/admin/guest-summary?lang=${getUserLanguage()}`);
-      if (!res.ok) throw new Error('Failed to load attendance data');
-      const data = await res.json();
+      const [summaryRes, guestsRes, eventsRes, choicesRes] = await Promise.all([
+        api(`/api/admin/guest-summary?lang=${getUserLanguage()}`),
+        api('/api/admin/guests?limit=9999'),
+        api(`/api/admin/events?lang=${getUserLanguage()}`),
+        api('/api/admin/event-choices')
+      ]);
+      if (!summaryRes.ok) throw new Error('Failed to load attendance data');
+      const data = await summaryRes.json();
+      const allGuests = guestsRes.ok ? (await guestsRes.json()).items || await guestsRes.json() : [];
+      const events = eventsRes.ok ? await eventsRes.json() : [];
+      const eventChoices = choicesRes.ok ? await choicesRes.json() : [];
 
       const eventRows = (data.perEventAttendance || []).map(e => `
         <tr>
           <td>${e.eventName}</td>
           <td><strong>${e.count}</strong></td>
         </tr>`).join('');
+
+      const choiceMap = {};
+      eventChoices.forEach(ec => { choiceMap[ec.guestId.toString ? ec.guestId.toString() : ec.guestId] = ec; });
+
+      const rows = [];
+      const sortedGuests = [...allGuests].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      sortedGuests.forEach(g => {
+        const guestId = g.id || g._id;
+        const ec = choiceMap[guestId] || { partyChoices: [] };
+        const members = [
+          { partyGuestId: guestId, name: g.name, isPrimary: true },
+          ...(g.partyMembers || []).map(pm => ({
+            partyGuestId: pm.id || pm.name,
+            name: pm.name,
+            isPrimary: false
+          }))
+        ];
+        members.forEach((m, mi) => {
+          const pc = ec.partyChoices.find(p => String(p.partyGuestId) === String(m.partyGuestId));
+          const eventChecks = events.map(ev => {
+            const evId = ev.id || ev._id;
+            const choice = pc?.choices?.find(c => (c.eventId.toString ? c.eventId.toString() : c.eventId) === evId);
+            const checked = choice?.attending ? 'checked' : '';
+            return `<td class="center"><input type="checkbox" ${checked} data-guest-id="${guestId}" data-party-guest-id="${m.partyGuestId}" data-event-id="${evId}" class="attendance-cb"></td>`;
+          }).join('');
+          const nameClass = m.isPrimary ? 'font-weight:600;' : 'padding-left:16px;color:var(--text-light);';
+          const partyCol = m.isPrimary ? '' : g.name;
+          const isFirst = mi === 0;
+          rows.push(`<tr class="attendance-row${isFirst ? ' party-first' : ''}" style="${isFirst ? 'border-top:2px solid var(--purple-light,#e8dced);' : ''}">
+            <td style="${nameClass}">${m.name || '—'}</td>
+            <td style="color:var(--text-light);font-size:0.85em;">${partyCol}</td>
+            ${eventChecks}
+          </tr>`);
+        });
+      });
+
+      const eventHeaders = events.map(ev => {
+        const evName = typeof ev.name === 'object' ? (ev.name[getUserLanguage()] || ev.name.en || Object.values(ev.name)[0]) : ev.name;
+        return `<th class="center" style="white-space:nowrap;">${evName}</th>`;
+      }).join('');
 
       target.innerHTML = `
         <div class="admin-content">
@@ -232,7 +279,78 @@
               <tbody>${eventRows || '<tr><td colspan="2">' + translate('admin:attendance.noEvents') + '</td></tr>'}</tbody>
             </table>
           </div>
+          <h3 style="margin-top:24px;"><i class="fas fa-clipboard-check"></i> ${translate('admin:attendance.checklist')}</h3>
+          <div style="margin-bottom:12px;">
+            <input type="text" id="attendanceFilter" placeholder="${translate('admin:attendance.filterPlaceholder')}" style="padding:6px 12px;border:1px solid var(--gray-300,#ddd);border-radius:6px;width:280px;font-size:13px;">
+          </div>
+          <div class="admin-card" style="overflow-x:auto;">
+            <table class="data-table" id="attendanceTable">
+              <thead><tr>
+                <th>${translate('admin:attendance.name')}</th>
+                <th>${translate('admin:attendance.party')}</th>
+                ${eventHeaders}
+              </tr></thead>
+              <tbody>${rows.join('')}</tbody>
+            </table>
+          </div>
         </div>`;
+
+      const filterInput = document.getElementById('attendanceFilter');
+      if (filterInput) {
+        filterInput.addEventListener('input', function() {
+          const q = this.value.toLowerCase();
+          document.querySelectorAll('#attendanceTable tbody tr.attendance-row').forEach(tr => {
+            const name = tr.querySelector('td')?.textContent?.toLowerCase() || '';
+            const party = tr.querySelectorAll('td')[1]?.textContent?.toLowerCase() || '';
+            tr.style.display = (name.includes(q) || party.includes(q)) ? '' : 'none';
+          });
+        });
+      }
+
+      let saveTimeout = null;
+      document.querySelectorAll('.attendance-cb').forEach(cb => {
+        cb.addEventListener('change', function() {
+          const gId = this.dataset.guestId;
+          const guest = sortedGuests.find(g => (g.id || g._id) === gId);
+          if (!guest) return;
+
+          const ec = choiceMap[gId] || { partyChoices: [] };
+          const members = [
+            { partyGuestId: gId },
+            ...(guest.partyMembers || []).map(pm => ({ partyGuestId: pm.id || pm.name }))
+          ];
+
+          const updatedPartyChoices = members.map(m => {
+            const existingPc = ec.partyChoices.find(p => String(p.partyGuestId) === String(m.partyGuestId));
+            const choices = events.map(ev => {
+              const evId = ev.id || ev._id;
+              const checkbox = document.querySelector(`.attendance-cb[data-guest-id="${gId}"][data-party-guest-id="${m.partyGuestId}"][data-event-id="${evId}"]`);
+              if (checkbox) return { eventId: evId, attending: checkbox.checked };
+              const existingChoice = existingPc?.choices?.find(c => (c.eventId.toString ? c.eventId.toString() : c.eventId) === evId);
+              return { eventId: evId, attending: existingChoice?.attending || false };
+            });
+            return { partyGuestId: String(m.partyGuestId), choices };
+          });
+
+          choiceMap[gId] = { guestId: gId, partyChoices: updatedPartyChoices };
+
+          if (saveTimeout) clearTimeout(saveTimeout);
+          saveTimeout = setTimeout(async () => {
+            try {
+              const saveRes = await api(`/api/admin/event-choices/${gId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ partyChoices: updatedPartyChoices })
+              });
+              if (!saveRes.ok) throw new Error('Save failed');
+              showToast(translate('admin:attendance.saved'), 'success');
+            } catch (err) {
+              showToast(translate('admin:attendance.error'), 'error');
+              console.error('Error saving attendance:', err);
+            }
+          }, 500);
+        });
+      });
     } catch(e) {
       console.error('Error loading event attendance:', e);
       target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';

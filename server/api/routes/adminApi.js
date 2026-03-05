@@ -320,6 +320,7 @@ router.get('/gift-purchases', auth('admin'), adminExpCtrl.getGiftPurchases);
 
 // Event Choices (for table assignment filtering)
 router.get('/event-choices', auth('admin'), adminExpCtrl.getAdminEventChoices);
+router.put('/event-choices/:guestId', auth('admin'), adminExpCtrl.updateAdminEventChoices);
 
 // Guests without choices/party
 router.get('/guests-without-event-choices', auth('admin'), adminExpCtrl.getGuestsWithoutEventChoices);
