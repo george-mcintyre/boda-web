@@ -910,6 +910,10 @@ async function getGuestListPrint(req, res, next) {
 
       (g.partyMembers || []).forEach(pm => {
         const candidates = [pm.id, pm.name, `member-${pm.id}`];
+        // Also try "null"/"undefined" strings — the guest portal serialises
+        // null/undefined member IDs into those literal strings when saving
+        // event choices via JSON, so the stored partyGuestId may be "null".
+        if (pm.id == null) candidates.push('null', 'undefined');
         const unnamed = /- Guest \d+$/.test(pm.name);
         rows.push({
           name: pm.name,
