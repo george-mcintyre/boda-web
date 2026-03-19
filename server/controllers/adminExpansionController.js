@@ -38,6 +38,7 @@ async function getGuestSummary(req, res, next) {
     const perEventAttendance = events.map(event => {
       let count = 0;
       eventChoices.forEach(ec => {
+        if (!guestIds.has(ec.guestId.toString())) return;
         if (ec.partyChoices) {
           ec.partyChoices.forEach(pc => {
             if (pc.choices) {

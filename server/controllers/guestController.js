@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const guestService = require('../services/guestService');
 const { Guest, Gift, GiftChoice, ChefProfile, DayMenu, Table, TableAssignment } = require('../models');
 const stripe = require('../config/stripe');
@@ -18,18 +19,26 @@ async function getParty(req, res, next) {
     const me = await guestService.getByEmail(req.user.email);
     if (!me) return res.status(404).json({ error: 'Guest not found' });
     
-    // Primary guest is automatically added to the party list by the server
+    let needsSave = false;
+    (me.partyMembers || []).forEach(member => {
+      if (!member.id) {
+        member.id = new mongoose.Types.ObjectId().toString();
+        needsSave = true;
+      }
+    });
+    if (needsSave) await me.save();
+
     const party = [
       {
         id: me._id.toString(),
         name: me.name,
-        adult: me.adult, // Use actual adult status from database
+        adult: me.adult,
         primary: true
       },
       ...(me.partyMembers || []).map(member => ({
-        id: member.id || null,
+        id: member.id,
         name: member.name,
-        adult: member.adult !== false // Default to true if not specified
+        adult: member.adult !== false
       }))
     ];
     
@@ -62,11 +71,11 @@ async function updateParty(req, res, next) {
     }
 
     const processedMembers = partyMembers
-     .filter(member => member.id !== myId) // exclude yourself
+     .filter(member => member.id !== myId)
      .map(member => ({
-       id: member.id || null,
+       id: member.id || new mongoose.Types.ObjectId().toString(),
        name: member.name,
-       adult: member.adult !== false // default to true
+       adult: member.adult !== false
      }));
     
     // Update the guest with new party members
@@ -94,18 +103,26 @@ async function getPartyByGuestId(req, res, next) {
     const guest = await Guest.findById(req.params.id);
     if (!guest) return res.status(404).json({ error: 'Guest not found' });
     
-    // Primary guest is automatically added to the party list by the server
+    let needsSave = false;
+    (guest.partyMembers || []).forEach(member => {
+      if (!member.id) {
+        member.id = new mongoose.Types.ObjectId().toString();
+        needsSave = true;
+      }
+    });
+    if (needsSave) await guest.save();
+
     const party = [
       {
         id: guest._id.toString(),
         name: guest.name,
-        adult: guest.adult, // Use actual adult status from database
+        adult: guest.adult,
         primary: true
       },
       ...(guest.partyMembers || []).map(member => ({
-        id: member.id || null,
+        id: member.id,
         name: member.name,
-        adult: member.adult !== false // Default to true if not specified
+        adult: member.adult !== false
       }))
     ];
     
@@ -125,11 +142,10 @@ async function updatePartyByGuestId(req, res, next) {
       return res.status(400).json({ error: 'Party members must be an array' });
     }
     
-    // Process party members (excluding primary guest who is handled separately)
     const processedMembers = partyMembers.map(member => ({
-      id: member.id || null,
+      id: member.id || new mongoose.Types.ObjectId().toString(),
       name: member.name,
-      adult: member.adult !== false // Default to true if not specified
+      adult: member.adult !== false
     }));
     
     // Update the guest with new party members
