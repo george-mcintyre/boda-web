@@ -5,24 +5,21 @@ function getLang(req) {
   }
   
 function mergeLocalizedString(existing, newValue, lang = DEFAULT_LANG) {
-  // If no new value provided, just return existing
   if (newValue == null) return existing;
 
-  // Normalize existing into a plain object
-  let obj = {};
-
-  if (!existing) {
-    obj = {};
-  } else if (existing instanceof Map) {
-    obj = Object.fromEntries(existing.entries());
-  } else if (typeof existing === 'object') {
-    obj = { ...existing };
+  let map;
+  if (existing instanceof Map) {
+    map = new Map(existing);
+  } else if (existing && typeof existing === 'object') {
+    map = new Map(Object.entries(existing));
   } else if (typeof existing === 'string') {
-    obj = { [lang]: existing };
+    map = new Map([[DEFAULT_LANG, existing]]);
+  } else {
+    map = new Map();
   }
 
-  obj[lang] = newValue;
-  return obj; // Mongoose will cast back to Map<String,String>
+  map.set(lang, newValue);
+  return map;
 }
 
 function localize(textOrLocalized, lang = DEFAULT_LANG) {

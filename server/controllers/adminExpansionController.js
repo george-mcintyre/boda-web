@@ -157,8 +157,8 @@ async function updateChefProfile(req, res, next) {
     const profile = await ChefProfile.findById(id);
     if (!profile) return res.status(404).json({ error: 'ChefProfile not found' });
 
-    if (name !== undefined) profile.name = mergeLocalizedString(profile.name, name, lang);
-    if (bio !== undefined) profile.bio = mergeLocalizedString(profile.bio, bio, lang);
+    if (name !== undefined) { profile.name = mergeLocalizedString(profile.name, name, lang); profile.markModified('name'); }
+    if (bio !== undefined) { profile.bio = mergeLocalizedString(profile.bio, bio, lang); profile.markModified('bio'); }
     if (menuType !== undefined) profile.menuType = menuType;
     if (image !== undefined) {
       if (image && image.imageId) profile.image = image.imageId;

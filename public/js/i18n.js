@@ -3242,8 +3242,8 @@ async function changeLanguage(lang) {
 
   try {
     currentLanguage = lang;
+    window.currentLanguage = lang;
     
-    // Save preference
     localStorage.setItem('i18nextLng', lang);
     
     // Update document direction

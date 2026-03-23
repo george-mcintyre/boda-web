@@ -557,7 +557,8 @@
                 const body = { name: values.name, bio: values.bio, menuType };
                 if (imageRef) body.image = imageRef;
 
-                const url = existing ? `/api/admin/chef-profiles/${existing.id}` : '/api/admin/chef-profiles';
+                const langParam = `lang=${getUserLanguage()}`;
+                const url = existing ? `/api/admin/chef-profiles/${existing.id}?${langParam}` : `/api/admin/chef-profiles?${langParam}`;
                 const method = existing ? 'PUT' : 'POST';
 
                 const r = await api(url, {
@@ -3732,7 +3733,8 @@
             const body = { name: values.name, bio: values.bio, menuType: 'banquet' };
             if (imageRef) body.image = imageRef;
 
-            const url = existing ? `/api/admin/chef-profiles/${existing.id}` : '/api/admin/chef-profiles';
+            const langParam = `lang=${getUserLanguage()}`;
+            const url = existing ? `/api/admin/chef-profiles/${existing.id}?${langParam}` : `/api/admin/chef-profiles?${langParam}`;
             const method = existing ? 'PUT' : 'POST';
 
             const r = await api(url, {

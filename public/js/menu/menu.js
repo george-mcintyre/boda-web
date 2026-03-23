@@ -121,8 +121,7 @@ async function loadBanquetMenu() {
   
   try {
     
-    // Get party members and menu data in parallel
-    const [partyResponse, menuResponse, menuChoicesResponse] = await Promise.all([
+    const [partyResponse, menuResponse, menuChoicesResponse, banquetChefResponse] = await Promise.all([
       fetch('/api/guest/party', {
         method: 'GET',
         headers: { 'Authorization': window.token }
@@ -134,8 +133,16 @@ async function loadBanquetMenu() {
       fetch('/api/guest/menu-choices', {
         method: 'GET',
         headers: { 'Authorization': window.token }
+      }),
+      fetch(`/api/guest/banquet-chef?lang=${window.currentLanguage}`, {
+        method: 'GET',
+        headers: { 'Authorization': window.token }
       })
     ]);
+    
+    if (banquetChefResponse.ok) {
+      banquetChefData = await banquetChefResponse.json();
+    }
 
     if (!partyResponse.ok || !menuResponse.ok) {
       menuContent.innerHTML = `
@@ -426,7 +433,7 @@ async function loadBanquetMenu() {
             ` : ''}
             <div class="chef-info">
               <h4 class="chef-name">${escapeHtml(banquetChefData.name)}</h4>
-              <p class="chef-bio">${escapeHtml(banquetChefData.bio)}</p>
+              <div class="chef-bio">${banquetChefData.bio}</div>
             </div>
           </div>
         </div>
@@ -496,6 +503,18 @@ async function loadDayMenu(day) {
   
   if (!viewContainer) return;
   
+  try {
+    const dayMenusResponse = await fetch(`/api/guest/day-menus?lang=${window.currentLanguage}`, {
+      method: 'GET',
+      headers: { 'Authorization': window.token }
+    });
+    if (dayMenusResponse.ok) {
+      dayMenusData = await dayMenusResponse.json();
+    }
+  } catch (err) {
+    console.error('Error refreshing day menus:', err);
+  }
+  
   const dayMenu = dayMenusData.find(m => m.day === day);
   
   if (!dayMenu) {
@@ -556,7 +575,7 @@ async function loadDayMenu(day) {
           ` : ''}
           <div class="chef-info">
             <h4 class="chef-name">${escapeHtml(dayMenu.chefProfile.name)}</h4>
-            <p class="chef-bio">${escapeHtml(dayMenu.chefProfile.bio)}</p>
+            <div class="chef-bio">${dayMenu.chefProfile.bio}</div>
           </div>
         </div>
       </div>
@@ -999,5 +1018,10 @@ if (document.readyState === 'loading') {
   initializeLightbox();
 }
 
-// Expose main loader function to window for guests.js
+window.addEventListener('languageChanged', () => {
+  const menuViewContainer = document.getElementById('menu-view-container');
+  if (!menuViewContainer) return;
+  switchMenuView(currentMenuView);
+});
+
 window.loadMenuSelections = loadMenuSelections;
