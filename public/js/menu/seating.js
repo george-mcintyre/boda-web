@@ -7,6 +7,24 @@
 // Key = table number (1 = Head Table). Values = { x, y } as % from top-left.
 // 12 tables total: Table 1 (high table) + Tables 2–12.
 // ============================================================================
+// ============================================================================
+// Seat positioning for round tables (2–12).
+// 10 seats per table, evenly spaced clockwise, seat 01 at 12 o'clock.
+// Radius measured from table center to seat center (70 px on 1455×860 image).
+// ============================================================================
+const SEATS_PER_TABLE = 10;
+const SEAT_RADIUS_X = 3.0;   // 43px / 1455px * 100
+const SEAT_RADIUS_Y = 5.0;   // 43px / 860px  * 100
+
+function getSeatPosition(tablePos, seatNumber) {
+  if (!seatNumber || seatNumber < 1 || seatNumber > SEATS_PER_TABLE) return tablePos;
+  const angle = -Math.PI / 2 + (seatNumber - 1) * (2 * Math.PI / SEATS_PER_TABLE);
+  return {
+    x: tablePos.x + SEAT_RADIUS_X * Math.cos(angle),
+    y: tablePos.y + SEAT_RADIUS_Y * Math.sin(angle)
+  };
+}
+
 const TABLE_POSITIONS = {
   1:  { x: 44.5, y: 76.5 },  // Table 1 (High Table) — bottom center, rectangular
   2:  { x: 36.0, y: 72.5 },  // Table 2 — left of dance floor, near bottom
@@ -235,12 +253,14 @@ function showTableLocation(memberIdx) {
     return;
   }
 
-  // Position the marker so its bottom-center tip points at the table center
-  // Use percentage positioning + transform for responsive scaling
+  const target = (!member.isHeadTable && member.seatNumber)
+    ? getSeatPosition(pos, member.seatNumber)
+    : pos;
+
   marker.style.display = 'block';
-  marker.style.left = pos.x + '%';
-  marker.style.top = pos.y + '%';
-  marker.style.transform = 'translate(-50%, -100%)'; // center horizontally, anchor at bottom
+  marker.style.left = target.x + '%';
+  marker.style.top = target.y + '%';
+  marker.style.transform = 'translate(-50%, -100%)';
 
   // Smooth scroll to the image area
   container.scrollIntoView({ behavior: 'smooth', block: 'center' });

@@ -541,6 +541,15 @@ async function createTableAssignment(req, res, next) {
       return res.status(400).json({ error: 'tableId and guestId are required' });
     }
 
+    const table = await Table.findById(tableId).lean();
+    if (!table) return res.status(404).json({ error: 'Table not found' });
+
+    const currentCount = await TableAssignment.countDocuments({ tableId });
+    const fixedCount = (table.fixedGuests || []).length;
+    if (currentCount + fixedCount >= table.capacity) {
+      return res.status(400).json({ error: `Table is full (${table.capacity}/${table.capacity})` });
+    }
+
     const maxSeat = await TableAssignment.findOne({ tableId }).sort({ seatNumber: -1 }).lean();
     const seatNumber = (maxSeat?.seatNumber || 0) + 1;
 
@@ -569,7 +578,23 @@ async function updateTableAssignment(req, res, next) {
     const assignment = await TableAssignment.findById(id);
     if (!assignment) return res.status(404).json({ error: 'Assignment not found' });
 
-    if (tableId !== undefined) assignment.tableId = tableId;
+    const tableChanged = tableId !== undefined && tableId !== assignment.tableId.toString();
+
+    if (tableChanged) {
+      const newTable = await Table.findById(tableId).lean();
+      if (!newTable) return res.status(404).json({ error: 'Table not found' });
+
+      const currentCount = await TableAssignment.countDocuments({ tableId });
+      const fixedCount = (newTable.fixedGuests || []).length;
+      if (currentCount + fixedCount >= newTable.capacity) {
+        return res.status(400).json({ error: `Table is full (${newTable.capacity}/${newTable.capacity})` });
+      }
+
+      assignment.tableId = tableId;
+      const maxSeat = await TableAssignment.findOne({ tableId }).sort({ seatNumber: -1 }).lean();
+      assignment.seatNumber = (maxSeat?.seatNumber || 0) + 1;
+    }
+
     if (guestId !== undefined) assignment.guestId = guestId;
     if (partyMemberName !== undefined) assignment.partyMemberName = partyMemberName || null;
 
@@ -578,7 +603,8 @@ async function updateTableAssignment(req, res, next) {
       id: assignment._id.toString(),
       tableId: assignment.tableId.toString(),
       guestId: assignment.guestId.toString(),
-      partyMemberName: assignment.partyMemberName
+      partyMemberName: assignment.partyMemberName,
+      seatNumber: assignment.seatNumber
     });
   } catch (e) { next(e); }
 }

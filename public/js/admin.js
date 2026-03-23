@@ -866,29 +866,32 @@
             const newTableId = this.value;
 
             try {
+              let res;
               if (!newTableId && assignmentId) {
-                // Unassign
-                await api(`/api/admin/table-assignments/${assignmentId}`, { method: 'DELETE' });
+                res = await api(`/api/admin/table-assignments/${assignmentId}`, { method: 'DELETE' });
               } else if (newTableId && !assignmentId) {
-                // New assignment
                 const body = { tableId: newTableId, guestId };
                 if (partyMember) body.partyMemberName = partyMember;
-                await api('/api/admin/table-assignments', {
+                res = await api('/api/admin/table-assignments', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify(body)
                 });
               } else if (newTableId && assignmentId) {
-                // Move to different table
-                await api(`/api/admin/table-assignments/${assignmentId}`, {
+                res = await api(`/api/admin/table-assignments/${assignmentId}`, {
                   method: 'PUT',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({ tableId: newTableId })
                 });
               }
+              if (res && !res.ok) {
+                const err = await res.json().catch(() => ({}));
+                notify(err.error || 'Failed to update assignment', 'error');
+              }
               showTableAllocation();
             } catch (e) {
               notify('Error updating assignment: ' + e.message, 'error');
+              showTableAllocation();
             }
           });
         });
