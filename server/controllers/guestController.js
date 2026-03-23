@@ -495,7 +495,8 @@ async function getTableAssignments(req, res, next) {
       tableNumber: a.tableId ? a.tableId.number : null,
       tableName: a.tableId ? a.tableId.name : null,
       isHeadTable: a.tableId ? a.tableId.isHeadTable : false,
-      partyMemberName: a.partyMemberName || null
+      partyMemberName: a.partyMemberName || null,
+      seatNumber: a.seatNumber || null
     }));
 
     res.json(items);
@@ -519,14 +520,14 @@ async function getTableCompanions(req, res, next) {
     // Build list: start with fixedGuests (e.g. bride/groom on Head Table)
     const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     const fixedNames = new Set((table.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg))));
-    const companions = (table.fixedGuests || []).map(fg => ({
-      name: typeof fg === 'string' ? fg : (fg.name || fg)
+    const companions = (table.fixedGuests || []).map((fg, i) => ({
+      name: typeof fg === 'string' ? fg : (fg.name || fg),
+      seatNumber: i + 1
     }));
-    // Add assignments, skipping any that duplicate a fixedGuest name
     for (const a of assignments) {
       const displayName = a.partyMemberName || (a.guestId ? a.guestId.name : 'Unknown');
       if (!fixedNames.has(norm(a.guestId ? a.guestId.name : ''))) {
-        companions.push({ name: displayName });
+        companions.push({ name: displayName, seatNumber: a.seatNumber || null });
       }
     }
 

@@ -309,6 +309,7 @@ const translations = {
     'guests:headTable': 'Head Table',
     'guests:table': 'Table',
     'guests:notAssigned': 'Not yet assigned',
+    'guests:seat': 'Seat',
     'guests:seatingQrLabel': 'Scan to view on your phone:',
     'guests:yourTableCompanions': 'Your table companions',
 
@@ -1083,6 +1084,7 @@ const translations = {
     'guests:headTable': 'Mesa Principal',
     'guests:table': 'Mesa',
     'guests:notAssigned': 'Aún no asignado',
+    'guests:seat': 'Asiento',
     'guests:seatingQrLabel': 'Escanea para ver en tu teléfono:',
     'guests:yourTableCompanions': 'Tus compañeros de mesa',
 
@@ -1856,6 +1858,7 @@ const translations = {
     'guests:headTable': 'Table d\'Honneur',
     'guests:table': 'Table',
     'guests:notAssigned': 'Pas encore assigné',
+    'guests:seat': 'Place',
     'guests:seatingQrLabel': 'Scannez pour voir sur votre téléphone :',
     'guests:yourTableCompanions': 'Vos compagnons de table',
 
@@ -2629,6 +2632,7 @@ const translations = {
     'guests:headTable': 'Ehrentisch',
     'guests:table': 'Tisch',
     'guests:notAssigned': 'Noch nicht zugewiesen',
+    'guests:seat': 'Platz',
     'guests:seatingQrLabel': 'Zum Ansehen auf dem Handy scannen:',
     'guests:yourTableCompanions': 'Deine Tischbegleiter',
 

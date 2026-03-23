@@ -754,24 +754,22 @@
               <div class="stat-label">${translate('admin:tables.assigned')}</div>
             </div>
           </div>
+
+          <!-- Floor Plan -->
+          <div style="max-width:700px;margin:0 auto 30px;">
+            <div class="admin-card" style="padding:0;overflow:hidden;">
+              <img src="/assets/images/seating-plan.png" alt="Banquet Seating Plan" style="width:100%;height:auto;display:block;border-radius:8px;">
+            </div>
+            <div class="admin-card" style="text-align:center;margin-top:12px;padding:16px;">
+              <p style="margin:0 0 8px;font-size:0.85em;color:var(--text-light);"><i class="fas fa-qrcode"></i> ${translate('admin:tables.qrDeepLink')}</p>
+              <img src="/api/admin/seating-qr" alt="Seating QR Code" style="width:180px;height:180px;" />
+              <p style="margin:8px 0 0;font-size:0.75em;color:var(--text-light);word-break:break-all;">george-and-iluminada.com/guests.html?tab=menu&seating=show</p>
+            </div>
+          </div>
           
-          <!-- Floor Plan and Table Cards Container -->
-          <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:30px;">
-            <!-- Left: Table Cards -->
-            <div style="flex:1;min-width:300px;">
-              ${tableCards}
-            </div>
-            
-            <!-- Right: Floor Plan -->
-            <div style="flex:1;min-width:400px;max-width:600px;">
-              <div class="admin-card" style="padding:0;overflow:hidden;">
-                <img src="/assets/images/seating plan.png" alt="Banquet Seating Plan" style="width:100%;height:auto;display:block;border-radius:8px;">
-              </div>
-              <div class="admin-card" style="text-align:center;margin-top:12px;padding:16px;">
-                <p style="margin:0 0 8px;font-size:0.85em;color:var(--text-light);"><i class="fas fa-qrcode"></i> ${translate('admin:tables.qrDeepLink')}</p>
-                <img src="/api/admin/seating-qr" alt="Seating QR Code" style="width:180px;height:180px;" />
-                <p style="margin:8px 0 0;font-size:0.75em;color:var(--text-light);word-break:break-all;">george-and-iluminada.com/guests.html?tab=menu&seating=show</p>
-            </div>
+          <!-- Table Cards -->
+          <div style="margin-bottom:30px;">
+            ${tableCards}
           </div>
 
           <!-- Guest Assignment Grid -->

@@ -3,24 +3,23 @@
 
 // ============================================================================
 // TABLE_POSITIONS: Hardcoded percentage-based positions for each table
-// on the static seating plan image (seating plan.png, 1543 x 1148 px).
-// Key = table number (0 = Head Table). Values = { x, y } as % from top-left.
+// on the static seating plan image (seating-plan.png, 1455 x 860 px).
+// Key = table number (1 = Head Table). Values = { x, y } as % from top-left.
+// 12 tables total: Table 1 (high table) + Tables 2–12.
 // ============================================================================
 const TABLE_POSITIONS = {
-  0:  { x: 47.0, y: 78.0 },  // Head Table — bottom center
-  1:  { x: 37.5, y: 75.5 },  // Table 1 — just left of HT
-  2:  { x: 57.5, y: 75.5 },  // Table 2 — just right of HT
-  3:  { x: 20.0, y: 74.0 },  // Table 3 — further left of Table 1
-  4:  { x: 73.5, y: 66.5 },  // Table 4 — further right of Table 2
-  5:  { x: 29.0, y: 61.6 },  // Table 5 — left mid-lower
-  6:  { x: 61.8, y: 56.8 },  // Table 6 — right middle
-  7:  { x: 19.9, y: 50.9 },  // Table 7 — left middle
-  8:  { x: 83.3, y: 53.3 },  // Table 8 — far right
-  9:  { x: 10.1, y: 61.4 },  // Table 9 — lower left
-  10: { x: 63.6, y: 40.5 },  // Table 10 — upper right
-  11: { x: 29.1, y: 39.0 },  // Table 11 — upper left-mid
-  12: { x: 75.9, y: 37.7 },  // Table 12 — upper right
-  13: { x: 10.1, y: 39.0 },  // Table 13 — top far-left
+  1:  { x: 44.5, y: 76.5 },  // Table 1 (High Table) — bottom center, rectangular
+  2:  { x: 36.0, y: 72.5 },  // Table 2 — left of dance floor, near bottom
+  3:  { x: 52.5, y: 72.5 },  // Table 3 — right of dance floor, near bottom
+  4:  { x: 26.75, y: 76.5 },  // Table 4 — bottom-left
+  5:  { x: 63.0, y: 75.0 },  // Table 5 — right side, lower
+  6:  { x: 27.5, y: 56.5 },  // Table 6 — left-center
+  7:  { x: 61.5, y: 56.5 },  // Table 7 — right of dance floor, mid
+  8:  { x: 19.5, y: 65.0 },  // Table 8 — left side, between 10 and 4
+  9:  { x: 75.0, y: 65.0 },  // Table 9 — far right, mid-lower
+  10: { x: 20.0, y: 47.5 },  // Table 10 — upper left
+  11: { x: 81.5, y: 48.5 },  // Table 11 — far right, upper
+  12: { x: 71.5, y: 40.0 },  // Table 12 — upper right
 };
 
 
@@ -90,7 +89,8 @@ async function loadSeatingView() {
         ...member,
         tableNumber: assignment ? assignment.tableNumber : null,
         tableName: assignment ? assignment.tableName : null,
-        isHeadTable: assignment ? assignment.isHeadTable : false
+        isHeadTable: assignment ? assignment.isHeadTable : false,
+        seatNumber: assignment ? assignment.seatNumber : null
       };
     });
 
@@ -121,12 +121,15 @@ async function loadSeatingView() {
         : member.tableNumber != null
           ? `${translate('guests:table')} ${member.tableNumber}`
           : translate('guests:notAssigned');
+      const seatLabelText = member.seatNumber != null
+        ? `${translate('guests:seat')} ${member.seatNumber}`
+        : '';
 
       html += `
         <button class="seating-member-btn" data-member-idx="${idx}" data-table-number="${member.tableNumber}" data-is-head="${member.isHeadTable}" onclick="showTableLocation(${idx})">
           <i class="fas fa-user"></i>
           <span class="member-btn-name">${escapeHtml(member.name)}</span>
-          <span class="member-btn-table">${tableLabelText}</span>
+          <span class="member-btn-table">${tableLabelText}${seatLabelText ? ', ' + seatLabelText : ''}</span>
         </button>
       `;
     });
@@ -140,7 +143,7 @@ async function loadSeatingView() {
     html += `
       <div class="seating-plan-wrapper">
         <div class="seating-plan-container" id="seating-plan-container">
-          <img src="/assets/images/seating%20plan.png"
+          <img src="/assets/images/seating-plan.png"
                alt="${translate('guests:seatingTitle')}"
                class="seating-plan-image"
                id="seating-plan-image" />
@@ -224,7 +227,7 @@ function showTableLocation(memberIdx) {
   }
 
   // Get position from TABLE_POSITIONS
-  const tableKey = member.isHeadTable ? 0 : member.tableNumber;
+  const tableKey = member.tableNumber;
   const pos = TABLE_POSITIONS[tableKey];
 
   if (!pos) {
@@ -275,8 +278,9 @@ async function loadTableCompanions(tableNumber, currentMemberName, section, list
     // Build companion chips (highlight current member)
     list.innerHTML = companions.map(c => {
       const isCurrent = c.name === currentMemberName;
+      const seatLabel = c.seatNumber != null ? ` (${translate('guests:seat')} ${c.seatNumber})` : '';
       return `<span class="companion-chip${isCurrent ? ' companion-current' : ''}">
-        <i class="fas fa-user"></i> ${escapeHtml(c.name)}
+        <i class="fas fa-user"></i> ${escapeHtml(c.name)}${seatLabel}
       </span>`;
     }).join('');
 
