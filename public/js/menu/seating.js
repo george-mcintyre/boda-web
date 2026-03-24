@@ -170,6 +170,11 @@ async function loadSeatingView() {
                class="seating-location-marker"
                id="seating-location-marker"
                style="display: none;" />
+          <div class="seating-companion-marker"
+               id="seating-companion-marker"
+               style="display: none;">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
         </div>
       </div>
     `;
@@ -223,7 +228,8 @@ function showTableLocation(memberIdx) {
 
   if (!marker || !container) return;
 
-  // Update active button state
+  clearCompanionMarker();
+
   document.querySelectorAll('.seating-member-btn').forEach(btn => {
     btn.classList.remove('active');
   });
@@ -295,11 +301,14 @@ async function loadTableCompanions(tableNumber, currentMemberName, section, list
       : `${translate('guests:table')} ${data.tableNumber}`;
     titleEl.textContent = tableName;
 
-    // Build companion chips (highlight current member)
-    list.innerHTML = companions.map(c => {
+    window._seatingCompanions = { tableNumber: data.tableNumber, isHeadTable: data.isHeadTable, companions };
+
+    list.innerHTML = companions.map((c, i) => {
       const isCurrent = c.name === currentMemberName;
       const seatLabel = c.seatNumber != null ? ` (${translate('guests:seat')} ${c.seatNumber})` : '';
-      return `<span class="companion-chip${isCurrent ? ' companion-current' : ''}">
+      const hasseat = c.seatNumber != null;
+      return `<span class="companion-chip${isCurrent ? ' companion-current' : ''} companion-clickable"
+        ${hasseat ? `onclick="${isCurrent ? 'clearCompanionMarker()' : `showCompanionLocation(${i})`}"` : ''}>
         <i class="fas fa-user"></i> ${escapeHtml(c.name)}${seatLabel}
       </span>`;
     }).join('');
@@ -320,7 +329,53 @@ function checkSeatingDeepLink() {
   return params.get('seating') === 'show';
 }
 
-// Make functions globally accessible
+// ============================================================================
+// showCompanionLocation() — Show a distinct marker for a table companion
+// ============================================================================
+function showCompanionLocation(companionIdx) {
+  const data = window._seatingCompanions;
+  if (!data || !data.companions[companionIdx]) return;
+
+  const companion = data.companions[companionIdx];
+  const marker = document.getElementById('seating-companion-marker');
+  const container = document.getElementById('seating-plan-container');
+  if (!marker || !container) return;
+
+  if (marker.style.display !== 'none' && marker.dataset.activeIdx === String(companionIdx)) {
+    marker.style.display = 'none';
+    document.querySelectorAll('.companion-chip.companion-active').forEach(c => c.classList.remove('companion-active'));
+    return;
+  }
+
+  const tableKey = data.tableNumber;
+  const pos = TABLE_POSITIONS[tableKey];
+  if (!pos) return;
+
+  const target = (!data.isHeadTable && companion.seatNumber)
+    ? getSeatPosition(pos, companion.seatNumber)
+    : pos;
+
+  marker.dataset.activeIdx = String(companionIdx);
+  marker.style.display = 'flex';
+  marker.style.left = target.x + '%';
+  marker.style.top = target.y + '%';
+
+  // Update active chip
+  document.querySelectorAll('.companion-chip.companion-active').forEach(c => c.classList.remove('companion-active'));
+  const allClickable = document.querySelectorAll('.companion-chip.companion-clickable');
+  allClickable[companionIdx]?.classList.add('companion-active');
+
+  container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function clearCompanionMarker() {
+  const marker = document.getElementById('seating-companion-marker');
+  if (marker) { marker.style.display = 'none'; delete marker.dataset.activeIdx; }
+  document.querySelectorAll('.companion-chip.companion-active').forEach(c => c.classList.remove('companion-active'));
+}
+
 window.loadSeatingView = loadSeatingView;
 window.showTableLocation = showTableLocation;
+window.showCompanionLocation = showCompanionLocation;
+window.clearCompanionMarker = clearCompanionMarker;
 window.checkSeatingDeepLink = checkSeatingDeepLink;
