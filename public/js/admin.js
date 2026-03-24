@@ -775,7 +775,7 @@
               <table class="data-table" id="assignmentTable">
                 <thead>
                   <tr>
-                    <th>${translate('admin:tables.guest')}</th>
+                    <th>${translate('admin:tables.party')}</th>
                     <th>${translate('admin:tables.partyMember')}</th>
                     <th>${translate('admin:tables.tableAssignment')}</th>
                   </tr>
@@ -863,8 +863,9 @@
           const pmAssignId = pmAssignment ? pmAssignment.id : '';
           allRows.push({
             isAssigned: !!pmAssignment,
+            guestId: g.id,
             html: `<tr class="assignment-row" data-guest-id="${g.id}" data-assigned="${!!pmAssignment}" style="background:var(--gray-50);">
-              <td></td>
+              <td style="color:var(--text-light);font-size:0.9em;">${g.name}</td>
               <td style="padding-left:24px;"><i class="fas fa-user-friends" style="color:var(--text-light);font-size:0.8em;"></i> ${pm.name}${pm.adult === false ? ' <span style="color:var(--text-light);font-size:0.75em;">(child)</span>' : ''}</td>
               <td>
                 <select class="table-assign-select" data-guest-id="${g.id}" data-party-member="${pm.name}" data-assignment-id="${pmAssignId}">
