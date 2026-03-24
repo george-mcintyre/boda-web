@@ -612,7 +612,8 @@
     }
   }
 
-  // Table Allocation sub-tab
+  let showUnassignedOnly = false;
+
   async function showTableAllocation() {
     const target = getContentTarget();
     setLoading(translate('admin:subtab.tableAllocation'));
@@ -969,20 +970,24 @@
         });
       });
 
-      // Filter button
-      let showUnassignedOnly = false;
-      target.querySelector('#filterUnassignedBtn')?.addEventListener('click', function() {
-        showUnassignedOnly = !showUnassignedOnly;
-        this.textContent = showUnassignedOnly ? translate('admin:tables.showAll') : translate('admin:tables.showUnassigned');
-        this.classList.toggle('active', showUnassignedOnly);
-        target.querySelectorAll('.assignment-row').forEach(row => {
-          if (showUnassignedOnly && row.dataset.assigned === 'true') {
-            row.style.display = 'none';
-          } else {
-            row.style.display = '';
-          }
+      const filterBtn = target.querySelector('#filterUnassignedBtn');
+      if (filterBtn) {
+        if (showUnassignedOnly) {
+          filterBtn.textContent = translate('admin:tables.showAll');
+          filterBtn.classList.add('active');
+          target.querySelectorAll('.assignment-row').forEach(row => {
+            row.style.display = row.dataset.assigned === 'true' ? 'none' : '';
+          });
+        }
+        filterBtn.addEventListener('click', function() {
+          showUnassignedOnly = !showUnassignedOnly;
+          this.textContent = showUnassignedOnly ? translate('admin:tables.showAll') : translate('admin:tables.showUnassigned');
+          this.classList.toggle('active', showUnassignedOnly);
+          target.querySelectorAll('.assignment-row').forEach(row => {
+            row.style.display = (showUnassignedOnly && row.dataset.assigned === 'true') ? 'none' : '';
+          });
         });
-      });
+      }
     } catch(e) {
       console.error('Error loading tables:', e);
       target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
