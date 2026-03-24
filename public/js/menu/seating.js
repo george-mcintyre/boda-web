@@ -25,6 +25,21 @@ function getSeatPosition(tablePos, seatNumber) {
   };
 }
 
+const HEAD_TABLE_SEATS = 6;
+const HEAD_TABLE_HALF_WIDTH = 7.0;
+const HEAD_TABLE_SEAT_ORDER = [3, 4, 1, 2, 5, 6];
+
+function getHeadTableSeatPosition(tablePos, seatNumber) {
+  if (!seatNumber || seatNumber < 1 || seatNumber > HEAD_TABLE_SEATS) return tablePos;
+  const posIdx = HEAD_TABLE_SEAT_ORDER.indexOf(seatNumber);
+  if (posIdx < 0) return tablePos;
+  const step = (2 * HEAD_TABLE_HALF_WIDTH) / (HEAD_TABLE_SEATS - 1);
+  return {
+    x: tablePos.x - HEAD_TABLE_HALF_WIDTH + posIdx * step,
+    y: tablePos.y
+  };
+}
+
 const TABLE_POSITIONS = {
   1:  { x: 44.5, y: 76.5 },  // Table 1 (High Table) — bottom center, rectangular
   2:  { x: 36.0, y: 72.5 },  // Table 2 — left of dance floor, near bottom
@@ -259,8 +274,8 @@ function showTableLocation(memberIdx) {
     return;
   }
 
-  const target = (!member.isHeadTable && member.seatNumber)
-    ? getSeatPosition(pos, member.seatNumber)
+  const target = member.seatNumber
+    ? (member.isHeadTable ? getHeadTableSeatPosition(pos, member.seatNumber) : getSeatPosition(pos, member.seatNumber))
     : pos;
 
   marker.style.display = 'block';
@@ -351,8 +366,8 @@ function showCompanionLocation(companionIdx) {
   const pos = TABLE_POSITIONS[tableKey];
   if (!pos) return;
 
-  const target = (!data.isHeadTable && companion.seatNumber)
-    ? getSeatPosition(pos, companion.seatNumber)
+  const target = companion.seatNumber
+    ? (data.isHeadTable ? getHeadTableSeatPosition(pos, companion.seatNumber) : getSeatPosition(pos, companion.seatNumber))
     : pos;
 
   marker.dataset.activeIdx = String(companionIdx);
