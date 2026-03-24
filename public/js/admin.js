@@ -635,14 +635,17 @@
       // Build set of guestIds where at least one party member is attending the banquet
       // Also count total confirmed attendees (individual people attending)
       const banquetGuestIds = new Set();
+      const banquetAttendeeIds = new Set();
       let totalConfirmed = 0;
       eventChoices.forEach(ec => {
         const gId = ec.guestId && ec.guestId.toString ? ec.guestId.toString() : ec.guestId;
         (ec.partyChoices || []).forEach(pc => {
+          const pmId = pc.partyGuestId && pc.partyGuestId.toString ? pc.partyGuestId.toString() : pc.partyGuestId;
           (pc.choices || []).forEach(c => {
             const eId = c.eventId && c.eventId.toString ? c.eventId.toString() : c.eventId;
             if (eId === BANQUET_EVENT_ID && c.attending) {
               banquetGuestIds.add(gId);
+              banquetAttendeeIds.add(pmId);
               totalConfirmed++;
             }
           });
@@ -787,12 +790,55 @@
       // Table options for dropdown
       const tableOptions = tables.map(t => `<option value="${t.id}">${getTableDisplayName(t)}</option>`).join('');
 
-      // Build guest rows
+      const staleDeletes = [];
+      guests.forEach(g => {
+        const primaryAttending = banquetAttendeeIds.has(g.id);
+        if (!primaryAttending && !fixedGuestIds.has(g.id)) {
+          const staleAssignment = assignmentMap[g.id];
+          if (staleAssignment) staleDeletes.push(api(`/api/admin/table-assignments/${staleAssignment.id}`, { method: 'DELETE' }));
+        }
+        (g.partyMembers || []).forEach(pm => {
+          if (!banquetAttendeeIds.has(pm.id)) {
+            const pmKey = `${g.id}_${pm.name}`;
+            const staleAssignment = assignmentMap[pmKey];
+            if (staleAssignment) staleDeletes.push(api(`/api/admin/table-assignments/${staleAssignment.id}`, { method: 'DELETE' }));
+          }
+        });
+      });
+      if (staleDeletes.length > 0) {
+        await Promise.all(staleDeletes).catch(() => {});
+        showTableAllocation();
+        return;
+      }
+
       const tbody = target.querySelector('#assignmentBody');
       let allRows = [];
 
       guests.forEach(g => {
-        // Primary guest row
+        const primaryAttending = banquetAttendeeIds.has(g.id);
+
+        if (!primaryAttending && !fixedGuestIds.has(g.id)) {
+          (g.partyMembers || []).filter(pm => banquetAttendeeIds.has(pm.id)).forEach(pm => {
+            const pmKey = `${g.id}_${pm.name}`;
+            const pmAssignment = assignmentMap[pmKey];
+            const pmAssignId = pmAssignment ? pmAssignment.id : '';
+            allRows.push({
+              isAssigned: !!pmAssignment,
+              html: `<tr class="assignment-row" data-guest-id="${g.id}" data-assigned="${!!pmAssignment}" style="background:var(--gray-50);">
+                <td><strong>${g.name}</strong></td>
+                <td style="padding-left:24px;"><i class="fas fa-user-friends" style="color:var(--text-light);font-size:0.8em;"></i> ${pm.name}${pm.adult === false ? ' <span style="color:var(--text-light);font-size:0.75em;">(child)</span>' : ''}</td>
+                <td>
+                  <select class="table-assign-select" data-guest-id="${g.id}" data-party-member="${pm.name}" data-assignment-id="${pmAssignId}">
+                    <option value="">${translate('admin:tables.unassigned')}</option>
+                    ${tableOptions}
+                  </select>
+                </td>
+              </tr>`
+            });
+          });
+          return;
+        }
+
         const primaryAssignment = assignmentMap[g.id];
         const isFixed = fixedGuestIds.has(g.id);
         const primaryAssignId = primaryAssignment ? primaryAssignment.id : '';
@@ -811,8 +857,7 @@
           </tr>`
         });
 
-        // Party member rows
-        (g.partyMembers || []).forEach(pm => {
+        (g.partyMembers || []).filter(pm => banquetAttendeeIds.has(pm.id)).forEach(pm => {
           const pmKey = `${g.id}_${pm.name}`;
           const pmAssignment = assignmentMap[pmKey];
           const pmAssignId = pmAssignment ? pmAssignment.id : '';
