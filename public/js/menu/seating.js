@@ -25,15 +25,15 @@ function getSeatPosition(tablePos, seatNumber) {
   };
 }
 
-const HEAD_TABLE_SEATS = 6;
 const HEAD_TABLE_HALF_WIDTH = 7.0;
 const HEAD_TABLE_SEAT_ORDER = [3, 4, 1, 2, 5, 6];
 
 function getHeadTableSeatPosition(tablePos, seatNumber) {
-  if (!seatNumber || seatNumber < 1 || seatNumber > HEAD_TABLE_SEATS) return tablePos;
+  const totalSeats = HEAD_TABLE_SEAT_ORDER.length;
+  if (!seatNumber || seatNumber < 1 || seatNumber > totalSeats) return tablePos;
   const posIdx = HEAD_TABLE_SEAT_ORDER.indexOf(seatNumber);
   if (posIdx < 0) return tablePos;
-  const step = (2 * HEAD_TABLE_HALF_WIDTH) / (HEAD_TABLE_SEATS - 1);
+  const step = (2 * HEAD_TABLE_HALF_WIDTH) / (totalSeats - 1);
   return {
     x: tablePos.x - HEAD_TABLE_HALF_WIDTH + posIdx * step,
     y: tablePos.y

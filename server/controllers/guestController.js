@@ -487,17 +487,44 @@ async function getTableAssignments(req, res, next) {
     const me = await guestService.getByEmail(req.user.email);
     if (!me) return res.status(404).json({ error: 'Guest not found' });
 
-    const assignments = await TableAssignment.find({ guestId: me._id })
-      .populate('tableId', 'number name isHeadTable')
-      .lean();
+    const Table = require('../models/Table');
+    const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 
-    const items = assignments.map(a => ({
-      tableNumber: a.tableId ? a.tableId.number : null,
-      tableName: a.tableId ? a.tableId.name : null,
-      isHeadTable: a.tableId ? a.tableId.isHeadTable : false,
-      partyMemberName: a.partyMemberName || null,
-      seatNumber: a.seatNumber || null
-    }));
+    const [assignments, fixedTable] = await Promise.all([
+      TableAssignment.find({ guestId: me._id }).populate('tableId', 'number name isHeadTable fixedGuests').lean(),
+      Table.findOne({ 'fixedGuests.name': { $regex: new RegExp(me.name.split(' ')[0], 'i') } }).lean()
+    ]);
+
+    const fixedCount = fixedTable && fixedTable.fixedGuests ? fixedTable.fixedGuests.length : 0;
+
+    const items = assignments.map(a => {
+      const fc = a.tableId && a.tableId.fixedGuests ? a.tableId.fixedGuests.length : 0;
+      return {
+        tableNumber: a.tableId ? a.tableId.number : null,
+        tableName: a.tableId ? a.tableId.name : null,
+        isHeadTable: a.tableId ? a.tableId.isHeadTable : false,
+        partyMemberName: a.partyMemberName || null,
+        seatNumber: a.seatNumber ? a.seatNumber + fc : null
+      };
+    });
+
+    if (fixedTable) {
+      const myName = norm(me.name);
+      const fixedIdx = fixedTable.fixedGuests.findIndex(fg => {
+        const fn = norm(typeof fg === 'string' ? fg : (fg.name || fg));
+        return myName.includes(fn) || fn.includes(myName);
+      });
+      const alreadyHasAssignment = items.some(i => i.tableNumber === fixedTable.number && !i.partyMemberName);
+      if (fixedIdx >= 0 && !alreadyHasAssignment) {
+        items.push({
+          tableNumber: fixedTable.number,
+          tableName: fixedTable.name || null,
+          isHeadTable: fixedTable.isHeadTable || false,
+          partyMemberName: null,
+          seatNumber: fixedIdx + 1
+        });
+      }
+    }
 
     res.json(items);
   } catch (e) { next(e); }
@@ -520,6 +547,7 @@ async function getTableCompanions(req, res, next) {
     // Build list: start with fixedGuests (e.g. bride/groom on Head Table)
     const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
     const fixedNames = new Set((table.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg))));
+    const fixedCount = (table.fixedGuests || []).length;
     const companions = (table.fixedGuests || []).map((fg, i) => ({
       name: typeof fg === 'string' ? fg : (fg.name || fg),
       seatNumber: i + 1
@@ -527,7 +555,7 @@ async function getTableCompanions(req, res, next) {
     for (const a of assignments) {
       const displayName = a.partyMemberName || (a.guestId ? a.guestId.name : 'Unknown');
       if (!fixedNames.has(norm(a.guestId ? a.guestId.name : ''))) {
-        companions.push({ name: displayName, seatNumber: a.seatNumber || null });
+        companions.push({ name: displayName, seatNumber: a.seatNumber ? a.seatNumber + fixedCount : null });
       }
     }
 
