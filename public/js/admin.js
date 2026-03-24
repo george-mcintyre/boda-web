@@ -690,6 +690,12 @@
         return;
       }
 
+      const childNames = new Set();
+      allGuests.forEach(g => {
+        if (g.adult === false) childNames.add(g.name);
+        (g.partyMembers || []).forEach(pm => { if (pm.adult === false) childNames.add(pm.name); });
+      });
+
       const totalCapacity = tables.reduce((sum, t) => sum + (t.capacity || 0), 0);
       let totalAssigned = tables.reduce((sum, t) => sum + (t.assignedCount || 0), 0);
 
@@ -706,7 +712,9 @@
           .filter(a => !fixedNames.has(norm(a.guestName)))
           .map((a, i) => {
             const sn = (t.fixedGuests || []).length + i + 1;
-            return `<span class="badge badge-secondary seat-badge" draggable="true" data-assignment-id="${a.id}" data-table-id="${t.id}" style="margin:2px;cursor:grab;" title="Seat ${sn}"><small style="opacity:.5">${sn}.</small> ${a.partyMemberName || a.guestName}</span>`;
+            const displayName = a.partyMemberName || a.guestName;
+            const isChild = childNames.has(displayName);
+            return `<span class="badge badge-secondary seat-badge" draggable="true" data-assignment-id="${a.id}" data-table-id="${t.id}" style="margin:2px;cursor:grab;" title="Seat ${sn}"><small style="opacity:.5">${sn}.</small> ${displayName}${isChild ? ' <span style="background:#4a90d9;color:#fff;font-size:0.7em;padding:1px 4px;border-radius:3px;vertical-align:middle;">child</span>' : ''}</span>`;
           }).join('');
         const assignedNames = fixedBadges + draggableBadges;
 
