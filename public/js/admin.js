@@ -884,45 +884,84 @@
         });
       }
 
-      // Drag/drop seat reordering
-      target.querySelectorAll('.seat-list').forEach(container => {
-        let dragEl = null;
+      let dragEl = null;
+      const dropZones = target.querySelectorAll('.seat-drop-zone');
+
+      dropZones.forEach(zone => {
+        const container = zone.querySelector('.seat-list');
+        if (!container) return;
+
         container.addEventListener('dragstart', e => {
           const badge = e.target.closest('.seat-badge');
           if (!badge) return;
           dragEl = badge;
           badge.style.opacity = '0.4';
           e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', badge.dataset.assignmentId);
         });
-        container.addEventListener('dragend', e => {
+
+        container.addEventListener('dragend', () => {
           if (dragEl) dragEl.style.opacity = '1';
+          target.querySelectorAll('.seat-drop-zone.drag-over').forEach(z => z.classList.remove('drag-over'));
           dragEl = null;
         });
-        container.addEventListener('dragover', e => {
+
+        zone.addEventListener('dragover', e => {
+          if (!dragEl) return;
           e.preventDefault();
           e.dataTransfer.dropEffect = 'move';
+          zone.classList.add('drag-over');
         });
-        container.addEventListener('drop', async e => {
+
+        zone.addEventListener('dragleave', e => {
+          if (!zone.contains(e.relatedTarget)) {
+            zone.classList.remove('drag-over');
+          }
+        });
+
+        zone.addEventListener('drop', async e => {
           e.preventDefault();
+          zone.classList.remove('drag-over');
           if (!dragEl) return;
+
+          const fromTableId = dragEl.dataset.tableId;
+          const toTableId = zone.dataset.tableId;
+          const assignmentId = dragEl.dataset.assignmentId;
+          const toContainer = zone.querySelector('.seat-list');
+
+          if (fromTableId !== toTableId) {
+            try {
+              const res = await api(`/api/admin/table-assignments/${assignmentId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tableId: toTableId })
+              });
+              if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                notify(err.error || 'Failed to move guest', 'error');
+              }
+              showTableAllocation();
+            } catch (err) {
+              notify('Error moving guest: ' + err.message, 'error');
+            }
+            return;
+          }
+
           const dropTarget = e.target.closest('.seat-badge');
           if (!dropTarget || dropTarget === dragEl) return;
-          const tableId = container.dataset.tableId;
-          const badges = [...container.querySelectorAll('.seat-badge')];
+          const badges = [...toContainer.querySelectorAll('.seat-badge')];
           const fromIdx = badges.indexOf(dragEl);
           const toIdx = badges.indexOf(dropTarget);
           if (fromIdx < 0 || toIdx < 0) return;
-          if (fromIdx < toIdx) {
-            dropTarget.after(dragEl);
-          } else {
-            dropTarget.before(dragEl);
-          }
-          const orderedIds = [...container.querySelectorAll('.seat-badge')].map(b => b.dataset.assignmentId);
+          if (fromIdx < toIdx) dropTarget.after(dragEl);
+          else dropTarget.before(dragEl);
+
+          const orderedIds = [...toContainer.querySelectorAll('.seat-badge')].map(b => b.dataset.assignmentId);
           try {
             await api('/api/admin/table-seats/reorder', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ tableId, orderedIds })
+              body: JSON.stringify({ tableId: toTableId, orderedIds })
             });
             showTableAllocation();
           } catch (err) {
