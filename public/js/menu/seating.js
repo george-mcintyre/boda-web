@@ -25,7 +25,7 @@ function getSeatPosition(tablePos, seatNumber) {
   };
 }
 
-const HEAD_TABLE_HALF_WIDTH = 7.0;
+const HEAD_TABLE_HALF_WIDTH = 4.5;
 const HEAD_TABLE_SEAT_ORDER = [3, 4, 1, 2, 5, 6];
 
 function getHeadTableSeatPosition(tablePos, seatNumber) {
@@ -41,7 +41,7 @@ function getHeadTableSeatPosition(tablePos, seatNumber) {
 }
 
 const TABLE_POSITIONS = {
-  1:  { x: 44.5, y: 76.5 },  // Table 1 (High Table) — bottom center, rectangular
+  1:  { x: 44.0, y: 83.5 },  // Table 1 (High Table) — bottom center, rectangular
   2:  { x: 36.0, y: 72.5 },  // Table 2 — left of dance floor, near bottom
   3:  { x: 52.5, y: 72.5 },  // Table 3 — right of dance floor, near bottom
   4:  { x: 26.75, y: 76.5 },  // Table 4 — bottom-left
