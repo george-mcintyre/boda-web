@@ -587,6 +587,8 @@ async function updateTableAssignment(req, res, next) {
 
     const tableChanged = tableId !== undefined && tableId !== assignment.tableId.toString();
 
+    const oldTableId = assignment.tableId.toString();
+
     if (tableChanged) {
       const newTable = await Table.findById(tableId).lean();
       if (!newTable) return res.status(404).json({ error: 'Table not found' });
@@ -602,14 +604,21 @@ async function updateTableAssignment(req, res, next) {
       }
 
       assignment.tableId = tableId;
-      const maxSeat = await TableAssignment.findOne({ tableId }).sort({ seatNumber: -1 }).lean();
-      assignment.seatNumber = (maxSeat?.seatNumber || 0) + 1;
+      const currentCount = await TableAssignment.countDocuments({ tableId });
+      assignment.seatNumber = currentCount + 1;
     }
 
     if (guestId !== undefined) assignment.guestId = guestId;
     if (partyMemberName !== undefined) assignment.partyMemberName = partyMemberName || null;
 
     await assignment.save();
+
+    if (tableChanged) {
+      await renumberSeats(oldTableId);
+      await renumberSeats(tableId);
+      await assignment.constructor.findById(assignment._id).lean().then(a => { if (a) assignment.seatNumber = a.seatNumber; });
+    }
+
     res.json({
       id: assignment._id.toString(),
       tableId: assignment.tableId.toString(),
@@ -620,10 +629,20 @@ async function updateTableAssignment(req, res, next) {
   } catch (e) { next(e); }
 }
 
+async function renumberSeats(tableId) {
+  const assignments = await TableAssignment.find({ tableId }).sort({ seatNumber: 1 }).lean();
+  const ops = assignments.map((a, idx) =>
+    TableAssignment.updateOne({ _id: a._id }, { seatNumber: idx + 1 })
+  );
+  if (ops.length) await Promise.all(ops);
+}
+
 async function deleteTableAssignment(req, res, next) {
   try {
     const { id } = req.params;
+    const assignment = await TableAssignment.findById(id).lean();
     await TableAssignment.findByIdAndDelete(id);
+    if (assignment) await renumberSeats(assignment.tableId);
     res.json({ status: 'ok' });
   } catch (e) { next(e); }
 }

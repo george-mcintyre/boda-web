@@ -701,8 +701,7 @@
         const draggableBadges = (t.assignments || [])
           .filter(a => !fixedNames.has(norm(a.guestName)))
           .map((a, i) => {
-            const seatIdx = (t.fixedGuests || []).length + i + 1;
-            const sn = a.seatNumber || seatIdx;
+            const sn = (t.fixedGuests || []).length + i + 1;
             return `<span class="badge badge-secondary seat-badge" draggable="true" data-assignment-id="${a.id}" data-table-id="${t.id}" style="margin:2px;cursor:grab;" title="Seat ${sn}"><small style="opacity:.5">${sn}.</small> ${a.partyMemberName || a.guestName}</span>`;
           }).join('');
         const assignedNames = fixedBadges + draggableBadges;
