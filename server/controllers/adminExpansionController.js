@@ -419,13 +419,16 @@ async function listTables(req, res, next) {
 
     const items = tables.map(t => {
       const tableAssignments = assignments.filter(a => a.tableId.toString() === t._id.toString());
-      // Deduplicate: don't count assignments whose guestName matches a fixedGuest
-      const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      const fixedNames = new Set((t.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg))));
-      const uniqueAssignmentCount = tableAssignments.filter(a => {
+      const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+      const fixedNamesList = (t.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg)));
+      const isFixedGuest = name => {
+        const n = norm(name);
+        return fixedNamesList.some(fn => n.includes(fn) || fn.includes(n));
+      };
+      const nonFixedAssignments = tableAssignments.filter(a => {
         const name = a.guestId ? a.guestId.name : '';
-        return !fixedNames.has(norm(name));
-      }).length;
+        return !isFixedGuest(name);
+      });
       return {
         id: t._id.toString(),
         number: t.number,
@@ -433,8 +436,8 @@ async function listTables(req, res, next) {
         capacity: t.capacity,
         isHeadTable: t.isHeadTable,
         fixedGuests: t.fixedGuests || [],
-        assignedCount: uniqueAssignmentCount + (t.fixedGuests ? t.fixedGuests.length : 0),
-        assignments: tableAssignments
+        assignedCount: nonFixedAssignments.length + (t.fixedGuests ? t.fixedGuests.length : 0),
+        assignments: nonFixedAssignments
           .sort((a, b) => (a.seatNumber || 999) - (b.seatNumber || 999))
           .map(a => ({
             id: a._id.toString(),
@@ -544,9 +547,13 @@ async function createTableAssignment(req, res, next) {
     const table = await Table.findById(tableId).lean();
     if (!table) return res.status(404).json({ error: 'Table not found' });
 
-    const currentCount = await TableAssignment.countDocuments({ tableId });
+    const existingAssignments = await TableAssignment.find({ tableId }).populate('guestId', 'name').lean();
     const fixedCount = (table.fixedGuests || []).length;
-    if (currentCount + fixedCount >= table.capacity) {
+    const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const fixedNamesList = (table.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg)));
+    const isFixed = name => { const n = norm(name); return fixedNamesList.some(fn => n.includes(fn) || fn.includes(n)); };
+    const nonFixedCount = existingAssignments.filter(a => !isFixed(a.guestId ? a.guestId.name : '')).length;
+    if (nonFixedCount + fixedCount >= table.capacity) {
       return res.status(400).json({ error: `Table is full (${table.capacity}/${table.capacity})` });
     }
 
@@ -584,9 +591,13 @@ async function updateTableAssignment(req, res, next) {
       const newTable = await Table.findById(tableId).lean();
       if (!newTable) return res.status(404).json({ error: 'Table not found' });
 
-      const currentCount = await TableAssignment.countDocuments({ tableId });
+      const existingAssignments = await TableAssignment.find({ tableId }).populate('guestId', 'name').lean();
       const fixedCount = (newTable.fixedGuests || []).length;
-      if (currentCount + fixedCount >= newTable.capacity) {
+      const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+      const fixedNamesList = (newTable.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg)));
+      const isFixed = name => { const n = norm(name); return fixedNamesList.some(fn => n.includes(fn) || fn.includes(n)); };
+      const nonFixedCount = existingAssignments.filter(a => !isFixed(a.guestId ? a.guestId.name : '')).length;
+      if (nonFixedCount + fixedCount >= newTable.capacity) {
         return res.status(400).json({ error: `Table is full (${newTable.capacity}/${newTable.capacity})` });
       }
 

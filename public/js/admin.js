@@ -656,27 +656,16 @@
         assignmentMap[key] = a;
       });
 
-      // Bride & Groom: auto-assign to Head Table on first visit, then lock
-      const HEAD_TABLE_NAMES = ['george mcintyre', 'iluminada'];
       const headTable = tables.find(t => t.isHeadTable);
       const fixedGuestIds = new Set();
-      let needsRefresh = false;
       if (headTable) {
+        const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+        const fixedNames = (headTable.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg)));
         for (const g of guests) {
-          if (HEAD_TABLE_NAMES.some(n => (g.name || '').toLowerCase().includes(n))) {
+          if (fixedNames.some(fn => norm(g.name).includes(fn) || fn.includes(norm(g.name)))) {
             fixedGuestIds.add(g.id);
-            if (!assignmentMap[g.id]) {
-              // First time: create real assignment
-              await api('/api/admin/table-assignments', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tableId: headTable.id, guestId: g.id })
-              });
-              needsRefresh = true;
-            }
           }
         }
-        if (needsRefresh) { showTableAllocation(); return; }
       }
 
       if (tables.length === 0) {
@@ -785,8 +774,7 @@
                   <tr>
                     <th>${translate('admin:tables.guest')}</th>
                     <th>${translate('admin:tables.partyMember')}</th>
-                    <th>${translate('admin:tables.currentTable')}</th>
-                    <th>${translate('admin:tables.action')}</th>
+                    <th>${translate('admin:tables.tableAssignment')}</th>
                   </tr>
                 </thead>
                 <tbody id="assignmentBody"></tbody>
@@ -814,7 +802,6 @@
           html: `<tr class="assignment-row" data-guest-id="${g.id}" data-assigned="${!!primaryAssignment}">
             <td><strong>${g.name}</strong>${isFixed ? ' <i class="fas fa-crown" style="color:gold;font-size:0.75em;" title="' + translate('admin:tables.headTable') + '"></i>' : ''}</td>
             <td><i class="fas fa-user" style="color:var(--primary);font-size:0.8em;"></i> ${g.name}</td>
-            <td>${primaryAssignment ? getTableDisplayName(tables.find(t => t.id === primaryAssignment.tableId) || {number: '?'}) : '<span style="color:var(--text-light);">' + translate('admin:tables.unassigned') + '</span>'}</td>
             <td>
               ${isFixed ? '<span style="color:var(--text-light);font-size:0.85em;"><i class="fas fa-lock"></i></span>' : `<select class="table-assign-select" data-guest-id="${g.id}" data-party-member="" data-assignment-id="${primaryAssignId}">
                 <option value="">${translate('admin:tables.unassigned')}</option>
@@ -834,7 +821,6 @@
             html: `<tr class="assignment-row" data-guest-id="${g.id}" data-assigned="${!!pmAssignment}" style="background:var(--gray-50);">
               <td></td>
               <td style="padding-left:24px;"><i class="fas fa-user-friends" style="color:var(--text-light);font-size:0.8em;"></i> ${pm.name}${pm.adult === false ? ' <span style="color:var(--text-light);font-size:0.75em;">(child)</span>' : ''}</td>
-              <td>${pmAssignment ? getTableDisplayName(tables.find(t => t.id === pmAssignment.tableId) || {number: '?'}) : '<span style="color:var(--text-light);">' + translate('admin:tables.unassigned') + '</span>'}</td>
               <td>
                 <select class="table-assign-select" data-guest-id="${g.id}" data-party-member="${pm.name}" data-assignment-id="${pmAssignId}">
                   <option value="">${translate('admin:tables.unassigned')}</option>
