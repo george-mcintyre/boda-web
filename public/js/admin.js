@@ -634,11 +634,13 @@
 
       // Build set of guestIds where at least one party member is attending the banquet
       // Also count total confirmed attendees (individual people attending)
+      const allGuestIds = new Set(allGuests.map(g => g.id));
       const banquetGuestIds = new Set();
       const banquetAttendeeIds = new Set();
       let totalConfirmed = 0;
       eventChoices.forEach(ec => {
         const gId = ec.guestId && ec.guestId.toString ? ec.guestId.toString() : ec.guestId;
+        if (!allGuestIds.has(gId)) return;
         (ec.partyChoices || []).forEach(pc => {
           const pmId = pc.partyGuestId && pc.partyGuestId.toString ? pc.partyGuestId.toString() : pc.partyGuestId;
           (pc.choices || []).forEach(c => {
