@@ -495,35 +495,41 @@ async function getTableAssignments(req, res, next) {
       Table.findOne({ 'fixedGuests.name': { $regex: new RegExp(me.name.split(' ')[0], 'i') } }).lean()
     ]);
 
-    const fixedCount = fixedTable && fixedTable.fixedGuests ? fixedTable.fixedGuests.length : 0;
-
-    const items = assignments.map(a => {
-      const fc = a.tableId && a.tableId.fixedGuests ? a.tableId.fixedGuests.length : 0;
-      return {
-        tableNumber: a.tableId ? a.tableId.number : null,
-        tableName: a.tableId ? a.tableId.name : null,
-        isHeadTable: a.tableId ? a.tableId.isHeadTable : false,
-        partyMemberName: a.partyMemberName || null,
-        seatNumber: a.seatNumber ? a.seatNumber + fc : null
-      };
-    });
-
+    let fixedSeat = null;
+    let fixedTableNumber = null;
     if (fixedTable) {
       const myName = norm(me.name);
       const fixedIdx = fixedTable.fixedGuests.findIndex(fg => {
         const fn = norm(typeof fg === 'string' ? fg : (fg.name || fg));
         return myName.includes(fn) || fn.includes(myName);
       });
-      const alreadyHasAssignment = items.some(i => i.tableNumber === fixedTable.number && !i.partyMemberName);
-      if (fixedIdx >= 0 && !alreadyHasAssignment) {
-        items.push({
-          tableNumber: fixedTable.number,
-          tableName: fixedTable.name || null,
-          isHeadTable: fixedTable.isHeadTable || false,
-          partyMemberName: null,
-          seatNumber: fixedIdx + 1
-        });
+      if (fixedIdx >= 0) {
+        fixedSeat = fixedIdx + 1;
+        fixedTableNumber = fixedTable.number;
       }
+    }
+
+    const items = assignments.map(a => {
+      const tableNum = a.tableId ? a.tableId.number : null;
+      const fc = a.tableId && a.tableId.fixedGuests ? a.tableId.fixedGuests.length : 0;
+      const isFixedOnThisTable = !a.partyMemberName && tableNum === fixedTableNumber && fixedSeat != null;
+      return {
+        tableNumber: tableNum,
+        tableName: a.tableId ? a.tableId.name : null,
+        isHeadTable: a.tableId ? a.tableId.isHeadTable : false,
+        partyMemberName: a.partyMemberName || null,
+        seatNumber: isFixedOnThisTable ? fixedSeat : (a.seatNumber ? a.seatNumber + fc : null)
+      };
+    });
+
+    if (fixedSeat != null && !items.some(i => i.tableNumber === fixedTableNumber && !i.partyMemberName)) {
+      items.push({
+        tableNumber: fixedTable.number,
+        tableName: fixedTable.name || null,
+        isHeadTable: fixedTable.isHeadTable || false,
+        partyMemberName: null,
+        seatNumber: fixedSeat
+      });
     }
 
     res.json(items);
