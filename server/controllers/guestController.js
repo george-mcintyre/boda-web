@@ -559,8 +559,9 @@ async function getTableCompanions(req, res, next) {
       seatNumber: i + 1
     }));
     for (const a of assignments) {
-      const displayName = a.partyMemberName || (a.guestId ? a.guestId.name : 'Unknown');
-      if (!fixedNames.has(norm(a.guestId ? a.guestId.name : ''))) {
+      if (!a.guestId) continue;
+      const displayName = a.partyMemberName || a.guestId.name;
+      if (!fixedNames.has(norm(a.guestId.name))) {
         companions.push({ name: displayName, seatNumber: a.seatNumber ? a.seatNumber + fixedCount : null });
       }
     }

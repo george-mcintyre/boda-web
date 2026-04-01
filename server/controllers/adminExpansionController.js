@@ -523,16 +523,23 @@ async function listTableAssignments(req, res, next) {
       .sort({ seatNumber: 1 })
       .lean();
 
-    const items = assignments.map(a => ({
-      id: a._id.toString(),
-      tableId: a.tableId ? a.tableId._id.toString() : null,
-      tableNumber: a.tableId ? a.tableId.number : null,
-      tableName: a.tableId ? a.tableId.name : null,
-      guestId: a.guestId ? a.guestId._id.toString() : null,
-      guestName: a.guestId ? a.guestId.name : 'Unknown',
-      partyMemberName: a.partyMemberName || null,
-      seatNumber: a.seatNumber || null
-    }));
+    const staleIds = assignments.filter(a => !a.guestId).map(a => a._id);
+    if (staleIds.length) {
+      TableAssignment.deleteMany({ _id: { $in: staleIds } }).catch(() => {});
+    }
+
+    const items = assignments
+      .filter(a => a.guestId)
+      .map(a => ({
+        id: a._id.toString(),
+        tableId: a.tableId ? a.tableId._id.toString() : null,
+        tableNumber: a.tableId ? a.tableId.number : null,
+        tableName: a.tableId ? a.tableId.name : null,
+        guestId: a.guestId._id.toString(),
+        guestName: a.guestId.name,
+        partyMemberName: a.partyMemberName || null,
+        seatNumber: a.seatNumber || null
+      }));
     res.json(items);
   } catch (e) { next(e); }
 }

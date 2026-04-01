@@ -1,4 +1,4 @@
-const { Guest } = require('../models');
+const { Guest, TableAssignment } = require('../models');
 
 function normalizeGuestInput(data = {}) {
   const out = { ...data };
@@ -48,6 +48,7 @@ async function update(id, data) {
 }
 
 async function remove(id) { 
+  await TableAssignment.deleteMany({ guestId: id });
   await Guest.findByIdAndDelete(id);
 }
 
