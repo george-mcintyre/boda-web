@@ -518,18 +518,25 @@ async function seedTables(req, res, next) {
 async function listTableAssignments(req, res, next) {
   try {
     const assignments = await TableAssignment.find({})
-      .populate('guestId', 'name email')
+      .populate('guestId', 'name email partyMembers')
       .populate('tableId', 'number name')
       .sort({ seatNumber: 1 })
       .lean();
 
-    const staleIds = assignments.filter(a => !a.guestId).map(a => a._id);
+    const staleIds = assignments.filter(a => {
+      if (!a.guestId) return true;
+      if (!a.partyMemberName) return false;
+      const memberNames = (a.guestId.partyMembers || []).map(m => m.name);
+      return !memberNames.includes(a.partyMemberName);
+    }).map(a => a._id);
+
     if (staleIds.length) {
       TableAssignment.deleteMany({ _id: { $in: staleIds } }).catch(() => {});
     }
 
+    const staleSet = new Set(staleIds.map(id => id.toString()));
     const items = assignments
-      .filter(a => a.guestId)
+      .filter(a => a.guestId && !staleSet.has(a._id.toString()))
       .map(a => ({
         id: a._id.toString(),
         tableId: a.tableId ? a.tableId._id.toString() : null,

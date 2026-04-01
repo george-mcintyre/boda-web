@@ -58,6 +58,8 @@ async function updateParty(req, res, next) {
       return res.status(400).json({ error: 'Party members must be an array' });
     }
     
+    const oldNames = new Set((me.partyMembers || []).map(m => m.name));
+    
     // Process party members (excluding primary guest who is handled separately)
     const myId = me._id.toString();
     // 1) Find the member that corresponds to "me"
@@ -78,9 +80,15 @@ async function updateParty(req, res, next) {
        adult: member.adult !== false
      }));
     
-    // Update the guest with new party members
+    const newNames = new Set(processedMembers.map(m => m.name));
+    const removedNames = [...oldNames].filter(n => !newNames.has(n));
+    
     me.partyMembers = processedMembers;
     await me.save();
+    
+    if (removedNames.length) {
+      await TableAssignment.deleteMany({ guestId: me._id, partyMemberName: { $in: removedNames } });
+    }
     
     // Return the full party including primary guest
     const party = [
@@ -142,15 +150,23 @@ async function updatePartyByGuestId(req, res, next) {
       return res.status(400).json({ error: 'Party members must be an array' });
     }
     
+    const oldNames = new Set((guest.partyMembers || []).map(m => m.name));
+    
     const processedMembers = partyMembers.map(member => ({
       id: member.id || new mongoose.Types.ObjectId().toString(),
       name: member.name,
       adult: member.adult !== false
     }));
     
-    // Update the guest with new party members
+    const newNames = new Set(processedMembers.map(m => m.name));
+    const removedNames = [...oldNames].filter(n => !newNames.has(n));
+    
     guest.partyMembers = processedMembers;
     await guest.save();
+    
+    if (removedNames.length) {
+      await TableAssignment.deleteMany({ guestId: guest._id, partyMemberName: { $in: removedNames } });
+    }
     
     // Return the full party including primary guest
     const party = [
@@ -547,7 +563,7 @@ async function getTableCompanions(req, res, next) {
     if (!table) return res.status(404).json({ error: 'Table not found' });
 
     const assignments = await TableAssignment.find({ tableId: table._id })
-      .populate('guestId', 'name')
+      .populate('guestId', 'name partyMembers')
       .lean();
 
     // Build list: start with fixedGuests (e.g. bride/groom on Head Table)
@@ -560,6 +576,10 @@ async function getTableCompanions(req, res, next) {
     }));
     for (const a of assignments) {
       if (!a.guestId) continue;
+      if (a.partyMemberName) {
+        const memberNames = (a.guestId.partyMembers || []).map(m => m.name);
+        if (!memberNames.includes(a.partyMemberName)) continue;
+      }
       const displayName = a.partyMemberName || a.guestId.name;
       if (!fixedNames.has(norm(a.guestId.name))) {
         companions.push({ name: displayName, seatNumber: a.seatNumber ? a.seatNumber + fixedCount : null });
