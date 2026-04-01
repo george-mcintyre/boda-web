@@ -34,13 +34,27 @@ async function getGuestSummary(req, res, next) {
       }
     });
 
+    const validPartyIds = new Map();
+    guests.forEach(g => {
+      const gid = g._id.toString();
+      const ids = new Set([gid]);
+      (g.partyMembers || []).forEach(pm => {
+        if (pm.id) ids.add(pm.id);
+        if (pm.name) ids.add(pm.name);
+      });
+      validPartyIds.set(gid, ids);
+    });
+
     // Per-event attendance
     const perEventAttendance = events.map(event => {
       let count = 0;
       eventChoices.forEach(ec => {
-        if (!guestIds.has(ec.guestId.toString())) return;
+        const gid = ec.guestId.toString();
+        const valid = validPartyIds.get(gid);
+        if (!valid) return;
         if (ec.partyChoices) {
           ec.partyChoices.forEach(pc => {
+            if (!valid.has(pc.partyGuestId)) return;
             if (pc.choices) {
               pc.choices.forEach(c => {
                 if (c.eventId && c.eventId.toString() === event._id.toString() && c.attending) {
