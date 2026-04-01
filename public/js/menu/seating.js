@@ -13,12 +13,14 @@
 // Radius measured from table center to seat center (70 px on 1455×860 image).
 // ============================================================================
 const SEATS_PER_TABLE = 10;
+const MAX_SEATS_PER_TABLE = 12;
 const SEAT_RADIUS_X = 3.0;   // 43px / 1455px * 100
 const SEAT_RADIUS_Y = 5.0;   // 43px / 860px  * 100
 
-function getSeatPosition(tablePos, seatNumber) {
-  if (!seatNumber || seatNumber < 1 || seatNumber > SEATS_PER_TABLE) return tablePos;
-  const angle = -Math.PI / 2 + (seatNumber - 1) * (2 * Math.PI / SEATS_PER_TABLE);
+function getSeatPosition(tablePos, seatNumber, totalSeats) {
+  const divisor = totalSeats > SEATS_PER_TABLE ? MAX_SEATS_PER_TABLE : SEATS_PER_TABLE;
+  if (!seatNumber || seatNumber < 1 || seatNumber > divisor) return tablePos;
+  const angle = -Math.PI / 2 + (seatNumber - 1) * (2 * Math.PI / divisor);
   return {
     x: tablePos.x + SEAT_RADIUS_X * Math.cos(angle),
     y: tablePos.y + SEAT_RADIUS_Y * Math.sin(angle)
@@ -233,7 +235,7 @@ async function loadSeatingView() {
 // ============================================================================
 // showTableLocation() — Overlay location.png on the correct table
 // ============================================================================
-function showTableLocation(memberIdx) {
+async function showTableLocation(memberIdx) {
   const partyData = window._seatingPartyData;
   if (!partyData || !partyData[memberIdx]) return;
 
@@ -250,13 +252,11 @@ function showTableLocation(memberIdx) {
   });
   document.querySelector(`[data-member-idx="${memberIdx}"]`)?.classList.add('active');
 
-  // Companions section ref
   const companionsSection = document.getElementById('seating-companions');
   const companionsList = document.getElementById('companions-list');
   const companionsTableName = document.getElementById('companions-table-name');
 
   if (member.tableNumber == null && !member.isHeadTable) {
-    // Not assigned — hide marker and companions, show toast
     marker.style.display = 'none';
     if (companionsSection) companionsSection.style.display = 'none';
     if (typeof showToast === 'function') {
@@ -265,7 +265,6 @@ function showTableLocation(memberIdx) {
     return;
   }
 
-  // Get position from TABLE_POSITIONS
   const tableKey = member.tableNumber;
   const pos = TABLE_POSITIONS[tableKey];
 
@@ -274,8 +273,10 @@ function showTableLocation(memberIdx) {
     return;
   }
 
+  const totalSeats = await loadTableCompanions(tableKey, member.name, companionsSection, companionsList, companionsTableName);
+
   const target = member.seatNumber
-    ? (member.isHeadTable ? getHeadTableSeatPosition(pos, member.seatNumber) : getSeatPosition(pos, member.seatNumber))
+    ? (member.isHeadTable ? getHeadTableSeatPosition(pos, member.seatNumber) : getSeatPosition(pos, member.seatNumber, totalSeats))
     : pos;
 
   marker.style.display = 'block';
@@ -283,18 +284,14 @@ function showTableLocation(memberIdx) {
   marker.style.top = target.y + '%';
   marker.style.transform = 'translate(-50%, -100%)';
 
-  // Smooth scroll to the image area
   container.scrollIntoView({ behavior: 'smooth', block: 'center' });
-
-  // Fetch and show table companions
-  loadTableCompanions(tableKey, member.name, companionsSection, companionsList, companionsTableName);
 }
 
 // ============================================================================
 // loadTableCompanions() — Fetch and display who else is at the same table
 // ============================================================================
 async function loadTableCompanions(tableNumber, currentMemberName, section, list, titleEl) {
-  if (!section || !list || !titleEl) return;
+  if (!section || !list || !titleEl) return SEATS_PER_TABLE;
 
   try {
     const res = await fetch(`/api/guest/table-companions/${tableNumber}`, {
@@ -304,13 +301,12 @@ async function loadTableCompanions(tableNumber, currentMemberName, section, list
 
     if (!res.ok) {
       section.style.display = 'none';
-      return;
+      return SEATS_PER_TABLE;
     }
 
     const data = await res.json();
     const companions = (data.companions || []).sort((a, b) => (a.seatNumber || 999) - (b.seatNumber || 999));
 
-    // Table display name
     const tableName = data.isHeadTable
       ? translate('guests:headTable')
       : `${translate('guests:table')} ${data.tableNumber}`;
@@ -329,9 +325,11 @@ async function loadTableCompanions(tableNumber, currentMemberName, section, list
     }).join('');
 
     section.style.display = companions.length > 0 ? '' : 'none';
+    return companions.length;
   } catch (err) {
     console.error('Error loading table companions:', err);
     section.style.display = 'none';
+    return SEATS_PER_TABLE;
   }
 }
 
@@ -367,7 +365,7 @@ function showCompanionLocation(companionIdx) {
   if (!pos) return;
 
   const target = companion.seatNumber
-    ? (data.isHeadTable ? getHeadTableSeatPosition(pos, companion.seatNumber) : getSeatPosition(pos, companion.seatNumber))
+    ? (data.isHeadTable ? getHeadTableSeatPosition(pos, companion.seatNumber) : getSeatPosition(pos, companion.seatNumber, data.companions.length))
     : pos;
 
   marker.dataset.activeIdx = String(companionIdx);

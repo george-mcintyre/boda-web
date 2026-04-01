@@ -567,8 +567,10 @@ async function createTableAssignment(req, res, next) {
     const fixedNamesList = (table.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg)));
     const isFixed = name => { const n = norm(name); return fixedNamesList.some(fn => n.includes(fn) || fn.includes(n)); };
     const nonFixedCount = existingAssignments.filter(a => !isFixed(a.guestId ? a.guestId.name : '')).length;
-    if (nonFixedCount + fixedCount >= table.capacity) {
-      return res.status(400).json({ error: `Table is full (${table.capacity}/${table.capacity})` });
+    const MAX_SEATS = 12;
+    const totalOccupied = nonFixedCount + fixedCount;
+    if (totalOccupied >= MAX_SEATS) {
+      return res.status(400).json({ error: `Table is full (${totalOccupied}/${table.capacity})` });
     }
 
     const maxSeat = await TableAssignment.findOne({ tableId }).sort({ seatNumber: -1 }).lean();
@@ -613,8 +615,10 @@ async function updateTableAssignment(req, res, next) {
       const fixedNamesList = (newTable.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg)));
       const isFixed = name => { const n = norm(name); return fixedNamesList.some(fn => n.includes(fn) || fn.includes(n)); };
       const nonFixedCount = existingAssignments.filter(a => !isFixed(a.guestId ? a.guestId.name : '')).length;
-      if (nonFixedCount + fixedCount >= newTable.capacity) {
-        return res.status(400).json({ error: `Table is full (${newTable.capacity}/${newTable.capacity})` });
+      const MAX_SEATS = 12;
+      const totalOccupied = nonFixedCount + fixedCount;
+      if (totalOccupied >= MAX_SEATS) {
+        return res.status(400).json({ error: `Table is full (${totalOccupied}/${newTable.capacity})` });
       }
 
       assignment.tableId = tableId;
