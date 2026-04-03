@@ -13,12 +13,11 @@
 // Radius measured from table center to seat center (70 px on 1455×860 image).
 // ============================================================================
 const SEATS_PER_TABLE = 10;
-const MAX_SEATS_PER_TABLE = 12;
 const SEAT_RADIUS_X = 3.0;   // 43px / 1455px * 100
 const SEAT_RADIUS_Y = 5.0;   // 43px / 860px  * 100
 
 function getSeatPosition(tablePos, seatNumber, totalSeats) {
-  const divisor = totalSeats > SEATS_PER_TABLE ? MAX_SEATS_PER_TABLE : SEATS_PER_TABLE;
+  const divisor = totalSeats > SEATS_PER_TABLE ? totalSeats : SEATS_PER_TABLE;
   if (!seatNumber || seatNumber < 1 || seatNumber > divisor) return tablePos;
   const angle = -Math.PI / 2 + (seatNumber - 1) * (2 * Math.PI / divisor);
   return {
