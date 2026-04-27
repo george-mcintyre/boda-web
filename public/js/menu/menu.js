@@ -5,45 +5,58 @@
 let currentMenuView = 'banquet'; // Track which menu is currently shown
 let banquetChefData = null;
 
+async function isSeatingEnabled() {
+  try {
+    const r = await fetch('/api/admin/settings');
+    if (!r.ok) return false;
+    const s = await r.json();
+    return s.seatingEnabled === true;
+  } catch (_) {
+    return false;
+  }
+}
+
 // Main menu loader - sets up sub-navigation and loads initial view
 async function loadMenuSelections() {
   const menuContent = document.getElementById('menu');
 
   if (!menuContent) return;
-  
-  // Show loading state
+
   menuContent.innerHTML = `
     <div class="loading-state">
       <i class="fas fa-spinner fa-spin fa-3x"></i>
       <p><div data-i18n="guests:menuLoading">${translate('guests:menuLoading')}</div></p>
     </div>
   `;
-  
-  // Create sub-navigation (banquet + seating only)
+
+  const seatingEnabled = await isSeatingEnabled();
+
+  const seatingBtnHtml = seatingEnabled
+    ? `<button class="menu-sub-btn" data-menu="seating">
+         <i class="fas fa-chair"></i>
+         <span data-i18n="guests:seating">Seating</span>
+       </button>`
+    : '';
+
   menuContent.innerHTML = `
     <div class="menu-sub-nav">
       <button class="menu-sub-btn active" data-menu="banquet">
         <i class="fas fa-utensils"></i>
         <span data-i18n="guests:mainBanquet">Main Banquet</span>
       </button>
-      <button class="menu-sub-btn" data-menu="seating">
-        <i class="fas fa-chair"></i>
-        <span data-i18n="guests:seating">Seating</span>
-      </button>
+      ${seatingBtnHtml}
     </div>
     <div id="menu-view-container"></div>
   `;
-  
-  // Add click handlers for sub-navigation
+
   document.querySelectorAll('.menu-sub-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const menuType = btn.dataset.menu;
       switchMenuView(menuType);
     });
   });
-  
-  // Check for seating deep link
-  if (typeof checkSeatingDeepLink === 'function' && checkSeatingDeepLink()) {
+
+  if (seatingEnabled && typeof checkSeatingDeepLink === 'function' && checkSeatingDeepLink()) {
     switchMenuView('seating');
   } else {
     await loadBanquetMenu();
@@ -52,12 +65,15 @@ async function loadMenuSelections() {
 
 // Switch between menu views (banquet | seating)
 function switchMenuView(menuType) {
+  if (menuType === 'seating' && !document.querySelector('.menu-sub-btn[data-menu="seating"]')) {
+    menuType = 'banquet';
+  }
   currentMenuView = menuType;
-  
+
   document.querySelectorAll('.menu-sub-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.menu === menuType);
   });
-  
+
   if (menuType === 'banquet') {
     loadBanquetMenu();
   } else if (menuType === 'seating') {

@@ -7,5 +7,6 @@ const configSchema = new Schema({
   guestsEnabled: { type: Boolean, default: true },
   menuEnabled: { type: Boolean, default: true },
   messagesEnabled: { type: Boolean, default: true },
+  seatingEnabled: { type: Boolean, default: false },
 }, { timestamps: true });
 module.exports = model('Config', configSchema);

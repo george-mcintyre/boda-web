@@ -3735,7 +3735,8 @@
       eventsEnabled: false,
       menuEnabled: false,
       messagesEnabled: false,
-      giftsEnabled: false
+      giftsEnabled: false,
+      seatingEnabled: false
     };
     
     content.innerHTML = `
@@ -3752,6 +3753,7 @@
               { key: 'guestsEnabled', label: 'admin:settings.enableGuestArea', icon: 'fa-users', desc: 'admin:settings.enableGuestAreaDesc' },
               { key: 'eventsEnabled', label: 'admin:settings.showWeddingEvents', icon: 'fa-calendar-alt', desc: 'admin:settings.showWeddingEventsDesc' },
               { key: 'menuEnabled', label: 'admin:settings.menu', icon: 'fa-utensils', desc: 'admin:settings.menuDesc' },
+              { key: 'seatingEnabled', label: 'admin:settings.seating', icon: 'fa-chair', desc: 'admin:settings.seatingDesc' },
               { key: 'messagesEnabled', label: 'admin:settings.messages', icon: 'fa-comments', desc: 'admin:settings.messagesDesc' },
               { key: 'giftsEnabled', label: 'admin:settings.gifts', icon: 'fa-gift', desc: 'admin:settings.giftsDesc' }
             ].map(feature => `
@@ -3787,9 +3789,10 @@
     try {
       // Get current state of all toggles
       const currentSettings = {
-        guestsEnabled: featureKey === 'guestsEnabled' ? enabled : (document.getElementById('toggle-guestsEnabled')?.checked || false) ,
+        guestsEnabled: featureKey === 'guestsEnabled' ? enabled : (document.getElementById('toggle-guestsEnabled')?.checked || false),
         eventsEnabled: featureKey === 'eventsEnabled' ? enabled : (document.getElementById('toggle-eventsEnabled')?.checked || false),
         menuEnabled: featureKey === 'menuEnabled' ? enabled : (document.getElementById('toggle-menuEnabled')?.checked || false),
+        seatingEnabled: featureKey === 'seatingEnabled' ? enabled : (document.getElementById('toggle-seatingEnabled')?.checked || false),
         messagesEnabled: featureKey === 'messagesEnabled' ? enabled : (document.getElementById('toggle-messagesEnabled')?.checked || false),
         giftsEnabled: featureKey === 'giftsEnabled' ? enabled : (document.getElementById('toggle-giftsEnabled')?.checked || false)
       };
