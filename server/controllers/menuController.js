@@ -335,7 +335,7 @@ async function updateGuestCourseOption(req, res, next) {
       choices: (choice.choices || []).map(item => ({
         courseId: item.courseId,
         optionId: item.optionId,
-        cookingPreference: item.cookingPreference || 'medium'
+        cookingPreference: item.cookingPreference || null
       })),
       specialRequests: choice.specialRequest || [],
       specialRequestDetail: choice.specialRequestDetail || ''
