@@ -12,6 +12,10 @@ const courseOptionSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'CourseOptionImage'
   },
+  imageCloseup: {
+    type: Schema.Types.ObjectId,
+    ref: 'CourseOptionImage'
+  },
   description: { ...LocalizedString, default: null },
   // Dietary Flags
   isVegetarian: { type: Boolean, default: false },
@@ -29,7 +33,10 @@ const courseOptionSchema = new Schema({
   containsNuts: { type: Boolean, default: false },
   
   // Deprecated - replaced by specific allergen flags above
-  containsAllergens: { type: Boolean, default: false }
+  containsAllergens: { type: Boolean, default: false },
+
+  // Cooking preference
+  allowsCookingPreference: { type: Boolean, default: false }
 }, { timestamps: true });
 
 module.exports = model('CourseOption', courseOptionSchema);

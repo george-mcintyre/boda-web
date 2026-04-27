@@ -73,6 +73,7 @@ const translations = {
     // Common: Errors
     'common:error.saving.menu.selection': 'Error saving menu selection',
     'common:error.saving.menu.selections': 'Error saving menu selections',
+    'common:error.cookingPreference.required': 'Cooking preference is required',
     'common:error.saving.special.request': 'Error saving special request',
     'common:error.saving.special.request.details': 'Error saving special request details',
 
@@ -303,6 +304,13 @@ const translations = {
     'guests:welcomeCocktails': 'Welcome Cocktails',
     'guests:weddingBrunch': 'Wedding Brunch',
     'guests:seating': 'Seating',
+    'guests:selectMealChoices': 'Select your meal choices',
+    'guests:viewPhotos': 'View photos',
+    'guests:photoToggleWide': 'Wide',
+    'guests:photoToggleCloseup': 'Close-up',
+    'guests:guestColumnHeader': 'Guest',
+    'guests:fullMenuDetails': 'Full Menu Details',
+    'guests:selectOption': 'Select',
     'guests:seatingTitle': 'Your Seating Plan',
     'guests:seatingDescription': 'Click on a party member below to see where they are seated.',
     'guests:selectPartyMember': 'Select a party member:',
@@ -316,7 +324,12 @@ const translations = {
     
     // Menu titles and descriptions
     'guests:mainBanquetTitle': 'Main Banquet - Make Your Selections',
-    'guests:mainBanquetDescription': 'Please select your meal preferences for each course. Drag and drop guests to their chosen options.',
+    'guests:mainBanquetDescription': 'Please select your meal preferences for each course.',
+    'guests:dietaryPreferences': 'Dietary Preferences',
+    'guests:conflict.notVegetarian': '"{{option}}" may not be vegetarian',
+    'guests:conflict.containsDairy': '"{{option}}" contains dairy',
+    'guests:conflict.containsGluten': '"{{option}}" contains gluten',
+    'guests:conflict.containsNuts': '"{{option}}" contains nuts',
     'guests:meetTheChef': 'Meet The Chef',
     'guests:menuInfoNotAvailable': 'Menu information not yet available.',
     'guests:retry': 'Retry',
@@ -612,6 +625,10 @@ const translations = {
     'admin:menu.field.optionDescriptionHelp': 'e.g. A delicate blend of cream, mushrooms, and garlic',
     'admin:menu.field.image': 'Image',
     'admin:menu.field.imageHelp': 'Upload menu option image (will be stored in database)',
+    'admin:menu.field.imageCloseup': 'Close-up image (optional)',
+    'admin:menu.field.imageCloseupHelp': 'Optional close-up shot shown in the photo viewer',
+    'admin:menu.field.imageCloseupCurrent': 'Current close-up image',
+    'admin:menu.field.imageCloseupPreviewHint': 'Close-up preview will appear here',
 
     // menu Options Special Dietary Indicators
     'admin:menu.field.isVegetarian': 'Vegetarian',
@@ -625,9 +642,18 @@ const translations = {
     'admin:menu.field.helpAllergens': 'This option contains allergens - please check ingredient list',
     'admin:menu.field.helpLactose': 'This option contains lactose/dairy products',
     'admin:menu.field.helpSpicy': 'This option contains spicy ingredients',
-    'admin:menu.field.helpNuts': 'This option may contain nuts',
+     'admin:menu.field.helpNuts': 'This option may contain nuts',
+    'admin:menu.field.allowsCookingPreference': 'Allows Cooking Preference',
+    'admin:menu.field.helpAllowsCookingPreference': 'Guests can specify how they would like this option cooked (e.g. rare, medium, well done)',
 
-    // Admin Day Menus
+    // Cooking preference (beef doneness)
+    'menu.cooking.label': 'How would you like your meat cooked?',
+    'menu.cooking.rare': 'Rare',
+    'menu.cooking.medium-rare': 'Medium Rare',
+    'menu.cooking.medium': 'Medium',
+    'menu.cooking.well-done': 'Well Done',
+
+     // Admin Day Menus
     'admin:dayMenu.noMenuConfigured': 'No menu configured for this day yet.',
     //--------------------------------
     // Admin Gifts Section
@@ -849,6 +875,7 @@ const translations = {
     
     // Common: Errors
     'common:error.saving.menu.selections': 'Error al guardar las selecciones de menú',
+    'common:error.cookingPreference.required': 'El punto de cocción es obligatorio',
     'common:error.saving.menu.selection': 'Error al guardar la selección de menú',
     'common:error.saving.special.request': 'Error al guardar la petición especial',
     'common:error.saving.special.request.details': 'Error al guardar los detalles de la petición especial',
@@ -1080,6 +1107,13 @@ const translations = {
     'guests:welcomeCocktails': 'Cóctel de Bienvenida',
     'guests:weddingBrunch': 'Brunch de Boda',
     'guests:seating': 'Asientos',
+    'guests:selectMealChoices': 'Selecciona tus platos',
+    'guests:viewPhotos': 'Ver fotos',
+    'guests:photoToggleWide': 'Vista general',
+    'guests:photoToggleCloseup': 'Primer plano',
+    'guests:guestColumnHeader': 'Invitado',
+    'guests:fullMenuDetails': 'Menú Completo',
+    'guests:selectOption': 'Seleccionar',
     'guests:seatingTitle': 'Tu Plan de Asientos',
     'guests:seatingDescription': 'Haz clic en un miembro del grupo para ver dónde está sentado.',
     'guests:selectPartyMember': 'Selecciona un miembro del grupo:',
@@ -1093,7 +1127,12 @@ const translations = {
     
     // Menu titles and descriptions
     'guests:mainBanquetTitle': 'Banquete Principal - Haz Tus Selecciones',
-    'guests:mainBanquetDescription': 'Por favor, selecciona tus preferencias de menú para cada plato. Arrastra y suelta a los invitados en sus opciones elegidas.',
+    'guests:mainBanquetDescription': 'Por favor, selecciona tus preferencias de menú para cada plato.',
+    'guests:dietaryPreferences': 'Preferencias dietéticas',
+    'guests:conflict.notVegetarian': '"{{option}}" puede no ser vegetariano',
+    'guests:conflict.containsDairy': '"{{option}}" contiene lácteos',
+    'guests:conflict.containsGluten': '"{{option}}" contiene gluten',
+    'guests:conflict.containsNuts': '"{{option}}" contiene frutos secos',
     'guests:meetTheChef': 'Conoce al Chef',
     'guests:menuInfoNotAvailable': 'Información del menú aún no disponible.',
     'guests:courseGroupWelcomeCocktails': 'Cóctel de Bienvenida',
@@ -1388,6 +1427,10 @@ const translations = {
     'admin:menu.field.optionDescriptionHelp': 'p. ej., Una delicada mezcla de crema, champiñones y ajo',
     'admin:menu.field.image': 'Imagen',
     'admin:menu.field.imageHelp': 'Sube la imagen de la opción de menú (se guardará en la base de datos)',
+    'admin:menu.field.imageCloseup': 'Imagen de primer plano (opcional)',
+    'admin:menu.field.imageCloseupHelp': 'Toma de primer plano opcional que se muestra en el visor de fotos',
+    'admin:menu.field.imageCloseupCurrent': 'Imagen de primer plano actual',
+    'admin:menu.field.imageCloseupPreviewHint': 'La vista previa del primer plano aparecerá aquí',
 
     // menu Options Special Dietary Indicators
     'admin:menu.field.isVegetarian': 'Vegetariano',
@@ -1401,9 +1444,18 @@ const translations = {
     'admin:menu.field.helpAllergens': 'Esta opción contiene alérgenos; por favor revisa la lista de ingredientes',
     'admin:menu.field.helpLactose': 'Esta opción contiene lactosa/productos lácteos',
     'admin:menu.field.helpSpicy': 'Esta opción contiene ingredientes picantes',
-    'admin:menu.field.helpNuts': 'Esta opción puede contener frutos secos',
+     'admin:menu.field.helpNuts': 'Esta opción puede contener frutos secos',
+    'admin:menu.field.allowsCookingPreference': 'Permite preferencia de cocción',
+    'admin:menu.field.helpAllowsCookingPreference': 'Los invitados pueden especificar cómo desean este plato cocinado (ej. poco hecho, al punto, muy hecho)',
 
-    // Admin Day Menus
+    // Cooking preference (beef doneness)
+    'menu.cooking.label': '¿Cómo prefiere la carne?',
+    'menu.cooking.rare': 'Poco hecho',
+    'menu.cooking.medium-rare': 'Al punto menos',
+    'menu.cooking.medium': 'Al punto',
+    'menu.cooking.well-done': 'Muy hecho',
+
+     // Admin Day Menus
     'admin:dayMenu.noMenuConfigured': 'Todavía no hay menú configurado para este día.',
     //--------------------------------
     // Admin Gifts Section
@@ -1626,6 +1678,7 @@ const translations = {
     // Common: Errors
     'common:error.saving.menu.selection': 'Erreur lors de l’enregistrement de la sélection de menu',
     'common:error.saving.menu.selections': 'Erreur lors de l’enregistrement des sélections de menu',
+    'common:error.cookingPreference.required': 'Le choix de cuisson est obligatoire',
     'common:error.saving.special.request': 'Erreur lors de l’enregistrement de la demande spéciale',
     'common:error.saving.special.request.details': 'Erreur lors de l’enregistrement des détails de la demande spéciale',
 
@@ -1856,6 +1909,13 @@ const translations = {
     'guests:welcomeCocktails': 'Cocktail de Bienvenue',
     'guests:weddingBrunch': 'Brunch de Mariage',
     'guests:seating': 'Places Assises',
+    'guests:selectMealChoices': 'Choisissez vos plats',
+    'guests:viewPhotos': 'Voir les photos',
+    'guests:photoToggleWide': 'Vue d’ensemble',
+    'guests:photoToggleCloseup': 'Gros plan',
+    'guests:guestColumnHeader': 'Invité',
+    'guests:fullMenuDetails': 'Menu Complet',
+    'guests:selectOption': 'Choisir',
     'guests:seatingTitle': 'Votre Plan de Table',
     'guests:seatingDescription': 'Cliquez sur un membre du groupe pour voir où il est assis.',
     'guests:selectPartyMember': 'Sélectionnez un membre du groupe :',
@@ -1869,7 +1929,12 @@ const translations = {
     
     // Menu titles and descriptions
     'guests:mainBanquetTitle': 'Banquet Principal - Faites Vos Sélections',
-    'guests:mainBanquetDescription': 'Veuillez sélectionner vos préférences de menu pour chaque plat. Glissez et déposez les invités sur leurs options choisies.',
+    'guests:mainBanquetDescription': 'Veuillez sélectionner vos préférences de menu pour chaque plat.',
+    'guests:dietaryPreferences': 'Préférences alimentaires',
+    'guests:conflict.notVegetarian': '"{{option}}" peut ne pas être végétarien',
+    'guests:conflict.containsDairy': '"{{option}}" contient des produits laitiers',
+    'guests:conflict.containsGluten': '"{{option}}" contient du gluten',
+    'guests:conflict.containsNuts': '"{{option}}" contient des fruits à coque',
     'guests:meetTheChef': 'Rencontrez le Chef',
     'guests:menuInfoNotAvailable': 'Informations sur le menu pas encore disponibles.',
     'guests:courseGroupWelcomeCocktails': 'Cocktail de Bienvenue',
@@ -2164,6 +2229,10 @@ const translations = {
     'admin:menu.field.optionDescriptionHelp': 'ex. Un délicat mélange de crème, de champignons et d’ail',
     'admin:menu.field.image': 'Image',
     'admin:menu.field.imageHelp': 'Téléchargez l’image de l’option de menu (elle sera stockée dans la base de données)',
+    'admin:menu.field.imageCloseup': 'Image en gros plan (facultatif)',
+    'admin:menu.field.imageCloseupHelp': 'Photo en gros plan facultative affichée dans la visionneuse',
+    'admin:menu.field.imageCloseupCurrent': 'Image en gros plan actuelle',
+    'admin:menu.field.imageCloseupPreviewHint': 'L’aperçu du gros plan apparaîtra ici',
 
     // menu Options Special Dietary Indicators
     'admin:menu.field.isVegetarian': 'Végétarien',
@@ -2177,9 +2246,18 @@ const translations = {
     'admin:menu.field.helpAllergens': 'Cette option contient des allergènes - veuillez consulter la liste des ingrédients',
     'admin:menu.field.helpLactose': 'Cette option contient du lactose / des produits laitiers',
     'admin:menu.field.helpSpicy': 'Cette option contient des ingrédients épicés',
-    'admin:menu.field.helpNuts': 'Cette option peut contenir des fruits à coque',
+     'admin:menu.field.helpNuts': 'Cette option peut contenir des fruits à coque',
+    'admin:menu.field.allowsCookingPreference': 'Préférence de cuisson',
+    'admin:menu.field.helpAllowsCookingPreference': 'Les invités peuvent préciser leur cuisson souhaitée (ex. bleu, à point, bien cuit)',
 
-    // Admin Day Menus
+    // Cooking preference (beef doneness)
+    'menu.cooking.label': 'Comment souhaitez-vous votre viande ?',
+    'menu.cooking.rare': 'Bleu',
+    'menu.cooking.medium-rare': 'Saignant',
+    'menu.cooking.medium': 'À point',
+    'menu.cooking.well-done': 'Bien cuit',
+
+     // Admin Day Menus
     'admin:dayMenu.noMenuConfigured': 'Aucun menu configuré pour ce jour pour le moment.',
     //--------------------------------
     // Admin Gifts Section
@@ -2402,6 +2480,7 @@ const translations = {
     // Common: Errors
     'common:error.saving.menu.selection': 'Fehler beim Speichern der Menüauswahl',
     'common:error.saving.menu.selections': 'Fehler beim Speichern der Menüauswahlen',
+    'common:error.cookingPreference.required': 'Garpunkt ist erforderlich',
     'common:error.saving.special.request': 'Fehler beim Speichern des Sonderwunsches',
     'common:error.saving.special.request.details': 'Fehler beim Speichern der Details des Sonderwunsches',
 
@@ -2632,6 +2711,13 @@ const translations = {
     'guests:welcomeCocktails': 'Willkommenscocktail',
     'guests:weddingBrunch': 'Hochzeitsbrunch',
     'guests:seating': 'Sitzplan',
+    'guests:selectMealChoices': 'Wähle deine Gerichte',
+    'guests:viewPhotos': 'Fotos ansehen',
+    'guests:photoToggleWide': 'Übersicht',
+    'guests:photoToggleCloseup': 'Nahaufnahme',
+    'guests:guestColumnHeader': 'Gast',
+    'guests:fullMenuDetails': 'Vollständiges Menü',
+    'guests:selectOption': 'Auswählen',
     'guests:seatingTitle': 'Dein Sitzplan',
     'guests:seatingDescription': 'Klicke auf ein Gruppenmitglied, um zu sehen, wo es sitzt.',
     'guests:selectPartyMember': 'Wähle ein Gruppenmitglied:',
@@ -2645,7 +2731,12 @@ const translations = {
     
     // Menu titles and descriptions
     'guests:mainBanquetTitle': 'Hauptbankett - Triff Deine Auswahl',
-    'guests:mainBanquetDescription': 'Bitte wähle deine Menüpräferenzen für jeden Gang. Ziehe die Gäste per Drag-and-Drop auf ihre gewählten Optionen.',
+    'guests:mainBanquetDescription': 'Bitte wähle deine Menüpräferenzen für jeden Gang.',
+    'guests:dietaryPreferences': 'Ernährungspräferenzen',
+    'guests:conflict.notVegetarian': '"{{option}}" ist möglicherweise nicht vegetarisch',
+    'guests:conflict.containsDairy': '"{{option}}" enthält Milchprodukte',
+    'guests:conflict.containsGluten': '"{{option}}" enthält Gluten',
+    'guests:conflict.containsNuts': '"{{option}}" enthält Nüsse',
     'guests:meetTheChef': 'Triff den Koch',
     'guests:menuInfoNotAvailable': 'Menüinformationen noch nicht verfügbar.',
     'guests:courseGroupWelcomeCocktails': 'Willkommenscocktail',
@@ -2940,6 +3031,10 @@ const translations = {
     'admin:menu.field.optionDescriptionHelp': 'z. B. Eine feine Mischung aus Sahne, Pilzen und Knoblauch',
     'admin:menu.field.image': 'Bild',
     'admin:menu.field.imageHelp': 'Bild der Menüoption hochladen (wird in der Datenbank gespeichert)',
+    'admin:menu.field.imageCloseup': 'Nahaufnahme (optional)',
+    'admin:menu.field.imageCloseupHelp': 'Optionale Nahaufnahme, die im Foto-Viewer angezeigt wird',
+    'admin:menu.field.imageCloseupCurrent': 'Aktuelle Nahaufnahme',
+    'admin:menu.field.imageCloseupPreviewHint': 'Vorschau der Nahaufnahme erscheint hier',
 
     // menu Options Special Dietary Indicators
     'admin:menu.field.isVegetarian': 'Vegetarisch',
@@ -2953,9 +3048,18 @@ const translations = {
     'admin:menu.field.helpAllergens': 'Diese Option enthält Allergene – bitte Zutatenliste prüfen',
     'admin:menu.field.helpLactose': 'Diese Option enthält Laktose/Milchprodukte',
     'admin:menu.field.helpSpicy': 'Diese Option enthält scharfe Zutaten',
-    'admin:menu.field.helpNuts': 'Diese Option kann Nüsse enthalten',
+     'admin:menu.field.helpNuts': 'Diese Option kann Nüsse enthalten',
+    'admin:menu.field.allowsCookingPreference': 'Gargrad wählbar',
+    'admin:menu.field.helpAllowsCookingPreference': 'Gäste können angeben, wie sie diese Option zubereitet möchten (z. B. blutig, medium, durchgebraten)',
 
-    // Admin Day Menus
+    // Cooking preference (beef doneness)
+    'menu.cooking.label': 'Wie möchten Sie Ihr Fleisch gegart haben?',
+    'menu.cooking.rare': 'Blutig',
+    'menu.cooking.medium-rare': 'Rosa',
+    'menu.cooking.medium': 'Medium',
+    'menu.cooking.well-done': 'Durchgebraten',
+
+     // Admin Day Menus
     'admin:dayMenu.noMenuConfigured': 'Noch kein Menü für diesen Tag konfiguriert.',
     //--------------------------------
     // Admin Gifts Section

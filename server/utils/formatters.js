@@ -61,21 +61,21 @@ function formatCourseForApi(course) {
 
 // Format course option for API response
 function formatCourseOptionForApi(option, lang) {
-  // Format image data for display
-  let imageData = null;
-  if (option.image) {
-    if (option.image.data && option.image.contentType) {
-      // Populated image document with binary data
-      const base64Data = option.image.data.toString('base64');
-      imageData = `data:${option.image.contentType};base64,${base64Data}`;
-    } else {
-      // Unpopulated ObjectId reference — return as string for frontend
-      const idStr = option.image._id ? option.image._id.toString() : option.image.toString();
-      if (idStr.length === 24 && /^[0-9a-fA-F]{24}$/.test(idStr)) {
-        imageData = idStr;
-      }
+  const formatImageRef = (img) => {
+    if (!img) return null;
+    if (img.data && img.contentType) {
+      const base64Data = img.data.toString('base64');
+      return `data:${img.contentType};base64,${base64Data}`;
     }
-  }
+    const idStr = img._id ? img._id.toString() : img.toString();
+    if (idStr.length === 24 && /^[0-9a-fA-F]{24}$/.test(idStr)) {
+      return idStr;
+    }
+    return null;
+  };
+
+  const imageData = formatImageRef(option.image);
+  const imageCloseupData = formatImageRef(option.imageCloseup);
 
   // Debug logging for vegan field issue
   if (option.label && option.label.en && option.label.en.includes('Gazpacho')) {
@@ -93,6 +93,7 @@ function formatCourseOptionForApi(option, lang) {
     courseId: option.courseId.toString(),
     label: localize(option.label, lang),
     image: imageData,
+    imageCloseup: imageCloseupData,
     description: localize(option.description, lang) || null,
     // Dietary Flags
     isVegan: option.isVegan || false,
@@ -109,6 +110,8 @@ function formatCourseOptionForApi(option, lang) {
     containsNuts: option.containsNuts || false,
     // Deprecated
     containsAllergens: option.containsAllergens || false,
+    // Cooking preference flag
+    allowsCookingPreference: option.allowsCookingPreference || false,
     // Generated HTML with icons
     dietaryIcons: generateDietaryIconsHTML(option)
   };

@@ -1,11 +1,9 @@
 // Menu Management Module
 // Contains all menu-related functions extracted from guests.js
 
-// Global variables that need to be available from the main scope
-let draggedChip = null;
+// Global variables
 let currentMenuView = 'banquet'; // Track which menu is currently shown
-let dayMenusData = []; // Store day menus data
-let banquetChefData = null; // Store banquet chef data
+let banquetChefData = null;
 
 // Main menu loader - sets up sub-navigation and loads initial view
 async function loadMenuSelections() {
@@ -21,43 +19,12 @@ async function loadMenuSelections() {
     </div>
   `;
   
-  // Load day menus data in parallel
-  try {
-    const [dayMenusResponse, banquetChefResponse] = await Promise.all([
-      fetch(`/api/guest/day-menus?lang=${window.currentLanguage}`, {
-        method: 'GET',
-        headers: { 'Authorization': window.token }
-      }),
-      fetch(`/api/guest/banquet-chef?lang=${window.currentLanguage}`, {
-        method: 'GET',
-        headers: { 'Authorization': window.token }
-      })
-    ]);
-    
-    if (dayMenusResponse.ok) {
-      dayMenusData = await dayMenusResponse.json();
-    }
-    if (banquetChefResponse.ok) {
-      banquetChefData = await banquetChefResponse.json();
-    }
-  } catch (err) {
-    console.error('Error loading day menus:', err);
-  }
-  
-  // Create sub-navigation
+  // Create sub-navigation (banquet + seating only)
   menuContent.innerHTML = `
     <div class="menu-sub-nav">
       <button class="menu-sub-btn active" data-menu="banquet">
         <i class="fas fa-utensils"></i>
         <span data-i18n="guests:mainBanquet">Main Banquet</span>
-      </button>
-      <button class="menu-sub-btn" data-menu="day1">
-        <i class="fas fa-glass-cheers"></i>
-        <span data-i18n="guests:welcomeCocktails">Welcome Cocktails</span>
-      </button>
-      <button class="menu-sub-btn" data-menu="day3">
-        <i class="fas fa-sun"></i>
-        <span data-i18n="guests:weddingBrunch">Wedding Brunch</span>
       </button>
       <button class="menu-sub-btn" data-menu="seating">
         <i class="fas fa-chair"></i>
@@ -69,7 +36,7 @@ async function loadMenuSelections() {
   
   // Add click handlers for sub-navigation
   document.querySelectorAll('.menu-sub-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', () => {
       const menuType = btn.dataset.menu;
       switchMenuView(menuType);
     });
@@ -79,39 +46,33 @@ async function loadMenuSelections() {
   if (typeof checkSeatingDeepLink === 'function' && checkSeatingDeepLink()) {
     switchMenuView('seating');
   } else {
-    // Load initial banquet view
     await loadBanquetMenu();
   }
 }
 
-// Switch between menu views
+// Switch between menu views (banquet | seating)
 function switchMenuView(menuType) {
   currentMenuView = menuType;
   
-  // Update active button
   document.querySelectorAll('.menu-sub-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.menu === menuType);
   });
   
-  // Load appropriate view
   if (menuType === 'banquet') {
     loadBanquetMenu();
   } else if (menuType === 'seating') {
     if (typeof loadSeatingView === 'function') {
       loadSeatingView();
     }
-  } else {
-    loadDayMenu(menuType);
   }
 }
 
-// Load banquet menu (original functionality)
+// Load banquet menu with selection table + read-only detail cards
 async function loadBanquetMenu() {
   const viewContainer = document.getElementById('menu-view-container');
   
   if (!viewContainer) return;
   
-  // Show loading state
   viewContainer.innerHTML = `
     <div class="loading-state">
       <i class="fas fa-spinner fa-spin fa-3x"></i>
@@ -120,7 +81,6 @@ async function loadBanquetMenu() {
   `;
   
   try {
-    
     const [partyResponse, menuResponse, menuChoicesResponse, banquetChefResponse] = await Promise.all([
       fetch('/api/guest/party', {
         method: 'GET',
@@ -139,13 +99,13 @@ async function loadBanquetMenu() {
         headers: { 'Authorization': window.token }
       })
     ]);
-    
+
     if (banquetChefResponse.ok) {
       banquetChefData = await banquetChefResponse.json();
     }
 
     if (!partyResponse.ok || !menuResponse.ok) {
-      menuContent.innerHTML = `
+      viewContainer.innerHTML = `
         <div class="error-state">
           <i class="fas fa-exclamation-triangle"></i>
           <h3><div data-i18n="guests:menuErrorTitle">Error Loading Menu</div></h3>
@@ -162,7 +122,252 @@ async function loadBanquetMenu() {
     const menuData = await menuResponse.json();
     const menuChoicesData = menuChoicesResponse.ok ? await menuChoicesResponse.json() : [];
 
-    // Group courses by type (starter, main, dessert, drinks)
+    // Build choices lookup: { memberId: { courseId: optionId } }
+    const choicesLookup = {};
+    menuChoicesData.forEach(memberChoice => {
+      const memberId = memberChoice.partyGuestId;
+      choicesLookup[memberId] = {};
+      if (memberChoice.choices) {
+        memberChoice.choices.forEach(choice => {
+          choicesLookup[memberId][choice.courseId] = choice.optionId;
+        });
+      }
+    });
+
+    // Build cooking preferences lookup: { memberId: { courseId: cookingPreference } }
+    const cookingPreferencesLookup = {};
+    menuChoicesData.forEach(memberChoice => {
+      const memberId = memberChoice.partyGuestId;
+      cookingPreferencesLookup[memberId] = {};
+      if (memberChoice.choices) {
+        memberChoice.choices.forEach(choice => {
+          if (choice.cookingPreference) {
+            cookingPreferencesLookup[memberId][choice.courseId] = choice.cookingPreference;
+          }
+        });
+      }
+    });
+    window.cookingPrefsData = cookingPreferencesLookup;
+
+    const specialRequestsLookup = {};
+    menuChoicesData.forEach(memberChoice => {
+      specialRequestsLookup[memberChoice.partyGuestId] = {
+        specialRequest: memberChoice.specialRequest || [],
+        specialRequestDetail: memberChoice.specialRequestDetail || ''
+      };
+    });
+
+    const dietaryOptions = [
+      { name: 'vegetarian', label: 'Vegetarian', icon: 'fa-leaf' },
+      { name: 'lactose-intolerant', label: 'Lactose Intolerant', icon: 'fa-cheese' },
+      { name: 'gluten-intolerant', label: 'Gluten Intolerant', icon: 'fa-bread-slice' },
+      { name: 'nut-allergy', label: 'Nut Allergy', icon: 'fa-seedling' },
+      { name: 'other', label: 'Other', icon: 'fa-question-circle' }
+    ];
+
+    const resolveImageRef = (ref, optionId, isCloseup) => {
+      if (!ref) return null;
+      if (typeof ref !== 'string') return null;
+      if (ref.startsWith('data:')) return ref;
+      if (ref.length === 24 && /^[0-9a-fA-F]{24}$/.test(ref)) {
+        const suffix = isCloseup ? 'image-closeup/thumbnail' : 'image/thumbnail';
+        return `/api/admin/menu-options/${optionId}/${suffix}`;
+      }
+      return ref;
+    };
+    const getOptionImageUrl = (option) => resolveImageRef(option && option.image, option && option.id, false);
+    const getOptionCloseupUrl = (option) => resolveImageRef(option && option.imageCloseup, option && option.id, true);
+
+    const getDesc = (desc) => {
+      if (!desc) return '';
+      if (typeof desc === 'object') return desc[window.currentLanguage] || desc.en || '';
+      return String(desc);
+    };
+
+    // Selectable courses: those requiring a choice with more than one option
+    const selectableCourses = menuData.filter(c => c.selectionRequired !== false && c.options && c.options.length > 1);
+
+    const cookingPrefValues = ['rare', 'medium-rare', 'medium', 'well-done'];
+
+    // ── Selection table ──────────────────────────────────────────────────
+    let html = '<div class="unified-menu-container">';
+    html += `
+      <div class="intro-card intro-section">
+        <h2 class="card-title">
+          <div data-i18n="guests:mainBanquetTitle">${translate('guests:mainBanquetTitle') || 'Main Banquet - Make Your Selections'}</div>
+        </h2>
+        <p class="card-description">
+          <div data-i18n="guests:mainBanquetDescription">${translate('guests:mainBanquetDescription') || 'Please select your meal preferences for each course.'}</div>
+        </p>
+      </div>
+    `;
+
+    if (selectableCourses.length > 0) {
+      html += `
+        <div class="banquet-selection-table-wrapper">
+          <h3 class="selection-table-heading" data-i18n="guests:selectMealChoices">${translate('guests:selectMealChoices') || 'Select your meal choices'}</h3>
+          <div class="table-responsive">
+            <table class="banquet-selection-table">
+              <thead>
+                <tr>
+                  <th data-i18n="guests:guestColumnHeader">${translate('guests:guestColumnHeader') || 'Guest'}</th>
+                  ${selectableCourses.map(c => `<th>${escapeHtml(c.label)}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody>
+                ${partyData.map(member => {
+                  const memberRequests = specialRequestsLookup[member.id] || { specialRequest: [], specialRequestDetail: '' };
+                  const selectedRequests = Array.isArray(memberRequests.specialRequest) ? memberRequests.specialRequest : [];
+
+                  const courseCellsHtml = selectableCourses.map(course => {
+                    const savedOptionId = (choicesLookup[member.id] || {})[course.id] || '';
+                    const savedCookingPref = (cookingPreferencesLookup[member.id] || {})[course.id] || 'medium';
+                    const selectedOpt = course.options.find(o => o.id === savedOptionId) || null;
+                    const selectedImgUrl = selectedOpt ? (getOptionImageUrl(selectedOpt) || '') : '';
+                    const selectedLabel = selectedOpt ? escapeHtml(selectedOpt.label) : (translate('guests:selectOption') || 'Select…');
+                    const allowsCookingPref = selectedOpt ? !!selectedOpt.allowsCookingPreference : false;
+
+                    const optionsHtml = [
+                      `<div class="cms-option" data-value="" data-allows-cooking-pref="false" data-image-url="" data-is-vegetarian="false" data-is-vegan="false" data-contains-lactose="false" data-contains-gluten="false" data-contains-nuts="false">
+                        <span class="cms-option-text"><span class="cms-option-title">— ${translate('guests:selectOption') || 'Select'} —</span></span>
+                      </div>`
+                    ].concat(course.options.map(opt => {
+                      const optImg = getOptionImageUrl(opt) || '';
+                      const desc = getDesc(opt.description);
+                      return `<div class="cms-option${savedOptionId === opt.id ? ' selected' : ''}" data-value="${opt.id}" data-allows-cooking-pref="${opt.allowsCookingPreference ? 'true' : 'false'}" data-image-url="${escapeHtml(optImg)}" data-is-vegetarian="${opt.isVegetarian ? 'true' : 'false'}" data-is-vegan="${opt.isVegan ? 'true' : 'false'}" data-contains-lactose="${opt.containsLactose ? 'true' : 'false'}" data-contains-gluten="${opt.containsGluten ? 'true' : 'false'}" data-contains-nuts="${opt.containsNuts ? 'true' : 'false'}">
+                        ${optImg ? `<img src="${escapeHtml(optImg)}" alt="" loading="lazy">` : '<span class="cms-option-no-img"></span>'}
+                        <span class="cms-option-text">
+                          <span class="cms-option-title">${escapeHtml(opt.label)}</span>
+                          ${desc ? `<span class="cms-option-desc">${escapeHtml(desc)}</span>` : ''}
+                        </span>
+                      </div>`;
+                    })).join('');
+
+                    return `
+                      <td class="course-choice-cell" data-course-id="${course.id}" data-label="${escapeHtml(course.label)}">
+                        <div class="selection-cell-inner">
+                          <div class="custom-menu-select" data-member-id="${member.id}" data-course-id="${course.id}" data-value="${escapeHtml(savedOptionId)}">
+                            <button type="button" class="cms-trigger" aria-haspopup="listbox" aria-expanded="false">
+                              ${selectedImgUrl ? `<img src="${escapeHtml(selectedImgUrl)}" alt="" class="cms-trigger-img">` : '<span class="cms-trigger-img cms-trigger-img--empty"></span>'}
+                              <span class="cms-trigger-label">${selectedLabel}</span>
+                              <i class="fas fa-chevron-down cms-chevron"></i>
+                            </button>
+                            <div class="cms-panel" role="listbox" style="display:none">${optionsHtml}</div>
+                          </div>
+                          <select class="cooking-pref-inline" data-member-id="${member.id}" data-course-id="${course.id}" onchange="window.onCookingPrefChange(this)" style="${allowsCookingPref ? '' : 'display:none;'}">
+                            ${cookingPrefValues.map(p => `<option value="${p}" ${savedCookingPref === p ? 'selected' : ''}>${translate('menu.cooking.' + p) || p}</option>`).join('')}
+                          </select>
+                        </div>
+                      </td>
+                    `;
+                  }).join('');
+
+                  const dietarySubRowHtml = `
+                    <tr class="dietary-sub-row" data-member-id="${member.id}">
+                      <td colspan="${selectableCourses.length + 1}" class="dietary-sub-row-cell">
+                        <div class="menu-dietary-card dietary-inline-container" data-member-id="${member.id}" data-member-name="${escapeHtml(member.name)}">
+                          <div class="dietary-inline-checkboxes">
+                            ${dietaryOptions.map(opt => {
+                              const isSelected = selectedRequests.some(r =>
+                                (typeof r === 'string' && r === opt.name) ||
+                                (typeof r === 'object' && r.name === opt.name && r.selected)
+                              );
+                              return `<label class="dietary-checkbox ${isSelected ? 'checked' : ''}">
+                                <input type="checkbox"
+                                  name="dietary-${member.id}"
+                                  value="${opt.name}"
+                                  data-member-id="${member.id}"
+                                  ${isSelected ? 'checked' : ''}
+                                  onchange="updateDietaryCheckbox(this)">
+                                <i class="fas ${opt.icon}"></i>
+                                <span data-i18n="guests:dietary${opt.label}">${translate('guests:dietary' + opt.label)}</span>
+                              </label>`;
+                            }).join('')}
+                          </div>
+                          <div class="special-request-detail">
+                            <label for="special-detail-${member.id}"><div data-i18n="guests:additionalDetailsLabel">${translate('guests:additionalDetailsLabel')}</div></label>
+                            <textarea
+                              id="special-detail-${member.id}"
+                              name="special-detail-${member.id}"
+                              data-i18n="guests:additionalDetails:placeholder"
+                              placeholder="Additional details or specific requirements..."
+                              rows="2"
+                            >${escapeHtml(memberRequests.specialRequestDetail || '')}</textarea>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  `;
+
+                  return `
+                    <tr data-member-id="${member.id}">
+                      <td class="member-name-cell">
+                        ${escapeHtml(member.name)}
+                        ${member.primary ? `<span class="badge badge-primary" data-i18n="common:party.primary">${translate('common:party.primary') || 'You'}</span>` : ''}
+                      </td>
+                      ${courseCellsHtml}
+                    </tr>
+                    ${dietarySubRowHtml}
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    } else {
+      html += `
+        <div class="banquet-selection-table-wrapper">
+          <h3 class="selection-table-heading" data-i18n="guests:dietaryPreferences">${translate('guests:dietaryPreferences') || 'Dietary Preferences'}</h3>
+          ${partyData.map(member => {
+            const memberRequests = specialRequestsLookup[member.id] || { specialRequest: [], specialRequestDetail: '' };
+            const selectedRequests = Array.isArray(memberRequests.specialRequest) ? memberRequests.specialRequest : [];
+            return `
+              <div class="menu-dietary-card dietary-inline-container" data-member-id="${member.id}" data-member-name="${escapeHtml(member.name)}">
+                <div class="dietary-fallback-member-name">${escapeHtml(member.name)}</div>
+                <div class="dietary-inline-checkboxes">
+                  ${dietaryOptions.map(opt => {
+                    const isSelected = selectedRequests.some(r =>
+                      (typeof r === 'string' && r === opt.name) ||
+                      (typeof r === 'object' && r.name === opt.name && r.selected)
+                    );
+                    return `<label class="dietary-checkbox ${isSelected ? 'checked' : ''}">
+                      <input type="checkbox"
+                        name="dietary-${member.id}"
+                        value="${opt.name}"
+                        data-member-id="${member.id}"
+                        ${isSelected ? 'checked' : ''}
+                        onchange="updateDietaryCheckbox(this)">
+                      <i class="fas ${opt.icon}"></i>
+                      <span data-i18n="guests:dietary${opt.label}">${translate('guests:dietary' + opt.label)}</span>
+                    </label>`;
+                  }).join('')}
+                </div>
+                <div class="special-request-detail">
+                  <label for="special-detail-${member.id}"><div data-i18n="guests:additionalDetailsLabel">${translate('guests:additionalDetailsLabel')}</div></label>
+                  <textarea
+                    id="special-detail-${member.id}"
+                    name="special-detail-${member.id}"
+                    data-i18n="guests:additionalDetails:placeholder"
+                    placeholder="Additional details or specific requirements..."
+                    rows="2"
+                  >${escapeHtml(memberRequests.specialRequestDetail || '')}</textarea>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    // ── Full menu detail section heading ─────────────────────────────────
+    html += `
+      <div class="menu-details-heading">
+        <h3 data-i18n="guests:fullMenuDetails">${translate('guests:fullMenuDetails') || 'Full Menu Details'}</h3>
+      </div>
+    `;
+
+    // ── Read-only course detail cards ─────────────────────────────────────
     const courseGroups = {
       welcome_cocktails: { label: 'guests:courseGroupWelcomeCocktails', icon: 'fa-glass-cheers', courses: [] },
       starter: { label: 'guests:courseGroupStarters', icon: 'fa-seedling', courses: [] },
@@ -178,50 +383,8 @@ async function loadBanquetMenu() {
       }
     });
 
-    // Build a lookup for party member choices: { partyGuestId: { courseId: optionId } }
-    const choicesLookup = {};
-    menuChoicesData.forEach(memberChoice => {
-      const memberId = memberChoice.partyGuestId;
-      choicesLookup[memberId] = {};
-      if (memberChoice.choices) {
-        memberChoice.choices.forEach(choice => {
-          choicesLookup[memberId][choice.courseId] = choice.optionId;
-        });
-      }
-    });
-
-
-    // Helper to get image URL for option
-    const getOptionImageUrl = (option) => {
-      if (!option.image) return null;
-      if (typeof option.image === 'string') {
-        if (option.image.startsWith('data:')) {
-          return option.image;
-        } else if (option.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(option.image)) {
-          return `/api/admin/menu-options/${option.id}/image/thumbnail`;
-        }
-        return option.image;
-      }
-      return null;
-    };
-
-    // Build HTML for the unified menu
-    let html = '<div class="unified-menu-container">';
-    html += `
-      <div class="intro-card intro-section">
-        <h2 class="card-title">
-          <div data-i18n="guests:mainBanquetTitle">Main Banquet - Make Your Selections</div>
-        </h2>
-        <p class="card-description">
-          <div data-i18n="guests:mainBanquetDescription">Please select your meal preferences for each course. Drag and drop guests to their chosen options.</div>
-        </p>
-      </div>
-    `;
-    
-
-    // Iterate through course groups
     const groupOrder = ['welcome_cocktails', 'starter', 'main', 'dessert', 'late_night_snacks', 'drinks'];
-    
+
     groupOrder.forEach(groupKey => {
       const group = courseGroups[groupKey];
       if (!group.courses.length) return;
@@ -235,45 +398,31 @@ async function loadBanquetMenu() {
           <div class="course-group-content">
       `;
 
-      // Iterate through courses in this group - each course gets its own card
       group.courses.forEach(course => {
         const options = course.options || [];
-        // Course is not selectable if: explicitly marked as not required, OR only has one option
         const isSelectable = course.selectionRequired !== false && options.length > 1;
-        
+
         html += `
           <div class="card" data-course-id="${course.id}" data-selectable="${isSelectable}">
             <div class="card-header">
               <h4>${escapeHtml(course.label)}</h4>
-              ${isSelectable ? '<span class="badge badge-warning"><i class="fas fa-hand-pointer"></i> <div data-i18n="guests:selectionRequired">Selection Required</div></span>' : '<span class="badge badge-secondary"><i class="fas fa-info-circle"></i> <div data-i18n="guests:infoOnly">Info Only</div></span>'}
+              ${isSelectable
+                ? '<span class="badge badge-warning"><i class="fas fa-hand-pointer"></i> <div data-i18n="guests:selectionRequired">Selection Required</div></span>'
+                : '<span class="badge badge-secondary"><i class="fas fa-info-circle"></i> <div data-i18n="guests:infoOnly">Info Only</div></span>'
+              }
             </div>
             <div class="card-content">
         `;
 
-        // Iterate through options in this course
-        options.forEach((option, optionIndex) => {
+        options.forEach(option => {
           const imageUrl = getOptionImageUrl(option);
-          
-          // Determine which party members have selected this option (only for selectable courses)
-          let membersForOption = [];
-          if (isSelectable) {
-            partyData.forEach(member => {
-              const memberChoices = choicesLookup[member.id] || {};
-              const selectedOptionId = memberChoices[course.id];
-              
-              if (selectedOptionId === option.id) {
-                membersForOption.push(member);
-              } else if (!selectedOptionId && optionIndex === 0) {
-                // Default: first option gets unassigned members
-                membersForOption.push(member);
-              }
-            });
-          }
+          const closeupUrl = getOptionCloseupUrl(option);
+          const hasBoth = !!(imageUrl && closeupUrl);
 
           html += `
             <div class="menu-option-card" data-option-id="${option.id}" data-course-id="${course.id}">
               <div class="option-card-main">
-                <div class="option-image-container" data-lightbox-url="${imageUrl}">
+                <div class="option-image-container" data-lightbox-url="${imageUrl || ''}" data-lightbox-closeup="${closeupUrl || ''}" data-lightbox-alt="${escapeHtml(option.label)}">
                   ${imageUrl ? `
                     <img src="${imageUrl}" alt="${escapeHtml(option.label)}" class="option-thumbnail" onerror="this.style.display='none'; this.parentElement.classList.add('no-image');">
                   ` : `
@@ -281,6 +430,7 @@ async function loadBanquetMenu() {
                       <i class="fas fa-utensils"></i>
                     </div>
                   `}
+                  ${hasBoth ? `<span class="option-photo-badge" aria-label="${escapeHtml(translate('guests:viewPhotos') || 'View photos')}"><i class="fas fa-camera"></i><span class="option-photo-badge-count">2</span></span>` : ''}
                 </div>
                 <div class="option-details">
                   <div class="option-header-row">
@@ -300,26 +450,9 @@ async function loadBanquetMenu() {
                     ${option.containsSesame ? '<span class="dietary-badge allergens"><i class="fas fa-circle" style="color: #d68910;"></i> Contains Sesame</span>' : ''}
                     ${option.containsLactose ? '<span class="dietary-badge lactose"><i class="fas fa-cheese" style="color: #fd7e14;"></i> Contains Dairy</span>' : ''}
                     ${option.containsNuts ? '<span class="dietary-badge contains-nuts"><i class="fas fa-dot-circle" style="color: #8b4513;"></i> Contains Nuts</span>' : ''}
-                </div>
+                  </div>
                 </div>
               </div>
-              ${isSelectable ? `
-                <div class="option-selection-panel" data-option-id="${option.id}" data-course-id="${course.id}">
-                  <div class="selection-panel-header">
-                    <span class="panel-label"><i class="fas fa-users"></i> <div data-i18n="guests:whosHavingThis">Who's having this?</div></span>
-                    <span class="member-count">${membersForOption.length} <span data-i18n="guests:selectedCount">${translate("guests:selectedCount")}</span></span>
-                  </div>
-                  <div class="member-drop-zone" data-option-id="${option.id}" data-course-id="${course.id}">
-                    ${membersForOption.map(member => `
-                      <div class="member-chip" draggable="true" data-member-id="${member.id}" data-member-name="${escapeHtml(member.name)}">
-                        <i class="fas fa-user"></i>
-                        <span>${escapeHtml(member.name)}</span>
-                        ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:party.primary\">${member.primary ? translate('common:party.primary') : ''}</span>" : ''}
-                      </div>
-                    `).join('')}
-                  </div>
-                </div>
-              ` : ''}
             </div>
           `;
         });
@@ -336,93 +469,12 @@ async function loadBanquetMenu() {
       `;
     });
 
-    // Build special requests lookup from existing choices
-    const specialRequestsLookup = {};
-    menuChoicesData.forEach(memberChoice => {
-      specialRequestsLookup[memberChoice.partyGuestId] = {
-        specialRequest: memberChoice.specialRequest || [],
-        specialRequestDetail: memberChoice.specialRequestDetail || ''
-      };
-    });
-
-    // Add special dietary requests section
-    html += `
-      <div class="special-requests-section">
-        <div class="special-requests-header">
-          <i class="fas fa-exclamation-triangle"></i>
-          <h3><div data-i18n="guests:dietaryRequirementsTitle">Dietary Requirements & Special Requests</div></h3>
-        </div>
-        <p class="special-requests-description"><div data-i18n="guests:dietaryRequirementsDescription">Please let us know about any dietary requirements or allergies for each guest.</div></p>
-        <div class="special-requests-cards">
-    `;
-
-    // Create a card for each party member
-    partyData.forEach(member => {
-      const memberRequests = specialRequestsLookup[member.id] || { specialRequest: [], specialRequestDetail: '' };
-      const selectedRequests = Array.isArray(memberRequests.specialRequest) ? memberRequests.specialRequest : [];
-      
-      const dietaryOptions = [
-        { name: 'vegetarian', label: 'Vegetarian', icon: 'fa-leaf' },
-        { name: 'lactose-intolerant', label: 'Lactose Intolerant', icon: 'fa-cheese' },
-        { name: 'gluten-intolerant', label: 'Gluten Intolerant', icon: 'fa-bread-slice' },
-        { name: 'nut-allergy', label: 'Nut Allergy', icon: 'fa-seedling' },
-        { name: 'other', label: 'Other', icon: 'fa-question-circle' }
-      ];
-
-      html += `
-        <div class="card menu-dietary-card" data-member-id="${member.id}">
-          <div class="card-header">
-            <h4>
-              <i class="fas fa-user"></i>
-              ${escapeHtml(member.name)}
-              ${member.primary ? "<span class=\"badge badge-primary\" data-i18n=\"common:party.primary\">${member.primary ? translate('common:party.primary') : ''}</span>" : ''}
-            </h4>
-          </div>
-          <div class="card-content">
-            ${dietaryOptions.map(opt => {
-              const isSelected = selectedRequests.some(r =>
-                (typeof r === 'string' && r === opt.name) ||
-                (typeof r === 'object' && r.name === opt.name && r.selected)
-              );
-              return `
-                <label class="dietary-checkbox ${isSelected ? 'checked' : ''}">
-                  <input type="checkbox"
-                    name="dietary-${member.id}"
-                    value="${opt.name}"
-                    ${isSelected ? 'checked' : ''}
-                    onchange="updateDietaryCheckbox(this)">
-                  <i class="fas ${opt.icon}"></i>
-                  <span data-i18n="guests:dietary${opt.label}">${translate("guests:dietary" + opt.label)}</span>
-                </label>
-              `;
-            }).join('')}
-          </div>
-          <div class="special-request-detail">
-            <label for="special-detail-${member.id}"><div data-i18n="guests:additionalDetailsLabel">${translate("guests:additionalDetailsLabel")}</div></label>
-            <textarea
-              id="special-detail-${member.id}"
-              name="special-detail-${member.id}"
-              data-i18n="guests:additionalDetails:placeholder"
-              placeholder="Additional details or specific requirements..."
-              rows="3"
-            >${escapeHtml(memberRequests.specialRequestDetail || '')}</textarea>
-          </div>
-        </div>
-      `;
-    });
-
-    html += `
-        </div>
-      </div>
-    `;
-    
-    // Add chef profile section at the bottom (after special requests)
     if (banquetChefData) {
       html += `
         <div class="chef-profile-section">
           <div class="chef-profile-header">
             <i class="fas fa-user-chef"></i>
-            <h3><div data-i18n="guests:meetTheChef">Meet The Chef</div></h3>
+            <h3><div data-i18n="guests:meetTheChef">${translate('guests:meetTheChef') || 'Meet The Chef'}</div></h3>
           </div>
           <div class="chef-profile-card">
             ${banquetChefData.imageUrl ? `
@@ -440,40 +492,19 @@ async function loadBanquetMenu() {
       `;
     }
 
-
     html += '</div>'; // Close unified-menu-container
 
     viewContainer.innerHTML = html;
 
-    // Translate the newly loaded content
-    if (typeof updatePageContent === 'function') {
-      updatePageContent();
-    }
-    
-    // Load auth-protected images
-    if (typeof loadAuthImages === 'function') {
-      loadAuthImages();
-    }
+    if (typeof updatePageContent === 'function') updatePageContent();
+    if (typeof loadAuthImages === 'function') loadAuthImages();
 
-    // Initialize drag and drop functionality
-    initMenuDragDrop();
+    initCustomMenuSelects(viewContainer);
 
-    // Initialize image zoom functionality
-    initImageZoom();
-
-    // Attach auto-save to special request textareas
     document.querySelectorAll('.special-request-detail textarea').forEach(textarea => {
-      // Save on blur (when user clicks away)
-      textarea.addEventListener('blur', () => {
-        autoSaveMenuChoices();
-      });
-      
-      // Save on Enter key (but don't prevent default - allow newlines)
+      textarea.addEventListener('blur', () => autoSaveMenuChoices());
       textarea.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-          // Ctrl+Enter or Cmd+Enter saves immediately
-          autoSaveMenuChoices();
-        }
+        if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) autoSaveMenuChoices();
       });
     });
 
@@ -489,346 +520,129 @@ async function loadBanquetMenu() {
         </button>
       </div>
     `;
+    if (typeof updatePageContent === 'function') updatePageContent();
+  }
+}
 
-    // Even on error, try to translate any remaining content
-    if (typeof updatePageContent === 'function') {
-      updatePageContent();
+// ── Selection change handler ──────────────────────────────────────────────────
+
+window.onMenuSelectChange = function(wrapper) {
+  const cell = wrapper.closest('.course-choice-cell');
+  if (!cell) return;
+
+  const memberId = wrapper.dataset.memberId;
+  const courseId = wrapper.dataset.courseId;
+  const optionId = wrapper.dataset.value;
+  const selectedItem = optionId ? wrapper.querySelector(`.cms-option[data-value="${optionId}"]`) : null;
+  const allowsCookingPref = selectedItem && selectedItem.dataset.allowsCookingPref === 'true';
+
+  const cookingSelect = cell.querySelector('.cooking-pref-inline');
+  if (allowsCookingPref) {
+    cookingSelect.style.display = '';
+  } else {
+    cookingSelect.style.display = 'none';
+    if (window.cookingPrefsData && window.cookingPrefsData[memberId]) {
+      delete window.cookingPrefsData[memberId][courseId];
     }
   }
-}
 
-// Load day menu (informational only - day1 or day3)
-async function loadDayMenu(day) {
-  const viewContainer = document.getElementById('menu-view-container');
-  
-  if (!viewContainer) return;
-  
-  try {
-    const dayMenusResponse = await fetch(`/api/guest/day-menus?lang=${window.currentLanguage}`, {
-      method: 'GET',
-      headers: { 'Authorization': window.token }
-    });
-    if (dayMenusResponse.ok) {
-      dayMenusData = await dayMenusResponse.json();
-    }
-  } catch (err) {
-    console.error('Error refreshing day menus:', err);
-  }
-  
-  const dayMenu = dayMenusData.find(m => m.day === day);
-  
-  if (!dayMenu) {
-    viewContainer.innerHTML = `
-      <div class="info-card">
-        <p><div data-i18n="guests:menuInfoNotAvailable">Menu information not yet available.</div></p>
-      </div>
-    `;
-    return;
-  }
-  
-  let html = '<div class="day-menu-container">';
-  
-  // Title based on day
-  const title = day === 'day1' ? 'Welcome Cocktails Menu' : 'Wedding Brunch Menu';
-  const titleKey = day === 'day1' ? 'guests:welcomeCocktailsMenuTitle' : 'guests:weddingBrunchMenuTitle';
-  
-  html += `
-    <div class="intro-card intro-section">
-      <h2 class="card-title">
-        <div data-i18n="${titleKey}">${title}</div>
-      </h2>
-      <p class="card-description">
-        <div data-i18n="guests:dayMenuDescription">Information about the menu for this event.</div>
-      </p>
-    </div>
-  `;
-  
-  // Render sections
-  dayMenu.sections.forEach(section => {
-    html += `
-      <div class="day-menu-section">
-        <h3 class="section-title">${escapeHtml(section.title)}</h3>
-        ${section.imageUrl ? `
-          <div class="section-image">
-            <img data-auth-src="${section.imageUrl}" alt="${escapeHtml(section.title)}" onerror="this.style.display='none';">
-          </div>
-        ` : ''}
-        <div class="section-content">${escapeHtml(section.content)}</div>
-      </div>
-    `;
-  });
-  
-  // Add chef profile at the bottom
-  if (dayMenu.chefProfile) {
-    html += `
-      <div class="chef-profile-section">
-        <div class="chef-profile-header">
-          <i class="fas fa-user-chef"></i>
-          <h3><div data-i18n="guests:meetTheChef">Meet The Chef</div></h3>
-        </div>
-        <div class="chef-profile-card">
-          ${dayMenu.chefProfile.imageUrl ? `
-            <div class="chef-photo">
-              <img data-auth-src="${dayMenu.chefProfile.imageUrl}" alt="${escapeHtml(dayMenu.chefProfile.name)}" onerror="this.style.display='none';">
-              <span style="display:none;"></span>
-            </div>
-          ` : ''}
-          <div class="chef-info">
-            <h4 class="chef-name">${escapeHtml(dayMenu.chefProfile.name)}</h4>
-            <div class="chef-bio">${dayMenu.chefProfile.bio}</div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
-  
-  html += '</div>'; // Close day-menu-container
-  
-  viewContainer.innerHTML = html;
-  
-  // Translate the newly loaded content
-  if (typeof updatePageContent === 'function') {
-    updatePageContent();
-  }
-  
-  // Load auth-protected images
-  if (typeof loadAuthImages === 'function') {
-    loadAuthImages();
-  }
-}
-
-// Initialize image zoom functionality for menu thumbnails
-function initImageZoom() {
-  // Create zoom overlay element
-  const zoomOverlay = document.createElement('div');
-  zoomOverlay.className = 'image-zoom-overlay';
-  zoomOverlay.innerHTML = '<img src="" alt="Zoomed Image" class="zoom-image">';
-  document.body.appendChild(zoomOverlay);
-
-  // Get all image containers
-  const imageContainers = document.querySelectorAll('.option-image-container');
-  
-  imageContainers.forEach(container => {
-    const img = container.querySelector('.option-thumbnail');
-    
-    if (!img) return; // Skip if no image found
-    
-    container.addEventListener('mouseenter', function(e) {
-      const imageUrl = img.src;
-      
-      if (!imageUrl || imageUrl === '') return;
-      
-      // Show zoom overlay
-      const zoomImg = zoomOverlay.querySelector('.zoom-image');
-      zoomImg.src = imageUrl;
-      zoomOverlay.style.display = 'block';
-      
-      // Position overlay
-      positionZoomOverlay(e);
-    });
-    
-    container.addEventListener('mousemove', function(e) {
-      if (zoomOverlay.style.display === 'block') {
-        positionZoomOverlay(e);
-      }
-    });
-    
-    container.addEventListener('mouseleave', function() {
-      zoomOverlay.style.display = 'none';
-    });
-  });
-  
-  // Position the zoom overlay based on mouse position
-  function positionZoomOverlay(e) {
-    const zoomImg = zoomOverlay.querySelector('.zoom-image');
-    const overlay = zoomOverlay;
-    
-    // Get mouse position
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
-    
-    // Get viewport dimensions
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-    
-    // Default zoom image dimensions
-    const zoomWidth = 300;
-    const zoomHeight = 300;
-    
-    // Calculate position (try to keep overlay on screen)
-    let left = mouseX + 20; // Offset from cursor
-    let top = mouseY + 20;
-    
-    // Adjust if going off right edge
-    if (left + zoomWidth > viewportWidth) {
-      left = mouseX - zoomWidth - 20;
-    }
-    
-    // Adjust if going off bottom edge
-    if (top + zoomHeight > viewportHeight) {
-      top = mouseY - zoomHeight - 20;
-    }
-    
-    // Adjust if going off left edge
-    if (left < 10) {
-      left = 10;
-    }
-    
-    // Adjust if going off top edge
-    if (top < 10) {
-      top = 10;
-    }
-    
-    // Apply positioning
-    overlay.style.left = left + 'px';
-    overlay.style.top = top + 'px';
-  }
-}
-
-// Initialize drag and drop for menu selections
-function initMenuDragDrop() {
-  const memberChips = document.querySelectorAll('.member-chip');
-  const dropZones = document.querySelectorAll('.member-drop-zone');
-
-  memberChips.forEach(chip => {
-    chip.addEventListener('dragstart', handleDragStart);
-    chip.addEventListener('dragend', handleDragEnd);
-  });
-
-  dropZones.forEach(zone => {
-    zone.addEventListener('dragover', handleDragOver);
-    zone.addEventListener('dragenter', handleDragEnter);
-    zone.addEventListener('dragleave', handleDragLeave);
-    zone.addEventListener('drop', handleDrop);
-  });
-}
-
-function handleDragStart(e) {
-  draggedChip = this;
-  this.classList.add('dragging');
-  e.dataTransfer.effectAllowed = 'move';
-  e.dataTransfer.setData('text/plain', this.dataset.memberId);
-  
-  // Highlight valid drop zones (same course)
-  const courseId = this.closest('.member-drop-zone').dataset.courseId;
-  document.querySelectorAll(`.member-drop-zone[data-course-id="${courseId}"]`).forEach(zone => {
-    zone.classList.add('drop-target-highlight');
-  });
-}
-
-function handleDragEnd(e) {
-  this.classList.remove('dragging');
-  document.querySelectorAll('.member-drop-zone').forEach(zone => {
-    zone.classList.remove('drop-target-highlight', 'drag-over');
-  });
-  draggedChip = null;
-}
-
-function handleDragOver(e) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-}
-
-function handleDragEnter(e) {
-  e.preventDefault();
-  if (draggedChip) {
-    const draggedCourseId = draggedChip.closest('.member-drop-zone').dataset.courseId;
-    if (this.dataset.courseId === draggedCourseId) {
-      this.classList.add('drag-over');
-    }
-  }
-}
-
-function handleDragLeave(e) {
-  this.classList.remove('drag-over');
-}
-
-function handleDrop(e) {
-  e.preventDefault();
-  this.classList.remove('drag-over');
-  
-  if (!draggedChip) return;
-  
-  const draggedCourseId = draggedChip.closest('.member-drop-zone').dataset.courseId;
-  const targetCourseId = this.dataset.courseId;
-  
-  // Only allow drops within the same course
-  if (draggedCourseId !== targetCourseId) return;
-  
-  // Move the chip to the new zone
-  this.appendChild(draggedChip);
-  
-  // Update the member counts
-  updateMemberCounts(targetCourseId);
-  
-  // Auto-save the change
   autoSaveMenuChoices();
-}
+  if (memberId) checkDietaryConflicts(memberId);
+};
 
-function updateMemberCounts(courseId) {
-  const dropZones = document.querySelectorAll(`.member-drop-zone[data-course-id="${courseId}"]`);
-  dropZones.forEach(zone => {
-    const count = zone.querySelectorAll('.member-chip').length;
-    const panel = zone.closest('.option-selection-panel');
-    if (panel) {
-      const countSpan = panel.querySelector('.member-count');
-      if (countSpan) {
-        countSpan.textContent = `${count} ${translate("guests:selectedCount")}`;
-      }
-    }
-  });
-}
-
-// Auto-save function - saves with user notification
-async function autoSaveMenuChoices() {
-  // Debounce to avoid too many saves
-  if (window.autoSaveTimeout) {
-    clearTimeout(window.autoSaveTimeout);
-  }
-  window.autoSaveTimeout = setTimeout(async () => {
-    await saveAllMenuChoices(false); // false = show notification
-  }, 500); // Wait 500ms after last change
-}
-
-// Update dietary checkbox visual state and auto-save
-window.updateDietaryCheckbox = function(checkbox) {
-  const label = checkbox.closest('.dietary-checkbox');
-  if (label) {
-    if (checkbox.checked) {
-      label.classList.add('checked');
-    } else {
-      label.classList.remove('checked');
-    }
-  }
+window.onCookingPrefChange = function(select) {
+  const memberId = select.dataset.memberId;
+  const courseId = select.dataset.courseId;
+  if (!window.cookingPrefsData) window.cookingPrefsData = {};
+  if (!window.cookingPrefsData[memberId]) window.cookingPrefsData[memberId] = {};
+  window.cookingPrefsData[memberId][courseId] = select.value;
   autoSaveMenuChoices();
 };
 
-// Save all menu choices (silent = true for auto-save, false for manual save)
+// ── Auto-save ────────────────────────────────────────────────────────────────
+
+async function autoSaveMenuChoices() {
+  if (window.autoSaveTimeout) clearTimeout(window.autoSaveTimeout);
+  window.autoSaveTimeout = setTimeout(async () => {
+    await saveAllMenuChoices(false);
+  }, 500);
+}
+
+window.updateDietaryCheckbox = function(checkbox) {
+  const label = checkbox.closest('.dietary-checkbox');
+  if (label) {
+    label.classList.toggle('checked', checkbox.checked);
+  }
+  const memberId = checkbox.dataset.memberId;
+  autoSaveMenuChoices();
+  if (memberId) checkDietaryConflicts(memberId);
+};
+
+// ── Dietary conflict checker ──────────────────────────────────────────────────
+
+function checkDietaryConflicts(memberId) {
+  const dietaryCard = document.querySelector(`.menu-dietary-card[data-member-id="${memberId}"]`);
+  if (!dietaryCard) return;
+
+  const checkedPrefs = new Set();
+  dietaryCard.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+    checkedPrefs.add(cb.value);
+  });
+  if (checkedPrefs.size === 0) return;
+
+  const memberName = dietaryCard.dataset.memberName || 'Guest';
+  const conflicts = [];
+
+  document.querySelectorAll(`.custom-menu-select[data-member-id="${memberId}"]`).forEach(wrapper => {
+    const optionId = wrapper.dataset.value;
+    if (!optionId) return;
+    const selectedItem = wrapper.querySelector(`.cms-option[data-value="${optionId}"]`);
+    if (!selectedItem) return;
+
+    const isVegetarian = selectedItem.dataset.isVegetarian === 'true';
+    const isVegan = selectedItem.dataset.isVegan === 'true';
+    const containsLactose = selectedItem.dataset.containsLactose === 'true';
+    const containsGluten = selectedItem.dataset.containsGluten === 'true';
+    const containsNuts = selectedItem.dataset.containsNuts === 'true';
+
+    const optionLabel = wrapper.querySelector('.cms-trigger-label')?.textContent?.trim() || 'selection';
+
+    if (checkedPrefs.has('vegetarian') && !isVegetarian && !isVegan) {
+      conflicts.push(translateWithVars('guests:conflict.notVegetarian', { option: optionLabel }));
+    }
+    if (checkedPrefs.has('lactose-intolerant') && containsLactose) {
+      conflicts.push(translateWithVars('guests:conflict.containsDairy', { option: optionLabel }));
+    }
+    if (checkedPrefs.has('gluten-intolerant') && containsGluten) {
+      conflicts.push(translateWithVars('guests:conflict.containsGluten', { option: optionLabel }));
+    }
+    if (checkedPrefs.has('nut-allergy') && containsNuts) {
+      conflicts.push(translateWithVars('guests:conflict.containsNuts', { option: optionLabel }));
+    }
+  });
+
+  conflicts.forEach(msg => {
+    showToast(`⚠️ ${memberName}: ${msg}`, 'warning');
+  });
+}
+
+// ── Save all menu choices ─────────────────────────────────────────────────────
+
 async function saveAllMenuChoices(silent = false) {
   if (!silent) {
     console.log('Saving menu selections...');
   }
 
   try {
-    // Build choices from current DOM state
     const partyChoices = {};
-    
-    // Find all member chips and their current positions (menu selections)
-    document.querySelectorAll('.member-chip').forEach(chip => {
-      const memberId = chip.dataset.memberId;
-      
-      // Skip invalid member IDs
-      if (!memberId || memberId === 'null' || memberId === 'undefined') {
-        return;
-      }
-      
-      const dropZone = chip.closest('.member-drop-zone');
-      
-      if (!dropZone) return;
-      
-      const optionId = dropZone.dataset.optionId;
-      const courseId = dropZone.dataset.courseId;
-      
+
+    document.querySelectorAll('.custom-menu-select').forEach(wrapper => {
+      const memberId = wrapper.dataset.memberId;
+      const courseId = wrapper.dataset.courseId;
+      const optionId = wrapper.dataset.value;
+
+      if (!memberId || memberId === 'null' || memberId === 'undefined' || !optionId) return;
+
       if (!partyChoices[memberId]) {
         partyChoices[memberId] = {
           partyGuestId: memberId,
@@ -837,26 +651,19 @@ async function saveAllMenuChoices(silent = false) {
           specialRequestDetail: null
         };
       }
-      
-      // Check if we already have a choice for this course
-      const existingChoice = partyChoices[memberId].choices.find(c => c.courseId === courseId);
-      if (!existingChoice) {
-        partyChoices[memberId].choices.push({
-          courseId: courseId,
-          optionId: optionId
-        });
-      }
+
+      partyChoices[memberId].choices.push({
+        courseId,
+        optionId,
+        cookingPreference: window.cookingPrefsData?.[memberId]?.[courseId] || undefined
+      });
     });
 
-    // Collect special dietary requests for each member
+    // Collect special dietary requests
     document.querySelectorAll('.menu-dietary-card').forEach(card => {
       const memberId = card.dataset.memberId;
-      
-      // Skip invalid member IDs
-      if (!memberId || memberId === 'null' || memberId === 'undefined') {
-        return;
-      }
-      
+      if (!memberId || memberId === 'null' || memberId === 'undefined') return;
+
       if (!partyChoices[memberId]) {
         partyChoices[memberId] = {
           partyGuestId: memberId,
@@ -865,38 +672,27 @@ async function saveAllMenuChoices(silent = false) {
           specialRequestDetail: null
         };
       }
-      
-      // Get selected dietary options
+
       const selectedOptions = [];
       card.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
-        selectedOptions.push({
-          name: checkbox.value,
-          selected: true
-        });
+        selectedOptions.push({ name: checkbox.value, selected: true });
       });
       partyChoices[memberId].specialRequest = selectedOptions;
-      
-      // Get free text detail
+
       const detailTextarea = card.querySelector('textarea');
-      if (detailTextarea && detailTextarea.value.trim()) {
-        partyChoices[memberId].specialRequestDetail = detailTextarea.value.trim();
-      } else {
-        partyChoices[memberId].specialRequestDetail = null;
-      }
+      partyChoices[memberId].specialRequestDetail = detailTextarea && detailTextarea.value.trim()
+        ? detailTextarea.value.trim()
+        : null;
     });
 
-    // Convert to array format expected by API, filtering out any with invalid IDs
     const choicesArray = Object.values(partyChoices).filter(choice => {
       const isValid = choice.partyGuestId &&
                       choice.partyGuestId !== 'null' &&
                       choice.partyGuestId !== 'undefined';
-      if (!isValid) {
-        console.warn('Filtering out invalid choice:', choice);
-      }
+      if (!isValid) console.warn('Filtering out invalid choice:', choice);
       return isValid;
     });
-    
-    // Send to server
+
     const response = await fetch('/api/guest/menu-choices', {
       method: 'PUT',
       headers: {
@@ -908,38 +704,128 @@ async function saveAllMenuChoices(silent = false) {
 
     if (response.ok) {
       if (!silent) {
-        showToast(`<div data-i18n="common:menu.selections.saved">${translate('common:menu.selections.saved')}</div>`, 'success');
+        showToast(translate('common:menu.selections.saved'), 'success');
       }
     } else {
       const data = await response.json();
-      showToast(`<div data-i18n="common:error.saving.menu.selections">${(data.error || translate('common:error.saving.menu.selections'))}</div>`, 'error');
+      const msg = data.errorCode
+        ? translate(`common:error.${data.errorCode}`) || translate('common:error.saving.menu.selections')
+        : data.error || translate('common:error.saving.menu.selections');
+      showToast(msg, 'error');
     }
   } catch (err) {
     console.error('Error saving menu choices:', err);
     if (!silent) {
-      showToast(`<div data-i18n="common:error.saving.menu.selections">${translate('common:error.saving.menu.selections')}</div>`, 'error');
+      showToast(translate('common:error.saving.menu.selections'), 'error');
     }
   }
 }
 
-// Make menu functions globally accessible
-window.loadMenuSelections = loadMenuSelections;
+// ── Image zoom on hover ───────────────────────────────────────────────────────
+
+function initCustomMenuSelects(container) {
+  const closeAll = (except) => {
+    container.querySelectorAll('.custom-menu-select.open').forEach(w => {
+      if (w !== except) {
+        w.classList.remove('open');
+        const p = w.querySelector('.cms-panel');
+        p.style.display = 'none';
+        w.querySelector('.cms-trigger').setAttribute('aria-expanded', 'false');
+      }
+    });
+  };
+
+  const positionPanel = (wrapper, panel) => {
+    const rect = wrapper.getBoundingClientRect();
+    panel.style.position = 'fixed';
+    panel.style.left = rect.left + 'px';
+    panel.style.top = (rect.bottom + 4) + 'px';
+    panel.style.width = rect.width + 'px';
+    panel.style.maxHeight = Math.min(320, window.innerHeight - rect.bottom - 12) + 'px';
+  };
+
+  container.querySelectorAll('.custom-menu-select').forEach(wrapper => {
+    const trigger = wrapper.querySelector('.cms-trigger');
+    const panel = wrapper.querySelector('.cms-panel');
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = wrapper.classList.contains('open');
+      closeAll(null);
+      if (!isOpen) {
+        wrapper.classList.add('open');
+        panel.style.display = 'block';
+        positionPanel(wrapper, panel);
+        trigger.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    panel.addEventListener('click', (e) => e.stopPropagation());
+
+    panel.querySelectorAll('.cms-option').forEach(option => {
+      option.addEventListener('click', () => {
+        const value = option.dataset.value;
+        const imgUrl = option.dataset.imageUrl || '';
+        const titleEl = option.querySelector('.cms-option-title');
+        const label = titleEl ? titleEl.textContent : '';
+
+        wrapper.dataset.value = value;
+
+        panel.querySelectorAll('.cms-option').forEach(o => o.classList.remove('selected'));
+        if (value) option.classList.add('selected');
+
+        const triggerImg = trigger.querySelector('.cms-trigger-img');
+        if (imgUrl) {
+          triggerImg.src = imgUrl;
+          triggerImg.classList.remove('cms-trigger-img--empty');
+          triggerImg.style.display = '';
+        } else {
+          triggerImg.src = '';
+          triggerImg.classList.add('cms-trigger-img--empty');
+          triggerImg.style.display = 'none';
+        }
+        trigger.querySelector('.cms-trigger-label').textContent = label;
+
+        wrapper.classList.remove('open');
+        panel.style.display = 'none';
+        trigger.setAttribute('aria-expanded', 'false');
+
+        window.onMenuSelectChange(wrapper);
+      });
+    });
+  });
+
+  document.addEventListener('click', () => closeAll(null));
+}
+
+
 
 // ============================================================================
 // Image Lightbox Functionality
 // ============================================================================
 
 function initializeLightbox() {
-  // Create lightbox HTML if it doesn't exist
+  const tr = (k, fb) => (typeof translate === 'function' ? translate(k) : '') || fb;
+
   if (!document.getElementById('image-lightbox')) {
     const lightboxHTML = `
-      <div id="image-lightbox" class="lightbox" style="display: none;">
+      <div id="image-lightbox" class="lightbox" style="display: none;" role="dialog" aria-modal="true">
         <div class="lightbox-backdrop"></div>
         <div class="lightbox-content">
           <button class="lightbox-close" aria-label="Close">
             <i class="fas fa-times"></i>
           </button>
           <img src="" alt="" class="lightbox-image">
+          <div class="lightbox-toggle" role="tablist" hidden>
+            <button type="button" class="lightbox-toggle-btn is-active" data-view="wide" role="tab" aria-selected="true">
+              <i class="fas fa-image"></i>
+              <span>${tr('guests:photoToggleWide', 'Wide')}</span>
+            </button>
+            <button type="button" class="lightbox-toggle-btn" data-view="closeup" role="tab" aria-selected="false">
+              <i class="fas fa-search-plus"></i>
+              <span>${tr('guests:photoToggleCloseup', 'Close-up')}</span>
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -950,68 +836,89 @@ function initializeLightbox() {
   const lightboxImg = lightbox.querySelector('.lightbox-image');
   const closeBtn = lightbox.querySelector('.lightbox-close');
   const backdrop = lightbox.querySelector('.lightbox-backdrop');
+  const toggle = lightbox.querySelector('.lightbox-toggle');
+  const toggleBtns = toggle ? toggle.querySelectorAll('.lightbox-toggle-btn') : [];
+  let currentPair = { wide: '', closeup: '', alt: '' };
+  let currentView = 'wide';
+  let returnFocusEl = null;
 
-  // Function to open lightbox
-  function openLightbox(imageUrl, altText) {
-    lightboxImg.src = imageUrl;
-    lightboxImg.alt = altText;
-    lightbox.style.display = 'flex';
-    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  function setView(view) {
+    if (view === 'closeup' && !currentPair.closeup) view = 'wide';
+    currentView = view;
+    lightboxImg.src = view === 'closeup' ? currentPair.closeup : currentPair.wide;
+    toggleBtns.forEach(b => {
+      const active = b.dataset.view === view;
+      b.classList.toggle('is-active', active);
+      b.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
   }
 
-  // Function to close lightbox
+  function openLightbox(wideUrl, altText, closeupUrl, triggerEl) {
+    currentPair = { wide: wideUrl || '', closeup: closeupUrl || '', alt: altText || '' };
+    lightboxImg.alt = altText || '';
+    if (toggle) toggle.hidden = !closeupUrl;
+    setView('wide');
+    lightbox.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    returnFocusEl = triggerEl || null;
+    setTimeout(() => closeBtn.focus(), 0);
+  }
+
   function closeLightbox() {
     lightbox.style.display = 'none';
-    document.body.style.overflow = ''; // Restore scrolling
-    lightboxImg.src = ''; // Clear image
+    document.body.style.overflow = '';
+    lightboxImg.src = '';
+    currentPair = { wide: '', closeup: '', alt: '' };
+    if (returnFocusEl && typeof returnFocusEl.focus === 'function') {
+      try { returnFocusEl.focus(); } catch (_) {}
+    }
+    returnFocusEl = null;
   }
 
-  // Add click handlers to all menu images
   document.addEventListener('click', (e) => {
     const imageContainer = e.target.closest('.option-image-container');
     if (imageContainer && imageContainer.dataset.lightboxUrl) {
-      const imageUrl = imageContainer.dataset.lightboxUrl;
-      const altText = imageContainer.querySelector('img')?.alt || 'Menu item';
-      openLightbox(imageUrl, altText);
+      const wideUrl = imageContainer.dataset.lightboxUrl;
+      const closeupUrl = imageContainer.dataset.lightboxCloseup || '';
+      const altText = imageContainer.dataset.lightboxAlt || imageContainer.querySelector('img')?.alt || 'Menu item';
+      openLightbox(wideUrl, altText, closeupUrl, imageContainer);
     }
   });
 
-  // Close button
-  closeBtn.addEventListener('click', closeLightbox);
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      setView(btn.dataset.view);
+    });
+  });
 
-  // Click backdrop to close
+  closeBtn.addEventListener('click', closeLightbox);
   backdrop.addEventListener('click', closeLightbox);
 
-  // Escape key to close
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && lightbox.style.display === 'flex') {
-      closeLightbox();
+    if (lightbox.style.display !== 'flex') return;
+    if (e.key === 'Escape') { closeLightbox(); return; }
+    if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && currentPair.closeup) {
+      e.preventDefault();
+      setView(currentView === 'wide' ? 'closeup' : 'wide');
     }
   });
 
-  // Mobile touch support: swipe down to close
-  let touchStartY = 0;
-  let touchEndY = 0;
-
+  let touchStartX = 0, touchStartY = 0;
   lightbox.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].screenX;
     touchStartY = e.changedTouches[0].screenY;
   });
-
   lightbox.addEventListener('touchend', (e) => {
-    touchEndY = e.changedTouches[0].screenY;
-    handleSwipe();
-  });
-
-  function handleSwipe() {
-    const swipeDistance = touchEndY - touchStartY;
-    // If swiped down more than 100px, close
-    if (swipeDistance > 100) {
-      closeLightbox();
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+    if (Math.abs(dy) > Math.abs(dx) && dy > 100) { closeLightbox(); return; }
+    if (currentPair.closeup && Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+      setView(dx < 0 ? 'closeup' : 'wide');
     }
-  }
+  });
 }
 
-// Initialize lightbox when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeLightbox);
 } else {

@@ -3,6 +3,23 @@ const { formatCourseForApi, formatCourseOptionForApi } = require('../utils/forma
 const { generateSelectionIconHTML, generateDietaryIconsHTML } = require('../utils/menuIcons');
 const { getLang, mergeLocalizedString, localize } = require('../utils/localized');
 
+const OBJECT_ID_RE = /^[0-9a-fA-F]{24}$/;
+
+function assignImageRef(option, field, value) {
+  if (value === undefined) return;
+  if (value === null || value === '') {
+    option[field] = null;
+    return;
+  }
+  if (typeof value === 'object' && value.imageId) {
+    option[field] = value.imageId;
+    return;
+  }
+  if (typeof value === 'string' && OBJECT_ID_RE.test(value)) {
+    option[field] = value;
+  }
+}
+
 // Helper to format menu part for API response
 function formatMenuCourseForApi(menuPart, index) {
   return {
@@ -31,6 +48,7 @@ async function listCourses(req, res, next) {
     for (const course of courses) {
       const options = await CourseOption.find({ courseId: course._id })
         .populate('image')
+        .populate('imageCloseup')
         .sort({ createdAt: 1 });
       
       menuData.push({
@@ -148,6 +166,7 @@ async function listCourseOptions(req, res, next) {
     
     const options = await CourseOption.find({ courseId })
       .populate('image')
+      .populate('imageCloseup')
       .sort({ createdAt: 1 });
     const formatted = options.map(option => formatCourseOptionForApi(option, lang));
     res.json(formatted);
@@ -169,7 +188,8 @@ async function getCourseOptionById(req, res, next) {
     }
 
     const option = await CourseOption.findOne({ _id: optionId, courseId })
-      .populate('image');
+      .populate('image')
+      .populate('imageCloseup');
     if (!option) {
       return res.status(404).json({ error: 'Course option not found' });
     }
@@ -276,6 +296,20 @@ async function updateGuestCourseOption(req, res, next) {
         if (!item.optionId) {
           return res.status(400).json({ error: 'optionId is required' });
         }
+
+        const [course, option] = await Promise.all([
+          Course.findById(item.courseId),
+          CourseOption.findById(item.optionId)
+        ]);
+        if (course && option && course.selectionRequired && option.allowsCookingPreference) {
+          const validPreferences = ['rare', 'medium-rare', 'medium', 'well-done'];
+          if (!item.cookingPreference || !validPreferences.includes(item.cookingPreference)) {
+            const optionName = option.label instanceof Map
+              ? (option.label.get('en') || option.label.values().next().value || '')
+              : (option.label?.en || Object.values(option.label || {})[0] || '');
+            return res.status(400).json({ errorCode: 'cookingPreference.required' });
+          }
+        }
       }
 
       // Validate specialRequest - supports both string (legacy) and array (new) formats
@@ -298,7 +332,11 @@ async function updateGuestCourseOption(req, res, next) {
     // Update or create menu choices
     const partyChoicesToSave = choices.map(choice => ({
       partyGuestId: choice.partyGuestId,
-      choices: choice.choices,
+      choices: (choice.choices || []).map(item => ({
+        courseId: item.courseId,
+        optionId: item.optionId,
+        cookingPreference: item.cookingPreference || 'medium'
+      })),
       specialRequests: choice.specialRequest || [],
       specialRequestDetail: choice.specialRequestDetail || ''
     }));
@@ -323,11 +361,11 @@ async function createCourseOption(req, res, next) {
     const {
       label,
       description,
-      image, // or other non-localised fields like price, etc.
+      image,
+      imageCloseup,
       ...rest
     } = req.body;
 
-    // Verify course exists (optional but nice)
     const course = await Course.findById(courseId);
     if (!course) {
       return res.status(404).json({ error: 'Course not found' });
@@ -338,20 +376,11 @@ async function createCourseOption(req, res, next) {
       ...rest,
     });
 
-    // Localised fields
     option.label = mergeLocalizedString(undefined, label, lang);
     option.description = mergeLocalizedString(undefined, description, lang);
 
-    // Non-localised image
-    if (image !== undefined) {
-      if (image === null) {
-        option.image = null;
-      } else if (typeof image === 'object' && image.imageId) {
-        option.image = image.imageId;
-      } else if (typeof image === 'string' && image.length === 24 && /^[0-9a-fA-F]{24}$/.test(image)) {
-        option.image = image;
-      }
-    }
+    assignImageRef(option, 'image', image);
+    assignImageRef(option, 'imageCloseup', imageCloseup);
 
     await option.save();
     res.status(201).json(formatCourseOptionForApi(option));
@@ -369,6 +398,7 @@ async function updateCourseOption(req, res, next) {
       label,
       description,
       image,
+      imageCloseup,
       ...rest
     } = req.body;
 
@@ -377,19 +407,10 @@ async function updateCourseOption(req, res, next) {
       return res.status(404).json({ error: 'Course option not found' });
     }
 
-    // Non-localised stuff
     Object.assign(option, rest);
-    if (image !== undefined) {
-      if (image === null) {
-        option.image = null;
-      } else if (typeof image === 'object' && image.imageId) {
-        option.image = image.imageId;
-      } else if (typeof image === 'string' && image.length === 24 && /^[0-9a-fA-F]{24}$/.test(image)) {
-        option.image = image;
-      }
-    }
+    assignImageRef(option, 'image', image);
+    assignImageRef(option, 'imageCloseup', imageCloseup);
 
-    // Localised fields: merge per-language
     option.label = mergeLocalizedString(option.label, label, lang);
     option.description = mergeLocalizedString(option.description, description, lang);
 

@@ -275,6 +275,7 @@
     "image": null,
     "isSpicy": false,
     "isVegetarian": false,
+    "allowsCookingPreference": true,
     "label": {
       "en": "Slow-Braised Beef Cheek in Rioja"
     },

@@ -192,9 +192,17 @@ window.showMessage = (elementId, msg, type = 'error') => {
   }, 5000);
 }
 
-// Function to show toast notifications
 window.showToast = function(message, type = 'success') {
-  // Create a toast element
+  const durations = { success: 5000, warning: 8000, error: 7000, info: 5000 };
+  const duration = durations[type] || 5000;
+
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    document.body.appendChild(container);
+  }
+
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
   toast.innerHTML = `
@@ -203,18 +211,16 @@ window.showToast = function(message, type = 'success') {
       <span>${message}</span>
     </div>
   `;
-  
-  //Add to the body
-  document.body.appendChild(toast);
-  
-  // Show with animation
+
+  container.appendChild(toast);
   setTimeout(() => toast.classList.add('show'), 100);
-  
-  // Hide after 3 seconds
+
   setTimeout(() => {
     toast.classList.remove('show');
-    setTimeout(() => document.body.removeChild(toast), 300);
-  }, 3000);
+    setTimeout(() => {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 300);
+  }, duration);
 }
 
 // Function to show custom confirmation dialog

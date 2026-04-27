@@ -777,7 +777,8 @@ async function getMenuResponses(req, res, next) {
         const choices = (pc.choices || []).map(c => ({
           courseId: c.courseId ? c.courseId.toString() : null,
           optionId: c.optionId ? c.optionId.toString() : null,
-          optionLabel: c.optionId ? (optionLabelMap[c.optionId.toString()] || '—') : '—'
+          optionLabel: c.optionId ? (optionLabelMap[c.optionId.toString()] || '—') : '—',
+          cookingPreference: c.cookingPreference || null
         }));
 
         const specialReqs = (pc.specialRequests || []).filter(sr => sr.selected).map(sr => sr.name);
@@ -1086,7 +1087,8 @@ async function getBanquetSeatingPrint(req, res, next) {
           const choice = pc?.choices?.find(ch => ch.courseId?.toString() === cid);
           mealChoices.push({
             course: courseMap[cid],
-            selected: choice ? (optionMap[choice.optionId?.toString()] || null) : null
+            selected: choice ? (optionMap[choice.optionId?.toString()] || null) : null,
+            cookingPreference: choice?.cookingPreference || null
           });
         });
 
@@ -1126,7 +1128,8 @@ async function getBanquetSeatingPrint(req, res, next) {
             const choice = pc?.choices?.find(ch => ch.courseId?.toString() === cid);
             mealChoices.push({
               course: courseMap[cid],
-              selected: choice ? (optionMap[choice.optionId?.toString()] || null) : null
+              selected: choice ? (optionMap[choice.optionId?.toString()] || null) : null,
+              cookingPreference: choice?.cookingPreference || null
             });
           });
 

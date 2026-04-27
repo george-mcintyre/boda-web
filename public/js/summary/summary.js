@@ -108,14 +108,17 @@ try {
     });
     }
     
-    // Build menu choices lookup: { partyGuestId: { courseId: optionId } }
+    // Build menu choices lookup: { partyGuestId: { courseId: { optionId, cookingPreference } } }
     const menuChoicesLookup = {};
     menuChoices.forEach(memberChoice => {
     const memberId = memberChoice.partyGuestId;
     menuChoicesLookup[memberId] = {};
     if (memberChoice.choices) {
         memberChoice.choices.forEach(choice => {
-        menuChoicesLookup[memberId][choice.courseId] = choice.optionId;
+        menuChoicesLookup[memberId][choice.courseId] = {
+            optionId: choice.optionId,
+            cookingPreference: choice.cookingPreference || null
+        };
         });
     }
     });
@@ -278,18 +281,20 @@ try {
         const sortedMenu = menu.slice().sort((a, b) => (courseOrder[a.course] || 999) - (courseOrder[b.course] || 999));
         
         sortedMenu.forEach(course => {
-        const selectedOptionId = memberChoices[course.id];
+        const choiceData = memberChoices[course.id];
+        const selectedOptionId = choiceData?.optionId || null;
+        const cookingPreference = choiceData?.cookingPreference || null;
         const isSelectable = course.selectionRequired !== false && course.options && course.options.length > 1;
         
         if (isSelectable) {
-            // Selectable course - show selected option
             const selectedLabel = selectedOptionId ? optionsLookup[selectedOptionId] : null;
+            const cookingSuffix = cookingPreference ? ` (${translate('menu.cooking.' + cookingPreference)})` : '';
             
             html += `
             <div class="menu-choice-item">
                 <span class="menu-course-label">${escapeHtml(course.label)}:</span>
                 <span class="menu-option-label ${selectedLabel ? '' : 'not-selected'}">
-                ${selectedLabel ? escapeHtml(selectedLabel) : 'Not selected'}
+                ${selectedLabel ? escapeHtml(selectedLabel) + cookingSuffix : 'Not selected'}
                 </span>
             </div>
             `;

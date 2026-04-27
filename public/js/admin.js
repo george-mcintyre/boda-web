@@ -93,8 +93,6 @@
     ],
     menu: [
       { id: 'banquet', i18nKey: 'admin:subtab.banquetMenu', icon: 'fa-utensils' },
-      { id: 'day1', i18nKey: 'admin:subtab.day1Menu', icon: 'fa-sun' },
-      { id: 'day3', i18nKey: 'admin:subtab.day3Menu', icon: 'fa-glass-cheers' },
       { id: 'tables', i18nKey: 'admin:subtab.tableAllocation', icon: 'fa-th' },
       { id: 'responses', i18nKey: 'admin:subtab.menuResponses', icon: 'fa-clipboard-list' },
       { id: 'noChoices', i18nKey: 'admin:subtab.menuNoChoices', icon: 'fa-times-circle' }
@@ -137,8 +135,6 @@
       case 'guests/management': return showGuests();
       case 'guests/noParty': return showGuestsNoParty();
       case 'menu/banquet': return showMenu();
-      case 'menu/day1': return showDayMenu('day1');
-      case 'menu/day3': return showDayMenu('day3');
       case 'menu/tables': return showTableAllocation();
       case 'menu/responses': return showMenuResponses();
       case 'menu/noChoices': return showMenuNoChoices();
@@ -353,261 +349,6 @@
       });
     } catch(e) {
       console.error('Error loading event attendance:', e);
-      target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
-    }
-  }
-
-  // Day Menu sub-tab (day1 or day3)
-  async function showDayMenu(day) {
-    const target = getContentTarget();
-    const menuType = day; // 'day1' or 'day3'
-    setLoading(translate('admin:subtab.' + day + 'Menu'));
-    try {
-      // Fetch day menus and chef profiles in parallel
-      const [menuRes, chefRes] = await Promise.all([
-        api(`/api/admin/day-menus?lang=${getUserLanguage()}`),
-        api(`/api/admin/chef-profiles?lang=${getUserLanguage()}`)
-      ]);
-      const menus = menuRes.ok ? await menuRes.json() : [];
-      const chefProfiles = chefRes.ok ? await chefRes.json() : [];
-      const menu = menus.find(m => m.day === day);
-      const dayChef = chefProfiles.find(p => p.menuType === menuType) || null;
-
-      if (!menu) {
-        target.innerHTML = `
-          <div class="admin-content">
-            <h3><i class="fas fa-utensils"></i> ${translate('admin:subtab.' + day + 'Menu')}</h3>
-            <div style="text-align:center;padding:40px;">
-              <i class="fas fa-plus-circle" style="font-size:3em;color:var(--gray-300);margin-bottom:15px;"></i>
-              <p style="color:var(--text-light);" data-i18n="admin:dayMenu.noMenuConfigured">No menu configured for this day yet.</p>
-              <button class="btn btn-primary" id="createDayMenuBtn"><i class="fas fa-plus"></i> Create Menu</button>
-            </div>
-          </div>`;
-        target.querySelector('#createDayMenuBtn')?.addEventListener('click', async () => {
-          const r = await api('/api/admin/day-menus', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ day, sections: [{title:'Section 1',content:''},{title:'Section 2',content:''},{title:'Section 3',content:''}] }) });
-          if (r.ok) showDayMenu(day);
-        });
-        return;
-      }
-
-      // Build section cards with edit buttons
-      const sectionsHtml = (menu.sections || []).map((s, i) => `
-        <div class="admin-card" style="margin-bottom:15px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h4 style="margin:0;">${s.title || 'Section ' + (i + 1)}</h4>
-            <button class="admin-action edit-section-btn" data-index="${i}" title="Edit Section"><i class="fas fa-edit"></i></button>
-          </div>
-          <p style="margin-top:8px;">${s.content || '<em style="color:var(--text-light);">' + translate('admin:menu.noContentYet') + '</em>'}</p>
-          ${s.imageUrl ? '<img data-auth-src="' + s.imageUrl + '" alt="Section image" style="max-width:200px;border-radius:8px;margin-top:8px;">' : '<p style="color:var(--text-light);font-size:0.85em;margin-top:8px;"><i class="fas fa-image"></i> ' + translate('admin:menu.noImage') + '</p>'}
-        </div>`).join('');
-
-      // Build chef profile section (same pattern as banquet menu)
-      let chefSection = '';
-      if (dayChef) {
-        console.log('DEBUG: dayChef data:', dayChef);
-        chefSection = `
-          <div class="chef-profile-card">
-            <div class="chef-profile-header">
-              <h4><i class="fas fa-hat-chef"></i> ${translate('admin:chef.title')}</h4>
-              <div class="chef-profile-actions">
-                <button class="admin-action" id="editDayChefBtn"><i class="fas fa-edit"></i></button>
-                <button class="admin-action danger" id="deleteDayChefBtn"><i class="fas fa-trash"></i></button>
-              </div>
-            </div>
-            <div class="chef-profile-body">
-              ${dayChef.imageUrl ? `<img data-auth-src="${dayChef.imageUrl}" alt="${dayChef.name}" class="chef-profile-photo"><span style="display:none;"></span>` : ''}
-              <div class="chef-profile-info">
-                <strong>${dayChef.name || 'No name'}</strong>
-                <p style="white-space: pre-line;">${dayChef.bio || 'No bio available'}</p>
-              </div>
-            </div>
-          </div>`;
-      } else {
-        chefSection = `
-          <div class="chef-profile-card" style="text-align:center;padding:20px;">
-            <i class="fas fa-hat-chef" style="font-size:2em;color:var(--gray-300);margin-bottom:10px;"></i>
-            <p style="color:var(--text-light);margin-bottom:10px;">${translate('admin:chef.title')}</p>
-            <button class="btn btn-primary" id="addDayChefBtn"><i class="fas fa-plus"></i> ${translate('admin:chef.addProfile')}</button>
-          </div>`;
-      }
-
-      // Build delete menu button
-      const deleteMenuHtml = `<button class="btn btn-secondary" id="deleteDayMenuBtn" style="margin-top:20px;"><i class="fas fa-trash"></i> ${translate('admin:menu.deleteMenu')}</button>`;
-
-      target.innerHTML = `
-        <div class="admin-content">
-          <h3><i class="fas fa-utensils"></i> ${translate('admin:subtab.' + day + 'Menu')}</h3>
-          ${chefSection}
-          ${sectionsHtml || '<p style="color:var(--text-light);">' + translate('admin:menu.noSections') + '</p>'}
-          ${deleteMenuHtml}
-        </div>`;
-
-      // Load auth-protected images
-      loadAuthImages(target);
-
-      // Wire up section edit buttons
-      target.querySelectorAll('.edit-section-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const idx = parseInt(btn.dataset.index, 10);
-          const section = menu.sections[idx];
-          openFormModal({
-            title: translateWithVars('admin:menu.editSection', { title: section.title || 'Section ' + (idx + 1) }),
-            submitText: translate('admin:menu.save'),
-            fields: [
-              { name: 'title', label: translate('admin:menu.sectionTitle'), required: true },
-              { name: 'content', label: translate('admin:menu.sectionContent'), type: 'textarea', rows: 5 },
-              { name: 'image', label: translate('admin:menu.sectionImage'), type: 'file', help: section.imageUrl ? '<img data-auth-src="' + section.imageUrl + '" style="max-width:150px;border-radius:6px;margin-top:6px;">' : translate('admin:menu.noImageUploaded') }
-            ],
-            initialValues: {
-              title: section.title || '',
-              content: section.content || ''
-            },
-            onSubmit: async (values, close) => {
-              try {
-                // Handle image upload if a file was selected
-                let imageRef = null;
-                const imageFile = document.getElementById('f_image')?.files[0];
-                if (imageFile) {
-                  const formData = new FormData();
-                  formData.append('image', imageFile);
-                  const uploadRes = await fetch('/api/admin/day-menus/upload-image', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                  });
-                  if (uploadRes.ok) {
-                    const uploadData = await uploadRes.json();
-                    imageRef = { imageId: uploadData.imageId };
-                  }
-                }
-
-                // Build updated sections array
-                const updatedSections = menu.sections.map((s, si) => {
-                  if (si === idx) {
-                    const updated = { title: values.title, content: values.content };
-                    if (imageRef) updated.image = imageRef;
-                    return updated;
-                  }
-                  return { title: s.title, content: s.content };
-                });
-
-                const r = await api(`/api/admin/day-menus/${menu.id}`, {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ sections: updatedSections })
-                });
-
-                if (!r.ok) {
-                  const errData = await r.json().catch(() => ({}));
-                  throw new Error(errData.error || 'Failed to update section');
-                }
-
-                close();
-                showDayMenu(day);
-              } catch (error) { throw error; }
-            }
-          });
-        });
-      });
-
-      // Wire up chef profile buttons
-      const openDayChefForm = (existingId) => {
-        const loadAndShow = async () => {
-          let existing = null;
-          if (existingId) {
-            try {
-              const res = await api(`/api/admin/chef-profiles?lang=${getUserLanguage()}`);
-              if (res.ok) {
-                const profiles = await res.json();
-                existing = profiles.find(p => p.id === existingId) || null;
-              }
-            } catch (e) { console.error('Error loading chef profile:', e); }
-          }
-
-          openFormModal({
-            title: existing ? translate('admin:chef.editProfile') : translate('admin:chef.addProfile'),
-            submitText: existing ? translate('admin:menu.save') : translate('admin:menu.add'),
-            fields: [
-              { name: 'name', label: translate('admin:chef.name'), required: true },
-              { name: 'bio', label: translate('admin:chef.bio'), type: 'textarea', rows: 4 },
-              { name: 'image', label: translate('admin:chef.photo'), type: 'file', help: existing?.imageUrl ? '<img data-auth-src="' + existing.imageUrl + '" style="max-width:150px;border-radius:6px;margin-top:6px;">' : '' }
-            ],
-            initialValues: {
-              name: existing?.name || '',
-              bio: existing?.bio || ''
-            },
-            onSubmit: async (values, close) => {
-              try {
-                let imageRef = null;
-                const imageFile = document.getElementById('f_image')?.files[0];
-                if (imageFile) {
-                  const formData = new FormData();
-                  formData.append('image', imageFile);
-                  const uploadRes = await fetch('/api/admin/chef-profiles/upload-image', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` },
-                    body: formData
-                  });
-                  if (uploadRes.ok) {
-                    const uploadData = await uploadRes.json();
-                    imageRef = { imageId: uploadData.imageId };
-                  }
-                }
-
-                const body = { name: values.name, bio: values.bio, menuType };
-                if (imageRef) body.image = imageRef;
-
-                const langParam = `lang=${getUserLanguage()}`;
-                const url = existing ? `/api/admin/chef-profiles/${existing.id}?${langParam}` : `/api/admin/chef-profiles?${langParam}`;
-                const method = existing ? 'PUT' : 'POST';
-
-                const r = await api(url, {
-                  method,
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(body)
-                });
-
-                if (!r.ok) {
-                  const errData = await r.json().catch(() => ({}));
-                  throw new Error(errData.error || 'Failed to save chef profile');
-                }
-
-                close();
-                showDayMenu(day);
-              } catch (error) { throw error; }
-            }
-          });
-        };
-        loadAndShow();
-      };
-
-      target.querySelector('#addDayChefBtn')?.addEventListener('click', () => openDayChefForm(null));
-      target.querySelector('#editDayChefBtn')?.addEventListener('click', () => openDayChefForm(dayChef.id));
-      target.querySelector('#deleteDayChefBtn')?.addEventListener('click', async () => {
-        if (!confirm(translate('admin:chef.deleteConfirm'))) return;
-        try {
-          const r = await api(`/api/admin/chef-profiles/${dayChef.id}`, { method: 'DELETE' });
-          if (r.ok) showDayMenu(day);
-          else notify('Failed to delete chef profile', 'error');
-        } catch (e) {
-          notify('Error deleting chef profile: ' + e.message, 'error');
-        }
-      });
-
-      // Wire up delete menu button
-      target.querySelector('#deleteDayMenuBtn')?.addEventListener('click', async () => {
-        if (!confirm(translate('admin:menu.confirmDeleteMenu'))) return;
-        try {
-          const r = await api(`/api/admin/day-menus/${menu.id}`, { method: 'DELETE' });
-          if (r.ok) showDayMenu(day);
-          else notify('Failed to delete menu', 'error');
-        } catch (e) {
-          notify('Error deleting menu: ' + e.message, 'error');
-        }
-      });
-
-    } catch(e) {
-      console.error('Error loading day menu:', e);
       target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
     }
   }
@@ -1084,7 +825,11 @@
       const groupHtml = tableGroups.map(group => {
         totalResponses += group.guests.length;
         const guestRows = group.guests.map(g => {
-          const choiceLabels = (g.choices || []).map(c => c.optionLabel).filter(l => l && l !== '—').join(', ') || '—';
+          const choiceLabels = (g.choices || []).map(c => {
+            if (!c.optionLabel || c.optionLabel === '—') return null;
+            if (c.cookingPreference) return `${c.optionLabel} (${translate('menu.cooking.' + c.cookingPreference)})`;
+            return c.optionLabel;
+          }).filter(Boolean).join(', ') || '—';
           const specReq = g.specialRequest ? `<span class="badge badge-info">${g.specialRequest.split(', ').map(s => translateDietary(s.trim())).join(', ')}</span>` : '';
           return `<tr><td>${g.guestName}${g.partyMemberName ? ' <small>(' + g.partyMemberName + ')</small>' : ''}</td><td>${choiceLabels}</td><td>${specReq}${g.specialRequestDetail ? ' ' + g.specialRequestDetail : ''}</td></tr>`;
         }).join('');
@@ -1666,82 +1411,54 @@
     return guests;
   }
 
-  // Image preview handler for file inputs
-  function setupImagePreview(modal) {
-    const fileInput = modal.querySelector('#f_image');
-    const previewContainer = modal.querySelector('#image-preview-container');
-    
-    console.log('setupImagePreview called:', {
-      hasFileInput: !!fileInput,
-      hasPreviewContainer: !!previewContainer,
-      fileInputId: fileInput?.id,
-      previewContainerId: previewContainer?.id
-    });
-    
-    if (!fileInput || !previewContainer) {
-      console.warn('Image preview setup failed: missing elements', {
-        fileInput: !!fileInput,
-        previewContainer: !!previewContainer
-      });
-      return;
-    }
-    
-    // Remove any existing listeners to prevent duplicates
-    const newFileInput = fileInput.cloneNode(true);
-    fileInput.parentNode.replaceChild(newFileInput, fileInput);
-    
-    newFileInput.addEventListener('change', function(e) {
-      console.log('File input changed:', e.target.files[0]);
-      const file = e.target.files[0];
-      
-      if (!file) {
-        console.log('No file selected, resetting preview');
-        // Reset preview if no file selected
-        previewContainer.innerHTML = `
-          <div style="text-align:center; color:#999;">
-            <i class="fas fa-image" style="font-size:2em; margin-bottom:10px; display:block;"></i>
-            <div>Image preview will appear here</div>
-          </div>`;
-        return;
-      }
-      
-      // Validate file type
+  function attachImagePreview(fileInput, previewContainer) {
+    if (!fileInput || !previewContainer) return;
+    const fresh = fileInput.cloneNode(true);
+    fileInput.parentNode.replaceChild(fresh, fileInput);
+    const resetHtml = `
+      <div style="text-align:center; color:#999;">
+        <i class="fas fa-image" style="font-size:2em; margin-bottom:10px; display:block;"></i>
+        <div>Image preview will appear here</div>
+      </div>`;
+    fresh.addEventListener('change', () => {
+      const file = fresh.files[0];
+      if (!file) { previewContainer.innerHTML = resetHtml; return; }
       if (!file.type.startsWith('image/')) {
         alert('Please select a valid image file');
-        newFileInput.value = '';
+        fresh.value = '';
         return;
       }
-      
-      // Validate file size (max 5MB)
       if (file.size > 50 * 1024 * 1024) {
         alert('File size must be less than 50MB');
-        newFileInput.value = '';
+        fresh.value = '';
         return;
       }
-      
-      // Create and show preview
       const reader = new FileReader();
-      reader.onload = function(e) {
-        console.log('FileReader loaded, creating preview');
-        const imageUrl = e.target.result;
+      reader.onload = (ev) => {
         previewContainer.innerHTML = `
           <div style="text-align:center;">
-            <img src="${imageUrl}" alt="Preview" style="max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <img src="${ev.target.result}" alt="Preview" style="max-width: 100%; max-height: 200px; object-fit: contain; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
             <div style="margin-top:8px; color:#666; font-size:0.9em;">
-              <i class="fas fa-info-circle"></i> 
+              <i class="fas fa-info-circle"></i>
               ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)
             </div>
           </div>`;
-        console.log('Preview created successfully');
       };
-      reader.onerror = function(error) {
-        console.error('FileReader error:', error);
-        alert('Error reading file');
-      };
+      reader.onerror = () => alert('Error reading file');
       reader.readAsDataURL(file);
     });
-    
-    console.log('Image preview event listener attached successfully');
+  }
+
+  function setupImagePreview(modal) {
+    const primary = modal.querySelector('#f_image');
+    const primaryPreview = modal.querySelector('#image-preview-container');
+    if (primary && primaryPreview) attachImagePreview(primary, primaryPreview);
+
+    modal.querySelectorAll('input[type="file"]').forEach(input => {
+      if (input.id === 'f_image') return;
+      const preview = modal.querySelector(`#${input.id}-preview`);
+      if (preview) attachImagePreview(input, preview);
+    });
   }
 
   // Custom image dropdown component
@@ -2076,6 +1793,10 @@
             </div>
           </div>`;
       }
+    }
+
+    if (typeof additionalOptions.afterRender === 'function') {
+      try { additionalOptions.afterRender(modal); } catch (e) { console.error('afterRender failed:', e); }
     }
 
     return { close, modal };
@@ -3543,13 +3264,7 @@
     setLoading(translate('admin:loadingCourses'));
     
     try {
-      // Fetch chef profiles and course data in parallel
-      const [chefRes, res] = await Promise.all([
-        api(`/api/admin/chef-profiles?lang=${getUserLanguage()}`),
-        api(`/api/admin/courseData?lang=${getUserLanguage()}`)
-      ]);
-      const chefProfiles = chefRes.ok ? await chefRes.json() : [];
-      const banquetChef = chefProfiles.find(p => p.menuType === 'banquet') || null;
+      const res = await api(`/api/admin/courseData?lang=${getUserLanguage()}`);
       const data = res.ok ? await res.json() : [];
       
       // Group by course type for better organization
@@ -3586,42 +3301,11 @@
         drinks: translate('admin:menu.courseType.drinks')
       };
       
-      // Build chef profile section
-      let chefSection = '';
-      if (banquetChef) {
-        console.log('DEBUG: banquetChef data:', banquetChef);
-        chefSection = `
-          <div class="chef-profile-card">
-            <div class="chef-profile-header">
-              <h4><i class="fas fa-hat-chef"></i> ${translate('admin:chef.title')}</h4>
-              <div class="chef-profile-actions">
-                <button class="admin-action" onclick="openChefProfileForm('${banquetChef.id}')"><i class="fas fa-edit"></i></button>
-                <button class="admin-action danger" onclick="deleteChefProfile('${banquetChef.id}')"><i class="fas fa-trash"></i></button>
-              </div>
-            </div>
-            <div class="chef-profile-body">
-              ${banquetChef.imageUrl ? `<img data-auth-src="${banquetChef.imageUrl}" alt="${banquetChef.name}" class="chef-profile-photo"><span style="display:none;"></span>` : ''}
-              <div class="chef-profile-info">
-                <strong>${banquetChef.name || 'No name'}</strong>
-                <p style="white-space: pre-line;">${banquetChef.bio || 'No bio available'}</p>
-              </div>
-            </div>
-          </div>`;
-      } else {
-        chefSection = `
-          <div class="chef-profile-card" style="text-align:center;padding:20px;">
-            <i class="fas fa-hat-chef" style="font-size:2em;color:var(--gray-300);margin-bottom:10px;"></i>
-            <p style="color:var(--text-light);margin-bottom:10px;">${translate('admin:chef.title')}</p>
-            <button class="btn btn-primary" onclick="openChefProfileForm(null)"><i class="fas fa-plus"></i> ${translate('admin:chef.addProfile')}</button>
-          </div>`;
-      }
-
       let menuContent = `
         <div class="admin-content">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
             <h3 style="margin:0;"><div data-i18n="admin:menu.title">${translate('admin:menu.title')}</div></h3>
           </div>
-          ${chefSection}
           <div class="menu-overview">
       `;
       
@@ -3684,6 +3368,7 @@
                         ${option.description ? `<small class="option-description">${option.description}</small>` : ''}
                       </div>
                       ${option.image ? `<img src="${option.image}" alt="${option.label}" class="option-image" onerror="this.style.display='none'">` : ''}
+                      ${option.imageCloseup ? `<img src="${option.imageCloseup}" alt="${option.label} close-up" class="option-image option-image-closeup" onerror="this.style.display='none'">` : ''}
                       <button class="admin-action" onclick="editMenuCourseOption('${part.id}', '${option.id}')" title="Edit Option">
                         <i class="fas fa-edit"></i>
                       </button>
@@ -3777,89 +3462,6 @@
       }
     } catch (error) {
       notify(translateWithVars('admin:menu.errorDeletingOption', { error: error.message }), 'error');
-    }
-  };
-
-  // Chef profile management
-  window.openChefProfileForm = function(existingId) {
-    const loadAndShow = async () => {
-      let existing = null;
-      if (existingId) {
-        try {
-          const res = await api(`/api/admin/chef-profiles?lang=${getUserLanguage()}`);
-          if (res.ok) {
-            const profiles = await res.json();
-            existing = profiles.find(p => p.id === existingId) || null;
-          }
-        } catch (e) { console.error('Error loading chef profile:', e); }
-      }
-
-      openFormModal({
-        title: existing ? translate('admin:chef.editProfile') : translate('admin:chef.addProfile'),
-        submitText: existing ? translate('admin:menu.save') : translate('admin:menu.add'),
-        fields: [
-          { name: 'name', label: translate('admin:chef.name'), required: true },
-          { name: 'bio', label: translate('admin:chef.bio'), type: 'textarea', rows: 4 },
-          { name: 'image', label: translate('admin:chef.photo'), type: 'file', help: existing?.imageUrl ? '<img data-auth-src="' + existing.imageUrl + '" style="max-width:150px;border-radius:6px;margin-top:6px;">' : '' }
-        ],
-        initialValues: {
-          name: existing?.name || '',
-          bio: existing?.bio || ''
-        },
-        onSubmit: async (values, close) => {
-          try {
-            // Handle image upload if a file was selected
-            let imageRef = null;
-            const imageFile = document.getElementById('f_image')?.files[0];
-            if (imageFile) {
-              const formData = new FormData();
-              formData.append('image', imageFile);
-              const uploadRes = await fetch('/api/admin/chef-profiles/upload-image', {
-                method: 'POST',
-                headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
-              });
-              if (uploadRes.ok) {
-                const uploadData = await uploadRes.json();
-                imageRef = { imageId: uploadData.imageId };
-              }
-            }
-
-            const body = { name: values.name, bio: values.bio, menuType: 'banquet' };
-            if (imageRef) body.image = imageRef;
-
-            const langParam = `lang=${getUserLanguage()}`;
-            const url = existing ? `/api/admin/chef-profiles/${existing.id}?${langParam}` : `/api/admin/chef-profiles?${langParam}`;
-            const method = existing ? 'PUT' : 'POST';
-
-            const r = await api(url, {
-              method,
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(body)
-            });
-
-            if (!r.ok) {
-              const errData = await r.json().catch(() => ({}));
-              throw new Error(errData.error || 'Failed to save chef profile');
-            }
-
-            close();
-            showMenu();
-          } catch (error) { throw error; }
-        }
-      });
-    };
-    loadAndShow();
-  };
-
-  window.deleteChefProfile = async function(id) {
-    if (!confirm(translate('admin:chef.deleteConfirm'))) return;
-    try {
-      const r = await api(`/api/admin/chef-profiles/${id}`, { method: 'DELETE' });
-      if (r.ok) showMenu();
-      else notify('Failed to delete chef profile', 'error');
-    } catch (e) {
-      notify('Error deleting chef profile: ' + e.message, 'error');
     }
   };
 
@@ -3975,16 +3577,43 @@
     
     const showForm = () => {
       const isEditing = !!existingData;
-      
-      // Get current image URL for display
+
       const currentImageUrl = existingData?.image || null;
+      const currentImageCloseupUrl = existingData?.imageCloseup || null;
       const showCurrentImage = isEditing && currentImageUrl;
-      
+
       openFormModal({
         title: isEditing ? `<div data-i18n="admin:menu.editCourseOption">${translate('admin:menu.editCourseOption')}</div>` : `<div data-i18n="admin:menu.addCourseOption">${translate('admin:menu.addCourseOption')}</div>`,
         submitText: isEditing ? `<span data-i18n="admin:menu.save">${translate('admin:menu.save')}</span>` : `<span data-i18n="admin:menu.add">${translate('admin:menu.add')}</span>`,
         showCurrentImage: showCurrentImage,
         currentImageUrl: currentImageUrl,
+        afterRender: (modal) => {
+          const imageField = modal.querySelector('[data-field="image"]');
+          if (!imageField) return;
+          const placeholderImg = currentImageCloseupUrl
+            ? `<img src="${currentImageCloseupUrl}" alt="Current close-up" style="max-width:100%; max-height:200px; object-fit:contain; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+               <div style="margin-top:8px; color:#666; font-size:0.9em;"><i class="fas fa-info-circle"></i> ${translate('admin:menu.field.imageCloseupCurrent') || 'Current close-up image'}</div>`
+            : `<div style="text-align:center; color:#999;">
+                 <i class="fas fa-image" style="font-size:2em; margin-bottom:10px; display:block;"></i>
+                 <div>${translate('admin:menu.field.imageCloseupPreviewHint') || 'Close-up preview will appear here'}</div>
+               </div>`;
+          const block = document.createElement('div');
+          block.style.marginBottom = '14px';
+          block.dataset.field = 'imageCloseup';
+          block.innerHTML = `
+            <label for="f_imageCloseup" style="display:block;margin:6px 0 6px 0;font-weight:600;color:#333;">
+              ${translate('admin:menu.field.imageCloseup') || 'Close-up image (optional)'}
+            </label>
+            <input id="f_imageCloseup" name="imageCloseup" type="file" accept="image/*" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;">
+            <small style="display:block;color:#6c757d;margin-top:4px;">
+              ${translate('admin:menu.field.imageCloseupHelp') || 'Optional close-up shot shown in the photo viewer'}
+            </small>
+            <div id="f_imageCloseup-preview" style="margin-top:10px; padding:10px; border:1px dashed #ddd; border-radius:8px; background:#f8f9fa; min-height:120px; display:flex; align-items:center; justify-content:center;">
+              <div style="text-align:center;">${placeholderImg}</div>
+            </div>`;
+          imageField.insertAdjacentElement('afterend', block);
+          attachImagePreview(modal.querySelector('#f_imageCloseup'), modal.querySelector('#f_imageCloseup-preview'));
+        },
         fields: [
           { name: 'label', label: translate('admin:menu.field.option'), required: true, help: translate('admin:menu.field.optionHelp') },
           { name: 'image', label: translate('admin:menu.field.image'), type: 'file', help: translate('admin:menu.field.imageHelp') },
@@ -3996,6 +3625,7 @@
           { name: 'containsLactose', label: translate('admin:menu.field.containsLactose'), type: 'checkbox', help: translate('admin:menu.field.helpLactose') },
           { name: 'isSpicy', label: translate('admin:menu.field.isSpicy'), type: 'checkbox', help: translate('admin:menu.field.helpSpicy') },
           { name: 'containsNuts', label: translate('admin:menu.field.containsNuts'), type: 'checkbox', help: translate('admin:menu.field.helpNuts') },
+          { name: 'allowsCookingPreference', label: translate('admin:menu.field.allowsCookingPreference'), type: 'checkbox', help: translate('admin:menu.field.helpAllowsCookingPreference') },
         ],
         initialValues: {
           label: existingData?.label || '',
@@ -4006,66 +3636,53 @@
           containsAllergens: existingData?.containsAllergens || false,
           containsLactose: existingData?.containsLactose || false,
           isSpicy: existingData?.isSpicy || false,
-          containsNuts: existingData?.containsNuts || false
+          containsNuts: existingData?.containsNuts || false,
+          allowsCookingPreference: existingData?.allowsCookingPreference || false
         },
         onSubmit: async (values, close, modal) => {
           try {
-            // Handle image upload
-            let imageReference = null;
-            const imageFile = document.getElementById('f_image')?.files[0];
-            if (imageFile) {
-              const formData = new FormData();
-              formData.append('image', imageFile);
-              const uploadRes = await fetch('/api/admin/menu-options/upload-image', {
+            const uploadField = async (file) => {
+              const fd = new FormData();
+              fd.append('image', file);
+              const r = await fetch('/api/admin/menu-options/upload-image', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
-                body: formData
+                body: fd
               });
-              if (uploadRes.ok) {
-                const uploadData = await uploadRes.json();
-                // Store the image ID for the menu option
-                imageReference = {
-                  imageId: uploadData.imageId
-                };
-              }
-            } else if (existingData?.image) {
-              // Keep existing image reference for edit mode
-              if (typeof existingData.image === 'string') {
-                if (existingData.image.startsWith('data:')) {
-                  // Base64 data - keep as is
-                  imageReference = existingData.image;
-                } else if (existingData.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(existingData.image)) {
-                  // ObjectId string - keep as is
-                  imageReference = existingData.image;
-                } else {
-                  // Legacy URL-based image - keep as is
-                  imageReference = existingData.image;
-                }
-              } else if (existingData.image && typeof existingData.image === 'object') {
-                // Database-stored image object - keep the reference
-                if (existingData.image.imageId) {
-                  // New format with imageId
-                  imageReference = { imageId: existingData.image.imageId };
-                } else if (existingData.image._id) {
-                  // MongoDB ObjectId reference
-                  imageReference = existingData.image._id.toString();
-                } else {
-                  // Other object format - keep as is
-                  imageReference = existingData.image;
-                }
-              }
-            }
-            
+              if (!r.ok) throw new Error(`Upload failed: HTTP ${r.status}`);
+              const d = await r.json();
+              return { imageId: d.imageId };
+            };
+            const keepExistingRef = (img) => {
+              if (!img) return null;
+              if (typeof img === 'string') return img;
+              if (img.imageId) return { imageId: img.imageId };
+              if (img._id) return img._id.toString();
+              return img;
+            };
+
+            const imageFile = document.getElementById('f_image')?.files[0];
+            const imageCloseupFile = document.getElementById('f_imageCloseup')?.files[0];
+
+            const imageReference = imageFile
+              ? await uploadField(imageFile)
+              : keepExistingRef(existingData?.image);
+            const imageCloseupReference = imageCloseupFile
+              ? await uploadField(imageCloseupFile)
+              : keepExistingRef(existingData?.imageCloseup);
+
             const courseData = {
               label: values.label,
               image: imageReference,
+              imageCloseup: imageCloseupReference,
               description: values.description,
               isVegetarian: values.isVegetarian || false,
               isVegan: values.isVegan || false,
               containsAllergens: values.containsAllergens || false,
               containsLactose: values.containsLactose || false,
               isSpicy: values.isSpicy || false,
-              containsNuts: values.containsNuts || false
+              containsNuts: values.containsNuts || false,
+              allowsCookingPreference: values.allowsCookingPreference || false
             };
             
             const url = optionId ? `/api/admin/courseData/${courseId}/options/${optionId}?lang=${getUserLanguage()}` : `/api/admin/courseData/${courseId}/options?lang=${getUserLanguage()}`;

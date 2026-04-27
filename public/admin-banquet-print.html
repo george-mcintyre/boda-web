@@ -123,9 +123,11 @@
             return `<tr class="empty"><td><span class="seat-num">${s.seat}</span> &mdash;</td>${emptyCols}<td></td><td></td></tr>`;
           }
 
-          const mealCols = s.mealChoices.map(m =>
-            `<td class="center">${m.selected ? m.selected : (s.isFixed ? '' : pend)}</td>`
-          ).join('');
+          const mealCols = s.mealChoices.map(m => {
+            let label = m.selected ? m.selected : (s.isFixed ? '' : pend);
+            if (m.selected && m.cookingPreference) label += ` (${translate('menu.cooking.' + m.cookingPreference)})`;
+            return `<td class="center">${label}</td>`;
+          }).join('');
 
           let allergyHtml = '';
           if (s.allergies.badges.length > 0 || s.allergies.detail) {

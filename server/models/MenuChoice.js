@@ -13,6 +13,7 @@ const specialRequestSchema = new Schema({
 const individualMenuOptionChoiceSchema = new Schema({
   courseId: { type: Schema.Types.ObjectId, ref: 'Course', required: true },
   optionId: { type: Schema.Types.ObjectId, ref: 'CourseOption', required: true },
+  cookingPreference: { type: String, enum: ['rare', 'medium-rare', 'medium', 'well-done'], default: 'medium' }
 }, { _id: false });
 
 // Schema for party guest's menu choices
