@@ -772,6 +772,10 @@ function initCustomMenuSelects(container) {
         wrapper.classList.add('open');
         panel.style.display = 'block';
         positionPanel(wrapper, panel);
+        requestAnimationFrame(() => positionPanel(wrapper, panel));
+        panel.querySelectorAll('img').forEach(img => {
+          if (!img.complete) img.addEventListener('load', () => positionPanel(wrapper, panel), { once: true });
+        });
         trigger.setAttribute('aria-expanded', 'true');
       }
     });
