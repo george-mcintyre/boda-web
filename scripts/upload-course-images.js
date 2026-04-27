@@ -12,9 +12,9 @@ const dryRun = args.has('--dry-run');
 const force = args.has('--force') || args.has('-y');
 const skipResize = args.has('--no-resize');
 
-const RESIZE_WIDE_PX = 1600;
-const RESIZE_CLOSEUP_PX = 1100;
-const JPEG_QUALITY = 82;
+const RESIZE_WIDE_PX = Number(process.env.RESIZE_WIDE_PX || 1100);
+const RESIZE_CLOSEUP_PX = Number(process.env.RESIZE_CLOSEUP_PX || 800);
+const JPEG_QUALITY = Number(process.env.JPEG_QUALITY || 72);
 
 const API_BASE = process.env.API_BASE_URL || 'http://localhost:3000';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'george.mcintyre@me.com';

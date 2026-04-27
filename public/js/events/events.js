@@ -201,7 +201,10 @@ async function loadEventsContent() {
       });
     }
     
-    // Date/time formatting helpers
+    // Wedding takes place in Spain — always render in Madrid local time,
+    // regardless of where the guest's browser is.
+    const VENUE_TZ = 'Europe/Madrid';
+
     const formatEventDate = (dateString) => {
       if (!dateString) return '';
       const date = new Date(dateString);
@@ -209,16 +212,18 @@ async function loadEventsContent() {
         weekday: 'long',
         day: 'numeric',
         month: 'long',
-        year: 'numeric'
+        year: 'numeric',
+        timeZone: VENUE_TZ
       });
     };
-    
+
     const formatEventTime = (dateString) => {
       if (!dateString) return '';
       const date = new Date(dateString);
       return date.toLocaleTimeString(currentLanguage || 'en-GB', {
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
+        timeZone: VENUE_TZ
       });
     };
     
