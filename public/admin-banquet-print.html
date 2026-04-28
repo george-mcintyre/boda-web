@@ -36,8 +36,11 @@
     tbody tr.empty td { color: #ccc; font-style: italic; }
     tbody tr.no-choice td { background: #fff9f0; }
 
-    .seat-num { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #e8dced; color: #8B5A96; font-weight: 700; font-size: 9px; margin-right: 4px; }
+    .seat-num { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #e8dced; color: #8B5A96; font-weight: 700; font-size: 9px; margin-right: 4px; flex-shrink: 0; }
     .seat-num.fixed { background: #d4a5a5; color: #fff; }
+    .seat-cell { display: flex; align-items: flex-start; gap: 2px; }
+    .seat-name { word-break: break-word; line-height: 1.25; }
+    .meal-cell { white-space: normal; word-break: break-word; line-height: 1.25; }
 
     .allergy-badges { display: flex; flex-wrap: wrap; gap: 2px; }
     .allergy-badge { display: inline-block; background: #fff3cd; color: #856404; border-radius: 3px; padding: 1px 4px; font-size: 8px; font-weight: 500; white-space: nowrap; }
@@ -46,12 +49,32 @@
     .check { color: #28a745; }
     .pending { color: #ffc107; }
 
+    /* Row severity tinting - lets staff scan a printed sheet at a glance.
+       Severity precedence: danger > warning > safe (set by JS in classes).
+       Override .no-choice background since severity matters more for staff. */
+    tbody tr.sev-danger td,
+    tbody tr.sev-danger.no-choice td { background: #f8d7da; }
+    tbody tr.sev-danger td:first-child { box-shadow: inset 4px 0 0 #dc3545; }
+    tbody tr.sev-warning td,
+    tbody tr.sev-warning.no-choice td { background: #fff3cd; }
+    tbody tr.sev-warning td:first-child { box-shadow: inset 4px 0 0 #ffc107; }
+    tbody tr.sev-safe td,
+    tbody tr.sev-safe.no-choice td { background: #d1e7dd; }
+    tbody tr.sev-safe td:first-child { box-shadow: inset 4px 0 0 #198754; }
+
     @media print {
       .print-btn, .no-print { display: none !important; }
       body { padding: 0; font-size: 9px; }
       table { font-size: 8px; }
       .table-block { break-inside: avoid; }
       @page { size: portrait; margin: 10mm; }
+      /* Force row tint colours to render on paper - browsers strip backgrounds otherwise */
+      tbody tr.sev-danger td,
+      tbody tr.sev-warning td,
+      tbody tr.sev-safe td {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
     }
   </style>
 </head>
@@ -105,14 +128,44 @@
       const pend = '<i class="fas fa-clock pending"></i>';
 
       const courseHeaders = courses.map(c => `<th class="center">${c.label}</th>`).join('');
-      // Build colgroup for consistent column widths across all tables
-      // Columns: Seat/name 20% | meal courses 12% each | status 5% | allergy takes remainder
+      // Column layout: name 22% | meal courses share the middle band evenly |
+      // chosen-status 5% (icon column) | allergy 30% (needs room for badges + free-text detail).
+      const numCourses = courses.length || 1;
+      const allergyWidth = 30;
+      const chosenWidth = 5;
+      const nameWidth = 22;
+      const mealBand = 100 - nameWidth - chosenWidth - allergyWidth;
+      const perMealWidth = (mealBand / numCourses).toFixed(2);
       const colgroup = `<colgroup>
-        <col style="width: 20%;">
-        ${courses.map(() => `<col style="width: 12%;">`).join('')}
-        <col style="width: 5%;">
-        <col>
+        <col style="width: ${nameWidth}%;">
+        ${courses.map(() => `<col style="width: ${perMealWidth}%;">`).join('')}
+        <col style="width: ${chosenWidth}%;">
+        <col style="width: ${allergyWidth}%;">
       </colgroup>`;
+
+      // Classify a dietary/allergy badge into a severity bucket.
+      // danger  -> severe allergen (red row): nut allergy, gluten
+      // safe    -> dietary preference (green row): vegetarian, vegan
+      // warning -> everything else (amber row): lactose, other, unknown
+      const classifyBadge = (raw) => {
+        const k = String(raw || '').toLowerCase().trim();
+        if (k === 'nut-allergy' || k === 'nut allergy' || k.includes('nut')) return 'danger';
+        if (k === 'gluten-intolerant' || k.includes('gluten')) return 'danger';
+        if (k === 'vegetarian' || k === 'vegan') return 'safe';
+        return 'warning';
+      };
+      // Worst-wins precedence when a guest has multiple flags.
+      const sevRank = { danger: 3, warning: 2, safe: 1 };
+      const worstSeverity = (badges, hasDetail) => {
+        let worst = null;
+        for (const b of badges) {
+          const s = classifyBadge(b);
+          if (!worst || sevRank[s] > sevRank[worst]) worst = s;
+        }
+        // Free-text "other" detail without explicit badges still warrants warning tint.
+        if (!worst && hasDetail) worst = 'warning';
+        return worst;
+      };
 
       let html = '';
       tables.forEach(t => {
@@ -126,7 +179,7 @@
           const mealCols = s.mealChoices.map(m => {
             let label = m.selected ? m.selected : (s.isFixed ? '' : pend);
             if (m.selected && m.cookingPreference) label += ` (${translate('menu.cooking.' + m.cookingPreference)})`;
-            return `<td class="center">${label}</td>`;
+            return `<td class="center meal-cell">${label}</td>`;
           }).join('');
 
           let allergyHtml = '';
@@ -137,10 +190,14 @@
           }
 
           const chosenCol = s.isFixed ? '' : (s.hasChosen ? ck : pend);
-          const trClass = (!s.isFixed && !s.hasChosen && s.name) ? ' class="no-choice"' : '';
+          const classes = [];
+          if (!s.isFixed && !s.hasChosen && s.name) classes.push('no-choice');
+          const sev = worstSeverity(s.allergies.badges, !!s.allergies.detail);
+          if (sev) classes.push('sev-' + sev);
+          const trClass = classes.length ? ` class="${classes.join(' ')}"` : '';
 
           return `<tr${trClass}>` +
-            `<td><span class="seat-num${s.isFixed ? ' fixed' : ''}">${s.seat}</span> ${s.name}</td>` +
+            `<td><div class="seat-cell"><span class="seat-num${s.isFixed ? ' fixed' : ''}">${s.seat}</span><span class="seat-name">${s.name}</span></div></td>` +
             mealCols +
             `<td class="center">${chosenCol}</td>` +
             `<td>${allergyHtml}</td>` +
