@@ -124,22 +124,21 @@
         'nut-allergy': translate('admin:dietary.nutAllergy'),
         'other': translate('admin:dietary.other')
       };
-      const ck = '<i class="fas fa-check check"></i>';
       const pend = '<i class="fas fa-clock pending"></i>';
 
       const courseHeaders = courses.map(c => `<th class="center">${c.label}</th>`).join('');
-      // Column layout: name 22% | meal courses share the middle band evenly |
-      // chosen-status 5% (icon column) | allergy 30% (needs room for badges + free-text detail).
+      // Column layout: name 22% | meal courses share the middle band | allergy 30%
+      // (needs room for badges + free-text detail). The chosen-status icon column was
+      // removed - the Main Course cell already conveys the same info (a meal name means
+      // chosen, the pending clock icon means not chosen).
       const numCourses = courses.length || 1;
       const allergyWidth = 30;
-      const chosenWidth = 5;
       const nameWidth = 22;
-      const mealBand = 100 - nameWidth - chosenWidth - allergyWidth;
+      const mealBand = 100 - nameWidth - allergyWidth;
       const perMealWidth = (mealBand / numCourses).toFixed(2);
       const colgroup = `<colgroup>
         <col style="width: ${nameWidth}%;">
         ${courses.map(() => `<col style="width: ${perMealWidth}%;">`).join('')}
-        <col style="width: ${chosenWidth}%;">
         <col style="width: ${allergyWidth}%;">
       </colgroup>`;
 
@@ -173,7 +172,7 @@
         const rows = t.seats.map(s => {
           if (!s.name) {
             const emptyCols = courses.map(() => '<td class="center"></td>').join('');
-            return `<tr class="empty"><td><span class="seat-num">${s.seat}</span> &mdash;</td>${emptyCols}<td></td><td></td></tr>`;
+            return `<tr class="empty"><td><span class="seat-num">${s.seat}</span> &mdash;</td>${emptyCols}<td></td></tr>`;
           }
 
           const mealCols = s.mealChoices.map(m => {
@@ -189,7 +188,6 @@
             if (s.allergies.detail) allergyHtml += `<div class="allergy-detail">${s.allergies.detail}</div>`;
           }
 
-          const chosenCol = s.isFixed ? '' : (s.hasChosen ? ck : pend);
           const classes = [];
           if (!s.isFixed && !s.hasChosen && s.name) classes.push('no-choice');
           const sev = worstSeverity(s.allergies.badges, !!s.allergies.detail);
@@ -199,7 +197,6 @@
           return `<tr${trClass}>` +
             `<td><div class="seat-cell"><span class="seat-num${s.isFixed ? ' fixed' : ''}">${s.seat}</span><span class="seat-name">${s.name}</span></div></td>` +
             mealCols +
-            `<td class="center">${chosenCol}</td>` +
             `<td>${allergyHtml}</td>` +
             `</tr>`;
         }).join('');
@@ -214,7 +211,6 @@
             <thead><tr>
               <th><i class="fas fa-chair"></i> ${translate('admin:banquetPrint.seat')}</th>
               ${courseHeaders}
-              <th class="center"><i class="fas fa-utensils"></i></th>
               <th><i class="fas fa-exclamation-triangle"></i> ${translate('admin:banquetPrint.allergy')}</th>
             </tr></thead>
             <tbody>${rows}</tbody>
