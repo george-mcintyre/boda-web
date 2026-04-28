@@ -729,75 +729,229 @@ async function bulkAssignTables(req, res, next) {
 async function getMenuResponses(req, res, next) {
   try {
     const lang = getLang(req);
-    const menuChoices = await MenuChoice.find({}).populate('guestId', 'name email').lean();
-    const assignments = await TableAssignment.find({}).populate('tableId', 'number name').lean();
-    const courses = await Course.find({}).lean();
+    const guests = await Guest.find({}).lean();
+    const tables = await Table.find({}).sort({ number: 1 }).lean();
+    const assignments = await TableAssignment.find({}).populate('tableId', 'number name isHeadTable').sort({ seatNumber: 1 }).lean();
+    const menuChoices = await MenuChoice.find({}).lean();
+    const eventChoices = await EventChoice.find({}).lean();
     const courseOptions = await CourseOption.find({}).lean();
 
-    // Build option label lookup
     const optionLabelMap = {};
     courseOptions.forEach(o => {
       optionLabelMap[o._id.toString()] = localize(o.label, lang);
     });
 
-    // Build assignment lookup: guestId+partyMemberName -> table
-    const assignmentMap = {};
-    assignments.forEach(a => {
-      const key = a.guestId.toString() + '|' + (a.partyMemberName || '');
-      assignmentMap[key] = a.tableId ? {
-        tableNumber: a.tableId.number,
-        tableName: a.tableId.name,
-        isHeadTable: a.tableId.isHeadTable || false
-      } : null;
+    const guestById = {};
+    guests.forEach(g => { guestById[g._id.toString()] = g; });
+
+    const menuChoiceByGuestId = {};
+    menuChoices.forEach(mc => {
+      if (mc.guestId) menuChoiceByGuestId[mc.guestId.toString()] = mc;
     });
 
-    // Group by table
+    const eventChoiceByGuestId = {};
+    eventChoices.forEach(ec => {
+      if (ec.guestId) eventChoiceByGuestId[ec.guestId.toString()] = ec;
+    });
+
+    const findPartyChoice = (doc, ...candidates) => {
+      if (!doc || !Array.isArray(doc.partyChoices)) return null;
+      for (const id of candidates) {
+        if (id == null) continue;
+        const match = doc.partyChoices.find(p => p.partyGuestId === id || p.partyGuestId === String(id));
+        if (match) return match;
+      }
+      return null;
+    };
+
+    const isAttending = (guest, partyMemberName) => {
+      const ec = eventChoiceByGuestId[guest._id.toString()];
+      if (!ec) return false;
+      const guestIdStr = guest._id.toString();
+      let candidates;
+      if (!partyMemberName) {
+        candidates = [guestIdStr];
+      } else {
+        const pmObj = (guest.partyMembers || []).find(pm => pm.name === partyMemberName);
+        candidates = [
+          pmObj?.id,
+          partyMemberName,
+          pmObj?._id ? `member-${pmObj._id}` : null,
+          pmObj?._id ? String(pmObj._id) : null
+        ];
+        if (pmObj && pmObj.id == null) candidates.push('null', 'undefined');
+      }
+      const pc = findPartyChoice(ec, ...candidates);
+      return !!(pc?.choices || []).some(c => c.attending);
+    };
+
+    const buildPersonRow = (displayName, guest, partyMemberName, seatNumber, isFixed) => {
+      const mc = menuChoiceByGuestId[guest._id.toString()];
+      const isPrimary = !partyMemberName;
+      let pc = null;
+      if (isPrimary) {
+        pc = findPartyChoice(mc, guest._id.toString());
+      } else {
+        const pmObj = (guest.partyMembers || []).find(pm => pm.name === partyMemberName);
+        const candidates = [
+          pmObj?.id,
+          partyMemberName,
+          pmObj?._id ? `member-${pmObj._id}` : null,
+          pmObj?._id ? String(pmObj._id) : null
+        ];
+        pc = findPartyChoice(mc, ...candidates);
+      }
+
+      const choices = (pc?.choices || []).map(c => ({
+        courseId: c.courseId ? c.courseId.toString() : null,
+        optionId: c.optionId ? c.optionId.toString() : null,
+        optionLabel: c.optionId ? (optionLabelMap[c.optionId.toString()] || '—') : '—',
+        cookingPreference: c.cookingPreference || null
+      }));
+      const specialReqs = (pc?.specialRequests || []).filter(sr => sr.selected).map(sr => sr.name);
+
+      return {
+        guestName: displayName,
+        partyMemberName: isPrimary ? null : `${guest.name}'s party`,
+        seatNumber: seatNumber ?? null,
+        isFixed: !!isFixed,
+        choices,
+        specialRequest: specialReqs.join(', ') || null,
+        specialRequestDetail: pc?.specialRequestDetail || null
+      };
+    };
+
     const tableGroups = {};
+    const ensureGroup = (tableNumber, tableName, isHeadTable) => {
+      const tableKey = tableNumber !== null && tableNumber !== undefined ? String(tableNumber) : 'unassigned';
+      if (!tableGroups[tableKey]) {
+        tableGroups[tableKey] = {
+          tableNumber: tableNumber ?? null,
+          tableName: tableName || null,
+          isHeadTable: !!isHeadTable,
+          guests: []
+        };
+      }
+      return tableGroups[tableKey];
+    };
 
-    menuChoices.forEach(mc => {
-      if (!mc.guestId) return;
-      const guestName = mc.guestId.name || mc.guestId.email;
+    const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const seenAssignments = new Set();
+    const fixedGuestNamesByTable = new Map();
 
-      (mc.partyChoices || []).forEach(pc => {
-        const isGuest = pc.partyGuestId === mc.guestId._id.toString();
-        const pmName = isGuest ? null : pc.partyGuestId;
-        const key = mc.guestId._id.toString() + '|' + (pmName || '');
-        const table = assignmentMap[key] || { tableNumber: null, tableName: null, isHeadTable: false };
-        const tableKey = table.tableNumber !== null ? String(table.tableNumber) : 'unassigned';
+    tables.forEach(table => {
+      const fixedSet = new Set();
+      (table.fixedGuests || []).forEach((fg, idx) => {
+        const fgName = typeof fg === 'string' ? fg : (fg.name || '');
+        if (!fgName) return;
+        fixedSet.add(norm(fgName));
+        const fixedSeat = idx + 1;
 
-        if (!tableGroups[tableKey]) {
-          tableGroups[tableKey] = {
-            tableNumber: table.tableNumber,
-            tableName: table.tableName || null,
-            isHeadTable: table.isHeadTable || false,
-            guests: []
-          };
+        const matchedGuest = guests.find(g => norm(g.name) === norm(fgName));
+        const group = ensureGroup(table.number, table.name, table.isHeadTable);
+
+        if (matchedGuest) {
+          if (!isAttending(matchedGuest, null)) {
+            seenAssignments.add(matchedGuest._id.toString() + '|');
+            return;
+          }
+          group.guests.push(buildPersonRow(fgName, matchedGuest, null, fixedSeat, true));
+          seenAssignments.add(matchedGuest._id.toString() + '|');
+        } else {
+          group.guests.push({
+            guestName: fgName,
+            partyMemberName: null,
+            seatNumber: fixedSeat,
+            isFixed: true,
+            choices: [],
+            specialRequest: null,
+            specialRequestDetail: null
+          });
         }
+      });
+      fixedGuestNamesByTable.set(table._id.toString(), fixedSet);
+    });
 
-        const choices = (pc.choices || []).map(c => ({
-          courseId: c.courseId ? c.courseId.toString() : null,
-          optionId: c.optionId ? c.optionId.toString() : null,
-          optionLabel: c.optionId ? (optionLabelMap[c.optionId.toString()] || '—') : '—',
-          cookingPreference: c.cookingPreference || null
-        }));
+    assignments.forEach(a => {
+      if (!a.guestId) return;
+      const guest = guestById[a.guestId.toString()];
+      if (!guest) return;
+      const dedupKey = guest._id.toString() + '|' + (a.partyMemberName || '');
+      if (seenAssignments.has(dedupKey)) return;
 
-        const specialReqs = (pc.specialRequests || []).filter(sr => sr.selected).map(sr => sr.name);
+      const tableIdStr = a.tableId ? a.tableId._id.toString() : null;
+      const fixedSet = tableIdStr ? fixedGuestNamesByTable.get(tableIdStr) : null;
+      const candidateName = a.partyMemberName || guest.name || '';
+      if (fixedSet && fixedSet.has(norm(candidateName))) {
+        seenAssignments.add(dedupKey);
+        return;
+      }
 
-        tableGroups[tableKey].guests.push({
-          guestName: isGuest ? guestName : guestName,
-          partyMemberName: pmName,
-          choices,
-          specialRequest: specialReqs.join(', ') || null,
-          specialRequestDetail: pc.specialRequestDetail || null
-        });
+      if (!isAttending(guest, a.partyMemberName || null)) {
+        seenAssignments.add(dedupKey);
+        return;
+      }
+      const tableNumber = a.tableId ? a.tableId.number : null;
+      const tableName = a.tableId ? a.tableId.name : null;
+      const isHeadTable = a.tableId ? !!a.tableId.isHeadTable : false;
+      const displayName = a.partyMemberName || guest.name || guest.email || 'Unknown';
+      const group = ensureGroup(tableNumber, tableName, isHeadTable);
+      group.guests.push(buildPersonRow(displayName, guest, a.partyMemberName || null, a.seatNumber || null, false));
+      seenAssignments.add(dedupKey);
+    });
+
+    guests.forEach(guest => {
+      const guestIdStr = guest._id.toString();
+      if (!seenAssignments.has(guestIdStr + '|') && isAttending(guest, null)) {
+        const mc = menuChoiceByGuestId[guestIdStr];
+        const hasPrimaryChoice = mc && Array.isArray(mc.partyChoices)
+          && mc.partyChoices.some(p => p.partyGuestId === guestIdStr);
+        if (hasPrimaryChoice) {
+          const group = ensureGroup(null, null, false);
+          group.guests.push(buildPersonRow(guest.name || guest.email || 'Unknown', guest, null, null, false));
+        }
+      }
+      (guest.partyMembers || []).forEach(pm => {
+        if (!pm || !pm.name) return;
+        if (seenAssignments.has(guestIdStr + '|' + pm.name)) return;
+        if (!isAttending(guest, pm.name)) return;
+        const group = ensureGroup(null, null, false);
+        group.guests.push(buildPersonRow(pm.name, guest, pm.name, null, false));
       });
     });
 
-    // Sort: numbered tables first, then unassigned
     const result = Object.values(tableGroups).sort((a, b) => {
       if (a.tableNumber === null) return 1;
       if (b.tableNumber === null) return -1;
       return a.tableNumber - b.tableNumber;
+    });
+
+    result.forEach(group => {
+      const fixed = group.guests.filter(g => g.isFixed);
+      const others = group.guests
+        .filter(g => !g.isFixed)
+        .sort((a, b) => {
+          const aSeat = a.seatNumber == null ? Infinity : a.seatNumber;
+          const bSeat = b.seatNumber == null ? Infinity : b.seatNumber;
+          if (aSeat !== bSeat) return aSeat - bSeat;
+          return (a.guestName || '').localeCompare(b.guestName || '');
+        });
+
+      const numbered = [...fixed, ...others];
+      numbered.forEach((g, i) => { g.seatNumber = i + 1; });
+
+      if (group.isHeadTable && fixed.length > 0 && others.length > 0) {
+        const fixedNumbered = numbered.slice(0, fixed.length);
+        const othersNumbered = numbered.slice(fixed.length);
+        const leftCount = Math.floor(othersNumbered.length / 2);
+        group.guests = [
+          ...othersNumbered.slice(0, leftCount),
+          ...fixedNumbered,
+          ...othersNumbered.slice(leftCount)
+        ];
+      } else {
+        group.guests = numbered;
+      }
     });
 
     res.json(result);
@@ -1046,6 +1200,8 @@ async function getBanquetSeatingPrint(req, res, next) {
     const tables = await Table.find({}).sort({ number: 1 }).lean();
     const assignments = await TableAssignment.find({}).populate('guestId', 'name email partyMembers').sort({ seatNumber: 1 }).lean();
     const menuChoices = await MenuChoice.find({}).lean();
+    const eventChoices = await EventChoice.find({}).lean();
+    const guests = await Guest.find({}).lean();
     const selectableCourses = await Course.find({ selectionRequired: true }).lean();
     const courseOptions = await CourseOption.find({
       courseId: { $in: selectableCourses.map(c => c._id) }
@@ -1058,44 +1214,74 @@ async function getBanquetSeatingPrint(req, res, next) {
 
     const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 
-    const findPartyChoice = (mc, ...candidates) => {
-      if (!mc?.partyChoices) return null;
+    const eventChoiceByGuestId = {};
+    eventChoices.forEach(ec => { if (ec.guestId) eventChoiceByGuestId[ec.guestId.toString()] = ec; });
+
+    const findPartyChoice = (doc, ...candidates) => {
+      if (!doc?.partyChoices) return null;
       for (const id of candidates) {
-        const match = mc.partyChoices.find(p => p.partyGuestId === id)
-          || mc.partyChoices.find(p => p.partyGuestId === String(id));
+        if (id == null) continue;
+        const match = doc.partyChoices.find(p => p.partyGuestId === id)
+          || doc.partyChoices.find(p => p.partyGuestId === String(id));
         if (match) return match;
       }
       return null;
+    };
+
+    const isAttending = (guest, partyMemberName) => {
+      const ec = eventChoiceByGuestId[guest._id.toString()];
+      if (!ec) return false;
+      const guestIdStr = guest._id.toString();
+      let candidates;
+      if (!partyMemberName) {
+        candidates = [guestIdStr];
+      } else {
+        const pmObj = (guest.partyMembers || []).find(pm => pm.name === partyMemberName);
+        candidates = [
+          pmObj?.id,
+          partyMemberName,
+          pmObj?._id ? `member-${pmObj._id}` : null,
+          pmObj?._id ? String(pmObj._id) : null
+        ];
+        if (pmObj && pmObj.id == null) candidates.push('null', 'undefined');
+      }
+      const pc = findPartyChoice(ec, ...candidates);
+      return !!(pc?.choices || []).some(c => c.attending);
+    };
+
+    const buildMealChoices = (pc) => {
+      const mealChoices = [];
+      selectableCourses.forEach(c => {
+        const cid = c._id.toString();
+        const choice = pc?.choices?.find(ch => ch.courseId?.toString() === cid);
+        mealChoices.push({
+          course: courseMap[cid],
+          selected: choice ? (optionMap[choice.optionId?.toString()] || null) : null,
+          cookingPreference: choice?.cookingPreference || null
+        });
+      });
+      return mealChoices;
     };
 
     const result = tables.map(t => {
       const tableAssignments = assignments.filter(a => a.tableId.toString() === t._id.toString());
       const fixedNames = new Set((t.fixedGuests || []).map(fg => norm(typeof fg === 'string' ? fg : (fg.name || fg))));
 
-      const seats = [];
+      const fixedSeats = [];
+      const otherSeats = [];
 
       (t.fixedGuests || []).forEach(fg => {
         const fgName = typeof fg === 'string' ? fg : (fg.name || fg);
-        const matchAssign = tableAssignments.find(a => fixedNames.has(norm(a.guestId?.name || '')));
-        const guestId = matchAssign?.guestId?._id?.toString();
-        const mc = guestId ? menuChoices.find(m => m.guestId.toString() === guestId) : null;
-        const pc = mc ? findPartyChoice(mc, guestId) : null;
+        const matchedGuest = guests.find(g => norm(g.name) === norm(fgName));
+        if (matchedGuest && !isAttending(matchedGuest, null)) return;
 
-        const mealChoices = [];
-        selectableCourses.forEach(c => {
-          const cid = c._id.toString();
-          const choice = pc?.choices?.find(ch => ch.courseId?.toString() === cid);
-          mealChoices.push({
-            course: courseMap[cid],
-            selected: choice ? (optionMap[choice.optionId?.toString()] || null) : null,
-            cookingPreference: choice?.cookingPreference || null
-          });
-        });
-
+        const mc = matchedGuest ? menuChoices.find(m => m.guestId.toString() === matchedGuest._id.toString()) : null;
+        const pc = matchedGuest && mc ? findPartyChoice(mc, matchedGuest._id.toString()) : null;
+        const mealChoices = buildMealChoices(pc);
         const badges = (pc?.specialRequests || []).filter(sr => sr.selected).map(sr => sr.name);
         const detail = pc?.specialRequestDetail || '';
 
-        seats.push({
+        fixedSeats.push({
           seat: 0,
           name: fgName,
           isFixed: true,
@@ -1108,35 +1294,26 @@ async function getBanquetSeatingPrint(req, res, next) {
       tableAssignments
         .filter(a => !fixedNames.has(norm(a.guestId?.name || '')))
         .forEach(a => {
-          const displayName = a.partyMemberName || (a.guestId ? a.guestId.name : 'Unknown');
-          const guestId = a.guestId?._id?.toString();
-          const mc = guestId ? menuChoices.find(m => m.guestId.toString() === guestId) : null;
-
-          const pmId = a.partyMemberName || guestId;
           const guest = a.guestId;
-          const pmObj = a.partyMemberName && guest?.partyMembers
+          if (!guest) return;
+          if (!isAttending(guest, a.partyMemberName || null)) return;
+
+          const displayName = a.partyMemberName || guest.name || 'Unknown';
+          const guestId = guest._id.toString();
+          const mc = menuChoices.find(m => m.guestId.toString() === guestId);
+          const pmObj = a.partyMemberName && guest.partyMembers
             ? guest.partyMembers.find(pm => pm.name === a.partyMemberName)
             : null;
           const candidates = a.partyMemberName
-            ? [pmObj?.id, a.partyMemberName, `member-${pmObj?.id}`]
+            ? [pmObj?.id, a.partyMemberName, pmObj?._id ? `member-${pmObj._id}` : null, pmObj?._id ? String(pmObj._id) : null]
             : [guestId];
           const pc = mc ? findPartyChoice(mc, ...candidates) : null;
 
-          const mealChoices = [];
-          selectableCourses.forEach(c => {
-            const cid = c._id.toString();
-            const choice = pc?.choices?.find(ch => ch.courseId?.toString() === cid);
-            mealChoices.push({
-              course: courseMap[cid],
-              selected: choice ? (optionMap[choice.optionId?.toString()] || null) : null,
-              cookingPreference: choice?.cookingPreference || null
-            });
-          });
-
+          const mealChoices = buildMealChoices(pc);
           const badges = (pc?.specialRequests || []).filter(sr => sr.selected).map(sr => sr.name);
           const detail = pc?.specialRequestDetail || '';
 
-          seats.push({
+          otherSeats.push({
             seat: 0,
             name: displayName,
             isFixed: false,
@@ -1146,10 +1323,27 @@ async function getBanquetSeatingPrint(req, res, next) {
           });
         });
 
-      const emptySeats = Math.max(0, t.capacity - seats.length);
+      const numbered = [...fixedSeats, ...otherSeats];
+      numbered.forEach((s, i) => { s.seat = i + 1; });
+
+      let ordered;
+      if (t.isHeadTable && fixedSeats.length > 0 && otherSeats.length > 0) {
+        const fixedNumbered = numbered.slice(0, fixedSeats.length);
+        const othersNumbered = numbered.slice(fixedSeats.length);
+        const leftCount = Math.floor(othersNumbered.length / 2);
+        ordered = [
+          ...othersNumbered.slice(0, leftCount),
+          ...fixedNumbered,
+          ...othersNumbered.slice(leftCount)
+        ];
+      } else {
+        ordered = numbered;
+      }
+
+      const emptySeats = Math.max(0, t.capacity - ordered.length);
       for (let i = 0; i < emptySeats; i++) {
-        seats.push({
-          seat: 0,
+        ordered.push({
+          seat: ordered.length + 1,
           name: null,
           isFixed: false,
           mealChoices: selectableCourses.map(c => ({ course: courseMap[c._id.toString()], selected: null })),
@@ -1158,15 +1352,13 @@ async function getBanquetSeatingPrint(req, res, next) {
         });
       }
 
-      seats.forEach((s, i) => { s.seat = i + 1; });
-
       return {
         number: t.number,
         name: t.name,
         isHeadTable: t.isHeadTable,
         capacity: t.capacity,
-        filledCount: seats.filter(s => s.name).length,
-        seats
+        filledCount: ordered.filter(s => s.name).length,
+        seats: ordered
       };
     });
 
