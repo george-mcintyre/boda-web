@@ -486,9 +486,12 @@
 
       target.innerHTML = `
         <div class="admin-content">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px;flex-wrap:wrap;">
             <h3 style="margin:0;"><i class="fas fa-th"></i> ${translate('admin:subtab.tableAllocation')}</h3>
-            <button onclick="window.open('admin-banquet-print.html','_blank')" class="btn" style="background:var(--gray-200);color:var(--text-dark);"><i class="fas fa-print"></i> <span data-i18n="admin:tables.printBanquet">${translate('admin:tables.printBanquet')}</span></button>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button onclick="window.openVenuePrintTokenDialog()" class="btn" style="background:var(--gray-200);color:var(--text-dark);"><i class="fas fa-store"></i> ${translate('admin:tables.venueAccess') || 'Venue Access'}</button>
+              <button onclick="window.open('admin-banquet-print.html','_blank')" class="btn" style="background:var(--gray-200);color:var(--text-dark);"><i class="fas fa-print"></i> <span data-i18n="admin:tables.printBanquet">${translate('admin:tables.printBanquet')}</span></button>
+            </div>
           </div>
           <div class="stats-grid" style="margin-bottom:20px;">
             <div class="stat-card">
@@ -3856,7 +3859,73 @@
       notify('Error updating setting: ' + error.message, 'error');
     }
   };
-  
+
+  window.openVenuePrintTokenDialog = async function() {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10000;';
+    overlay.innerHTML = `
+      <div class="admin-card" style="max-width:480px;width:90%;padding:24px;background:#fff;border-radius:12px;text-align:center;">
+        <h3 style="margin:0 0 8px;"><i class="fas fa-store" style="color:var(--primary-color);"></i> Venue Access</h3>
+        <p style="margin:0 0 16px;color:var(--text-light);font-size:0.9em;">Token-protected URL for venue staff to view and print the seating plan in Spanish. Read-only.</p>
+        <div id="venueTokenContent" style="min-height:200px;"></div>
+        <div style="margin-top:20px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
+          <button id="venueTokenRotate" class="btn" style="background:var(--primary-color);color:#fff;"><i class="fas fa-sync-alt"></i> Generate / Rotate</button>
+          <button id="venueTokenClose" class="btn" style="background:var(--gray-200);color:var(--text-dark);">Close</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const closeBtn = overlay.querySelector('#venueTokenClose');
+    closeBtn.addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+    const renderTokenState = (data) => {
+      const contentEl = overlay.querySelector('#venueTokenContent');
+      if (!data || !data.hasToken) {
+        contentEl.innerHTML = `
+          <div style="padding:24px;color:var(--text-light);">
+            <i class="fas fa-info-circle" style="font-size:2em;margin-bottom:8px;color:var(--primary-color);"></i>
+            <p style="margin:0;">No token generated yet. Click "Generate / Rotate" to create one.</p>
+          </div>`;
+      } else {
+        contentEl.innerHTML = `
+          <img src="${data.qrDataUrl}" alt="Venue Print QR" style="width:240px;height:240px;border:1px solid var(--gray-200);border-radius:8px;" />
+          <p style="margin:12px 0 4px;font-size:0.8em;color:var(--text-light);">Scan to open the venue print page.</p>
+          <p style="margin:0;font-size:0.7em;color:var(--text-light);word-break:break-all;"><a href="${data.url}" target="_blank" style="color:var(--primary-color);">${data.url}</a></p>
+          <p style="margin:8px 0 0;font-size:0.75em;color:#dc3545;"><i class="fas fa-exclamation-triangle"></i> Rotating invalidates any URL/QR previously shared.</p>
+        `;
+      }
+    };
+
+    overlay.querySelector('#venueTokenRotate').addEventListener('click', async () => {
+      const btn = overlay.querySelector('#venueTokenRotate');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating…';
+      try {
+        const r = await api('/api/admin/venue-print-token/rotate', { method: 'POST' });
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const data = await r.json();
+        renderTokenState({ hasToken: true, ...data });
+        notify('Venue access token rotated.', 'success');
+      } catch (e) {
+        notify('Failed to rotate token: ' + e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sync-alt"></i> Generate / Rotate';
+      }
+    });
+
+    try {
+      const r = await api('/api/admin/venue-print-token');
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const data = await r.json();
+      renderTokenState(data);
+    } catch (e) {
+      overlay.querySelector('#venueTokenContent').innerHTML = `<p style="color:#dc3545;">Failed to load token state: ${e.message}</p>`;
+    }
+  };
+
 
 
   // Router for tabs

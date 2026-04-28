@@ -8,5 +8,6 @@ const configSchema = new Schema({
   menuEnabled: { type: Boolean, default: true },
   messagesEnabled: { type: Boolean, default: true },
   seatingEnabled: { type: Boolean, default: false },
+  venuePrintToken: { type: String, default: null },
 }, { timestamps: true });
 module.exports = model('Config', configSchema);

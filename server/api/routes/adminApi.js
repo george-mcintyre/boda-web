@@ -331,4 +331,7 @@ router.get('/guest-list-print', auth('admin'), adminExpCtrl.getGuestListPrint);
 router.get('/banquet-seating-print', auth('admin'), adminExpCtrl.getBanquetSeatingPrint);
 router.post('/table-seats/reorder', auth('admin'), adminExpCtrl.reorderTableSeats);
 
+router.get('/venue-print-token', auth('admin'), adminExpCtrl.getVenuePrintTokenInfo);
+router.post('/venue-print-token/rotate', auth('admin'), adminExpCtrl.rotateVenuePrintToken);
+
 module.exports = router;

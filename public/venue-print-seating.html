@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Plan de Asientos del Banquete - Boda de Iluminada y George</title>
+  <link rel="icon" href="/assets/images/favicon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; font-size: 11px; color: #2C1810; background: #fff; padding: 20px; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 18px; color: #8B5A96; margin-bottom: 4px; }
+    .subtitle { font-size: 11px; color: #6B4E3D; margin-bottom: 16px; }
+    .print-btn { background: #8B5A96; color: #fff; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 12px; margin-bottom: 16px; }
+    .print-btn:hover { background: #7a4d85; }
+
+    .table-block { margin-bottom: 24px; break-inside: avoid; }
+    .table-header {
+      background: #f3eff5; padding: 8px 12px; border-radius: 6px 6px 0 0;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 2px solid #d4b8dd;
+    }
+    .table-header h2 { font-size: 14px; color: #8B5A96; margin: 0; font-family: 'Playfair Display', serif; }
+    .table-header .count { font-size: 11px; color: #6B4E3D; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 10px; table-layout: fixed; }
+    thead th {
+      background: #faf7fb; color: #8B5A96; font-weight: 600; padding: 5px 6px;
+      border-bottom: 1px solid #e8dced; text-align: left; white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    thead th.center { text-align: center; }
+    tbody td { padding: 4px 6px; border-bottom: 1px solid #f0ecf2; vertical-align: top; overflow: hidden; text-overflow: ellipsis; }
+    tbody td.center { text-align: center; }
+    tbody tr.empty td { color: #ccc; font-style: italic; }
+    tbody tr.no-choice td { background: #fff9f0; }
+
+    .seat-num { display: inline-block; width: 18px; height: 18px; line-height: 18px; text-align: center; border-radius: 50%; background: #e8dced; color: #8B5A96; font-weight: 700; font-size: 9px; margin-right: 4px; flex-shrink: 0; }
+    .seat-num.fixed { background: #d4a5a5; color: #fff; }
+    .seat-cell { display: flex; align-items: flex-start; gap: 2px; }
+    .seat-name { word-break: break-word; line-height: 1.25; }
+
+    .meal-cell { white-space: normal; word-break: break-word; line-height: 1.25; }
+
+    .allergy-badges { display: flex; flex-wrap: wrap; gap: 2px; }
+    .allergy-badge { display: inline-block; background: #fff3cd; color: #856404; border-radius: 3px; padding: 1px 4px; font-size: 8px; font-weight: 500; white-space: nowrap; }
+    .allergy-detail { font-size: 8px; color: #666; margin-top: 1px; font-style: italic; }
+
+    /* Row severity tinting - lets staff scan a printed sheet at a glance.
+       Severity precedence: danger > warning > safe (set by JS in classes). */
+    tbody tr.sev-danger td { background: #f8d7da !important; }
+    tbody tr.sev-danger td:first-child { box-shadow: inset 4px 0 0 #dc3545; }
+    tbody tr.sev-warning td { background: #fff3cd !important; }
+    tbody tr.sev-warning td:first-child { box-shadow: inset 4px 0 0 #ffc107; }
+    tbody tr.sev-safe td { background: #d1e7dd !important; }
+    tbody tr.sev-safe td:first-child { box-shadow: inset 4px 0 0 #198754; }
+    @media print {
+      tbody tr.sev-danger td,
+      tbody tr.sev-warning td,
+      tbody tr.sev-safe td {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+
+    .check { color: #28a745; }
+    .pending { color: #ffc107; }
+
+    @media print {
+      .print-btn, .no-print { display: none !important; }
+      body { padding: 0; font-size: 9px; }
+      table { font-size: 8px; }
+      .table-block { break-inside: avoid; }
+      @page { size: portrait; margin: 10mm; }
+    }
+  </style>
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
+  <h1><i class="fas fa-utensils" style="color:#D4A5A5;"></i> Plan de Asientos del Banquete</h1>
+  <div class="subtitle" id="generated"></div>
+  <div id="error" style="display:none;color:#dc3545;padding:20px;"></div>
+  <div id="content"></div>
+
+  <script>
+    const labels = {
+      title: 'Plan de Asientos del Banquete',
+      generated: 'Generado',
+      seat: 'Asiento',
+      allergy: 'Alergia',
+      seats: 'asientos',
+      table: 'Mesa',
+      headTable: 'Mesa Principal',
+      cooking: {
+        'rare': 'Poco hecho',
+        'medium-rare': 'Medio poco hecho',
+        'medium': 'Al punto',
+        'well-done': 'Muy hecho'
+      },
+      dietary: {
+        'vegetarian': 'Vegetariano',
+        'vegan': 'Vegano',
+        'lactose-intolerant': 'Intolerante a la lactosa',
+        'gluten-intolerant': 'Intolerante al gluten',
+        'nut-allergy': 'Alergia a frutos secos',
+        'nut allergy': 'Alergia a frutos secos',
+        'other': 'Otro'
+      }
+    };
+
+    document.title = labels.title;
+
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (!token) {
+      document.getElementById('error').style.display = 'block';
+      document.getElementById('error').textContent = 'Token no proporcionado.';
+    } else {
+      load();
+    }
+
+    async function load() {
+      try {
+        const res = await fetch('/api/venue-print-seating?token=' + encodeURIComponent(token));
+        if (!res.ok) {
+          if (res.status === 401) throw new Error('Token no válido o caducado.');
+          throw new Error('Error de API: ' + res.status);
+        }
+        render(await res.json());
+      } catch (e) {
+        document.getElementById('error').style.display = 'block';
+        document.getElementById('error').textContent = e.message;
+      }
+    }
+
+    function render(data) {
+      const { courses, tables } = data;
+      const dateStr = new Date().toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      document.getElementById('generated').textContent = labels.generated + ': ' + dateStr;
+
+      const ck = '<i class="fas fa-check check"></i>';
+      const pend = '<i class="fas fa-clock pending"></i>';
+
+      const courseHeaders = courses.map(c => `<th class="center">${c.label}</th>`).join('');
+      // Column layout: name takes ~22%, each meal course shares the middle band,
+      // chosen-status is a tight icon column, allergy gets the remaining space (~30%+).
+      const numCourses = courses.length || 1;
+      const allergyWidth = 30;
+      const chosenWidth = 5;
+      const nameWidth = 22;
+      const mealBand = 100 - nameWidth - chosenWidth - allergyWidth; // remaining for meal cols
+      const perMealWidth = (mealBand / numCourses).toFixed(2);
+      const colgroup = `<colgroup>
+        <col style="width: ${nameWidth}%;">
+        ${courses.map(() => `<col style="width: ${perMealWidth}%;">`).join('')}
+        <col style="width: ${chosenWidth}%;">
+        <col style="width: ${allergyWidth}%;">
+      </colgroup>`;
+
+      // Classify a dietary/allergy badge into a severity bucket.
+      // danger  -> severe allergen (red row): nut allergy, gluten
+      // safe    -> dietary preference (green row): vegetarian, vegan
+      // warning -> everything else (amber row): lactose, other, unknown
+      const classifyBadge = (raw) => {
+        const k = String(raw || '').toLowerCase().trim();
+        if (k === 'nut-allergy' || k === 'nut allergy' || k.includes('nut')) return 'danger';
+        if (k === 'gluten-intolerant' || k.includes('gluten')) return 'danger';
+        if (k === 'vegetarian' || k === 'vegan') return 'safe';
+        return 'warning';
+      };
+      // Worst-wins precedence when a guest has multiple flags.
+      const sevRank = { danger: 3, warning: 2, safe: 1 };
+      const worstSeverity = (badges, hasDetail) => {
+        let worst = null;
+        for (const b of badges) {
+          const s = classifyBadge(b);
+          if (!worst || sevRank[s] > sevRank[worst]) worst = s;
+        }
+        // Free-text "other" detail without explicit badges still warrants warning tint.
+        if (!worst && hasDetail) worst = 'warning';
+        return worst;
+      };
+
+      let html = '';
+      tables.forEach(t => {
+        const tableName = t.isHeadTable
+          ? `<i class="fas fa-crown" style="color:gold;"></i> ${labels.headTable}`
+          : `${labels.table} ${t.number}`;
+        const rows = t.seats.map(s => {
+          if (!s.name) {
+            const emptyCols = courses.map(() => '<td class="center"></td>').join('');
+            return `<tr class="empty"><td><span class="seat-num">${s.seat}</span> &mdash;</td>${emptyCols}<td></td><td></td></tr>`;
+          }
+
+          const mealCols = s.mealChoices.map(m => {
+            let label = m.selected ? m.selected : (s.isFixed ? '' : pend);
+            if (m.selected && m.cookingPreference) label += ` (${labels.cooking[m.cookingPreference] || m.cookingPreference})`;
+            return `<td class="center meal-cell">${label}</td>`;
+          }).join('');
+
+          let allergyHtml = '';
+          if (s.allergies.badges.length > 0 || s.allergies.detail) {
+            allergyHtml = '<div class="allergy-badges">' +
+              s.allergies.badges.map(b => `<span class="allergy-badge">${labels.dietary[b] || b}</span>`).join('') + '</div>';
+            if (s.allergies.detail) allergyHtml += `<div class="allergy-detail">${s.allergies.detail}</div>`;
+          }
+
+          const chosenCol = s.isFixed ? '' : (s.hasChosen ? ck : pend);
+          const classes = [];
+          if (!s.isFixed && !s.hasChosen && s.name) classes.push('no-choice');
+          const sev = worstSeverity(s.allergies.badges, !!s.allergies.detail);
+          if (sev) classes.push('sev-' + sev);
+          const trClass = classes.length ? ` class="${classes.join(' ')}"` : '';
+
+          return `<tr${trClass}>` +
+            `<td><div class="seat-cell"><span class="seat-num${s.isFixed ? ' fixed' : ''}">${s.seat}</span><span class="seat-name">${s.name}</span></div></td>` +
+            mealCols +
+            `<td class="center">${chosenCol}</td>` +
+            `<td>${allergyHtml}</td>` +
+            `</tr>`;
+        }).join('');
+
+        html += `<div class="table-block">
+          <div class="table-header">
+            <h2>${tableName}</h2>
+            <span class="count">${t.filledCount}/${t.capacity} ${labels.seats}</span>
+          </div>
+          <table>
+            ${colgroup}
+            <thead><tr>
+              <th><i class="fas fa-chair"></i> ${labels.seat}</th>
+              ${courseHeaders}
+              <th class="center"><i class="fas fa-utensils"></i></th>
+              <th><i class="fas fa-exclamation-triangle"></i> ${labels.allergy}</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
+      });
+
+      document.getElementById('content').innerHTML = html;
+    }
+  </script>
+</body>
+</html>

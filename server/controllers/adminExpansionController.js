@@ -1,4 +1,6 @@
-const { Guest, Event, EventChoice, MenuChoice, ChefProfile, ChefProfileImage, DayMenu, DayMenuImage, Table, TableAssignment, GiftChoice, Gift, Course, CourseOption } = require('../models');
+const { Guest, Event, EventChoice, MenuChoice, ChefProfile, ChefProfileImage, DayMenu, DayMenuImage, Table, TableAssignment, GiftChoice, Gift, Course, CourseOption, Config } = require('../models');
+const crypto = require('crypto');
+const QRCode = require('qrcode');
 const { mergeLocalizedString, localize, getLang } = require('../utils/localized');
 const fs = require('fs');
 const path = require('path');
@@ -1392,6 +1394,55 @@ async function updateAdminEventChoices(req, res, next) {
   } catch (e) { next(e); }
 }
 
+function buildVenuePrintUrl(req, token) {
+  const host = (req.headers['x-forwarded-host'] || req.headers.host || '').split(',')[0].trim();
+  const proto = (req.headers['x-forwarded-proto'] || req.protocol || 'https').split(',')[0].trim();
+  return `${proto}://${host}/venue-print-seating.html?token=${token}`;
+}
+
+async function buildVenuePrintQrPayload(req, token) {
+  const url = buildVenuePrintUrl(req, token);
+  const dataUrl = await QRCode.toDataURL(url, {
+    type: 'image/png',
+    width: 360,
+    margin: 2,
+    color: { dark: '#8B5A96', light: '#FDFBF7' }
+  });
+  return { url, qrDataUrl: dataUrl };
+}
+
+async function rotateVenuePrintToken(req, res, next) {
+  try {
+    const token = crypto.randomBytes(16).toString('hex');
+    await Config.findOneAndUpdate({}, { venuePrintToken: token }, { upsert: true, new: true });
+    const payload = await buildVenuePrintQrPayload(req, token);
+    res.json({ token, ...payload });
+  } catch (e) { next(e); }
+}
+
+async function getVenuePrintTokenInfo(req, res, next) {
+  try {
+    const config = await Config.findOne({}).lean();
+    if (!config || !config.venuePrintToken) {
+      return res.json({ hasToken: false });
+    }
+    const payload = await buildVenuePrintQrPayload(req, config.venuePrintToken);
+    res.json({ hasToken: true, ...payload });
+  } catch (e) { next(e); }
+}
+
+async function getVenuePrintSeating(req, res, next) {
+  try {
+    const token = req.query.token;
+    if (!token) return res.status(401).json({ error: 'Token required' });
+    const config = await Config.findOne({}).lean();
+    if (!config || !config.venuePrintToken) return res.status(401).json({ error: 'Invalid token' });
+    if (config.venuePrintToken !== token) return res.status(401).json({ error: 'Invalid token' });
+    req.query.lang = 'es';
+    return getBanquetSeatingPrint(req, res, next);
+  } catch (e) { next(e); }
+}
+
 module.exports = {
   getGuestSummary,
   listChefProfiles, createChefProfile, updateChefProfile, deleteChefProfile,
@@ -1409,5 +1460,8 @@ module.exports = {
   getGuestsWithoutMenuChoices,
   getGuestsWithoutParty,
   getGuestListPrint,
-  getBanquetSeatingPrint
+  getBanquetSeatingPrint,
+  rotateVenuePrintToken,
+  getVenuePrintTokenInfo,
+  getVenuePrintSeating
 };
