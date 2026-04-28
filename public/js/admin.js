@@ -821,6 +821,10 @@
         return;
       }
 
+      const seatBadgeStyle = 'display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;font-weight:700;font-size:11px;margin-right:6px;';
+      const seatBadgeRegular = `${seatBadgeStyle}background:#e8dced;color:#8B5A96;`;
+      const seatBadgeFixed = `${seatBadgeStyle}background:#d4a5a5;color:#fff;`;
+
       let totalResponses = 0;
       const groupHtml = tableGroups.map(group => {
         totalResponses += group.guests.length;
@@ -831,12 +835,15 @@
             return c.optionLabel;
           }).filter(Boolean).join(', ') || '—';
           const specReq = g.specialRequest ? `<span class="badge badge-info">${g.specialRequest.split(', ').map(s => translateDietary(s.trim())).join(', ')}</span>` : '';
-          return `<tr><td>${g.guestName}${g.partyMemberName ? ' <small>(' + g.partyMemberName + ')</small>' : ''}</td><td>${choiceLabels}</td><td>${specReq}${g.specialRequestDetail ? ' ' + g.specialRequestDetail : ''}</td></tr>`;
+          const seatBadge = g.seatNumber != null
+            ? `<span style="${g.isFixed ? seatBadgeFixed : seatBadgeRegular}">${g.seatNumber}</span>`
+            : '';
+          return `<tr><td>${seatBadge}${g.guestName}${g.partyMemberName ? ' <small>(' + g.partyMemberName + ')</small>' : ''}</td><td>${choiceLabels}</td><td>${specReq}${g.specialRequestDetail ? ' ' + g.specialRequestDetail : ''}</td></tr>`;
         }).join('');
 
         return `
           <div class="admin-card" style="margin-bottom:15px;">
-            <h4>${group.isHeadTable ? '<i class="fas fa-crown" style="color:gold;"></i> ' + translate('admin:tables.headTable') : (group.tableName || (group.tableNumber !== null ? translate('admin:tables.tableLabel') + ' ' + group.tableNumber : translate('admin:tables.unassigned')))} ${group.tableNumber !== null && !group.isHeadTable ? '(#' + group.tableNumber + ')' : ''}</h4>
+            <h4>${group.isHeadTable ? '<i class="fas fa-crown" style="color:gold;"></i> ' + translate('admin:tables.headTable') : (group.tableName || (group.tableNumber !== null ? translate('admin:tables.tableLabel') + ' ' + group.tableNumber : translate('admin:tables.unassigned')))}</h4>
             <table class="data-table">
               <thead><tr><th>${translate('admin:menuResponses.guest')}</th><th>${translate('admin:menuResponses.menuChoices')}</th><th>${translate('admin:menuResponses.specialRequests')}</th></tr></thead>
               <tbody>${guestRows}</tbody>
