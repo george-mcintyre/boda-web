@@ -70,17 +70,24 @@ async function main() {
   await mongoose.connect(MONGODB_URI, { dbName: MONGODB_DB });
   if (!jsonOutput) console.log('Connected.\n');
 
-  const mainCourses = await Course.find({ course: 'main' }).lean();
-  if (mainCourses.length === 0) throw new Error('No main course found');
-  const mainCourseIds = new Set(mainCourses.map(c => c._id.toString()));
+  // Match the server's actual validation rule (menuController.js):
+  //   course.selectionRequired && option.allowsCookingPreference
+  // Only options on a required course can trigger the bug; orphan options
+  // pointing at deleted courses are skipped server-side and so are skipped here.
+  const requiredCourses = await Course.find({ selectionRequired: true }).lean();
+  if (requiredCourses.length === 0) throw new Error('No selectionRequired course found');
+  const requiredCourseIds = new Set(requiredCourses.map(c => c._id.toString()));
 
   const allOptions = await CourseOption.find({}).lean();
   const optionsById = new Map(allOptions.map(o => [o._id.toString(), o]));
 
-  const beefOptions = allOptions.filter(o => o.allowsCookingPreference);
+  const beefOptions = allOptions.filter(o =>
+    o.allowsCookingPreference &&
+    requiredCourseIds.has(o.courseId?.toString())
+  );
   const beefIds = new Set(beefOptions.map(o => o._id.toString()));
   const fishOptions = allOptions.filter(o =>
-    mainCourseIds.has(o.courseId?.toString()) &&
+    requiredCourseIds.has(o.courseId?.toString()) &&
     !o.allowsCookingPreference &&
     !o.isVegetarian
   );
@@ -106,7 +113,7 @@ async function main() {
     const isStale = updatedAt && updatedAt < BUG_WINDOW_OPENED;
 
     for (const pc of (mc.partyChoices || [])) {
-      const mainChoice = (pc.choices || []).find(c => mainCourseIds.has(c.courseId?.toString()));
+      const mainChoice = (pc.choices || []).find(c => requiredCourseIds.has(c.courseId?.toString()));
       const memberId = pc.partyGuestId;
       const isPrimary = memberId === mc.guestId.toString();
       const memberLabel = isPrimary
@@ -170,9 +177,9 @@ async function main() {
   console.log(`Bug window opened: ${BUG_WINDOW_OPENED.toISOString()}`);
   console.log(`Bug window closed: ${new Date().toISOString()} (this fix)`);
   console.log('');
-  console.log(`MenuChoice documents:  ${menuChoices.length}`);
-  console.log(`Beef options in DB:    ${beefOptions.length} (${beefOptions.map(o => pickLabel(o.label)).join(', ')})`);
-  console.log(`Fish options in DB:    ${fishOptions.length} (${fishOptions.map(o => pickLabel(o.label)).join(', ')})`);
+  console.log(`MenuChoice documents:                 ${menuChoices.length}`);
+  console.log(`Bug-triggering options on required courses: ${beefOptions.length} (${beefOptions.map(o => pickLabel(o.label)).join(', ') || 'none'})`);
+  console.log(`Non-bug options on required courses (fishlike): ${fishOptions.length} (${fishOptions.map(o => pickLabel(o.label)).join(', ') || 'none'})`);
   console.log('');
   console.log(`Party members with no main saved:    ${noMainSaved.length}  ← HIGH suspicion`);
   console.log(`Party members on fish:                ${fishSelected.length}  ← MEDIUM suspicion`);
