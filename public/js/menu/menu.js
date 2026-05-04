@@ -555,6 +555,14 @@ window.onMenuSelectChange = function(wrapper) {
   const cookingSelect = cell.querySelector('.cooking-pref-inline');
   if (allowsCookingPref) {
     cookingSelect.style.display = '';
+    // Persist the currently displayed cooking preference (default "medium") so the
+    // save isn't rejected by server validation when the user accepts the default
+    // without explicitly interacting with the dropdown.
+    if (!window.cookingPrefsData) window.cookingPrefsData = {};
+    if (!window.cookingPrefsData[memberId]) window.cookingPrefsData[memberId] = {};
+    if (!window.cookingPrefsData[memberId][courseId]) {
+      window.cookingPrefsData[memberId][courseId] = cookingSelect.value || 'medium';
+    }
   } else {
     cookingSelect.style.display = 'none';
     if (window.cookingPrefsData && window.cookingPrefsData[memberId]) {
