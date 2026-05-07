@@ -384,10 +384,57 @@ const translations = {
     'guests:giftsPurchaseMessageLabel': 'Add a personal message (optional):',
     'guests:giftsPurchaseMessage:placeholder': 'Leave a lovely message for the couple...',
     'guests:giftsPurchaseCancel': 'Cancel',
+    'guests:giftsPurchaseClose': 'Close',
+    'guests:giftsPurchasedMessageLabel': 'Your personal message',
     'guests:giftsPurchaseProceed': 'Proceed to Payment',
     'guests:giftsPurchaseProcessing': 'Processing...',
     'guests:giftsPaymentError': 'Error processing payment',
     'guests:giftsPaymentServiceError': 'Error connecting to payment service',
+
+    //--------------------------------
+    // Cube Gifts
+    //--------------------------------
+    'guests:gifts.cube.title': 'A Block for Our Wedding Sculpture',
+    'guests:gifts.cube.description': 'Help us construct the perfect Wedding Present by buying one block that you\'ll build with us on the wedding day. It will become part of a permanent piece of art we\'ll treasure forever.',
+    'guests:gifts.cube.sold': 'Sold',
+    'guests:gifts.cube.priceLabel': 'Choose your contribution',
+    'guests:gifts.cube.priceLabelYour': 'Your contribution',
+    'guests:gifts.cube.priceFrom': 'from',
+    'guests:gifts.cube.messagePlaceholder': 'Leave a message for the couple...',
+    'guests:gifts.cube.alreadySold': 'This block has just been gifted by another guest. Please choose another.',
+    'guests:gifts.cube.buyButton': 'Build with us',
+
+    //--------------------------------
+    // Figurine Gifts
+    //--------------------------------
+    'guests:gifts.figurine.priceLabel': 'Choose your contribution',
+    'guests:gifts.figurine.messagePlaceholder': 'Leave a message for the couple...',
+    'guests:gifts.figurine.alreadySold': 'This figurine has just been claimed by another guest. Please choose another.',
+    'guests:gifts.figurine.buyButton': 'Claim this figurine',
+
+    //--------------------------------
+    // Gift Sections (Figurines / Blocks / Cards)
+    //--------------------------------
+    'guests:gifts.section.figurine.title': 'Bride & Groom Figurines',
+    'guests:gifts.section.figurine.lede': 'A 3D figurine of the bride, the groom, or one of them on a sun-lounger. It will be waiting at your table during the banquet — present it to the couple, watch it adorn the wedding cake, and then become a permanent part of the sculpture. A printed card with your message comes with each one.',
+    'guests:gifts.section.figurine.priceRange': '€250–€500',
+    'guests:gifts.section.figurine.delivery': 'Waiting at your table on the day',
+    'guests:gifts.section.figurine.leadTime': 'Order 2 weeks ahead for printing',
+    'guests:gifts.section.figurine.empty': 'Figurines are coming soon — keep an eye on this space.',
+
+    'guests:gifts.section.cube.title': 'Building the Wedding Sculpture',
+    'guests:gifts.section.cube.lede': 'A physical 3D cube matching the on-screen visualisation, with your printed message on one face and space to add to it on the day. You\'ll be called up to add your block to the sculpture during the banquet.',
+    'guests:gifts.section.cube.priceRange': '€50–€500',
+    'guests:gifts.section.cube.delivery': 'Delivered to your table on the day',
+    'guests:gifts.section.cube.leadTime': 'Order 2 weeks ahead for printing',
+    'guests:gifts.section.cube.empty': 'No blocks available right now.',
+
+    'guests:gifts.section.card.title': 'Gift Cards',
+    'guests:gifts.section.card.lede': 'A printed card delivered to your table on the day, with your message already on it and space to add to it. Hand it to the couple as your gift.',
+    'guests:gifts.section.card.priceRange': '€25–€250',
+    'guests:gifts.section.card.delivery': 'Delivered to your table on the day',
+    'guests:gifts.section.card.leadTime': 'Order 2 weeks ahead for printing',
+    'guests:gifts.section.card.empty': 'No cards available right now.',
 
     //--------------------------------
     // Admin Page
@@ -666,7 +713,7 @@ const translations = {
     'admin:gifts.deleteConfirm': 'Delete this gift?',
     'admin:gifts.noImage': 'No image',
     'admin:gifts.grandTotal': 'Grand Total',
-    'admin:gifts.grandTotalDescription': 'The available cards x price',
+    'admin:gifts.grandTotalDescription': 'Available gifts × price',
     'admin:gifts.table.title': 'Title',
     'admin:gifts.table.description': 'Description',
     'admin:gifts.table.image': 'Image',
@@ -1190,10 +1237,57 @@ const translations = {
     'guests:giftsPurchaseMessageLabel': 'Añade un mensaje personal (opcional):',
     'guests:giftsPurchaseMessage:placeholder': 'Deja un mensaje bonito para la pareja...',
     'guests:giftsPurchaseCancel': 'Cancelar',
+    'guests:giftsPurchaseClose': 'Cerrar',
+    'guests:giftsPurchasedMessageLabel': 'Tu mensaje personal',
     'guests:giftsPurchaseProceed': 'Continuar al pago',
     'guests:giftsPurchaseProcessing': 'Procesando...',
     'guests:giftsPaymentError': 'Error al procesar el pago',
     'guests:giftsPaymentServiceError': 'Error al conectar con el servicio de pagos',
+
+    //--------------------------------
+    // Cube Gifts
+    //--------------------------------
+    'guests:gifts.cube.title': 'Un Bloque para Nuestra Escultura de Boda',
+    'guests:gifts.cube.description': 'Ayúdanos a construir el regalo de boda perfecto comprando un bloque que ensamblaremos juntos el día de la boda. Formará parte de una obra de arte permanente que atesoraremos para siempre.',
+    'guests:gifts.cube.sold': 'Vendido',
+    'guests:gifts.cube.priceLabel': 'Elige tu contribución',
+    'guests:gifts.cube.priceLabelYour': 'Tu contribución',
+    'guests:gifts.cube.priceFrom': 'desde',
+    'guests:gifts.cube.messagePlaceholder': 'Deja un mensaje para los novios...',
+    'guests:gifts.cube.alreadySold': 'Este bloque acaba de ser regalado por otro invitado. Por favor, elige otro.',
+    'guests:gifts.cube.buyButton': 'Construye con nosotros',
+
+    //--------------------------------
+    // Figurine Gifts
+    //--------------------------------
+    'guests:gifts.figurine.priceLabel': 'Elige tu contribución',
+    'guests:gifts.figurine.messagePlaceholder': 'Deja un mensaje para los novios...',
+    'guests:gifts.figurine.alreadySold': 'Esta figurita acaba de ser reservada por otro invitado. Por favor, elige otra.',
+    'guests:gifts.figurine.buyButton': 'Reservar esta figurita',
+
+    //--------------------------------
+    // Gift Sections (Figurines / Blocks / Cards)
+    //--------------------------------
+    'guests:gifts.section.figurine.title': 'Figuritas de los Novios',
+    'guests:gifts.section.figurine.lede': 'Una figurita 3D de la novia, del novio o de cualquiera de los dos en una tumbona. Te estará esperando en tu mesa durante el banquete: entrégasela a la pareja, observa cómo adorna la tarta nupcial y, después, pasa a formar parte permanente de la escultura. Cada figurita incluye una tarjeta impresa con tu mensaje.',
+    'guests:gifts.section.figurine.priceRange': '€250–€500',
+    'guests:gifts.section.figurine.delivery': 'Te esperará en tu mesa el día de la boda',
+    'guests:gifts.section.figurine.leadTime': 'Reserva con 2 semanas de antelación para la impresión',
+    'guests:gifts.section.figurine.empty': 'Las figuritas llegarán pronto — atento a este espacio.',
+
+    'guests:gifts.section.cube.title': 'Construyendo la Escultura de Boda',
+    'guests:gifts.section.cube.lede': 'Un cubo 3D físico que reproduce la visualización en pantalla, con tu mensaje impreso en una de sus caras y espacio para añadir más el día de la boda. Te llamarán para añadir tu bloque a la escultura durante el banquete.',
+    'guests:gifts.section.cube.priceRange': '€50–€500',
+    'guests:gifts.section.cube.delivery': 'Entregado en tu mesa el día de la boda',
+    'guests:gifts.section.cube.leadTime': 'Reserva con 2 semanas de antelación para la impresión',
+    'guests:gifts.section.cube.empty': 'No hay bloques disponibles en este momento.',
+
+    'guests:gifts.section.card.title': 'Tarjetas de Regalo',
+    'guests:gifts.section.card.lede': 'Una tarjeta impresa entregada en tu mesa el día de la boda, con tu mensaje ya escrito y espacio para añadir más. Entrégasela a la pareja como tu regalo.',
+    'guests:gifts.section.card.priceRange': '€25–€250',
+    'guests:gifts.section.card.delivery': 'Entregada en tu mesa el día de la boda',
+    'guests:gifts.section.card.leadTime': 'Reserva con 2 semanas de antelación para la impresión',
+    'guests:gifts.section.card.empty': 'No hay tarjetas disponibles en este momento.',
 
     //--------------------------------
     // Admin Page
@@ -1472,7 +1566,7 @@ const translations = {
     'admin:gifts.deleteConfirm': '¿Eliminar este regalo?',
     'admin:gifts.noImage': 'Sin imagen',
     'admin:gifts.grandTotal': 'Total general',
-    'admin:gifts.grandTotalDescription': 'Las tarjetas disponibles x precio',
+    'admin:gifts.grandTotalDescription': 'Regalos disponibles × precio',
     'admin:gifts.table.title': 'Título',
     'admin:gifts.table.description': 'Descripción',
     'admin:gifts.table.image': 'Imagen',
@@ -1996,11 +2090,58 @@ const translations = {
     'guests:giftsPurchaseMessageLabel': 'Ajouter un message personnel (optionnel) :',
     'guests:giftsPurchaseMessage:placeholder': 'Laissez un joli message pour les mariés...',
     'guests:giftsPurchaseCancel': 'Annuler',
+    'guests:giftsPurchaseClose': 'Fermer',
+    'guests:giftsPurchasedMessageLabel': 'Votre message personnel',
     'guests:giftsPurchaseProceed': 'Procéder au paiement',
     'guests:giftsPurchaseProcessing': 'Traitement en cours...',
     'guests:giftsPaymentError': 'Erreur lors du traitement du paiement',
     'guests:giftsPaymentServiceError': 'Erreur de connexion au service de paiement',
-  
+
+    //--------------------------------
+    // Cube Gifts
+    //--------------------------------
+    'guests:gifts.cube.title': 'Un Bloc pour Notre Sculpture de Mariage',
+    'guests:gifts.cube.description': 'Aidez-nous à construire le cadeau de mariage parfait en achetant un bloc que vous assemblerez avec nous le jour du mariage. Il fera partie d’une œuvre d’art permanente que nous chérirons pour toujours.',
+    'guests:gifts.cube.sold': 'Vendu',
+    'guests:gifts.cube.priceLabel': 'Choisissez votre contribution',
+    'guests:gifts.cube.priceLabelYour': 'Votre contribution',
+    'guests:gifts.cube.priceFrom': 'à partir de',
+    'guests:gifts.cube.messagePlaceholder': 'Laissez un message pour les mariés...',
+    'guests:gifts.cube.alreadySold': 'Ce bloc vient d’être offert par un autre invité. Veuillez en choisir un autre.',
+    'guests:gifts.cube.buyButton': 'Construisez avec nous',
+
+    //--------------------------------
+    // Figurine Gifts
+    //--------------------------------
+    'guests:gifts.figurine.priceLabel': 'Choisissez votre contribution',
+    'guests:gifts.figurine.messagePlaceholder': 'Laissez un message pour les mariés...',
+    'guests:gifts.figurine.alreadySold': 'Cette figurine vient d\'être réservée par un autre invité. Veuillez en choisir une autre.',
+    'guests:gifts.figurine.buyButton': 'Réserver cette figurine',
+
+    //--------------------------------
+    // Gift Sections (Figurines / Blocks / Cards)
+    //--------------------------------
+    'guests:gifts.section.figurine.title': 'Figurines des Mariés',
+    'guests:gifts.section.figurine.lede': 'Une figurine 3D de la mariée, du marié, ou de l\'un d\'eux sur un transat. Elle vous attendra à votre table pendant le banquet : remettez-la aux mariés, regardez-la trôner sur la pièce montée, puis devenir une partie permanente de la sculpture. Une carte imprimée avec votre message accompagne chaque figurine.',
+    'guests:gifts.section.figurine.priceRange': '€250–€500',
+    'guests:gifts.section.figurine.delivery': 'Vous attendra à votre table le jour J',
+    'guests:gifts.section.figurine.leadTime': 'À commander 2 semaines à l\'avance pour l\'impression',
+    'guests:gifts.section.figurine.empty': 'Les figurines arrivent bientôt — surveillez cet espace.',
+
+    'guests:gifts.section.cube.title': 'Construire la Sculpture de Mariage',
+    'guests:gifts.section.cube.lede': 'Un cube 3D physique fidèle à la visualisation à l\'écran, avec votre message imprimé sur une face et de la place pour compléter le jour J. Vous serez appelé à ajouter votre bloc à la sculpture pendant le banquet.',
+    'guests:gifts.section.cube.priceRange': '€50–€500',
+    'guests:gifts.section.cube.delivery': 'Livré à votre table le jour J',
+    'guests:gifts.section.cube.leadTime': 'À commander 2 semaines à l\'avance pour l\'impression',
+    'guests:gifts.section.cube.empty': 'Aucun bloc disponible pour le moment.',
+
+    'guests:gifts.section.card.title': 'Cartes-cadeaux',
+    'guests:gifts.section.card.lede': 'Une carte imprimée livrée à votre table le jour du mariage, avec votre message déjà inscrit et de la place pour en ajouter. Remettez-la aux mariés en guise de cadeau.',
+    'guests:gifts.section.card.priceRange': '€25–€250',
+    'guests:gifts.section.card.delivery': 'Livrée à votre table le jour J',
+    'guests:gifts.section.card.leadTime': 'À commander 2 semaines à l\'avance pour l\'impression',
+    'guests:gifts.section.card.empty': 'Aucune carte disponible pour le moment.',
+
     //--------------------------------
     // Admin Page
     //--------------------------------
@@ -2278,7 +2419,7 @@ const translations = {
     'admin:gifts.deleteConfirm': 'Supprimer ce cadeau ?',
     'admin:gifts.noImage': 'Aucune image',
     'admin:gifts.grandTotal': 'Total général',
-    'admin:gifts.grandTotalDescription': 'Cartes disponibles x prix',
+    'admin:gifts.grandTotalDescription': 'Cadeaux disponibles × prix',
     'admin:gifts.table.title': 'Titre',
     'admin:gifts.table.description': 'Description',
     'admin:gifts.table.image': 'Image',
@@ -2802,11 +2943,58 @@ const translations = {
     'guests:giftsPurchaseMessageLabel': 'Persönliche Nachricht hinzufügen (optional):',
     'guests:giftsPurchaseMessage:placeholder': 'Schreibe eine schöne Nachricht für das Paar...',
     'guests:giftsPurchaseCancel': 'Abbrechen',
+    'guests:giftsPurchaseClose': 'Schließen',
+    'guests:giftsPurchasedMessageLabel': 'Deine persönliche Nachricht',
     'guests:giftsPurchaseProceed': 'Zur Zahlung fortfahren',
     'guests:giftsPurchaseProcessing': 'Verarbeite...',
     'guests:giftsPaymentError': 'Fehler bei der Zahlungsabwicklung',
     'guests:giftsPaymentServiceError': 'Fehler bei der Verbindung zum Zahlungsdienst',
-  
+
+    //--------------------------------
+    // Cube Gifts
+    //--------------------------------
+    'guests:gifts.cube.title': 'Ein Block für unsere Hochzeitsskulptur',
+    'guests:gifts.cube.description': 'Hilf uns, das perfekte Hochzeitsgeschenk zu bauen, indem du einen Block kaufst, den du mit uns am Hochzeitstag zusammensetzt. Er wird Teil eines bleibenden Kunstwerks, das wir für immer in Ehren halten werden.',
+    'guests:gifts.cube.sold': 'Verkauft',
+    'guests:gifts.cube.priceLabel': 'Wähle deinen Beitrag',
+    'guests:gifts.cube.priceLabelYour': 'Dein Beitrag',
+    'guests:gifts.cube.priceFrom': 'ab',
+    'guests:gifts.cube.messagePlaceholder': 'Hinterlasse eine Nachricht für das Brautpaar...',
+    'guests:gifts.cube.alreadySold': 'Dieser Block wurde gerade von einem anderen Gast verschenkt. Bitte wähle einen anderen.',
+    'guests:gifts.cube.buyButton': 'Bau mit uns',
+
+    //--------------------------------
+    // Figurine Gifts
+    //--------------------------------
+    'guests:gifts.figurine.priceLabel': 'Wähle deinen Beitrag',
+    'guests:gifts.figurine.messagePlaceholder': 'Hinterlasse eine Nachricht für das Brautpaar...',
+    'guests:gifts.figurine.alreadySold': 'Diese Figur wurde gerade von einem anderen Gast reserviert. Bitte wähle eine andere.',
+    'guests:gifts.figurine.buyButton': 'Diese Figur sichern',
+
+    //--------------------------------
+    // Gift Sections (Figurines / Blocks / Cards)
+    //--------------------------------
+    'guests:gifts.section.figurine.title': 'Braut- und Bräutigam-Figuren',
+    'guests:gifts.section.figurine.lede': 'Eine 3D-Figur der Braut, des Bräutigams oder eines der beiden auf einer Sonnenliege. Sie wartet beim Bankett an deinem Tisch auf dich – übergib sie dem Brautpaar, schau ihr zu, wie sie die Hochzeitstorte schmückt, und werde dann Teil der Skulptur. Eine gedruckte Karte mit deiner Nachricht liegt jeder Figur bei.',
+    'guests:gifts.section.figurine.priceRange': '€250–€500',
+    'guests:gifts.section.figurine.delivery': 'Wartet am Hochzeitstag an deinem Tisch',
+    'guests:gifts.section.figurine.leadTime': '2 Wochen vorher bestellen für den Druck',
+    'guests:gifts.section.figurine.empty': 'Die Figuren kommen bald — schau bald wieder vorbei.',
+
+    'guests:gifts.section.cube.title': 'Die Hochzeitsskulptur bauen',
+    'guests:gifts.section.cube.lede': 'Ein physischer 3D-Würfel, der genau der Bildschirmansicht entspricht, mit deiner gedruckten Nachricht auf einer Seite und Platz, um sie am Tag selbst zu ergänzen. Beim Bankett wirst du nach vorne gerufen, um deinen Block zur Skulptur hinzuzufügen.',
+    'guests:gifts.section.cube.priceRange': '€50–€500',
+    'guests:gifts.section.cube.delivery': 'Wird am Hochzeitstag an deinen Tisch geliefert',
+    'guests:gifts.section.cube.leadTime': '2 Wochen vorher bestellen für den Druck',
+    'guests:gifts.section.cube.empty': 'Im Moment sind keine Blöcke verfügbar.',
+
+    'guests:gifts.section.card.title': 'Geschenkkarten',
+    'guests:gifts.section.card.lede': 'Eine gedruckte Karte, die am Hochzeitstag an deinen Tisch geliefert wird – mit deiner Nachricht bereits darauf und Platz, sie zu ergänzen. Übergib sie dem Brautpaar als dein Geschenk.',
+    'guests:gifts.section.card.priceRange': '€25–€250',
+    'guests:gifts.section.card.delivery': 'Wird am Hochzeitstag an deinen Tisch geliefert',
+    'guests:gifts.section.card.leadTime': '2 Wochen vorher bestellen für den Druck',
+    'guests:gifts.section.card.empty': 'Im Moment sind keine Karten verfügbar.',
+
     //--------------------------------
     // Admin Page
     //--------------------------------
@@ -3084,7 +3272,7 @@ const translations = {
     'admin:gifts.deleteConfirm': 'Dieses Geschenk löschen?',
     'admin:gifts.noImage': 'Kein Bild',
     'admin:gifts.grandTotal': 'Gesamtsumme',
-    'admin:gifts.grandTotalDescription': 'Verfügbare Karten x Preis',
+    'admin:gifts.grandTotalDescription': 'Verfügbare Geschenke × Preis',
     'admin:gifts.table.title': 'Titel',
     'admin:gifts.table.description': 'Beschreibung',
     'admin:gifts.table.image': 'Bild',

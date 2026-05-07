@@ -4,6 +4,8 @@ const path = require('path');
 const models = require('../models');
 const { NODE_ENV } = require('../config/env');
 const { EJSON } = require('bson');
+const { seedCubes } = require('./seedCubes');
+const { seedFigurines } = require('./seedFigurines');
 
 async function ensureCollectionsAndIndexes() {
   const conn = mongoose.connection;
@@ -198,4 +200,39 @@ async function seedExampleDataIfEmpty() {
   return { seeded: false };
 }
 
-module.exports = { ensureCollectionsAndIndexes, seedExampleDataIfEmpty };
+async function seedCubeGiftsIfNeeded() {
+  try {
+    const result = await seedCubes();
+    if (result.inserted > 0) {
+      console.log(`[DB] Cube gifts: inserted ${result.inserted} (total ${result.total})`);
+    } else if (result.skipped > 0) {
+      console.log(`[DB] Cube gifts: ${result.skipped} already present, skipping seed`);
+    }
+    return result;
+  } catch (err) {
+    console.error('[DB] Failed to seed cube gifts:', err.message);
+    throw err;
+  }
+}
+
+async function seedFigurineGiftsIfNeeded() {
+  try {
+    const result = await seedFigurines();
+    if (result.inserted > 0) {
+      console.log(`[DB] Figurine gifts: inserted ${result.inserted} (total ${result.total})`);
+    } else if (result.skipped > 0) {
+      console.log(`[DB] Figurine gifts: ${result.skipped} already present, skipping seed`);
+    }
+    return result;
+  } catch (err) {
+    console.error('[DB] Failed to seed figurine gifts:', err.message);
+    throw err;
+  }
+}
+
+module.exports = {
+  ensureCollectionsAndIndexes,
+  seedExampleDataIfEmpty,
+  seedCubeGiftsIfNeeded,
+  seedFigurineGiftsIfNeeded,
+};

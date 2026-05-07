@@ -5,6 +5,7 @@ const giftChoiceSchema = new Schema({
   guestId: { type: Schema.Types.ObjectId, ref: 'Guest', required: true },
   date: { type: Date, default: Date.now },
   message: { type: String },
+  amount: { type: Number },
   stripeSessionId: { type: String, required: true, unique: true }
 }, { timestamps: true });
 

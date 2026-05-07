@@ -4,6 +4,21 @@ const { Guest, Gift, GiftChoice, ChefProfile, DayMenu, Table, TableAssignment } 
 const stripe = require('../config/stripe');
 const { APP_URL } = require('../config/env');
 const { getLang, localize } = require('../utils/localized');
+const { loadCubes, resolveCubeFaces } = require('../data/cubes-loader');
+
+function buildCubeFacesById() {
+  const facesById = new Map();
+  for (const cube of loadCubes()) {
+    facesById.set(cube.id, resolveCubeFaces(cube));
+  }
+  return facesById;
+}
+
+let cubeFacesByIdCache = null;
+function getCubeFacesById() {
+  if (!cubeFacesByIdCache) cubeFacesByIdCache = buildCubeFacesById();
+  return cubeFacesByIdCache;
+}
 
 async function getMe(req, res, next) {
   try {
@@ -221,49 +236,83 @@ async function bulkUpload(req, res, next) {
 async function getGifts(req, res, next) {
   const lang = getLang(req);
   try {
-    // Sort by amount (price) ascending as per requirements
-    const gifts = await Gift.find().sort({ amount: 1 }).lean();
-    
-    // Get purchase counts for each gift
+    const gifts = await Gift.find({ enabled: true }).lean();
+
     const giftIds = gifts.map(gift => gift._id);
     const purchaseCounts = await GiftChoice.aggregate([
       { $match: { giftId: { $in: giftIds } } },
       { $group: { _id: '$giftId', count: { $sum: 1 } } }
     ]);
-    
-    // Create a map of giftId to purchase count
+
     const purchaseCountMap = {};
     purchaseCounts.forEach(item => {
       purchaseCountMap[item._id.toString()] = item.count;
     });
-    
+
+    const cubeFacesById = getCubeFacesById();
+
     const items = gifts.map(gift => {
       const title = localize(gift.title, lang);
       const description = localize(gift.description, lang);
       const purchased = purchaseCountMap[gift._id.toString()] || 0;
       const stock = gift.available - purchased;
-      
-      // Generate image URL - gift.image could be an ObjectId reference or a number
+      const giftType = gift.type || 'cash';
+
+      const baseItem = {
+        id: gift._id.toString(),
+        type: giftType,
+        title: String(title),
+        description: String(description),
+        available: gift.available,
+        purchased,
+        stock,
+      };
+
+      if (giftType === 'cube') {
+        const faces = cubeFacesById.get(gift.cubeId);
+        const minPrice = Math.min(...(gift.amountOptions || []));
+        return {
+          ...baseItem,
+          cubeId: gift.cubeId,
+          amountOptions: gift.amountOptions,
+          faces: faces || null,
+          priceDisplay: `€${minPrice}+`,
+        };
+      }
+
+      if (giftType === 'figurine') {
+        const minPrice = Math.min(...(gift.amountOptions || []));
+        return {
+          ...baseItem,
+          figurineId: gift.figurineId,
+          amountOptions: gift.amountOptions,
+          priceDisplay: `€${minPrice}+`,
+        };
+      }
+
       let imageUrl;
       if (gift.image) {
         imageUrl = `/api/guest/gifts/${gift._id}/image`;
       } else {
-        throw new Error('Cannot find image for gift');
+        throw new Error(`Cannot find image for gift ${gift._id}`);
       }
-      
+
       return {
-        id: gift._id.toString(),
-        title: String(title),
-        description: String(description),
+        ...baseItem,
         amount: gift.amount,
-        available: gift.available,
-        purchased: purchased,
-        stock: stock,
         image: gift.image,
-        imageUrl: imageUrl,
-        priceDisplay: `€${gift.amount}`
+        imageUrl,
+        priceDisplay: `€${gift.amount}`,
       };
     });
+
+    items.sort((a, b) => {
+      if (a.type !== b.type) return a.type === 'cash' ? -1 : 1;
+      const aPrice = a.amount ?? Math.min(...(a.amountOptions || [0]));
+      const bPrice = b.amount ?? Math.min(...(b.amountOptions || [0]));
+      return aPrice - bPrice;
+    });
+
     res.json(items);
   } catch (e) { next(e); }
 }
@@ -275,23 +324,37 @@ async function getGiftChoices(req, res, next) {
     if (!me) return res.status(404).json({ error: 'Guest not found' });
 
     const giftChoices = await GiftChoice.find({ guestId: me._id })
-      .populate('giftId', 'title amount description image')
+      .populate('giftId', 'title amount amountOptions description image type cubeId figurineId')
       .sort({ date: -1 })
       .lean();
 
+    const cubeFacesById = getCubeFacesById();
+
     const items = giftChoices.map(choice => {
       const gift = choice.giftId;
-      
-      // Generate image URL for the gift
-      let imageUrl = `/api/guest/gifts/${gift._id}/image`;
-      
+      const fallbackAmount = gift.amount
+        ?? (Array.isArray(gift.amountOptions) && gift.amountOptions.length
+            ? Math.min(...gift.amountOptions)
+            : null);
+      const resolvedAmount = Number.isFinite(choice.amount) ? choice.amount : fallbackAmount;
+      const isCube = gift.type === 'cube';
+      const isFigurine = gift.type === 'figurine';
+      const hasOwnImage = !isCube && !isFigurine;
+
+      const imageUrl = hasOwnImage ? `/api/guest/gifts/${gift._id}/image` : null;
+
       return {
         id: choice._id.toString(),
         giftId: gift._id.toString(),
+        giftType: gift.type || 'cash',
         giftTitle: localize(gift.title, lang),
-        giftAmount: gift.amount,
+        giftAmount: resolvedAmount,
         giftDescription: localize(gift.description, lang),
         giftImageUrl: imageUrl,
+        cubeId: isCube ? gift.cubeId : null,
+        figurineId: isFigurine ? gift.figurineId : null,
+        faces: isCube ? (cubeFacesById.get(gift.cubeId) || null) : null,
+        amountOptions: (isCube || isFigurine) ? gift.amountOptions : null,
         date: choice.date.toISOString(),
         message: choice.message
       };
@@ -304,7 +367,7 @@ async function getGiftChoices(req, res, next) {
 async function createPaymentSession(req, res, next) {
   try {
     const lang = getLang(req);
-    const { giftId, message } = req.body;
+    const { giftId, message, amount: requestedAmount } = req.body;
 
     const me = await guestService.getByEmail(req.user.email);
     if (!me) return res.status(404).json({ error: 'Guest not found' });
@@ -314,34 +377,52 @@ async function createPaymentSession(req, res, next) {
       return res.status(404).json({ error: 'Gift not found or not available' });
     }
 
-    // Stock check (same logic as before)
     const purchaseCount = await GiftChoice.countDocuments({ giftId: gift._id });
     const stock = gift.available - purchaseCount;
     if (stock <= 0) {
       return res.status(400).json({ error: 'Gift is out of stock' });
     }
 
-    // Localised title/description – IMPORTANT: turn into plain strings
-    const title = String(localize(gift.title, lang));
-    const descRaw = localize(gift.description, lang);
-    const description = String(
-      descRaw || `Wedding gift: ${title}`
-    );
-
-    let imagePath;
-    if (gift.image) {
-      imagePath = `/api/guest/gifts/${gift._id.toString()}/image`;
+    const giftType = gift.type || 'cash';
+    let chargeAmount;
+    if (giftType === 'cube' || giftType === 'figurine') {
+      const options = gift.amountOptions || [];
+      const parsedAmount = Number(requestedAmount);
+      if (!Number.isFinite(parsedAmount) || !options.includes(parsedAmount)) {
+        return res.status(400).json({
+          error: `Invalid amount for ${giftType} gift; must be one of amountOptions`,
+          amountOptions: options,
+        });
+      }
+      chargeAmount = parsedAmount;
     } else {
-        return res.status(400).json({ error: 'Cannot find image for gift' });
+      chargeAmount = gift.amount;
     }
 
-    // Stripe needs absolute URLs for images + redirects
+    const title = String(localize(gift.title, lang));
+    const descRaw = localize(gift.description, lang);
+    const description = String(descRaw || `Wedding gift: ${title}`);
+
     const baseUrlFromReq = `${req.protocol}://${req.get('host')}`;
     const baseUrl =
       typeof APP_URL === 'string' && APP_URL.trim().length > 0
         ? APP_URL
         : baseUrlFromReq;
-    const imageUrl = `${baseUrl}${imagePath}`;
+
+    const imageUrls = [];
+    if (giftType === 'cube') {
+      const cubeFaces = getCubeFacesById().get(gift.cubeId);
+      if (cubeFaces && typeof cubeFaces.front === 'string' && cubeFaces.front.startsWith('/')) {
+        imageUrls.push(`${baseUrl}${cubeFaces.front}`);
+      }
+    } else if (giftType === 'figurine') {
+      // Figurines have no per-gift image yet; Stripe accepts an empty array,
+      // and the rendered checkout will show the title and description without a thumbnail.
+    } else if (gift.image) {
+      imageUrls.push(`${baseUrl}/api/guest/gifts/${gift._id.toString()}/image`);
+    } else {
+      return res.status(400).json({ error: 'Cannot find image for gift' });
+    }
 
     const safeMessage = typeof message === 'string' ? message : '';
 
@@ -353,11 +434,11 @@ async function createPaymentSession(req, res, next) {
         {
           price_data: {
             currency: 'eur',
-            unit_amount: gift.amount * 100,    // € → cents
+            unit_amount: chargeAmount * 100,
             product_data: {
-              name: title,                     // e.g. “Honeymoon Accommodation”
-              description,                     // localised description
-              images: [imageUrl],              // same visual as your card
+              name: title,
+              description,
+              images: imageUrls,
             },
           },
           quantity: 1,
@@ -369,12 +450,12 @@ async function createPaymentSession(req, res, next) {
 
       customer_email: me.email,
 
-      // So you can rebuild the “donated gifts” cards after payment
       metadata: {
         giftId: gift._id.toString(),
+        giftType,
         giftTitle: title,
-        giftAmount: String(gift.amount),
-        giftImageUrl: imageUrl,
+        giftAmount: String(chargeAmount),
+        giftImageUrl: imageUrls[0] || '',
         guestId: me._id.toString(),
         guestEmail: me.email,
         guestName: me.name || '',
@@ -416,7 +497,8 @@ async function handleStripeWebhook(req, res) {
     }
 
     try {
-      const { giftId, guestId, message } = session.metadata || {};
+      const { giftId, guestId, message, giftAmount } = session.metadata || {};
+      const parsedAmount = giftAmount != null ? Number(giftAmount) : null;
 
       const existing = await GiftChoice.findOne({ stripeSessionId: session.id });
       if (existing) {
@@ -428,6 +510,7 @@ async function handleStripeWebhook(req, res) {
         giftId,
         guestId,
         message: message || null,
+        amount: Number.isFinite(parsedAmount) ? parsedAmount : undefined,
         date: new Date(),
         stripeSessionId: session.id,
       });

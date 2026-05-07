@@ -317,6 +317,7 @@ router.get('/menu-responses', auth('admin'), adminExpCtrl.getMenuResponses);
 
 // Gift Purchases
 router.get('/gift-purchases', auth('admin'), adminExpCtrl.getGiftPurchases);
+router.delete('/gift-purchases/:id', auth('admin'), adminExpCtrl.undoGiftPurchase);
 
 // Event Choices (for table assignment filtering)
 router.get('/event-choices', auth('admin'), adminExpCtrl.getAdminEventChoices);

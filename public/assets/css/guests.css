@@ -2197,6 +2197,21 @@ main.main-content-full {
   position: relative;
 }
 
+.gift-card-image-section.is-clickable {
+  cursor: pointer;
+  transition: filter 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.gift-card-image-section.is-clickable:hover {
+  filter: brightness(1.05);
+  transform: scale(1.01);
+}
+
+.gift-card-image-section.is-clickable:focus-visible {
+  outline: 2px solid #8b5a96;
+  outline-offset: -2px;
+}
+
 .gift-card-image-overlay {
   position: absolute;
   inset: 0;
@@ -4021,4 +4036,247 @@ main.main-content-full {
 .option-image-closeup {
   margin-left: 4px;
   opacity: 0.9;
+}
+
+/* ============================================================================
+   Purchased cube cards (Thank You section) - background thumb + clickable
+   ============================================================================ */
+.donated-gift-card--cube {
+  cursor: pointer;
+  background-image: none !important;
+  background-color: #1a1a1a;
+  transition: transform 0.18s ease-out, box-shadow 0.18s ease-out;
+}
+
+.donated-gift-card--cube:hover,
+.donated-gift-card--cube:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  outline: none;
+}
+
+.donated-gift-cube-thumb {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.donated-gift-cube-thumb .cube-viewer {
+  --cube-size: 180px;
+  opacity: 0.55;
+}
+
+.donated-gift-card--cube .donated-gift-overlay {
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 50%, rgba(0,0,0,0.25) 100%);
+}
+
+.cube-price-options--locked {
+  pointer-events: none;
+}
+
+.cube-price-option__chip--locked {
+  display: inline-block;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: var(--primary, #8B5A96);
+  color: #ffffff;
+  font-weight: 600;
+  border: 2px solid var(--primary, #8B5A96);
+}
+
+.cube-purchased-overlay textarea[readonly] {
+  background: rgba(244, 228, 214, 0.35);
+  cursor: default;
+}
+
+/* ============================================================================
+   Gift sections (Figurines / Blocks / Cards) — section dividers + intro blocks
+   ============================================================================ */
+.gifts-section {
+  margin: 32px 0 48px;
+}
+
+.gifts-section__divider {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  color: var(--accent-color, #8b5a96);
+}
+
+.gifts-section__divider::before,
+.gifts-section__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, currentColor, transparent);
+  opacity: 0.4;
+}
+
+.gifts-section__title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.6em;
+  margin: 0;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gifts-section__title i {
+  font-size: 0.95em;
+  opacity: 0.85;
+}
+
+.gifts-section__intro {
+  background: rgba(244, 228, 214, 0.45);
+  border: 1px solid rgba(139, 90, 150, 0.18);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gifts-section__lede {
+  margin: 0;
+  font-size: 0.98em;
+  line-height: 1.55;
+  color: #2c1810;
+}
+
+.gifts-section__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: 0.9em;
+  color: #4a3a52;
+}
+
+.gifts-section__meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gifts-section__meta-item i {
+  color: var(--accent-color, #8b5a96);
+}
+
+.gifts-section--empty-state {
+  text-align: center;
+  padding: 24px;
+  background: rgba(244, 228, 214, 0.3);
+  border: 1px dashed rgba(139, 90, 150, 0.35);
+  border-radius: 14px;
+  color: #6b5a55;
+  font-style: italic;
+}
+
+/* ============================================================================
+   Figurine card + viewer (placeholder rendering until 3D models exist)
+   ============================================================================ */
+.gift-figurine-card .gift-card-image-section {
+  background: linear-gradient(135deg, #f4e4d6 0%, #e6d5c3 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  position: relative;
+}
+
+.gift-figurine-card__viewer-mount {
+  width: 140px;
+  height: 140px;
+  perspective: 500px;
+}
+
+.figurine-viewer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.figurine-viewer__stage {
+  position: relative;
+  width: 80%;
+  height: 80%;
+  transform-style: preserve-3d;
+  transform: rotateX(-12deg) rotateY(-18deg);
+  transition: transform 0.4s ease-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.figurine-viewer--thumb:hover .figurine-viewer__stage {
+  transform: rotateX(-12deg) rotateY(8deg);
+}
+
+.figurine-viewer__pedestal {
+  position: absolute;
+  bottom: 6px;
+  width: 70%;
+  height: 12px;
+  background: linear-gradient(to bottom, #8b5a96, #4a3a52);
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.figurine-viewer__figure {
+  position: relative;
+  z-index: 1;
+  width: 60%;
+  aspect-ratio: 1;
+  background: linear-gradient(160deg, #ffffff 0%, #d4a5a5 100%);
+  border-radius: 50% 50% 40% 40%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18), inset 0 -8px 12px rgba(139, 90, 150, 0.15);
+  margin-bottom: 8px;
+}
+
+.figurine-viewer__icon {
+  font-size: 2.4em;
+  color: #8b5a96;
+  opacity: 0.85;
+}
+
+.figurine-viewer--detail .figurine-viewer__icon {
+  font-size: 4em;
+}
+
+.figurine-viewer__placeholder-label {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(139, 90, 150, 0.85);
+  color: white;
+  font-size: 0.7em;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.figurine-purchase-viewer {
+  width: 100%;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.figurine-purchase-viewer .figurine-viewer--detail {
+  width: 200px;
+  height: 200px;
 }

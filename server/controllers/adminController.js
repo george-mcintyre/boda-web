@@ -2,23 +2,43 @@ const { Config, Gift, Event, GiftChoice, CourseOptionImage } = require('../model
 const { getAvailableGiftCardImages } = require('../utils/imageUtils');
 const { formatEventForApi, formatCourseForApi, formatCourseOptionForApi } = require('../utils/formatters');
 const { mergeLocalizedString, localize, getLang } = require('../utils/localized');
+const { loadCubes, resolveCubeFaces } = require('../data/cubes-loader');
+
+let cubeFacesByIdCache = null;
+function getCubeFacesById() {
+  if (!cubeFacesByIdCache) {
+    cubeFacesByIdCache = new Map();
+    for (const cube of loadCubes()) {
+      cubeFacesByIdCache.set(cube.id, resolveCubeFaces(cube));
+    }
+  }
+  return cubeFacesByIdCache;
+}
 
 async function getGiftChoices(req, res, next) {
   try {
     const giftChoices = await GiftChoice.find({})
-      .populate('giftId', 'title amount')
+      .populate('giftId', 'title amount amountOptions')
       .populate('guestId', 'name name email')
       .sort({ date: -1 })
       .lean();
 
-    const items = giftChoices.map(choice => ({
-      guestId: choice.guestId._id.toString(),
-      guestName: choice.guestId.name || choice.guestId.name || choice.guestId.email,
-      giftId: choice.giftId._id.toString(),
-      amount: choice.giftId.amount,
-      date: choice.date.toISOString(),
-      message: choice.message
-    }));
+    const items = giftChoices.map(choice => {
+      const gift = choice.giftId;
+      const fallbackAmount = gift.amount
+        ?? (Array.isArray(gift.amountOptions) && gift.amountOptions.length
+            ? Math.min(...gift.amountOptions)
+            : null);
+      const amount = Number.isFinite(choice.amount) ? choice.amount : fallbackAmount;
+      return {
+        guestId: choice.guestId._id.toString(),
+        guestName: choice.guestId.name || choice.guestId.name || choice.guestId.email,
+        giftId: gift._id.toString(),
+        amount,
+        date: choice.date.toISOString(),
+        message: choice.message
+      };
+    });
 
     res.json(items);
   } catch (e) { next(e); }
@@ -312,15 +332,26 @@ async function listGifts(req, res, next) {
                 imageData = gift.image;
             }
 
+            const fallbackPrice = gift.amount
+                ?? (Array.isArray(gift.amountOptions) && gift.amountOptions.length
+                    ? Math.min(...gift.amountOptions)
+                    : null);
+            const isCube = gift.type === 'cube';
+            const faces = isCube ? (getCubeFacesById().get(gift.cubeId) || null) : null;
             return {
                 id: gift._id.toString(),
                 title: localize(gift.title, lang),
                 description: localize(gift.description, lang),
+                type: gift.type,
                 amount: gift.amount,
+                amountOptions: gift.amountOptions,
+                cubeId: gift.cubeId,
+                figurineId: gift.figurineId,
+                faces,
                 available: gift.available,
                 purchased: purchaseCountMap[gift._id.toString()] || 0,
                 image: imageData,
-                priceDisplay: `€${gift.amount}`
+                priceDisplay: fallbackPrice != null ? `€${fallbackPrice}` : '—'
             };
         });
         res.json(items);

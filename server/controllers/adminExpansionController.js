@@ -965,21 +965,29 @@ async function getGiftPurchases(req, res, next) {
   try {
     const lang = getLang(req);
     const giftChoices = await GiftChoice.find({})
-      .populate('giftId', 'title amount')
+      .populate('giftId', 'title amount amountOptions')
       .populate('guestId', 'name email')
       .sort({ date: -1 })
       .lean();
 
     let totalAmount = 0;
     const purchases = giftChoices.map(choice => {
-      const amount = choice.giftId ? choice.giftId.amount : 0;
+      const gift = choice.giftId;
+      const fallbackAmount = gift
+        ? (gift.amount
+            ?? (Array.isArray(gift.amountOptions) && gift.amountOptions.length
+                ? Math.min(...gift.amountOptions)
+                : 0))
+        : 0;
+      const amount = Number.isFinite(choice.amount) ? choice.amount : fallbackAmount;
       totalAmount += amount;
       return {
+        id: choice._id.toString(),
         guestId: choice.guestId ? choice.guestId._id.toString() : null,
         guestName: choice.guestId ? (choice.guestId.name || choice.guestId.email) : 'Unknown',
         guestEmail: choice.guestId ? choice.guestId.email : null,
-        giftId: choice.giftId ? choice.giftId._id.toString() : null,
-        giftTitle: choice.giftId ? localize(choice.giftId.title, lang) : 'Unknown',
+        giftId: gift ? gift._id.toString() : null,
+        giftTitle: gift ? localize(gift.title, lang) : 'Unknown',
         giftAmount: amount,
         date: choice.date ? choice.date.toISOString() : null,
         message: choice.message || null
@@ -987,6 +995,15 @@ async function getGiftPurchases(req, res, next) {
     });
 
     res.json({ purchases, totalAmount });
+  } catch (e) { next(e); }
+}
+
+async function undoGiftPurchase(req, res, next) {
+  try {
+    const { id } = req.params;
+    const result = await GiftChoice.findByIdAndDelete(id);
+    if (!result) return res.status(404).json({ error: 'Purchase not found' });
+    res.json({ ok: true, deletedId: id });
   } catch (e) { next(e); }
 }
 
@@ -1454,6 +1471,7 @@ module.exports = {
   reorderTableSeats,
   getMenuResponses,
   getGiftPurchases,
+  undoGiftPurchase,
   getAdminEventChoices,
   updateAdminEventChoices,
   getGuestsWithoutEventChoices,

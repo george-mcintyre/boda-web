@@ -97,6 +97,14 @@ logs
 tmp/
 temp/
 
+# Playwright debug artefacts (browser snapshots/screenshots from local testing)
+.playwright-mcp-out/
+.playwright-mcp/
+
+# 3D printing / sculpture build artefacts (not needed for the live site)
+*.stl
+scripts/generate_picture_cube_stl.py
+
 
 
 

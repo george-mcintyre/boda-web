@@ -1,7 +1,7 @@
 // server/vercel-handler.js
 const { app } = require('./app');
 const { connectDB } = require('./config/db');
-const { ensureCollectionsAndIndexes, seedExampleDataIfEmpty } = require('./bootstrap/initDb');
+const { ensureCollectionsAndIndexes, seedExampleDataIfEmpty, seedCubeGiftsIfNeeded, seedFigurineGiftsIfNeeded } = require('./bootstrap/initDb');
 
 let isInitialized = false;
 
@@ -13,6 +13,12 @@ async function init() {
   );
   await seedExampleDataIfEmpty().catch(err =>
     console.warn('[DB] Seed warning:', err.message)
+  );
+  await seedCubeGiftsIfNeeded().catch(err =>
+    console.warn('[DB] Cube seed warning:', err.message)
+  );
+  await seedFigurineGiftsIfNeeded().catch(err =>
+    console.warn('[DB] Figurine seed warning:', err.message)
   );
   isInitialized = true;
 }

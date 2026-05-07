@@ -1,0 +1,294 @@
+# Cube tapestry data for individual cube rendering.
+#
+# Each cube is rendered alone (e.g. on a gift registry page).
+# All 6 faces are recorded since all are visible in solo render.
+#
+# Face values:
+#   - Image id "{prefix}-{row}-{col}" → /assets/images/cubes/{id}.jpg
+#       prefix: h (Heart, front wall)
+#               i (Iluminada, left wall)
+#               g (George, right wall)
+#               b (Bora Bora, top wall)
+#   - "white"  → blank/white face
+#   - "mirror" → mirrored face (forms inner walls of the heart enclave)
+#
+# Cubes are numbered 1..38 in heart-wall reading order first (1-16),
+# then Ilu-wall only (17-26), then George-wall only (27-36),
+# then Bora-wall only (37-38).
+
+# NOTE: Each cube has been re-oriented for display purposes so that
+# at least one image face is on `front`. Original physical orientations
+# from the printed sculpture are not preserved here. The viewer always
+# treats `front` as the face-on view.
+
+cubes:
+  # --- Heart wall (cubes 1-16) ---
+  - id: 1
+    front: h-1-1
+    back: white
+    top: b-3-1
+    bottom: white
+    left: i-1-3
+    right: white
+  - id: 2
+    front: h-1-2
+    back: white
+    top: b-4-2
+    bottom: mirror
+    left: i-1-4
+    right: white
+  - id: 3
+    front: h-1-3
+    back: white
+    top: b-4-3
+    bottom: mirror
+    left: white
+    right: g-1-1
+  - id: 4
+    front: h-1-4
+    back: white
+    top: b-3-4
+    bottom: white
+    left: white
+    right: g-1-2
+  - id: 5
+    front: h-2-1
+    back: white
+    top: b-4-1
+    bottom: white
+    left: i-2-4
+    right: mirror
+  - id: 6
+    front: h-2-2
+    back: white
+    top: b-3-2
+    bottom: white
+    left: white
+    right: white
+  - id: 7
+    front: h-2-3
+    back: white
+    top: b-3-3
+    bottom: white
+    left: white
+    right: white
+  - id: 8
+    front: h-2-4
+    back: white
+    top: b-4-4
+    bottom: white
+    left: mirror
+    right: g-2-1
+  - id: 9
+    front: h-3-1
+    back: white
+    top: white
+    bottom: white
+    left: i-3-4
+    right: mirror
+  - id: 10
+    front: h-3-2
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 11
+    front: h-3-3
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 12
+    front: h-3-4
+    back: white
+    top: white
+    bottom: white
+    left: mirror
+    right: g-3-1
+  - id: 13
+    front: h-4-1
+    back: white
+    top: white
+    bottom: white
+    left: i-4-3
+    right: white
+  - id: 14
+    front: h-4-2
+    back: white
+    top: mirror
+    bottom: white
+    left: i-4-4
+    right: white
+  - id: 15
+    front: h-4-3
+    back: white
+    top: mirror
+    bottom: white
+    left: white
+    right: g-4-1
+  - id: 16
+    front: h-4-4
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: g-4-2
+  # --- Iluminada wall only (cubes 17-26) ---
+  - id: 17
+    front: i-1-1
+    back: white
+    top: b-1-2
+    bottom: white
+    left: white
+    right: white
+  - id: 18
+    front: i-1-2
+    back: white
+    top: b-2-1
+    bottom: white
+    left: white
+    right: white
+  - id: 19
+    front: i-2-1
+    back: white
+    top: b-1-1
+    bottom: white
+    left: white
+    right: white
+  - id: 20
+    front: i-2-2
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 21
+    front: i-2-3
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 22
+    front: i-3-1
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 23
+    front: i-3-2
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 24
+    front: i-3-3
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 25
+    front: i-4-1
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 26
+    front: i-4-2
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  # --- George wall only (cubes 27-36) ---
+  - id: 27
+    front: g-1-3
+    back: white
+    top: b-2-4
+    bottom: white
+    left: white
+    right: white
+  - id: 28
+    front: g-1-4
+    back: white
+    top: b-1-3
+    bottom: white
+    left: white
+    right: white
+  - id: 29
+    front: g-2-2
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 30
+    front: g-2-3
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 31
+    front: g-2-4
+    back: white
+    top: b-1-4
+    bottom: white
+    left: white
+    right: white
+  - id: 32
+    front: g-3-2
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 33
+    front: g-3-3
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 34
+    front: g-3-4
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 35
+    front: g-4-3
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 36
+    front: g-4-4
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  # --- Bora Bora wall only (cubes 37-38) ---
+  - id: 37
+    front: b-2-2
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white
+  - id: 38
+    front: b-2-3
+    back: white
+    top: white
+    bottom: white
+    left: white
+    right: white

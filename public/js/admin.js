@@ -887,7 +887,10 @@
 
       const rows = data.purchases.map(p => {
         const date = p.date ? new Date(p.date).toLocaleDateString() : '—';
-        return `<tr><td>${p.guestName}</td><td>${p.giftTitle}</td><td>€${p.giftAmount}</td><td>${date}</td><td>${p.message || '—'}</td></tr>`;
+        const undoBtn = p.id
+          ? `<button class="admin-action danger" data-action="undo-purchase" data-id="${p.id}" data-gift-title="${(p.giftTitle || '').replace(/"/g, '&quot;')}" data-guest-name="${(p.guestName || '').replace(/"/g, '&quot;')}" title="Undo purchase (TESTING ONLY)"><i class="fas fa-undo"></i></button>`
+          : '';
+        return `<tr><td>${p.guestName}</td><td>${p.giftTitle}</td><td>€${p.giftAmount}</td><td>${date}</td><td>${p.message || '—'}</td><td>${undoBtn}</td></tr>`;
       }).join('');
 
       target.innerHTML = `
@@ -901,11 +904,48 @@
           </div>
           <div class="table-container">
             <table class="data-table">
-              <thead><tr><th>Guest</th><th>Gift</th><th>Amount</th><th>Date</th><th>Message</th></tr></thead>
+              <thead><tr><th>Guest</th><th>Gift</th><th>Amount</th><th>Date</th><th>Message</th><th>Actions</th></tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </div>
         </div>`;
+
+      const tbody = target.querySelector('tbody');
+      tbody.addEventListener('click', async (e) => {
+        const btn = e.target.closest('button[data-action="undo-purchase"]');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const giftTitle = btn.dataset.giftTitle || 'this purchase';
+        const guestName = btn.dataset.guestName || 'this guest';
+
+        const warning = '⚠️  TESTING ONLY — DO NOT USE ON THE LIVE SITE\n\n'
+          + 'This will permanently delete the purchase record from the database.\n\n'
+          + `Gift: ${giftTitle}\n`
+          + `Guest: ${guestName}\n\n`
+          + 'Effects:\n'
+          + '  • Purchase record removed\n'
+          + '  • Stock available counter restored\n'
+          + '  • Purchased counter decremented\n'
+          + '  • Guest will see this gift as "not purchased" again\n\n'
+          + 'Continue?';
+        if (!window.confirm(warning)) return;
+
+        if (!window.confirm('Final confirmation. This is irreversible. Proceed with undoing this purchase?')) return;
+
+        try {
+          const r = await api(`/api/admin/gift-purchases/${id}`, { method: 'DELETE' });
+          if (!r.ok) {
+            const err = await r.json().catch(() => ({}));
+            notify(err.error || 'Failed to undo purchase', 'error');
+            return;
+          }
+          notify('Purchase undone', 'success');
+          showGiftPurchases();
+        } catch (err) {
+          console.error('Undo purchase failed', err);
+          notify('Failed to undo purchase', 'error');
+        }
+      });
     } catch(e) {
       console.error('Error loading gift purchases:', e);
       target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
@@ -2261,6 +2301,14 @@
   }
 
   // ========== Gift list ==========
+  function resolveGiftPrice(gift) {
+    if (Number.isFinite(gift.amount)) return gift.amount;
+    if (Array.isArray(gift.amountOptions) && gift.amountOptions.length) {
+      return Math.min(...gift.amountOptions.map(Number).filter(Number.isFinite));
+    }
+    return null;
+  }
+
   async function showGifts(){
     setLoading(translate('admin:loadingGiftList'));
     
@@ -2293,16 +2341,30 @@
       };
       
       const imageUrl = getGiftImageUrl(it);
-      
+      const price = resolveGiftPrice(it);
+      const priceCell = price != null ? `€${price}` : '—';
+      const isCube = it.type === 'cube' && it.faces;
+      const isFigurine = it.type === 'figurine';
+      let imageCell;
+      if (isCube) {
+        imageCell = `<div class="admin-gift-cube-thumb" data-gift-id="${it.id}" style="width:64px;height:64px;display:inline-block;--cube-size:64px;"></div>`;
+      } else if (isFigurine) {
+        imageCell = `<div class="admin-gift-figurine-thumb" data-gift-id="${it.id}" data-figurine-id="${it.figurineId || ''}" style="width:64px;height:64px;display:inline-block;"></div>`;
+      } else if (imageUrl) {
+        imageCell = `<img src="${imageUrl}" alt="Gift card" style="width: 40px; height: 25px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;"><div data-i18n="admin:gifts.noImage">${translate('admin:gifts.noImage')}</div></span>`;
+      } else {
+        imageCell = '<span style="color: #999;"><div data-i18n="admin:gifts.noImage">' + translate('admin:gifts.noImage') + '</div></span>';
+      }
+
+      const remaining = Math.max(0, (parseInt(it.available) || 0) - (parseInt(it.purchased) || 0));
+
       return `
       <tr>
         <td>${it.title || ''}</td>
         <td>${it.description || ''}</td>
-        <td>
-          ${imageUrl ? `<img src="${imageUrl}" alt="Gift card" style="width: 40px; height: 25px; object-fit: cover; border-radius: 4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" onload="this.style.display='block';this.nextElementSibling.style.display='none';"><span style="color: #999; display: none;"><div data-i18n="admin:gifts.noImage">${translate('admin:gifts.noImage')}</div></span>` : '<span style="color: #999;"><div data-i18n="admin:gifts.noImage">' + translate('admin:gifts.noImage') + '</div></span>'}
-        </td>
-        <td>${it.available}</td>
-        <td>€${it.amount}</td>
+        <td>${imageCell}</td>
+        <td>${remaining}</td>
+        <td>${priceCell}</td>
         <td>${it.purchased}</td>
         <td>
           <button class="admin-action" data-action="edit" data-id="${it.id}"><i class="fas fa-edit"></i></button>
@@ -2312,9 +2374,17 @@
     }).join('');
     
     // Calculate Grand Total
-    const totalAvailable = (gifts||[]).reduce((sum, gift) => sum + (parseInt(gift.available) || 0), 0);
-    const totalValue = (gifts||[]).reduce((sum, gift) => sum + ((parseInt(gift.available) || 0) * (parseInt(gift.amount) || 0)), 0);
-    
+    const totalAvailable = (gifts||[]).reduce((sum, gift) => {
+      const remaining = Math.max(0, (parseInt(gift.available) || 0) - (parseInt(gift.purchased) || 0));
+      return sum + remaining;
+    }, 0);
+    const totalPurchased = (gifts||[]).reduce((sum, gift) => sum + (parseInt(gift.purchased) || 0), 0);
+    const totalValue = (gifts||[]).reduce((sum, gift) => {
+      const price = resolveGiftPrice(gift);
+      const remaining = Math.max(0, (parseInt(gift.available) || 0) - (parseInt(gift.purchased) || 0));
+      return sum + (remaining * (Number.isFinite(price) ? price : 0));
+    }, 0);
+
     // Add Grand Total row
     const grandTotalRow = `
       <tr style="background-color: #f8f9fa; font-weight: bold; border-top: 2px solid #dee2e6;">
@@ -2323,7 +2393,7 @@
         <td></td>
         <td><div data-i18n="admin:gifts.data.totalAvailable">${totalAvailable}</div></td>
         <td><div data-i18n="admin:gifts.data.totalValue">€${totalValue}</div></td>
-        <td><div data-i18n="admin:gifts.data.totalPurchased">0</div></td>
+        <td><div data-i18n="admin:gifts.data.totalPurchased">${totalPurchased}</div></td>
         <td></td>
       </tr>`;
     
@@ -2341,7 +2411,32 @@
         `<div data-i18n="admin:gifts.table.actions">${translate('admin:gifts.table.actions')}</div>`
       ]
     }, allRows, `<button id="addGift" class="admin-action"><i class="fas fa-plus"></i> <span data-i18n="admin:gifts.add">${translate('admin:gifts.add')}</span></button>`);
-    
+
+    if (typeof window.createCubeViewer === 'function') {
+      const giftById = new Map((gifts || []).map(g => [String(g.id), g]));
+      getContentTarget().querySelectorAll('.admin-gift-cube-thumb').forEach(mount => {
+        const gift = giftById.get(mount.getAttribute('data-gift-id'));
+        if (!gift || !gift.faces) return;
+        mount.innerHTML = '';
+        const viewer = window.createCubeViewer(gift.faces, {
+          mode: 'thumb',
+          sold: false,
+        });
+        viewer.style.setProperty('--cube-size', '64px');
+        mount.appendChild(viewer);
+      });
+    }
+
+    if (typeof window.createFigurineViewer === 'function') {
+      getContentTarget().querySelectorAll('.admin-gift-figurine-thumb').forEach(mount => {
+        const figurineId = parseInt(mount.getAttribute('data-figurine-id'), 10);
+        if (!Number.isFinite(figurineId)) return;
+        mount.innerHTML = '';
+        const viewer = window.createFigurineViewer(figurineId, { mode: 'thumb' });
+        mount.appendChild(viewer);
+      });
+    }
+
     const tbody = getContentTarget().querySelector('tbody');
     tbody.addEventListener('click', async (e)=>{
       const btn = e.target.closest('button'); if(!btn) return; 
@@ -2383,90 +2478,98 @@
 
         const imageUrl = getImageUrlForForm(current);
         const showCurrentImage = !!(current.image && imageUrl);
+        const isCube = current.type === 'cube';
+        const isFigurine = current.type === 'figurine';
+        const isTextOnlyEdit = isCube || isFigurine;
+
+        const editFields = isTextOnlyEdit
+          ? [
+              { name:'title', label: translate('admin:gifts.field.title'), required:true },
+              { name:'description', label: translate('admin:gifts.field.description'), type:'textarea', required:true },
+            ]
+          : [
+              { name:'title', label: translate('admin:gifts.field.title'), required:true },
+              { name:'description', label: translate('admin:gifts.field.description'), type:'textarea', required:true },
+              { name:'image', label: translate('admin:gifts.field.image'), type:'file', help: translate('admin:gifts.field.imageHelp') },
+              { name:'imagePreview', label:'Preview', type:'imagePreview' },
+              { name:'available', label: translate('admin:gifts.field.available'), type:'number', min:'0', required:true },
+              { name:'amount', label: translate('admin:gifts.field.price'), type:'select', required:true,
+                options: [
+                  { value: '25', label: translate('admin:gifts.priceOption.25') },
+                  { value: '50', label: translate('admin:gifts.priceOption.50') },
+                  { value: '100', label: translate('admin:gifts.priceOption.100') },
+                  { value: '200', label: translate('admin:gifts.priceOption.200') },
+                  { value: '500', label: translate('admin:gifts.priceOption.500') }
+                ]
+              }
+            ];
+
+        const editInitialValues = isTextOnlyEdit
+          ? { title: current.title || '', description: current.description || '' }
+          : {
+              title: current.title || '',
+              description: current.description || '',
+              available: current.available,
+              amount: String(current.amount)
+            };
 
         openFormModal({
           title: `<div data-i18n="admin:gifts.edit">${translate('admin:gifts.edit')}</div>`, 
           submitText: `<span data-i18n="admin:gifts.save">${translate('admin:gifts.save')}</span>`,
-          showCurrentImage: showCurrentImage,
-          currentImageUrl: imageUrl,
-          fields: [
-            { name:'title', label: translate('admin:gifts.field.title'), required:true },
-            { name:'description', label: translate('admin:gifts.field.description'), type:'textarea', required:true },
-            { name:'image', label: translate('admin:gifts.field.image'), type:'file', help: translate('admin:gifts.field.imageHelp') },
-            { name:'imagePreview', label:'Preview', type:'imagePreview' },
-            { name:'available', label: translate('admin:gifts.field.available'), type:'number', min:'0', required:true },
-            { name:'amount', label: translate('admin:gifts.field.price'), type:'select', required:true,
-              options: [
-                { value: '25', label: translate('admin:gifts.priceOption.25') },
-                { value: '50', label: translate('admin:gifts.priceOption.50') },
-                { value: '100', label: translate('admin:gifts.priceOption.100') },
-                { value: '200', label: translate('admin:gifts.priceOption.200') },
-                { value: '500', label: translate('admin:gifts.priceOption.500') }
-              ]
-            }
-          ],
-          initialValues: {
-            title: current.title || '',
-            description: current.description || '',
-            available: current.available,
-            amount: String(current.amount)
-          },
+          showCurrentImage: isTextOnlyEdit ? false : showCurrentImage,
+          currentImageUrl: isTextOnlyEdit ? null : imageUrl,
+          fields: editFields,
+          initialValues: editInitialValues,
           onSubmit: async (values, close, modal) => {
             try {
-              // Handle image upload
-              let imageReference = null;
-              const imageFile = document.getElementById('f_image')?.files[0];
-              if (imageFile) {
-                const formData = new FormData();
-                formData.append('image', imageFile);
-                const uploadRes = await fetch('/api/admin/gifts/upload-image', {
-                  method: 'POST',
-                  headers: { 'Authorization': `Bearer ${token}` },
-                  body: formData
-                });
-                if (uploadRes.ok) {
-                  const uploadData = await uploadRes.json();
-                  // Store the image ID for the gift
-                  imageReference = {
-                    imageId: uploadData.imageId
-                  };
-                }
-              } else if (current.image) {
-                // Keep existing image reference for edit mode
-                if (typeof current.image === 'string') {
-                  if (current.image.startsWith('data:')) {
-                    // Base64 data - keep as is
-                    imageReference = current.image;
-                  } else if (current.image.length === 24 && /^[0-9a-fA-F]{24}$/.test(current.image)) {
-                    // ObjectId string - keep as is
-                    imageReference = current.image;
-                  } else {
-                    // Legacy URL-based image - keep as is
-                    imageReference = current.image;
+              let giftData;
+              if (isTextOnlyEdit) {
+                // Cube and figurine gifts: only allow editing title/description. Other fields (type,
+                // amountOptions, cubeId/figurineId, image, available) are preserved server-side
+                // because updateGift only writes fields that are explicitly present in the body.
+                giftData = {
+                  title: values.title,
+                  description: values.description,
+                };
+              } else {
+                // Handle image upload
+                let imageReference = null;
+                const imageFile = document.getElementById('f_image')?.files[0];
+                if (imageFile) {
+                  const formData = new FormData();
+                  formData.append('image', imageFile);
+                  const uploadRes = await fetch('/api/admin/gifts/upload-image', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                  });
+                  if (uploadRes.ok) {
+                    const uploadData = await uploadRes.json();
+                    imageReference = { imageId: uploadData.imageId };
                   }
-                } else if (current.image && typeof current.image === 'object') {
-                  // Database-stored image object - keep the reference
-                  if (current.image.imageId) {
-                    // New format with imageId
-                    imageReference = { imageId: current.image.imageId };
-                  } else if (current.image._id) {
-                    // MongoDB ObjectId reference
-                    imageReference = current.image._id.toString();
-                  } else {
-                    // Other object format - keep as is
+                } else if (current.image) {
+                  if (typeof current.image === 'string') {
                     imageReference = current.image;
+                  } else if (current.image && typeof current.image === 'object') {
+                    if (current.image.imageId) {
+                      imageReference = { imageId: current.image.imageId };
+                    } else if (current.image._id) {
+                      imageReference = current.image._id.toString();
+                    } else {
+                      imageReference = current.image;
+                    }
                   }
                 }
+
+                giftData = {
+                  title: values.title,
+                  description: values.description,
+                  available: parseInt(values.available),
+                  amount: parseInt(values.amount),
+                  image: imageReference
+                };
               }
-              
-              const giftData = {
-                title: values.title,
-                description: values.description,
-                available: parseInt(values.available),
-                amount: parseInt(values.amount),
-                image: imageReference
-              };
-              
+
               const r = await api(`/api/admin/gifts/${id}?lang=${getUserLanguage()}`, { 
                 method:'PUT', 
                 headers:{'Content-Type':'application/json'}, 
