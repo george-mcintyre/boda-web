@@ -400,18 +400,15 @@
   align-items: center;
   justify-content: center;
   min-height: 160px;
-  background:
-    linear-gradient(135deg, rgba(244, 228, 214, 0.55) 0%, rgba(253, 251, 247, 0.65) 100%),
-    url('/assets/images/block-plinths.jpg');
-  background-size: cover, 92% auto;
-  background-position: center, center;
+  background-image: url('/assets/images/block-plinths.jpg');
+  background-size: 92% auto;
+  background-position: center;
   background-repeat: no-repeat;
+  background-color: #fdfbf7;
 }
 
 .gift-cube-card .gift-cube-card__viewer-host:has(.cube-viewer--orient-tr) {
-  background-image:
-    linear-gradient(135deg, rgba(244, 228, 214, 0.55) 0%, rgba(253, 251, 247, 0.65) 100%),
-    url('/assets/images/block-plinths-mirror.jpg');
+  background-image: url('/assets/images/block-plinths-mirror.jpg');
 }
 
 .gift-cube-card .gift-cube-card__viewer-mount {
