@@ -400,7 +400,12 @@
   align-items: center;
   justify-content: center;
   min-height: 160px;
-  background: linear-gradient(135deg, #f4e4d6 0%, #fdfbf7 100%);
+  background:
+    linear-gradient(135deg, rgba(244, 228, 214, 0.55) 0%, rgba(253, 251, 247, 0.65) 100%),
+    url('/assets/images/block-plinths.jpg');
+  background-size: cover, 92% auto;
+  background-position: center, center;
+  background-repeat: no-repeat;
 }
 
 .gift-cube-card .gift-cube-card__viewer-mount {

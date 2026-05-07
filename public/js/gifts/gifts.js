@@ -13,18 +13,22 @@ function formatPartyNames(partyData) {
 
 function renderCashGiftCardHtml(gift, isAvailable) {
   const titleEsc = escapeHtml(gift.title);
+  const descEsc = escapeHtml(gift.description || '');
+  const clickAttrs = isAvailable
+    ? `role="button" tabindex="0" onclick="purchaseGift('${gift.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();purchaseGift('${gift.id}');}"`
+    : '';
   return `
         <div class="card gift-credit-card ${!isAvailable ? 'sold-out' : ''}" data-gift-id="${gift.id}">
             <div class="gift-card-image-section ${isAvailable ? 'is-clickable' : ''}"
                  style="background-image: url('${escapeHtml(gift.imageUrl)}');"
-                 ${isAvailable ? `role="button" tabindex="0" onclick="purchaseGift('${gift.id}', '${titleEsc.replace(/'/g, "\\'")}', ${gift.amount})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();purchaseGift('${gift.id}', '${titleEsc.replace(/'/g, "\\'")}', ${gift.amount});}"` : ''}>
+                 ${clickAttrs}>
                 <div class="gift-card-image-overlay">
                     <h4 class="gift-card-title">${titleEsc}</h4>
                     <div class="gift-card-price">${escapeHtml(gift.priceDisplay)}</div>
                 </div>
             </div>
             <div class="gift-card-details">
-            <p class="gift-card-description">${gift.description}</p>
+            <p class="gift-card-description">${descEsc}</p>
             <div class="gift-card-stock">
                 ${isAvailable
                   ? `<span class="stock-available"><i class="fas fa-check-circle"></i> ${gift.stock} <span data-i18n="guests:giftsAvailable">${translate('guests:giftsAvailable')}</span></span>`
@@ -32,7 +36,7 @@ function renderCashGiftCardHtml(gift, isAvailable) {
             </div>
             <div class="action-container">
                 ${isAvailable ? `
-                <button class="btn-base btn-primary btn-sm" onclick="purchaseGift('${gift.id}', '${titleEsc.replace(/'/g, "\\'")}', ${gift.amount})">
+                <button class="btn-base btn-primary btn-sm" onclick="purchaseGift('${gift.id}')">
                     <i class="fas fa-credit-card"></i>
                     <span data-i18n="guests:giftsBuyGift">${translate('guests:giftsBuyGift')}</span>
                 </button>
@@ -233,6 +237,7 @@ function mountPurchasedCubeThumbs(giftChoices) {
 
 window._cubeGiftCache = null;
 window._figurineGiftCache = null;
+window._cashGiftCache = null;
 
 // Function to load the gifts content in the gifts tab
 async function loadGiftsContent() {
@@ -438,6 +443,7 @@ async function loadGiftsContent() {
 
     window._cubeGiftCache = gifts.filter(g => g && g.type === 'cube');
     window._figurineGiftCache = gifts.filter(g => g && g.type === 'figurine');
+    window._cashGiftCache = gifts.filter(g => g && (!g.type || g.type === 'cash'));
     window._purchasedChoicesCache = giftChoices;
     mountCubeViewers(gifts);
     mountFigurineViewers(gifts);
@@ -814,8 +820,16 @@ window.purchaseFigurine = async (giftId) => {
 };
 
 // Global function to purchase a gift
-window.purchaseGift = async (giftId, giftTitle, giftAmount) => {
-// Show a confirmation dialog with optional message
+window.purchaseGift = async (giftId) => {
+  const cashGifts = Array.isArray(window._cashGiftCache) ? window._cashGiftCache : [];
+  const gift = cashGifts.find(g => g.id === giftId);
+  if (!gift) {
+    showToast(translate('guests:giftsPaymentError'), 'error');
+    return;
+  }
+  const giftTitle = gift.title || '';
+  const giftAmount = gift.amount;
+
   const overlay = document.createElement('div');
   overlay.className = 'gift-purchase-overlay';
   overlay.innerHTML = `
@@ -827,7 +841,7 @@ window.purchaseGift = async (giftId, giftTitle, giftAmount) => {
     <div class="gift-purchase-content">
         <p><span data-i18n="guests:giftsPurchaseAbout">${translate('guests:giftsPurchaseAbout')}</span></p>
         <div class="gift-purchase-summary">
-        <strong>${giftTitle}</strong>
+        <strong>${escapeHtml(giftTitle)}</strong>
         <span class="gift-purchase-amount">€${giftAmount}</span>
         </div>
         <div class="gift-message-input">
