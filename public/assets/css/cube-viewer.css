@@ -408,6 +408,12 @@
   background-repeat: no-repeat;
 }
 
+.gift-cube-card .gift-cube-card__viewer-host:has(.cube-viewer--orient-tr) {
+  background-image:
+    linear-gradient(135deg, rgba(244, 228, 214, 0.55) 0%, rgba(253, 251, 247, 0.65) 100%),
+    url('/assets/images/block-plinths-mirror.jpg');
+}
+
 .gift-cube-card .gift-cube-card__viewer-mount {
   display: inline-block;
   padding: 16px;
