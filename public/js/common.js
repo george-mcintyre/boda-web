@@ -4,6 +4,66 @@
 window.token = localStorage.getItem('token');
 window.currentLanguage = localStorage.getItem('i18nextLng') || 'es';
 
+// Wraps window.fetch so 401/403 responses from our own API auto-redirect to
+// the matching login page. Installed only on pages that include common.js
+// (guests.html, admin.html) - the login pages deliberately do not load this
+// file, so wrong-credential 401s from /api/login cannot trigger a redirect
+// loop on the login form.
+(function installAuthFailureInterceptor() {
+  if (typeof window === 'undefined' || !window.fetch) return;
+  if (window.__authFailureInterceptorInstalled) return;
+  window.__authFailureInterceptorInstalled = true;
+
+  const originalFetch = window.fetch.bind(window);
+  const API_PREFIX = '/api/';
+  let redirectInFlight = false;
+
+  function isOwnApiUrl(input) {
+    try {
+      const url = typeof input === 'string'
+        ? input
+        : (input && input.url) || '';
+      return url.startsWith(API_PREFIX)
+          || url.startsWith(window.location.origin + API_PREFIX);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function redirectToLogin() {
+    if (redirectInFlight) return;
+    redirectInFlight = true;
+
+    const isAdminArea = (window.location.pathname || '')
+      .toLowerCase()
+      .includes('admin');
+
+    if (isAdminArea) {
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminEmail');
+      window.location.href = 'admin-login.html';
+    } else {
+      localStorage.removeItem('token');
+      localStorage.removeItem('name');
+      localStorage.removeItem('email');
+      window.location.href = 'login.html';
+    }
+  }
+
+  window.fetch = async function patchedFetch(input, init) {
+    const response = await originalFetch(input, init);
+    try {
+      if ((response.status === 401 || response.status === 403)
+          && isOwnApiUrl(input)) {
+        redirectToLogin();
+      }
+    } catch (e) {
+      console.error('Auth failure interceptor error:', e);
+    }
+    return response;
+  };
+})();
+
 // Tabs functionality with settings-based access control
 window.tabButtons = document.querySelectorAll('.tab-btn');
 window.tabContents = document.querySelectorAll('.tab-content');
