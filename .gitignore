@@ -103,7 +103,14 @@ temp/
 
 # 3D printing / sculpture build artefacts (not needed for the live site)
 *.stl
+*.3mf
 scripts/generate_picture_cube_stl.py
+
+# 3D source assets and intermediate build outputs (huge GLBs, STLs, raw renders)
+models/
+
+# Python bytecode cache from scripts/
+scripts/__pycache__/
 
 
 
