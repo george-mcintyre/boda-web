@@ -150,10 +150,14 @@
     });
 
     let dragActive = false;
+    let dragPending = false;
     let dragStartX = 0;
+    let dragStartY = 0;
     let dragStartFrame = 0;
+    let dragPointerId = -1;
     let lastInteractionTs = 0;
     let autoRotateRaf = 0;
+    const DRAG_INTENT_THRESHOLD_PX = 8;
 
     const startAutoRotate = () => {
       const start = performance.now();
@@ -174,27 +178,65 @@
 
     const onPointerDown = (e) => {
       if (!allLoaded && loadedCount < 2) return;
-      dragActive = true;
+      if (e.pointerType !== 'touch') {
+        dragActive = true;
+        dragPending = false;
+        dragPointerId = e.pointerId;
+        dragStartX = e.clientX;
+        dragStartY = e.clientY;
+        dragStartFrame = currentFrame;
+        lastInteractionTs = performance.now();
+        root.classList.add('figurine-viewer--dragging');
+        hint.classList.add('figurine-viewer__drag-hint--fade');
+        try { root.setPointerCapture(e.pointerId); } catch (_) {}
+        e.preventDefault();
+        return;
+      }
+      dragActive = false;
+      dragPending = true;
+      dragPointerId = e.pointerId;
       dragStartX = e.clientX;
+      dragStartY = e.clientY;
       dragStartFrame = currentFrame;
       lastInteractionTs = performance.now();
-      root.classList.add('figurine-viewer--dragging');
-      hint.classList.add('figurine-viewer__drag-hint--fade');
-      try { root.setPointerCapture(e.pointerId); } catch (_) {}
-      e.preventDefault();
     };
     const onPointerMove = (e) => {
-      if (!dragActive) return;
+      if (e.pointerId !== dragPointerId) return;
       const dx = e.clientX - dragStartX;
+      const dy = e.clientY - dragStartY;
+      if (dragPending) {
+        const absDx = Math.abs(dx);
+        const absDy = Math.abs(dy);
+        if (absDx < DRAG_INTENT_THRESHOLD_PX && absDy < DRAG_INTENT_THRESHOLD_PX) {
+          return;
+        }
+        if (absDy > absDx) {
+          dragPending = false;
+          dragPointerId = -1;
+          return;
+        }
+        dragPending = false;
+        dragActive = true;
+        root.classList.add('figurine-viewer--dragging');
+        hint.classList.add('figurine-viewer__drag-hint--fade');
+        try { root.setPointerCapture(e.pointerId); } catch (_) {}
+      }
+      if (!dragActive) return;
+      if (e.cancelable) e.preventDefault();
       const frameOffset = Math.round(dx / DRAG_PIXELS_PER_FRAME);
       setCurrentFrame(dragStartFrame + frameOffset);
       lastInteractionTs = performance.now();
     };
     const onPointerUp = (e) => {
-      if (!dragActive) return;
+      if (e.pointerId !== dragPointerId) return;
+      const wasDragging = dragActive;
       dragActive = false;
-      root.classList.remove('figurine-viewer--dragging');
-      try { root.releasePointerCapture(e.pointerId); } catch (_) {}
+      dragPending = false;
+      dragPointerId = -1;
+      if (wasDragging) {
+        root.classList.remove('figurine-viewer--dragging');
+        try { root.releasePointerCapture(e.pointerId); } catch (_) {}
+      }
       lastInteractionTs = performance.now();
     };
     const onKeyDown = (e) => {

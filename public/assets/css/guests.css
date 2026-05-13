@@ -4970,8 +4970,18 @@ main.main-content-full {
   color: rgba(139, 90, 150, 0.6);
 }
 
+.figurine-purchase-overlay {
+  overflow-y: auto;
+  align-items: flex-start;
+  padding: 24px 0;
+  -webkit-overflow-scrolling: touch;
+}
+
 .figurine-purchase-overlay .gift-purchase-dialog {
   max-width: 720px;
+  max-height: none;
+  overflow: visible;
+  margin: auto;
 }
 
 .figurine-purchase-viewer {
@@ -4990,8 +5000,13 @@ main.main-content-full {
 }
 
 @media (max-width: 640px) {
+  .figurine-purchase-overlay {
+    padding: 12px 0;
+    align-items: flex-start;
+  }
   .figurine-purchase-viewer {
-    height: 420px;
+    height: 340px;
+    max-height: 45vh;
   }
   .gift-figurine-card__viewer-mount {
     width: 260px;
