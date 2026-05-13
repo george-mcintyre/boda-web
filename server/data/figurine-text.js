@@ -11,10 +11,10 @@ const FIGURINES = [
       de: 'Die Braut',
     },
     description: {
-      en: 'A 3D figurine of the bride in her wedding finery — destined to perch atop the wedding cake and live forever as part of the sculpture afterwards. Includes a printed card you can sign on the day. The closest you\'ll get to making her stand still long enough for a portrait. (Placeholder description — final art forthcoming.)',
-      es: 'Una figurita 3D de la novia con sus mejores galas nupciales — destinada a coronar la tarta de boda y a vivir para siempre como parte de la escultura después. Incluye una tarjeta impresa que podrás firmar el día de la boda. Lo más parecido a conseguir que se quede quieta para un retrato. (Descripción provisional — el diseño final está por llegar.)',
-      fr: 'Une figurine 3D de la mariée dans ses plus beaux atours — destinée à trôner au sommet de la pièce montée et à vivre pour toujours dans la sculpture par la suite. Comprend une carte imprimée à signer le jour J. Ce qu\'on aura de plus proche d\'un portrait où elle reste immobile. (Description provisoire — le rendu final arrive.)',
-      de: 'Eine 3D-Figur der Braut in vollem Hochzeitsstaat — bestimmt dafür, die Hochzeitstorte zu krönen und danach für immer als Teil der Skulptur weiterzuleben. Inklusive einer gedruckten Karte zum Unterschreiben am Tag selbst. So nah wird man ihr nie kommen, um sie für ein Porträt stillstehen zu lassen. (Platzhalter-Beschreibung — der finale Entwurf folgt.)',
+      en: 'A 3D figurine of the bride in her wedding finery — destined to perch atop the wedding cake and live forever as part of the sculpture afterwards. Includes a printed gift note you can sign on the day. The closest you\'ll get to making her stand still long enough for a portrait. (Placeholder description — final art forthcoming.)',
+      es: 'Una figurita 3D de la novia con sus mejores galas nupciales — destinada a coronar la tarta de boda y a vivir para siempre como parte de la escultura después. Incluye una nota de regalo impresa que podrás firmar el día de la boda. Lo más parecido a conseguir que se quede quieta para un retrato. (Descripción provisional — el diseño final está por llegar.)',
+      fr: 'Une figurine 3D de la mariée dans ses plus beaux atours — destinée à trôner au sommet de la pièce montée et à vivre pour toujours dans la sculpture par la suite. Comprend un mot d\'accompagnement imprimé à signer le jour J. Ce qu\'on aura de plus proche d\'un portrait où elle reste immobile. (Description provisoire — le rendu final arrive.)',
+      de: 'Eine 3D-Figur der Braut in vollem Hochzeitsstaat — bestimmt dafür, die Hochzeitstorte zu krönen und danach für immer als Teil der Skulptur weiterzuleben. Inklusive einer gedruckten Geschenkkarte zum Unterschreiben am Tag selbst. So nah wird man ihr nie kommen, um sie für ein Porträt stillstehen zu lassen. (Platzhalter-Beschreibung — der finale Entwurf folgt.)',
     },
   },
   {
@@ -27,10 +27,10 @@ const FIGURINES = [
       de: 'Der Bräutigam',
     },
     description: {
-      en: 'A 3D figurine of the groom — sharp suit, faint smirk, ready to claim his half of the wedding cake. Will adorn the cake on the day, then settle in permanently as part of the sculpture. Comes with a printed card you can add to before handing it over. (Placeholder description — final art forthcoming.)',
-      es: 'Una figurita 3D del novio — traje impecable, leve sonrisa de medio lado, listo para reclamar su mitad de la tarta. Adornará la tarta el día de la boda y luego se instalará para siempre como parte de la escultura. Incluye una tarjeta impresa a la que podrás añadir tu mensaje antes de entregarla. (Descripción provisional — el diseño final está por llegar.)',
-      fr: 'Une figurine 3D du marié — costume impeccable, léger sourire en coin, prêt à réclamer sa moitié du gâteau. Trônera sur la pièce montée le jour J, puis s\'installera définitivement dans la sculpture. Vendue avec une carte imprimée à compléter avant de la remettre. (Description provisoire — le rendu final arrive.)',
-      de: 'Eine 3D-Figur des Bräutigams — scharfer Anzug, leises Schmunzeln, bereit, seine Hälfte der Torte zu beanspruchen. Krönt am Hochzeitstag die Torte und nimmt danach dauerhaft Platz in der Skulptur. Mit einer gedruckten Karte, die du vor der Übergabe ergänzen kannst. (Platzhalter-Beschreibung — der finale Entwurf folgt.)',
+      en: 'A 3D figurine of the groom — sharp suit, faint smirk, ready to claim his half of the wedding cake. Will adorn the cake on the day, then settle in permanently as part of the sculpture. Comes with a printed gift note you can add to before handing it over. (Placeholder description — final art forthcoming.)',
+      es: 'Una figurita 3D del novio — traje impecable, leve sonrisa de medio lado, listo para reclamar su mitad de la tarta. Adornará la tarta el día de la boda y luego se instalará para siempre como parte de la escultura. Incluye una nota de regalo impresa a la que podrás añadir tu mensaje antes de entregarla. (Descripción provisional — el diseño final está por llegar.)',
+      fr: 'Une figurine 3D du marié — costume impeccable, léger sourire en coin, prêt à réclamer sa moitié du gâteau. Trônera sur la pièce montée le jour J, puis s\'installera définitivement dans la sculpture. Vendue avec un mot d\'accompagnement imprimé à compléter avant de la remettre. (Description provisoire — le rendu final arrive.)',
+      de: 'Eine 3D-Figur des Bräutigams — scharfer Anzug, leises Schmunzeln, bereit, seine Hälfte der Torte zu beanspruchen. Krönt am Hochzeitstag die Torte und nimmt danach dauerhaft Platz in der Skulptur. Mit einer gedruckten Geschenkkarte, die du vor der Übergabe ergänzen kannst. (Platzhalter-Beschreibung — der finale Entwurf folgt.)',
     },
   },
   {

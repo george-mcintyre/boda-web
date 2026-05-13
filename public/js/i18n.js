@@ -361,7 +361,7 @@ const translations = {
     //--------------------------------
     'guests:giftsLoading': 'Loading gifts...',
     'guests:giftsPageTitle': 'Gifts list',
-    'guests:giftsPageDescription': 'Your presence is our gift. If you would still like to contribute to our honeymoon, choose from the gifts below. For each gift card, we will print a physical card and deliver it to your table on the wedding day with your message already inside, plus space for you to add more by hand and sign before giving it to the bride and groom.',
+    'guests:giftsPageDescription': 'Your presence is our gift. If you would still like to contribute to our honeymoon, choose from the gifts below. For every gift you choose we will print a personal gift note and deliver it to your table on the wedding day with your message already inside, plus space for you to add more by hand and sign before giving it to the bride and groom.',
     'guests:giftsThankYouTitle': 'Thank You for Your Generosity!',
     'guests:giftsThankYouMessage': 'We are so grateful for your wonderful gifts',
     'guests:giftsDonatedOn:rich': 'Donated on {{date}}',
@@ -372,7 +372,7 @@ const translations = {
     'guests:giftsAvailable': 'available',
     'guests:giftsSoldOut': 'Sold Out',
     'guests:giftsBuyGift': 'Buy Gift',
-    'guests:giftsPreviewCard': 'Preview card',
+    'guests:giftsPreviewCard': 'Preview gift note',
     'guests:giftsPaymentSuccessTitle': 'Payment Successful!',
     'guests:giftsPaymentSuccess': 'Thank you for your generous gift! Your contribution has been successfully processed.',
     'guests:giftsPaymentCancelledTitle': 'Payment cancelled.',
@@ -420,25 +420,25 @@ const translations = {
     // Gift Sections (Figurines / Blocks / Cards)
     //--------------------------------
     'guests:gifts.section.figurine.title': 'Bride & Groom Figurines',
-    'guests:gifts.section.figurine.lede': 'A 3D figurine of the bride, the groom, or one of them on a sun-lounger. It will be waiting at your table during the banquet — present it to the couple, watch it adorn the wedding cake, and then become a permanent part of the sculpture. A printed card with your message comes with each one.',
+    'guests:gifts.section.figurine.lede': 'A 3D figurine of the bride, the groom, or one of them on a sun-lounger. It will be waiting at your table during the banquet — present it to the couple, watch it adorn the wedding cake, and then become a permanent part of the sculpture. A printed gift note with your message comes with each one.',
     'guests:gifts.section.figurine.priceRange': '€250–€500',
     'guests:gifts.section.figurine.delivery': 'Waiting at your table on the day',
     'guests:gifts.section.figurine.leadTime': 'Order 2 weeks ahead for printing',
     'guests:gifts.section.figurine.empty': 'Figurines are coming soon — keep an eye on this space.',
 
     'guests:gifts.section.cube.title': 'Building the Wedding Sculpture',
-    'guests:gifts.section.cube.lede': 'A physical 3D cube matching the on-screen visualisation, with your printed message on one face and space to add to it on the day. You\'ll be called up to add your block to the sculpture during the banquet.',
+    'guests:gifts.section.cube.lede': 'A physical 3D block matching the on-screen visualisation, with your printed message on one face and space to add to it on the day. You\'ll be called up to add your block to the sculpture during the banquet.',
     'guests:gifts.section.cube.priceRange': '€50–€500',
     'guests:gifts.section.cube.delivery': 'Delivered to your table on the day',
     'guests:gifts.section.cube.leadTime': 'Order 2 weeks ahead for printing',
     'guests:gifts.section.cube.empty': 'No blocks available right now.',
 
-    'guests:gifts.section.card.title': 'Gift Cards',
-    'guests:gifts.section.card.lede': 'Click any card to preview the printed version. We will deliver the physical card to your table on the day, with your message already printed inside and space left for you to add more and sign it before giving it to the couple.',
+    'guests:gifts.section.card.title': 'Honeymoon Cards',
+    'guests:gifts.section.card.lede': 'A contribution toward our honeymoon, presented as a beautiful keepsake card. Click any card to preview the printed version — we\'ll deliver the physical honeymoon card to your table on the day, with your gift note already inside and space for you to add more and sign before giving it to the couple.',
     'guests:gifts.section.card.priceRange': '€25–€250',
     'guests:gifts.section.card.delivery': 'Delivered to your table on the day',
     'guests:gifts.section.card.leadTime': 'Order 2 weeks ahead for printing',
-    'guests:gifts.section.card.empty': 'No cards available right now.',
+    'guests:gifts.section.card.empty': 'No honeymoon cards available right now.',
     'guests:gifts.card.heroAlt': 'Gift card preview illustration of Iluminada and George',
     'guests:gifts.card.insideImageAlt': 'Printed card inside illustration of Iluminada and George',
     'guests:gifts.card.previewFront': 'Front of card',
@@ -450,6 +450,20 @@ const translations = {
     'guests:gifts.card.insertPreviewLabel': 'Card insert preview',
     'guests:gifts.card.insertPreviewFront': 'Insert front',
     'guests:gifts.card.insertPreviewBack': 'Insert back',
+
+    //--------------------------------
+    // Canonical gift terminology (use these labels everywhere)
+    //--------------------------------
+    'gifts:term.giftNote': 'Gift note',
+    'gifts:term.giftNote.plural': 'Gift notes',
+    'gifts:term.thankYouNote': 'Thank-you note',
+    'gifts:term.thankYouNote.plural': 'Thank-you notes',
+    'gifts:term.honeymoonCard': 'Honeymoon card',
+    'gifts:term.honeymoonCard.plural': 'Honeymoon cards',
+    'gifts:term.block': 'Block',
+    'gifts:term.block.plural': 'Blocks',
+    'gifts:term.figurine': 'Figurine',
+    'gifts:term.figurine.plural': 'Figurines',
 
     //--------------------------------
     // Admin Page
@@ -1228,7 +1242,7 @@ const translations = {
     // Gifts Page
     //--------------------------------
     'guests:giftsPageTitle': 'Lista de regalos',
-    'guests:giftsPageDescription': 'Tu presencia es nuestro regalo. Si aun así quieres contribuir a nuestra luna de miel, elige uno de los regalos de abajo. Con cada tarjeta-regalo imprimiremos una tarjeta física y la entregaremos en tu mesa el día de la boda con tu mensaje ya colocado en el interior, además de espacio para que añadas más a mano y la firmes antes de dársela a los novios.',
+    'guests:giftsPageDescription': 'Tu presencia es nuestro regalo. Si aun así quieres contribuir a nuestra luna de miel, elige uno de los regalos de abajo. Con cada regalo que elijas imprimiremos una nota de regalo personal y la entregaremos en tu mesa el día de la boda con tu mensaje ya colocado en el interior, además de espacio para que añadas más a mano y la firmes antes de dársela a los novios.',
     'guests:giftsLoading': 'Cargando regalos...',
     'guests:giftsThankYouTitle': '¡Gracias por tu generosidad!',
     'guests:giftsThankYouMessage': 'Estamos muy agradecidos por tus maravillosos regalos',
@@ -1240,7 +1254,7 @@ const translations = {
     'guests:giftsAvailable': 'disponibles',
     'guests:giftsSoldOut': 'Agotado',
     'guests:giftsBuyGift': 'Comprar regalo',
-    'guests:giftsPreviewCard': 'Ver tarjeta',
+    'guests:giftsPreviewCard': 'Ver nota de regalo',
     'guests:giftsPaymentSuccessTitle': 'Pago exitoso!',
     'guests:giftsPaymentSuccess': '¡Gracias por tu regalo! El pago se ha realizado correctamente.',
     'guests:giftsPaymentCancelledTitle': '¡Pago cancelado!',
@@ -1288,25 +1302,25 @@ const translations = {
     // Gift Sections (Figurines / Blocks / Cards)
     //--------------------------------
     'guests:gifts.section.figurine.title': 'Figuritas de los Novios',
-    'guests:gifts.section.figurine.lede': 'Una figurita 3D de la novia, del novio o de cualquiera de los dos en una tumbona. Te estará esperando en tu mesa durante el banquete: entrégasela a la pareja, observa cómo adorna la tarta nupcial y, después, pasa a formar parte permanente de la escultura. Cada figurita incluye una tarjeta impresa con tu mensaje.',
+    'guests:gifts.section.figurine.lede': 'Una figurita 3D de la novia, del novio o de cualquiera de los dos en una tumbona. Te estará esperando en tu mesa durante el banquete: entrégasela a la pareja, observa cómo adorna la tarta nupcial y, después, pasa a formar parte permanente de la escultura. Cada figurita incluye una nota de regalo impresa con tu mensaje.',
     'guests:gifts.section.figurine.priceRange': '€250–€500',
     'guests:gifts.section.figurine.delivery': 'Te esperará en tu mesa el día de la boda',
     'guests:gifts.section.figurine.leadTime': 'Reserva con 2 semanas de antelación para la impresión',
     'guests:gifts.section.figurine.empty': 'Las figuritas llegarán pronto — atento a este espacio.',
 
     'guests:gifts.section.cube.title': 'Construyendo la Escultura de Boda',
-    'guests:gifts.section.cube.lede': 'Un cubo 3D físico que reproduce la visualización en pantalla, con tu mensaje impreso en una de sus caras y espacio para añadir más el día de la boda. Te llamarán para añadir tu bloque a la escultura durante el banquete.',
+    'guests:gifts.section.cube.lede': 'Un bloque 3D físico que reproduce la visualización en pantalla, con tu mensaje impreso en una de sus caras y espacio para añadir más el día de la boda. Te llamarán para añadir tu bloque a la escultura durante el banquete.',
     'guests:gifts.section.cube.priceRange': '€50–€500',
     'guests:gifts.section.cube.delivery': 'Entregado en tu mesa el día de la boda',
     'guests:gifts.section.cube.leadTime': 'Reserva con 2 semanas de antelación para la impresión',
     'guests:gifts.section.cube.empty': 'No hay bloques disponibles en este momento.',
 
-    'guests:gifts.section.card.title': 'Tarjetas de Regalo',
-    'guests:gifts.section.card.lede': 'Haz clic en cualquier tarjeta para ver la versión impresa. Entregaremos la tarjeta física en tu mesa el día de la boda, con tu mensaje ya impreso en el interior y espacio para que añadas más y la firmes antes de entregársela a la pareja.',
+    'guests:gifts.section.card.title': 'Tarjetas de Luna de Miel',
+    'guests:gifts.section.card.lede': 'Una contribución a nuestra luna de miel, presentada como una preciosa tarjeta-recuerdo. Haz clic en cualquier tarjeta para ver la versión impresa: entregaremos la tarjeta de luna de miel física en tu mesa el día de la boda, con tu nota de regalo ya impresa en el interior y espacio para que añadas más y la firmes antes de entregársela a la pareja.',
     'guests:gifts.section.card.priceRange': '€25–€250',
     'guests:gifts.section.card.delivery': 'Entregada en tu mesa el día de la boda',
     'guests:gifts.section.card.leadTime': 'Reserva con 2 semanas de antelación para la impresión',
-    'guests:gifts.section.card.empty': 'No hay tarjetas disponibles en este momento.',
+    'guests:gifts.section.card.empty': 'No hay tarjetas de luna de miel disponibles en este momento.',
     'guests:gifts.card.heroAlt': 'Ilustración de vista previa de la tarjeta de Iluminada y George',
     'guests:gifts.card.insideImageAlt': 'Ilustración interior de la tarjeta de Iluminada y George',
     'guests:gifts.card.previewFront': 'Frontal de la tarjeta',
@@ -1318,6 +1332,20 @@ const translations = {
     'guests:gifts.card.insertPreviewLabel': 'Vista previa de la tarjeta insertada',
     'guests:gifts.card.insertPreviewFront': 'Frontal del inserto',
     'guests:gifts.card.insertPreviewBack': 'Reverso del inserto',
+
+    //--------------------------------
+    // Canonical gift terminology (use these labels everywhere)
+    //--------------------------------
+    'gifts:term.giftNote': 'Nota de regalo',
+    'gifts:term.giftNote.plural': 'Notas de regalo',
+    'gifts:term.thankYouNote': 'Nota de agradecimiento',
+    'gifts:term.thankYouNote.plural': 'Notas de agradecimiento',
+    'gifts:term.honeymoonCard': 'Tarjeta de luna de miel',
+    'gifts:term.honeymoonCard.plural': 'Tarjetas de luna de miel',
+    'gifts:term.block': 'Bloque',
+    'gifts:term.block.plural': 'Bloques',
+    'gifts:term.figurine': 'Figurita',
+    'gifts:term.figurine.plural': 'Figuritas',
 
     //--------------------------------
     // Admin Page
@@ -2096,7 +2124,7 @@ const translations = {
     // Gifts Page
     //--------------------------------
     'guests:giftsPageTitle': 'Liste de cadeaux',
-    'guests:giftsPageDescription': 'Votre présence est déjà notre plus beau cadeau. Si vous souhaitez tout de même contribuer à notre lune de miel, choisissez l’un des cadeaux ci-dessous. Pour chaque carte-cadeau, nous imprimerons une vraie carte et la livrerons à votre table le jour du mariage, avec votre message déjà placé à l’intérieur et de la place pour en ajouter à la main et la signer avant de la remettre aux mariés.',
+    'guests:giftsPageDescription': 'Votre présence est déjà notre plus beau cadeau. Si vous souhaitez tout de même contribuer à notre lune de miel, choisissez l’un des cadeaux ci-dessous. Pour chaque cadeau que vous choisirez, nous imprimerons un mot d’accompagnement personnel et le livrerons à votre table le jour du mariage, avec votre message déjà placé à l’intérieur et de la place pour en ajouter à la main et le signer avant de le remettre aux mariés.',
     'guests:giftsLoading': 'Chargement des cadeaux...',
     'guests:giftsThankYouTitle': 'Merci pour votre générosité !',
     'guests:giftsThankYouMessage': 'Nous sommes très reconnaissants pour vos merveilleux cadeaux',
@@ -2108,7 +2136,7 @@ const translations = {
     'guests:giftsAvailable': 'disponible(s)',
     'guests:giftsSoldOut': 'Épuisé',
     'guests:giftsBuyGift': 'Acheter le cadeau',
-    'guests:giftsPreviewCard': 'Aperçu de la carte',
+    'guests:giftsPreviewCard': 'Aperçu du mot',
     'guests:giftsPaymentSuccessTitle': 'Paiement réussi!',
     'guests:giftsPaymentSuccess': 'Merci pour votre cadeau ! Votre paiement a été effectué avec succès.',
     'guests:giftsPaymentCancelledTitle': 'Paiement annulé.',
@@ -2156,25 +2184,25 @@ const translations = {
     // Gift Sections (Figurines / Blocks / Cards)
     //--------------------------------
     'guests:gifts.section.figurine.title': 'Figurines des Mariés',
-    'guests:gifts.section.figurine.lede': 'Une figurine 3D de la mariée, du marié, ou de l\'un d\'eux sur un transat. Elle vous attendra à votre table pendant le banquet : remettez-la aux mariés, regardez-la trôner sur la pièce montée, puis devenir une partie permanente de la sculpture. Une carte imprimée avec votre message accompagne chaque figurine.',
+    'guests:gifts.section.figurine.lede': 'Une figurine 3D de la mariée, du marié, ou de l\'un d\'eux sur un transat. Elle vous attendra à votre table pendant le banquet : remettez-la aux mariés, regardez-la trôner sur la pièce montée, puis devenir une partie permanente de la sculpture. Un mot d\'accompagnement imprimé avec votre message accompagne chaque figurine.',
     'guests:gifts.section.figurine.priceRange': '€250–€500',
     'guests:gifts.section.figurine.delivery': 'Vous attendra à votre table le jour J',
     'guests:gifts.section.figurine.leadTime': 'À commander 2 semaines à l\'avance pour l\'impression',
     'guests:gifts.section.figurine.empty': 'Les figurines arrivent bientôt — surveillez cet espace.',
 
     'guests:gifts.section.cube.title': 'Construire la Sculpture de Mariage',
-    'guests:gifts.section.cube.lede': 'Un cube 3D physique fidèle à la visualisation à l\'écran, avec votre message imprimé sur une face et de la place pour compléter le jour J. Vous serez appelé à ajouter votre bloc à la sculpture pendant le banquet.',
+    'guests:gifts.section.cube.lede': 'Un bloc 3D physique fidèle à la visualisation à l\'écran, avec votre message imprimé sur une face et de la place pour compléter le jour J. Vous serez appelé à ajouter votre bloc à la sculpture pendant le banquet.',
     'guests:gifts.section.cube.priceRange': '€50–€500',
     'guests:gifts.section.cube.delivery': 'Livré à votre table le jour J',
     'guests:gifts.section.cube.leadTime': 'À commander 2 semaines à l\'avance pour l\'impression',
     'guests:gifts.section.cube.empty': 'Aucun bloc disponible pour le moment.',
 
-    'guests:gifts.section.card.title': 'Cartes-cadeaux',
-    'guests:gifts.section.card.lede': 'Cliquez sur une carte pour voir l’aperçu imprimé. Nous livrerons la carte physique à votre table le jour J, avec votre message déjà imprimé à l’intérieur et de la place pour ajouter quelques mots à la main et la signer avant de l’offrir aux mariés.',
+    'guests:gifts.section.card.title': 'Cartes Lune de Miel',
+    'guests:gifts.section.card.lede': 'Une contribution à notre lune de miel, présentée comme une jolie carte-souvenir. Cliquez sur une carte pour voir l\'aperçu imprimé : nous livrerons la carte lune de miel physique à votre table le jour J, avec votre mot d\'accompagnement déjà imprimé à l\'intérieur et de la place pour ajouter quelques mots à la main et la signer avant de l\'offrir aux mariés.',
     'guests:gifts.section.card.priceRange': '€25–€250',
     'guests:gifts.section.card.delivery': 'Livrée à votre table le jour J',
     'guests:gifts.section.card.leadTime': 'À commander 2 semaines à l\'avance pour l\'impression',
-    'guests:gifts.section.card.empty': 'Aucune carte disponible pour le moment.',
+    'guests:gifts.section.card.empty': 'Aucune carte lune de miel disponible pour le moment.',
     'guests:gifts.card.heroAlt': 'Illustration d’aperçu de carte d’Iluminada et George',
     'guests:gifts.card.insideImageAlt': 'Illustration intérieure de la carte d’Iluminada et George',
     'guests:gifts.card.previewFront': 'Recto de la carte',
@@ -2186,6 +2214,20 @@ const translations = {
     'guests:gifts.card.insertPreviewLabel': 'Aperçu de la carte insérée',
     'guests:gifts.card.insertPreviewFront': 'Recto de l’insert',
     'guests:gifts.card.insertPreviewBack': 'Verso de l’insert',
+
+    //--------------------------------
+    // Canonical gift terminology (use these labels everywhere)
+    //--------------------------------
+    'gifts:term.giftNote': 'Mot d’accompagnement',
+    'gifts:term.giftNote.plural': 'Mots d’accompagnement',
+    'gifts:term.thankYouNote': 'Mot de remerciement',
+    'gifts:term.thankYouNote.plural': 'Mots de remerciement',
+    'gifts:term.honeymoonCard': 'Carte lune de miel',
+    'gifts:term.honeymoonCard.plural': 'Cartes lune de miel',
+    'gifts:term.block': 'Bloc',
+    'gifts:term.block.plural': 'Blocs',
+    'gifts:term.figurine': 'Figurine',
+    'gifts:term.figurine.plural': 'Figurines',
 
     //--------------------------------
     // Admin Page
@@ -2964,7 +3006,7 @@ const translations = {
     // Gifts Page
     //--------------------------------
     'guests:giftsPageTitle': 'Geschenkeliste',
-    'guests:giftsPageDescription': 'Deine Anwesenheit ist bereits unser Geschenk. Wenn du trotzdem zu unserer Hochzeitsreise beitragen möchtest, wähle unten eines der Geschenke aus. Für jede Geschenkkarte drucken wir eine echte Karte und liefern sie am Hochzeitstag an deinen Tisch – mit deiner Nachricht bereits innen eingedruckt und mit Platz, damit du noch etwas per Hand ergänzen und unterschreiben kannst, bevor du sie dem Brautpaar gibst.',
+    'guests:giftsPageDescription': 'Deine Anwesenheit ist bereits unser Geschenk. Wenn du trotzdem zu unserer Hochzeitsreise beitragen möchtest, wähle unten eines der Geschenke aus. Zu jedem Geschenk drucken wir eine persönliche Geschenkkarte und liefern sie am Hochzeitstag an deinen Tisch – mit deiner Nachricht bereits innen eingedruckt und mit Platz, damit du noch etwas per Hand ergänzen und unterschreiben kannst, bevor du sie dem Brautpaar gibst.',
     'guests:giftsLoading': 'Lade Geschenke...',
     'guests:giftsThankYouTitle': 'Vielen Dank für deine Großzügigkeit!',
     'guests:giftsThankYouMessage': 'Wir sind dir für deine wunderbaren Geschenke sehr dankbar',
@@ -2976,7 +3018,7 @@ const translations = {
     'guests:giftsAvailable': 'verfügbar',
     'guests:giftsSoldOut': 'Ausverkauft',
     'guests:giftsBuyGift': 'Geschenk kaufen',
-    'guests:giftsPreviewCard': 'Karte ansehen',
+    'guests:giftsPreviewCard': 'Geschenkkarte ansehen',
     'guests:giftsPaymentSuccessTitle': 'Zahlung erfolgreich!',
     'guests:giftsPaymentSuccess': 'Vielen Dank für dein Geschenk! Deine Zahlung war erfolgreich.',
     'guests:giftsPaymentCancelledTitle': 'Zahlung storniert!',
@@ -3024,25 +3066,25 @@ const translations = {
     // Gift Sections (Figurines / Blocks / Cards)
     //--------------------------------
     'guests:gifts.section.figurine.title': 'Braut- und Bräutigam-Figuren',
-    'guests:gifts.section.figurine.lede': 'Eine 3D-Figur der Braut, des Bräutigams oder eines der beiden auf einer Sonnenliege. Sie wartet beim Bankett an deinem Tisch auf dich – übergib sie dem Brautpaar, schau ihr zu, wie sie die Hochzeitstorte schmückt, und werde dann Teil der Skulptur. Eine gedruckte Karte mit deiner Nachricht liegt jeder Figur bei.',
+    'guests:gifts.section.figurine.lede': 'Eine 3D-Figur der Braut, des Bräutigams oder eines der beiden auf einer Sonnenliege. Sie wartet beim Bankett an deinem Tisch auf dich – übergib sie dem Brautpaar, schau ihr zu, wie sie die Hochzeitstorte schmückt, und werde dann Teil der Skulptur. Eine gedruckte Geschenkkarte mit deiner Nachricht liegt jeder Figur bei.',
     'guests:gifts.section.figurine.priceRange': '€250–€500',
     'guests:gifts.section.figurine.delivery': 'Wartet am Hochzeitstag an deinem Tisch',
     'guests:gifts.section.figurine.leadTime': '2 Wochen vorher bestellen für den Druck',
     'guests:gifts.section.figurine.empty': 'Die Figuren kommen bald — schau bald wieder vorbei.',
 
     'guests:gifts.section.cube.title': 'Die Hochzeitsskulptur bauen',
-    'guests:gifts.section.cube.lede': 'Ein physischer 3D-Würfel, der genau der Bildschirmansicht entspricht, mit deiner gedruckten Nachricht auf einer Seite und Platz, um sie am Tag selbst zu ergänzen. Beim Bankett wirst du nach vorne gerufen, um deinen Block zur Skulptur hinzuzufügen.',
+    'guests:gifts.section.cube.lede': 'Ein physischer 3D-Block, der genau der Bildschirmansicht entspricht, mit deiner gedruckten Nachricht auf einer Seite und Platz, um sie am Tag selbst zu ergänzen. Beim Bankett wirst du nach vorne gerufen, um deinen Block zur Skulptur hinzuzufügen.',
     'guests:gifts.section.cube.priceRange': '€50–€500',
     'guests:gifts.section.cube.delivery': 'Wird am Hochzeitstag an deinen Tisch geliefert',
     'guests:gifts.section.cube.leadTime': '2 Wochen vorher bestellen für den Druck',
     'guests:gifts.section.cube.empty': 'Im Moment sind keine Blöcke verfügbar.',
 
-    'guests:gifts.section.card.title': 'Geschenkkarten',
-    'guests:gifts.section.card.lede': 'Klicke auf eine Karte, um die gedruckte Version anzusehen. Wir liefern die echte Karte am Hochzeitstag an deinen Tisch, mit deiner Nachricht bereits innen eingedruckt und mit Platz, damit du noch etwas per Hand ergänzen und sie unterschreiben kannst, bevor du sie dem Brautpaar übergibst.',
+    'guests:gifts.section.card.title': 'Hochzeitsreise-Karten',
+    'guests:gifts.section.card.lede': 'Ein Beitrag zu unserer Hochzeitsreise, präsentiert als hübsche Andenken-Karte. Klicke auf eine Karte, um die gedruckte Version anzusehen – wir liefern die echte Hochzeitsreise-Karte am Hochzeitstag an deinen Tisch, mit deiner Geschenkkarten-Nachricht bereits innen eingedruckt und mit Platz, damit du noch etwas per Hand ergänzen und unterschreiben kannst, bevor du sie dem Brautpaar übergibst.',
     'guests:gifts.section.card.priceRange': '€25–€250',
     'guests:gifts.section.card.delivery': 'Wird am Hochzeitstag an deinen Tisch geliefert',
     'guests:gifts.section.card.leadTime': '2 Wochen vorher bestellen für den Druck',
-    'guests:gifts.section.card.empty': 'Im Moment sind keine Karten verfügbar.',
+    'guests:gifts.section.card.empty': 'Im Moment sind keine Hochzeitsreise-Karten verfügbar.',
     'guests:gifts.card.heroAlt': 'Vorschaubild der Geschenkkarte von Iluminada und George',
     'guests:gifts.card.insideImageAlt': 'Innenillustration der Karte von Iluminada und George',
     'guests:gifts.card.previewFront': 'Vorderseite der Karte',
@@ -3054,6 +3096,20 @@ const translations = {
     'guests:gifts.card.insertPreviewLabel': 'Vorschau der eingelegten Karte',
     'guests:gifts.card.insertPreviewFront': 'Vorderseite des Einlegers',
     'guests:gifts.card.insertPreviewBack': 'Rückseite des Einlegers',
+
+    //--------------------------------
+    // Canonical gift terminology (use these labels everywhere)
+    //--------------------------------
+    'gifts:term.giftNote': 'Geschenkkarte',
+    'gifts:term.giftNote.plural': 'Geschenkkarten',
+    'gifts:term.thankYouNote': 'Dankeskarte',
+    'gifts:term.thankYouNote.plural': 'Dankeskarten',
+    'gifts:term.honeymoonCard': 'Hochzeitsreise-Karte',
+    'gifts:term.honeymoonCard.plural': 'Hochzeitsreise-Karten',
+    'gifts:term.block': 'Block',
+    'gifts:term.block.plural': 'Blöcke',
+    'gifts:term.figurine': 'Figur',
+    'gifts:term.figurine.plural': 'Figuren',
 
     //--------------------------------
     // Admin Page
