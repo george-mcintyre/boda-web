@@ -356,7 +356,8 @@ async function getGiftChoices(req, res, next) {
         faces: isCube ? (cubeFacesById.get(gift.cubeId) || null) : null,
         amountOptions: (isCube || isFigurine) ? gift.amountOptions : null,
         date: choice.date.toISOString(),
-        message: choice.message
+        message: choice.message,
+        giftFrom: choice.giftFrom
       };
     });
 
@@ -367,7 +368,7 @@ async function getGiftChoices(req, res, next) {
 async function createPaymentSession(req, res, next) {
   try {
     const lang = getLang(req);
-    const { giftId, message, amount: requestedAmount } = req.body;
+    const { giftId, message, giftFrom, amount: requestedAmount } = req.body;
 
     const me = await guestService.getByEmail(req.user.email);
     if (!me) return res.status(404).json({ error: 'Guest not found' });
@@ -424,7 +425,12 @@ async function createPaymentSession(req, res, next) {
       return res.status(400).json({ error: 'Cannot find image for gift' });
     }
 
-    const safeMessage = typeof message === 'string' ? message : '';
+    const safeMessage = typeof message === 'string'
+      ? message.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, ' ').slice(0, 240)
+      : '';
+    const safeGiftFrom = typeof giftFrom === 'string'
+      ? giftFrom.replace(/[\u0000-\u001F\u007F]/g, ' ').trim().slice(0, 80)
+      : '';
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -460,6 +466,7 @@ async function createPaymentSession(req, res, next) {
         guestEmail: me.email,
         guestName: me.name || '',
         message: safeMessage,
+        giftFrom: safeGiftFrom,
         lang,
       },
     });
@@ -497,7 +504,7 @@ async function handleStripeWebhook(req, res) {
     }
 
     try {
-      const { giftId, guestId, message, giftAmount } = session.metadata || {};
+      const { giftId, guestId, message, giftFrom, giftAmount } = session.metadata || {};
       const parsedAmount = giftAmount != null ? Number(giftAmount) : null;
 
       const existing = await GiftChoice.findOne({ stripeSessionId: session.id });
@@ -510,6 +517,7 @@ async function handleStripeWebhook(req, res) {
         giftId,
         guestId,
         message: message || null,
+        giftFrom: giftFrom || null,
         amount: Number.isFinite(parsedAmount) ? parsedAmount : undefined,
         date: new Date(),
         stripeSessionId: session.id,

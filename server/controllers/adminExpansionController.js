@@ -990,7 +990,8 @@ async function getGiftPurchases(req, res, next) {
         giftTitle: gift ? localize(gift.title, lang) : 'Unknown',
         giftAmount: amount,
         date: choice.date ? choice.date.toISOString() : null,
-        message: choice.message || null
+        message: choice.message || null,
+        giftFrom: choice.giftFrom || null
       };
     });
 

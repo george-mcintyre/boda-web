@@ -890,7 +890,13 @@
         const undoBtn = p.id
           ? `<button class="admin-action danger" data-action="undo-purchase" data-id="${p.id}" data-gift-title="${(p.giftTitle || '').replace(/"/g, '&quot;')}" data-guest-name="${(p.guestName || '').replace(/"/g, '&quot;')}" title="Undo purchase (TESTING ONLY)"><i class="fas fa-undo"></i></button>`
           : '';
-        return `<tr><td>${p.guestName}</td><td>${p.giftTitle}</td><td>€${p.giftAmount}</td><td>${date}</td><td>${p.message || '—'}</td><td>${undoBtn}</td></tr>`;
+        const giftFromCell = p.giftFrom
+          ? p.giftFrom.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+          : '—';
+        const messageCell = p.message
+          ? p.message.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+          : '—';
+        return `<tr><td>${p.guestName}</td><td>${p.giftTitle}</td><td>€${p.giftAmount}</td><td>${date}</td><td>${giftFromCell}</td><td>${messageCell}</td><td>${undoBtn}</td></tr>`;
       }).join('');
 
       target.innerHTML = `
@@ -904,7 +910,7 @@
           </div>
           <div class="table-container">
             <table class="data-table">
-              <thead><tr><th>Guest</th><th>Gift</th><th>Amount</th><th>Date</th><th>Message</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Guest</th><th>Gift</th><th>Amount</th><th>Date</th><th>From</th><th>Message</th><th>Actions</th></tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </div>

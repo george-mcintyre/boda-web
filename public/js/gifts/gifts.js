@@ -1,5 +1,12 @@
 // Gifts Management Module
 
+const CASH_GIFT_COUPLE_INSIDE_URL = '/assets/images/gift-cards/couple-inside-transparent.png';
+const CASH_GIFT_COUPLE_PREVIEW_URL = '/assets/images/gift-cards/couple-preview-square.png';
+const CUBE_GIFT_PREVIEW_URL = '/assets/images/gift-cards/blocks-section-hero.png';
+
+const GIFT_FROM_MAX_LENGTH = 80;
+const GIFT_MESSAGE_MAX_LENGTH = 240;
+
 function formatPartyNames(partyData) {
   const names = partyData.map(p => p.name);
 
@@ -18,13 +25,15 @@ function renderCashGiftCardHtml(gift, isAvailable) {
     ? `role="button" tabindex="0" onclick="purchaseGift('${gift.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();purchaseGift('${gift.id}');}"`
     : '';
   return `
-        <div class="card gift-credit-card ${!isAvailable ? 'sold-out' : ''}" data-gift-id="${gift.id}">
-            <div class="gift-card-image-section ${isAvailable ? 'is-clickable' : ''}"
-                 style="background-image: url('${escapeHtml(gift.imageUrl)}');"
-                 ${clickAttrs}>
+        <div class="card gift-credit-card gift-credit-card--cash ${!isAvailable ? 'sold-out' : ''} ${isAvailable ? 'is-clickable' : ''}"
+             data-gift-id="${gift.id}"
+             ${clickAttrs}>
+            <div class="gift-card-image-section"
+                 style="background-image: url('${escapeHtml(gift.imageUrl)}');">
                 <div class="gift-card-image-overlay">
                     <h4 class="gift-card-title">${titleEsc}</h4>
                     <div class="gift-card-price">${escapeHtml(gift.priceDisplay)}</div>
+                    ${isAvailable ? `<span class="gift-card-preview-chip" data-i18n="guests:giftsPreviewCard">${translate('guests:giftsPreviewCard')}</span>` : ''}
                 </div>
             </div>
             <div class="gift-card-details">
@@ -36,9 +45,9 @@ function renderCashGiftCardHtml(gift, isAvailable) {
             </div>
             <div class="action-container">
                 ${isAvailable ? `
-                <button class="btn-base btn-primary btn-sm" onclick="purchaseGift('${gift.id}')">
-                    <i class="fas fa-credit-card"></i>
-                    <span data-i18n="guests:giftsBuyGift">${translate('guests:giftsBuyGift')}</span>
+                <button class="btn-base btn-primary btn-sm" onclick="event.stopPropagation();purchaseGift('${gift.id}')">
+                    <i class="fas fa-envelope-open-text"></i>
+                    <span data-i18n="guests:giftsPreviewCard">${translate('guests:giftsPreviewCard')}</span>
                 </button>
                 ` : `
                 <button class="btn-disabled" disabled>
@@ -108,6 +117,32 @@ function renderGiftSection({ key, icon, gifts, renderCard }) {
     ? gifts.map(g => renderCard(g, g.stock > 0)).join('')
     : `<div class="gifts-section--empty-state" data-i18n="guests:gifts.section.${key}.empty">${translate(`guests:gifts.section.${key}.empty`)}</div>`;
 
+  const introMediaConfig = key === 'card'
+    ? {
+        imageUrl: CASH_GIFT_COUPLE_PREVIEW_URL,
+        altKey: 'guests:gifts.card.heroAlt',
+      }
+    : key === 'cube'
+      ? {
+          imageUrl: CUBE_GIFT_PREVIEW_URL,
+          altKey: 'guests:gifts.cube.heroAlt',
+        }
+      : null;
+
+  const introMediaHtml = introMediaConfig
+    ? `
+      <div class="gifts-section__intro-media">
+        <img src="${introMediaConfig.imageUrl}"
+             alt="${translate(introMediaConfig.altKey)}"
+             class="gifts-section__intro-image">
+      </div>
+    `
+    : '';
+
+  const introClassName = introMediaConfig
+    ? 'gifts-section__intro gifts-section__intro--with-media'
+    : 'gifts-section__intro';
+
   return `
     <section class="gifts-section gifts-section--${key}">
       <div class="gifts-section__divider">
@@ -116,25 +151,112 @@ function renderGiftSection({ key, icon, gifts, renderCard }) {
           <span data-i18n="${titleKey}">${translate(titleKey)}</span>
         </h3>
       </div>
-      <div class="gifts-section__intro">
-        <p class="gifts-section__lede" data-i18n="${ledeKey}">${translate(ledeKey)}</p>
-        <div class="gifts-section__meta">
-          <span class="gifts-section__meta-item">
-            <i class="fas fa-euro-sign"></i>
-            <span data-i18n="${priceKey}">${translate(priceKey)}</span>
-          </span>
-          <span class="gifts-section__meta-item">
-            <i class="fas fa-truck"></i>
-            <span data-i18n="${deliveryKey}">${translate(deliveryKey)}</span>
-          </span>
-          <span class="gifts-section__meta-item">
-            <i class="fas fa-print"></i>
-            <span data-i18n="${leadTimeKey}">${translate(leadTimeKey)}</span>
-          </span>
+      <div class="${introClassName}">
+        <div class="gifts-section__intro-body">
+          <p class="gifts-section__lede" data-i18n="${ledeKey}">${translate(ledeKey)}</p>
+          <div class="gifts-section__meta">
+            <span class="gifts-section__meta-item">
+              <i class="fas fa-euro-sign"></i>
+              <span data-i18n="${priceKey}">${translate(priceKey)}</span>
+            </span>
+            <span class="gifts-section__meta-item">
+              <i class="fas fa-truck"></i>
+              <span data-i18n="${deliveryKey}">${translate(deliveryKey)}</span>
+            </span>
+            <span class="gifts-section__meta-item">
+              <i class="fas fa-print"></i>
+              <span data-i18n="${leadTimeKey}">${translate(leadTimeKey)}</span>
+            </span>
+          </div>
         </div>
+        ${introMediaHtml}
       </div>
       <div class="gift-cards-grid">${cardsHtml}</div>
     </section>
+  `;
+}
+
+function getCashGiftPreviewMessage(message) {
+  return message || translate('guests:gifts.card.previewMessagePlaceholder');
+}
+
+function getDefaultGiftFromValue() {
+  const partyData = Array.isArray(window._partyDataCache) ? window._partyDataCache : [];
+  const firstNames = partyData
+    .map(p => (p && typeof p.name === 'string' ? p.name.trim().split(/\s+/)[0] : ''))
+    .filter(Boolean);
+  if (firstNames.length === 0) return '';
+  if (firstNames.length === 1) return firstNames[0];
+  if (firstNames.length === 2) return `${firstNames[0]} & ${firstNames[1]}`;
+  return `${firstNames.slice(0, -1).join(', ')} & ${firstNames[firstNames.length - 1]}`;
+}
+
+function resolveGiftFromValue(rawInput) {
+  const trimmed = typeof rawInput === 'string' ? rawInput.trim() : '';
+  return trimmed || getDefaultGiftFromValue();
+}
+
+function renderGiftFromFieldHtml(inputId) {
+  const defaultValue = getDefaultGiftFromValue().slice(0, GIFT_FROM_MAX_LENGTH);
+  const counterId = `${inputId}-counter`;
+  return `
+    <div class="gift-from-input" data-char-limited="true">
+      <label for="${inputId}"><span data-i18n="guests:giftsPurchaseFromLabel">${translate('guests:giftsPurchaseFromLabel')}</span></label>
+      <input type="text" id="${inputId}" maxlength="${GIFT_FROM_MAX_LENGTH}"
+             value="${escapeHtml(defaultValue)}"
+             placeholder="${translate('guests:giftsPurchaseFrom:placeholder')}"
+             data-i18n="guests:giftsPurchaseFrom:placeholder"
+             data-char-counter-target="${counterId}">
+      <div class="char-counter" id="${counterId}" aria-live="polite">${defaultValue.length}/${GIFT_FROM_MAX_LENGTH}</div>
+    </div>
+  `;
+}
+
+function attachCharCounter(rootEl, inputSelector, max) {
+  const input = rootEl.querySelector(inputSelector);
+  if (!input) return;
+  const counterId = input.getAttribute('data-char-counter-target');
+  const counter = counterId ? rootEl.querySelector(`#${counterId}`) : null;
+  const update = () => {
+    if (input.value.length > max) {
+      input.value = input.value.slice(0, max);
+    }
+    if (counter) {
+      counter.textContent = `${input.value.length}/${max}`;
+      counter.classList.toggle('char-counter--full', input.value.length >= max);
+    }
+  };
+  input.addEventListener('input', update);
+  update();
+}
+
+function renderCashGiftInsertFrontHtml({ giftTitle, imageUrl, isAttached = false }) {
+  const modifier = isAttached ? ' cash-insert-card--attached' : '';
+  return `
+    <div class="cash-insert-card cash-insert-card--front${modifier}" aria-hidden="true">
+      <span class="cash-insert-card__tape cash-insert-card__tape--left"></span>
+      <span class="cash-insert-card__tape cash-insert-card__tape--right"></span>
+      <div class="cash-insert-card__front-art" style="background-image: url('${escapeHtml(imageUrl)}');"></div>
+      <div class="cash-insert-card__front-overlay"></div>
+      <div class="cash-insert-card__front-copy">
+        <h5>${escapeHtml(giftTitle)}</h5>
+      </div>
+    </div>
+  `;
+}
+
+function renderCashGiftInsertBackHtml({ giftTitle, giftDescription, message, signerName }) {
+  const messageText = getCashGiftPreviewMessage(message);
+  const messageEmptyAttr = message ? 'false' : 'true';
+  return `
+    <div class="cash-insert-card cash-insert-card--back" aria-hidden="true">
+      <div class="cash-insert-card__back-copy">
+        <h5>${escapeHtml(giftTitle)}</h5>
+        <p>${escapeHtml(giftDescription)}</p>
+        <div class="cash-insert-card__message" data-insert-card-message="true" data-empty="${messageEmptyAttr}">${escapeHtml(messageText)}</div>
+        <div class="cash-insert-card__signature" data-insert-card-signer="true">— ${escapeHtml(signerName)}</div>
+      </div>
+    </div>
   `;
 }
 
@@ -342,7 +464,7 @@ async function loadGiftsContent() {
 
     // ========== Section 1: Thank You Section (if there are donated gifts) ==========
     if (giftChoices.length > 0) {
-      const partyNames = formatPartyNames(partyData);
+      const fallbackPartyNames = formatPartyNames(partyData);
       html += `
         <div class="gifts-thank-you-section">
             <div class="thank-you-header">
@@ -375,7 +497,7 @@ async function loadGiftsContent() {
                         <i class="fas fa-quote-left"></i>
                         ${escapeHtml(choice.message)}
                         <i class="fas fa-quote-right"></i>
-                         -- ${partyNames}
+                         -- ${escapeHtml((choice.giftFrom || '').trim() || fallbackPartyNames)}
                     </div>
                     ` : ''}
                 </div>
@@ -441,6 +563,7 @@ async function loadGiftsContent() {
 
     giftsContent.innerHTML = html;
 
+    window._partyDataCache = partyData;
     window._cubeGiftCache = gifts.filter(g => g && g.type === 'cube');
     window._figurineGiftCache = gifts.filter(g => g && g.type === 'figurine');
     window._cashGiftCache = gifts.filter(g => g && (!g.type || g.type === 'cash'));
@@ -587,9 +710,11 @@ window.purchaseCube = async (giftId) => {
           <label class="cube-price-selector__label" data-i18n="guests:gifts.cube.priceLabel">${translate('guests:gifts.cube.priceLabel')}</label>
           <div class="cube-price-options">${priceOptionsHtml}</div>
         </div>
+        ${renderGiftFromFieldHtml('cubeGiftFromInput')}
         <div class="gift-message-input" data-reflection-zone="below">
           <label for="cubeMessage" data-i18n="guests:giftsPurchaseMessageLabel">${translate('guests:giftsPurchaseMessageLabel')}</label>
-          <textarea id="cubeMessage" placeholder="${translate('guests:gifts.cube.messagePlaceholder')}" rows="3"></textarea>
+          <textarea id="cubeMessage" placeholder="${translate('guests:gifts.cube.messagePlaceholder')}" rows="3" maxlength="${GIFT_MESSAGE_MAX_LENGTH}" data-char-counter-target="cubeMessage-counter"></textarea>
+        <div class="char-counter" id="cubeMessage-counter" aria-live="polite">0/${GIFT_MESSAGE_MAX_LENGTH}</div>
         </div>
       </div>
       <div class="action-container" data-live="true" data-reflection-zone="below">
@@ -606,6 +731,9 @@ window.purchaseCube = async (giftId) => {
 
   document.body.appendChild(overlay);
   setTimeout(() => overlay.classList.add('show'), 10);
+
+  attachCharCounter(overlay, '#cubeGiftFromInput', GIFT_FROM_MAX_LENGTH);
+  attachCharCounter(overlay, '#cubeMessage', GIFT_MESSAGE_MAX_LENGTH);
 
   let detailViewer = null;
   const mount = overlay.querySelector('[data-cube-detail-mount="true"]');
@@ -650,6 +778,8 @@ window.purchaseCube = async (giftId) => {
       return;
     }
     const message = liveContent.querySelector('#cubeMessage').value.trim();
+    const cubeGiftFromInputEl = liveContent.querySelector('#cubeGiftFromInput');
+    const giftFrom = resolveGiftFromValue(cubeGiftFromInputEl ? cubeGiftFromInputEl.value : '');
     const confirmBtn = liveActions.querySelector('.btn-confirm-cube-purchase');
     confirmBtn.disabled = true;
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="guests:giftsPurchaseProcessing">' + translate('guests:giftsPurchaseProcessing') + '</span>';
@@ -661,7 +791,7 @@ window.purchaseCube = async (giftId) => {
           'Content-Type': 'application/json',
           'Authorization': window.token,
         },
-        body: JSON.stringify({ giftId: gift.id, amount, message }),
+        body: JSON.stringify({ giftId: gift.id, amount, message, giftFrom }),
       });
       const data = await response.json();
       if (response.ok && data.checkoutUrl) {
@@ -724,9 +854,11 @@ window.purchaseFigurine = async (giftId) => {
           <label class="cube-price-selector__label" data-i18n="guests:gifts.figurine.priceLabel">${translate('guests:gifts.figurine.priceLabel')}</label>
           <div class="cube-price-options">${priceOptionsHtml}</div>
         </div>
+        ${renderGiftFromFieldHtml('figurineGiftFromInput')}
         <div class="gift-message-input">
           <label for="figurineMessage" data-i18n="guests:giftsPurchaseMessageLabel">${translate('guests:giftsPurchaseMessageLabel')}</label>
-          <textarea id="figurineMessage" placeholder="${translate('guests:gifts.figurine.messagePlaceholder')}" rows="3"></textarea>
+          <textarea id="figurineMessage" placeholder="${translate('guests:gifts.figurine.messagePlaceholder')}" rows="3" maxlength="${GIFT_MESSAGE_MAX_LENGTH}" data-char-counter-target="figurineMessage-counter"></textarea>
+          <div class="char-counter" id="figurineMessage-counter" aria-live="polite">0/${GIFT_MESSAGE_MAX_LENGTH}</div>
         </div>
       </div>
       <div class="action-container" data-live="true">
@@ -743,6 +875,9 @@ window.purchaseFigurine = async (giftId) => {
 
   document.body.appendChild(overlay);
   setTimeout(() => overlay.classList.add('show'), 10);
+
+  attachCharCounter(overlay, '#figurineGiftFromInput', GIFT_FROM_MAX_LENGTH);
+  attachCharCounter(overlay, '#figurineMessage', GIFT_MESSAGE_MAX_LENGTH);
 
   let detailViewer = null;
   const mount = overlay.querySelector('[data-figurine-detail-mount="true"]');
@@ -782,6 +917,8 @@ window.purchaseFigurine = async (giftId) => {
       return;
     }
     const message = liveContent.querySelector('#figurineMessage').value.trim();
+    const figurineGiftFromInputEl = liveContent.querySelector('#figurineGiftFromInput');
+    const giftFrom = resolveGiftFromValue(figurineGiftFromInputEl ? figurineGiftFromInputEl.value : '');
     const confirmBtn = liveActions.querySelector('.btn-confirm-figurine-purchase');
     confirmBtn.disabled = true;
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="guests:giftsPurchaseProcessing">' + translate('guests:giftsPurchaseProcessing') + '</span>';
@@ -793,7 +930,7 @@ window.purchaseFigurine = async (giftId) => {
           'Content-Type': 'application/json',
           'Authorization': window.token,
         },
-        body: JSON.stringify({ giftId: gift.id, amount, message }),
+        body: JSON.stringify({ giftId: gift.id, amount, message, giftFrom }),
       });
       const data = await response.json();
       if (response.ok && data.checkoutUrl) {
@@ -827,26 +964,95 @@ window.purchaseGift = async (giftId) => {
     showToast(translate('guests:giftsPaymentError'), 'error');
     return;
   }
+  if (gift.stock <= 0) {
+    showToast(translate('guests:giftsSoldOut'), 'error');
+    return;
+  }
   const giftTitle = gift.title || '';
   const giftAmount = gift.amount;
+  const giftDescription = gift.description || '';
+  const initialSignerName = resolveGiftFromValue('');
+  const insertFrontHtml = renderCashGiftInsertFrontHtml({
+    giftTitle,
+    imageUrl: gift.imageUrl,
+    isAttached: true,
+  });
+  const insertBackHtml = renderCashGiftInsertBackHtml({
+    giftTitle,
+    giftDescription,
+    message: '',
+    signerName: initialSignerName,
+  });
 
   const overlay = document.createElement('div');
-  overlay.className = 'gift-purchase-overlay';
+  overlay.className = 'gift-purchase-overlay cash-gift-preview-overlay';
   overlay.innerHTML = `
-    <div class="gift-purchase-dialog">
+    <div class="gift-purchase-dialog cash-gift-preview-dialog">
     <div class="gift-purchase-header">
-        <i class="fas fa-gift"></i>
-        <h3><span data-i18n="guests:giftsPurchaseTitle">${translate('guests:giftsPurchaseTitle')}</span></h3>
+        <i class="fas fa-envelope-open-text"></i>
+        <h3>${escapeHtml(giftTitle)}</h3>
     </div>
     <div class="gift-purchase-content">
-        <p><span data-i18n="guests:giftsPurchaseAbout">${translate('guests:giftsPurchaseAbout')}</span></p>
         <div class="gift-purchase-summary">
-        <strong>${escapeHtml(giftTitle)}</strong>
+        <strong><span data-i18n="guests:giftsPurchaseAbout">${translate('guests:giftsPurchaseAbout')}</span></strong>
         <span class="gift-purchase-amount">€${giftAmount}</span>
         </div>
+        <div class="cash-gift-preview-grid">
+          <section class="cash-card-preview-page cash-card-preview-page--front">
+            <div class="cash-card-preview-page__label" data-i18n="guests:gifts.card.previewFront">${translate('guests:gifts.card.previewFront')}</div>
+            <div class="cash-card-front-surface" style="background-image: url('${escapeHtml(gift.imageUrl)}');">
+              <div class="cash-card-front-copy">
+                <h4>${escapeHtml(giftTitle)}</h4>
+              </div>
+            </div>
+          </section>
+          <section class="cash-card-preview-page cash-card-preview-page--inside">
+            <div class="cash-card-preview-page__label" data-i18n="guests:gifts.card.previewInside">${translate('guests:gifts.card.previewInside')}</div>
+            <div class="cash-card-inside-preview">
+              <div class="cash-card-inside-panel cash-card-inside-panel--image">
+                <img src="${CASH_GIFT_COUPLE_INSIDE_URL}" alt="${translate('guests:gifts.card.insideImageAlt')}" class="cash-card-inside-image">
+              </div>
+              <div class="cash-card-inside-panel cash-card-inside-panel--copy">
+                <div class="cash-card-inside-copy">
+                  <h4>${escapeHtml(giftTitle)}</h4>
+                  <p>${escapeHtml(giftDescription)}</p>
+                  <div class="cash-card-message-preview" data-card-message-preview="true" data-empty="true">${translate('guests:gifts.card.previewMessagePlaceholder')}</div>
+                  <div class="cash-card-insert-slot">
+                    <div class="cash-card-insert-slot__label" data-i18n="guests:gifts.card.insertAttachedLabel">${translate('guests:gifts.card.insertAttachedLabel')}</div>
+                    <div class="cash-card-insert-slot__surface">
+                      ${insertFrontHtml}
+                    </div>
+                  </div>
+                  <div class="cash-card-writing-space">
+                    <div class="cash-card-writing-lines" aria-hidden="true">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <section class="cash-insert-card-gallery">
+          <div class="cash-insert-card-gallery__label" data-i18n="guests:gifts.card.insertPreviewLabel">${translate('guests:gifts.card.insertPreviewLabel')}</div>
+          <div class="cash-insert-card-gallery__grid">
+            <div class="cash-insert-card-gallery__item">
+              <div class="cash-insert-card-gallery__item-label" data-i18n="guests:gifts.card.insertPreviewFront">${translate('guests:gifts.card.insertPreviewFront')}</div>
+              ${renderCashGiftInsertFrontHtml({ giftTitle, imageUrl: gift.imageUrl })}
+            </div>
+            <div class="cash-insert-card-gallery__item">
+              <div class="cash-insert-card-gallery__item-label" data-i18n="guests:gifts.card.insertPreviewBack">${translate('guests:gifts.card.insertPreviewBack')}</div>
+              ${insertBackHtml}
+            </div>
+          </div>
+        </section>
+        ${renderGiftFromFieldHtml('giftFromInput')}
         <div class="gift-message-input">
         <label for="giftMessage"><span data-i18n="guests:giftsPurchaseMessageLabel">${translate('guests:giftsPurchaseMessageLabel')}</span></label>
-        <textarea id="giftMessage" placeholder="${translate('guests:giftsPurchaseMessage:placeholder')}" data-i18n="guests:giftsPurchaseMessage:placeholder" rows="3"></textarea>
+        <textarea id="giftMessage" placeholder="${translate('guests:giftsPurchaseMessage:placeholder')}" data-i18n="guests:giftsPurchaseMessage:placeholder" rows="3" maxlength="${GIFT_MESSAGE_MAX_LENGTH}" data-char-counter-target="giftMessage-counter"></textarea>
+        <div class="char-counter" id="giftMessage-counter" aria-live="polite">0/${GIFT_MESSAGE_MAX_LENGTH}</div>
         </div>
     </div>
     <div class="action-container">
@@ -862,15 +1068,49 @@ window.purchaseGift = async (giftId) => {
   document.body.appendChild(overlay);
   setTimeout(() => overlay.classList.add('show'), 10);
 
+  attachCharCounter(overlay, '#giftFromInput', GIFT_FROM_MAX_LENGTH);
+  attachCharCounter(overlay, '#giftMessage', GIFT_MESSAGE_MAX_LENGTH);
+
+  const updatePreviewMessage = () => {
+    const textarea = overlay.querySelector('#giftMessage');
+    const pagePreview = overlay.querySelector('[data-card-message-preview="true"]');
+    const insertPreview = overlay.querySelector('[data-insert-card-message="true"]');
+    if (!textarea || !pagePreview || !insertPreview) return;
+    const nextMessage = textarea.value.trim();
+    const previewText = getCashGiftPreviewMessage(nextMessage);
+    pagePreview.textContent = previewText;
+    pagePreview.setAttribute('data-empty', nextMessage ? 'false' : 'true');
+    insertPreview.textContent = previewText;
+    insertPreview.setAttribute('data-empty', nextMessage ? 'false' : 'true');
+  };
+
+  const updatePreviewSigner = () => {
+    const input = overlay.querySelector('#giftFromInput');
+    const signerEl = overlay.querySelector('[data-insert-card-signer="true"]');
+    if (!input || !signerEl) return;
+    signerEl.textContent = `— ${resolveGiftFromValue(input.value)}`;
+  };
+
+  overlay.querySelector('#giftMessage').addEventListener('input', updatePreviewMessage);
+  overlay.querySelector('#giftFromInput').addEventListener('input', updatePreviewSigner);
+
+  const cleanup = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => {
+      if (overlay.parentNode) document.body.removeChild(overlay);
+    }, 300);
+    document.removeEventListener('keydown', handleEscape);
+  };
+
 // Handle cancel
   overlay.querySelector('.btn-cancel-purchase').addEventListener('click', () => {
-    overlay.classList.remove('show');
-    setTimeout(() => document.body.removeChild(overlay), 300);
+    cleanup();
   });
 
 // Handle confirm
   overlay.querySelector('.btn-confirm-purchase').addEventListener('click', async () => {
     const message = document.getElementById('giftMessage').value.trim();
+    const giftFrom = resolveGiftFromValue(document.getElementById('giftFromInput').value);
     const confirmBtn = overlay.querySelector('.btn-confirm-purchase');
 
     // Show loading state
@@ -884,7 +1124,7 @@ window.purchaseGift = async (giftId) => {
           'Content-Type': 'application/json',
           'Authorization': window.token
         },
-        body: JSON.stringify({giftId, message})
+        body: JSON.stringify({giftId, message, giftFrom})
       });
 
       const data = await response.json();
@@ -908,11 +1148,13 @@ window.purchaseGift = async (giftId) => {
 // Close on escape
   const handleEscape = (e) => {
     if (e.key === 'Escape') {
-      overlay.classList.remove('show');
-      setTimeout(() => document.body.removeChild(overlay), 300);
-      document.removeEventListener('keydown', handleEscape);
+      cleanup();
     }
   };
   document.addEventListener('keydown', handleEscape);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      cleanup();
+    }
+  });
 };
-

@@ -361,7 +361,7 @@ const translations = {
     //--------------------------------
     'guests:giftsLoading': 'Loading gifts...',
     'guests:giftsPageTitle': 'Gifts list',
-    'guests:giftsPageDescription': 'Your presence is our gift. But if you want to contribute to our honeymoon you can choose an amusing gift from the list below and it will be printed with your message and displayed on a big wall at the wedding banquet.  The cash amount you choose will be used to fund our honeymoon.  Thank you',
+    'guests:giftsPageDescription': 'Your presence is our gift. If you would still like to contribute to our honeymoon, choose from the gifts below. For each gift card, we will print a physical card and deliver it to your table on the wedding day with your message already inside, plus space for you to add more by hand and sign before giving it to the bride and groom.',
     'guests:giftsThankYouTitle': 'Thank You for Your Generosity!',
     'guests:giftsThankYouMessage': 'We are so grateful for your wonderful gifts',
     'guests:giftsDonatedOn:rich': 'Donated on {{date}}',
@@ -372,6 +372,7 @@ const translations = {
     'guests:giftsAvailable': 'available',
     'guests:giftsSoldOut': 'Sold Out',
     'guests:giftsBuyGift': 'Buy Gift',
+    'guests:giftsPreviewCard': 'Preview card',
     'guests:giftsPaymentSuccessTitle': 'Payment Successful!',
     'guests:giftsPaymentSuccess': 'Thank you for your generous gift! Your contribution has been successfully processed.',
     'guests:giftsPaymentCancelledTitle': 'Payment cancelled.',
@@ -381,6 +382,8 @@ const translations = {
     'guests:giftsRetry': 'Retry',
     'guests:giftsPurchaseTitle': 'Purchase Gift',
     'guests:giftsPurchaseAbout': 'You\'re about to purchase:',
+    'guests:giftsPurchaseFromLabel': 'From (will be printed on the card):',
+    'guests:giftsPurchaseFrom:placeholder': 'Your name or names',
     'guests:giftsPurchaseMessageLabel': 'Add a personal message (optional):',
     'guests:giftsPurchaseMessage:placeholder': 'Leave a lovely message for the couple...',
     'guests:giftsPurchaseCancel': 'Cancel',
@@ -403,6 +406,7 @@ const translations = {
     'guests:gifts.cube.messagePlaceholder': 'Leave a message for the couple...',
     'guests:gifts.cube.alreadySold': 'This block has just been gifted by another guest. Please choose another.',
     'guests:gifts.cube.buyButton': 'Build with us',
+    'guests:gifts.cube.heroAlt': 'Wedding sculpture blocks section preview image',
 
     //--------------------------------
     // Figurine Gifts
@@ -430,11 +434,22 @@ const translations = {
     'guests:gifts.section.cube.empty': 'No blocks available right now.',
 
     'guests:gifts.section.card.title': 'Gift Cards',
-    'guests:gifts.section.card.lede': 'A printed card delivered to your table on the day, with your message already on it and space to add to it. Hand it to the couple as your gift.',
+    'guests:gifts.section.card.lede': 'Click any card to preview the printed version. We will deliver the physical card to your table on the day, with your message already printed inside and space left for you to add more and sign it before giving it to the couple.',
     'guests:gifts.section.card.priceRange': '€25–€250',
     'guests:gifts.section.card.delivery': 'Delivered to your table on the day',
     'guests:gifts.section.card.leadTime': 'Order 2 weeks ahead for printing',
     'guests:gifts.section.card.empty': 'No cards available right now.',
+    'guests:gifts.card.heroAlt': 'Gift card preview illustration of Iluminada and George',
+    'guests:gifts.card.insideImageAlt': 'Printed card inside illustration of Iluminada and George',
+    'guests:gifts.card.previewFront': 'Front of card',
+    'guests:gifts.card.previewInside': 'Inside of card',
+    'guests:gifts.card.previewMessagePlaceholder': 'Optional personal message',
+    'guests:gifts.card.previewNamePlaceholder': 'Your names will appear here',
+    'guests:gifts.card.previewWritingSpace': 'Space to add more by hand and sign on the day.',
+    'guests:gifts.card.insertAttachedLabel': 'Card insert attached here',
+    'guests:gifts.card.insertPreviewLabel': 'Card insert preview',
+    'guests:gifts.card.insertPreviewFront': 'Insert front',
+    'guests:gifts.card.insertPreviewBack': 'Insert back',
 
     //--------------------------------
     // Admin Page
@@ -1213,7 +1228,7 @@ const translations = {
     // Gifts Page
     //--------------------------------
     'guests:giftsPageTitle': 'Lista de regalos',
-    'guests:giftsPageDescription': 'Tu presencia es nuestro regalo. Pero si quieres contribuir a nuestra luna de miel, puedes elegir un regalo divertido de la lista de abajo; se imprimirá con tu mensaje y se mostrará en un gran panel en el banquete de boda. El importe que elijas se utilizará para financiar nuestra luna de miel. ¡Gracias!',
+    'guests:giftsPageDescription': 'Tu presencia es nuestro regalo. Si aun así quieres contribuir a nuestra luna de miel, elige uno de los regalos de abajo. Con cada tarjeta-regalo imprimiremos una tarjeta física y la entregaremos en tu mesa el día de la boda con tu mensaje ya colocado en el interior, además de espacio para que añadas más a mano y la firmes antes de dársela a los novios.',
     'guests:giftsLoading': 'Cargando regalos...',
     'guests:giftsThankYouTitle': '¡Gracias por tu generosidad!',
     'guests:giftsThankYouMessage': 'Estamos muy agradecidos por tus maravillosos regalos',
@@ -1225,6 +1240,7 @@ const translations = {
     'guests:giftsAvailable': 'disponibles',
     'guests:giftsSoldOut': 'Agotado',
     'guests:giftsBuyGift': 'Comprar regalo',
+    'guests:giftsPreviewCard': 'Ver tarjeta',
     'guests:giftsPaymentSuccessTitle': 'Pago exitoso!',
     'guests:giftsPaymentSuccess': '¡Gracias por tu regalo! El pago se ha realizado correctamente.',
     'guests:giftsPaymentCancelledTitle': '¡Pago cancelado!',
@@ -1234,6 +1250,8 @@ const translations = {
     'guests:giftsRetry': 'Reintentar',
     'guests:giftsPurchaseTitle': 'Comprar regalo',
     'guests:giftsPurchaseAbout': 'Vas a comprar:',
+    'guests:giftsPurchaseFromLabel': 'De (se imprimirá en la tarjeta):',
+    'guests:giftsPurchaseFrom:placeholder': 'Tu nombre o nombres',
     'guests:giftsPurchaseMessageLabel': 'Añade un mensaje personal (opcional):',
     'guests:giftsPurchaseMessage:placeholder': 'Deja un mensaje bonito para la pareja...',
     'guests:giftsPurchaseCancel': 'Cancelar',
@@ -1256,6 +1274,7 @@ const translations = {
     'guests:gifts.cube.messagePlaceholder': 'Deja un mensaje para los novios...',
     'guests:gifts.cube.alreadySold': 'Este bloque acaba de ser regalado por otro invitado. Por favor, elige otro.',
     'guests:gifts.cube.buyButton': 'Construye con nosotros',
+    'guests:gifts.cube.heroAlt': 'Imagen de vista previa de la sección de bloques de la escultura de boda',
 
     //--------------------------------
     // Figurine Gifts
@@ -1283,11 +1302,22 @@ const translations = {
     'guests:gifts.section.cube.empty': 'No hay bloques disponibles en este momento.',
 
     'guests:gifts.section.card.title': 'Tarjetas de Regalo',
-    'guests:gifts.section.card.lede': 'Una tarjeta impresa entregada en tu mesa el día de la boda, con tu mensaje ya escrito y espacio para añadir más. Entrégasela a la pareja como tu regalo.',
+    'guests:gifts.section.card.lede': 'Haz clic en cualquier tarjeta para ver la versión impresa. Entregaremos la tarjeta física en tu mesa el día de la boda, con tu mensaje ya impreso en el interior y espacio para que añadas más y la firmes antes de entregársela a la pareja.',
     'guests:gifts.section.card.priceRange': '€25–€250',
     'guests:gifts.section.card.delivery': 'Entregada en tu mesa el día de la boda',
     'guests:gifts.section.card.leadTime': 'Reserva con 2 semanas de antelación para la impresión',
     'guests:gifts.section.card.empty': 'No hay tarjetas disponibles en este momento.',
+    'guests:gifts.card.heroAlt': 'Ilustración de vista previa de la tarjeta de Iluminada y George',
+    'guests:gifts.card.insideImageAlt': 'Ilustración interior de la tarjeta de Iluminada y George',
+    'guests:gifts.card.previewFront': 'Frontal de la tarjeta',
+    'guests:gifts.card.previewInside': 'Interior de la tarjeta',
+    'guests:gifts.card.previewMessagePlaceholder': 'Mensaje personal opcional',
+    'guests:gifts.card.previewNamePlaceholder': 'Aquí aparecerán vuestros nombres',
+    'guests:gifts.card.previewWritingSpace': 'Espacio para añadir más a mano y firmar el día de la boda.',
+    'guests:gifts.card.insertAttachedLabel': 'Tarjeta insertada colocada aquí',
+    'guests:gifts.card.insertPreviewLabel': 'Vista previa de la tarjeta insertada',
+    'guests:gifts.card.insertPreviewFront': 'Frontal del inserto',
+    'guests:gifts.card.insertPreviewBack': 'Reverso del inserto',
 
     //--------------------------------
     // Admin Page
@@ -2066,7 +2096,7 @@ const translations = {
     // Gifts Page
     //--------------------------------
     'guests:giftsPageTitle': 'Liste de cadeaux',
-    'guests:giftsPageDescription': 'Votre présence est notre cadeau. Mais si vous souhaitez contribuer à notre lune de miel, vous pouvez choisir un cadeau amusant dans la liste ci-dessous ; il sera imprimé avec votre message et affiché sur un grand mur lors du banquet de mariage. Le montant que vous choisissez servira à financer notre lune de miel. Merci.',
+    'guests:giftsPageDescription': 'Votre présence est déjà notre plus beau cadeau. Si vous souhaitez tout de même contribuer à notre lune de miel, choisissez l’un des cadeaux ci-dessous. Pour chaque carte-cadeau, nous imprimerons une vraie carte et la livrerons à votre table le jour du mariage, avec votre message déjà placé à l’intérieur et de la place pour en ajouter à la main et la signer avant de la remettre aux mariés.',
     'guests:giftsLoading': 'Chargement des cadeaux...',
     'guests:giftsThankYouTitle': 'Merci pour votre générosité !',
     'guests:giftsThankYouMessage': 'Nous sommes très reconnaissants pour vos merveilleux cadeaux',
@@ -2078,6 +2108,7 @@ const translations = {
     'guests:giftsAvailable': 'disponible(s)',
     'guests:giftsSoldOut': 'Épuisé',
     'guests:giftsBuyGift': 'Acheter le cadeau',
+    'guests:giftsPreviewCard': 'Aperçu de la carte',
     'guests:giftsPaymentSuccessTitle': 'Paiement réussi!',
     'guests:giftsPaymentSuccess': 'Merci pour votre cadeau ! Votre paiement a été effectué avec succès.',
     'guests:giftsPaymentCancelledTitle': 'Paiement annulé.',
@@ -2087,6 +2118,8 @@ const translations = {
     'guests:giftsRetry': 'Réessayer',
     'guests:giftsPurchaseTitle': 'Acheter un cadeau',
     'guests:giftsPurchaseAbout': 'Vous êtes sur le point d’acheter :',
+    'guests:giftsPurchaseFromLabel': 'De (sera imprimé sur la carte) :',
+    'guests:giftsPurchaseFrom:placeholder': 'Votre nom ou vos prénoms',
     'guests:giftsPurchaseMessageLabel': 'Ajouter un message personnel (optionnel) :',
     'guests:giftsPurchaseMessage:placeholder': 'Laissez un joli message pour les mariés...',
     'guests:giftsPurchaseCancel': 'Annuler',
@@ -2109,6 +2142,7 @@ const translations = {
     'guests:gifts.cube.messagePlaceholder': 'Laissez un message pour les mariés...',
     'guests:gifts.cube.alreadySold': 'Ce bloc vient d’être offert par un autre invité. Veuillez en choisir un autre.',
     'guests:gifts.cube.buyButton': 'Construisez avec nous',
+    'guests:gifts.cube.heroAlt': 'Image d’aperçu de la section des blocs de la sculpture de mariage',
 
     //--------------------------------
     // Figurine Gifts
@@ -2136,11 +2170,22 @@ const translations = {
     'guests:gifts.section.cube.empty': 'Aucun bloc disponible pour le moment.',
 
     'guests:gifts.section.card.title': 'Cartes-cadeaux',
-    'guests:gifts.section.card.lede': 'Une carte imprimée livrée à votre table le jour du mariage, avec votre message déjà inscrit et de la place pour en ajouter. Remettez-la aux mariés en guise de cadeau.',
+    'guests:gifts.section.card.lede': 'Cliquez sur une carte pour voir l’aperçu imprimé. Nous livrerons la carte physique à votre table le jour J, avec votre message déjà imprimé à l’intérieur et de la place pour ajouter quelques mots à la main et la signer avant de l’offrir aux mariés.',
     'guests:gifts.section.card.priceRange': '€25–€250',
     'guests:gifts.section.card.delivery': 'Livrée à votre table le jour J',
     'guests:gifts.section.card.leadTime': 'À commander 2 semaines à l\'avance pour l\'impression',
     'guests:gifts.section.card.empty': 'Aucune carte disponible pour le moment.',
+    'guests:gifts.card.heroAlt': 'Illustration d’aperçu de carte d’Iluminada et George',
+    'guests:gifts.card.insideImageAlt': 'Illustration intérieure de la carte d’Iluminada et George',
+    'guests:gifts.card.previewFront': 'Recto de la carte',
+    'guests:gifts.card.previewInside': 'Intérieur de la carte',
+    'guests:gifts.card.previewMessagePlaceholder': 'Message personnel facultatif',
+    'guests:gifts.card.previewNamePlaceholder': 'Vos noms apparaîtront ici',
+    'guests:gifts.card.previewWritingSpace': 'Espace pour ajouter quelques mots à la main et signer le jour J.',
+    'guests:gifts.card.insertAttachedLabel': 'Carte insérée fixée ici',
+    'guests:gifts.card.insertPreviewLabel': 'Aperçu de la carte insérée',
+    'guests:gifts.card.insertPreviewFront': 'Recto de l’insert',
+    'guests:gifts.card.insertPreviewBack': 'Verso de l’insert',
 
     //--------------------------------
     // Admin Page
@@ -2919,7 +2964,7 @@ const translations = {
     // Gifts Page
     //--------------------------------
     'guests:giftsPageTitle': 'Geschenkeliste',
-    'guests:giftsPageDescription': 'Deine Anwesenheit ist unser Geschenk. Wenn du dennoch zu unserer Flitterreise beitragen möchtest, kannst du unten ein lustiges Geschenk auswählen. Es wird mit deiner Nachricht gedruckt und auf einer großen Wand beim Hochzeitsbankett ausgestellt. Der von dir gewählte Geldbetrag wird zur Finanzierung unserer Flitterreise verwendet. Vielen Dank!',
+    'guests:giftsPageDescription': 'Deine Anwesenheit ist bereits unser Geschenk. Wenn du trotzdem zu unserer Hochzeitsreise beitragen möchtest, wähle unten eines der Geschenke aus. Für jede Geschenkkarte drucken wir eine echte Karte und liefern sie am Hochzeitstag an deinen Tisch – mit deiner Nachricht bereits innen eingedruckt und mit Platz, damit du noch etwas per Hand ergänzen und unterschreiben kannst, bevor du sie dem Brautpaar gibst.',
     'guests:giftsLoading': 'Lade Geschenke...',
     'guests:giftsThankYouTitle': 'Vielen Dank für deine Großzügigkeit!',
     'guests:giftsThankYouMessage': 'Wir sind dir für deine wunderbaren Geschenke sehr dankbar',
@@ -2931,6 +2976,7 @@ const translations = {
     'guests:giftsAvailable': 'verfügbar',
     'guests:giftsSoldOut': 'Ausverkauft',
     'guests:giftsBuyGift': 'Geschenk kaufen',
+    'guests:giftsPreviewCard': 'Karte ansehen',
     'guests:giftsPaymentSuccessTitle': 'Zahlung erfolgreich!',
     'guests:giftsPaymentSuccess': 'Vielen Dank für dein Geschenk! Deine Zahlung war erfolgreich.',
     'guests:giftsPaymentCancelledTitle': 'Zahlung storniert!',
@@ -2940,6 +2986,8 @@ const translations = {
     'guests:giftsRetry': 'Erneut versuchen',
     'guests:giftsPurchaseTitle': 'Geschenk kaufen',
     'guests:giftsPurchaseAbout': 'Du bist dabei, folgendes zu kaufen:',
+    'guests:giftsPurchaseFromLabel': 'Von (wird auf die Karte gedruckt):',
+    'guests:giftsPurchaseFrom:placeholder': 'Dein Name oder eure Namen',
     'guests:giftsPurchaseMessageLabel': 'Persönliche Nachricht hinzufügen (optional):',
     'guests:giftsPurchaseMessage:placeholder': 'Schreibe eine schöne Nachricht für das Paar...',
     'guests:giftsPurchaseCancel': 'Abbrechen',
@@ -2962,6 +3010,7 @@ const translations = {
     'guests:gifts.cube.messagePlaceholder': 'Hinterlasse eine Nachricht für das Brautpaar...',
     'guests:gifts.cube.alreadySold': 'Dieser Block wurde gerade von einem anderen Gast verschenkt. Bitte wähle einen anderen.',
     'guests:gifts.cube.buyButton': 'Bau mit uns',
+    'guests:gifts.cube.heroAlt': 'Vorschaubild für den Blockbereich der Hochzeitsskulptur',
 
     //--------------------------------
     // Figurine Gifts
@@ -2989,11 +3038,22 @@ const translations = {
     'guests:gifts.section.cube.empty': 'Im Moment sind keine Blöcke verfügbar.',
 
     'guests:gifts.section.card.title': 'Geschenkkarten',
-    'guests:gifts.section.card.lede': 'Eine gedruckte Karte, die am Hochzeitstag an deinen Tisch geliefert wird – mit deiner Nachricht bereits darauf und Platz, sie zu ergänzen. Übergib sie dem Brautpaar als dein Geschenk.',
+    'guests:gifts.section.card.lede': 'Klicke auf eine Karte, um die gedruckte Version anzusehen. Wir liefern die echte Karte am Hochzeitstag an deinen Tisch, mit deiner Nachricht bereits innen eingedruckt und mit Platz, damit du noch etwas per Hand ergänzen und sie unterschreiben kannst, bevor du sie dem Brautpaar übergibst.',
     'guests:gifts.section.card.priceRange': '€25–€250',
     'guests:gifts.section.card.delivery': 'Wird am Hochzeitstag an deinen Tisch geliefert',
     'guests:gifts.section.card.leadTime': '2 Wochen vorher bestellen für den Druck',
     'guests:gifts.section.card.empty': 'Im Moment sind keine Karten verfügbar.',
+    'guests:gifts.card.heroAlt': 'Vorschaubild der Geschenkkarte von Iluminada und George',
+    'guests:gifts.card.insideImageAlt': 'Innenillustration der Karte von Iluminada und George',
+    'guests:gifts.card.previewFront': 'Vorderseite der Karte',
+    'guests:gifts.card.previewInside': 'Innenseite der Karte',
+    'guests:gifts.card.previewMessagePlaceholder': 'Optionale persönliche Nachricht',
+    'guests:gifts.card.previewNamePlaceholder': 'Eure Namen erscheinen hier',
+    'guests:gifts.card.previewWritingSpace': 'Platz, um am Hochzeitstag noch etwas per Hand zu ergänzen und zu unterschreiben.',
+    'guests:gifts.card.insertAttachedLabel': 'Eingelegte Karte hier befestigt',
+    'guests:gifts.card.insertPreviewLabel': 'Vorschau der eingelegten Karte',
+    'guests:gifts.card.insertPreviewFront': 'Vorderseite des Einlegers',
+    'guests:gifts.card.insertPreviewBack': 'Rückseite des Einlegers',
 
     //--------------------------------
     // Admin Page

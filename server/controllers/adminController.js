@@ -36,7 +36,8 @@ async function getGiftChoices(req, res, next) {
         giftId: gift._id.toString(),
         amount,
         date: choice.date.toISOString(),
-        message: choice.message
+        message: choice.message,
+        giftFrom: choice.giftFrom
       };
     });
 
