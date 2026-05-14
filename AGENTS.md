@@ -206,6 +206,48 @@ The wedding portal has five distinct physical gift artefacts. They were previous
 - **User-facing copy**: `public/js/i18n.js` — section "Canonical gift terminology" near the end of each language block, keys `gifts:term.giftNote`, `gifts:term.thankYouNote`, `gifts:term.honeymoonCard`, `gifts:term.block`, `gifts:term.figurine` (plus `.plural` variants). Use these keys via `translate()` rather than hardcoding strings.
 - **Gift descriptions**: `server/data/figurine-text.js`, `server/data/cube-text.js`. References to "a printed card" inside descriptions should say "gift note" (or the locale equivalent) — never "card" alone, which is now ambiguous.
 
+### How gifts work end-to-end (the physical flow)
+
+The wedding has **three purchaseable gift types** and **two paper artefacts** that accompany every purchase. Knowing the flow keeps copy honest and prevents agents from inventing extra steps.
+
+**The three purchaseable gifts** (one of these per guest purchase):
+
+1. **Honeymoon card** — a credit-card-shaped voucher. Funds go toward the honeymoon. Gift type `'cash'` in the schema.
+2. **Block** — a printed picture cube that becomes part of the wedding sculpture. Gift type `'cube'`, `cubeId` 1..38.
+3. **Figurine** — a 3D-printed figurine of the couple (4 variants). Gift type `'figurine'`, `figurineId` 1..4.
+
+**The two paper artefacts** (both included in every guest's banquet bag at their seat):
+
+1. **Gift note** (guest → couple) — printed with the **purchaser's** name and personal message at the time they bought their gift online, with space to handwrite more and sign on the wedding day. Travels TO the couple, alongside the gift itself.
+2. **Thank-you note** (couple → guest) — written by the bride and groom, addressed to that specific purchaser, **prepared in advance**. Because all purchases are made before the wedding day, the couple knows every gift + buyer combination ahead of time and can write a personalised thank-you for each one. Travels FROM the couple, in the same bag as the gift the guest is about to hand over.
+
+### The banquet-day choreography
+
+When a guest sits down at their assigned table seat at the wedding banquet, they find a bag at their place containing:
+
+- The Honeymoon card / Block / Figurine they purchased (the physical gift itself)
+- The Gift note already printed with their name and message, with space to handwrite extra words and sign right there
+- The Thank-you note from the couple, already addressed to them
+
+During a designated moment in the banquet, the guest signs their Gift note, places it with their gift, and presents it to the couple — the Thank-you note stays in their bag (it's theirs to take home).
+
+This means every gift purchase the platform processes is **deterministic at print time**: by the day of the wedding, all Gift notes have been printed and all Thank-you notes have been written. There is no live in-banquet checkout flow.
+
+### Previews shown in the gift-purchase UI
+
+Each gift type has a preview matching its physical form. A purchaser can preview the gift before committing to buying.
+
+| Gift type | Preview surface | Code location |
+|---|---|---|
+| Honeymoon card | Front + inside spread, with the buyer's name and live-typed message rendered onto the inside as they type | `public/js/gifts/gifts.js` (`cash-gift-preview-overlay`, `cash-card-preview-page--front`, `cash-card-preview-page--inside`) — assets in `public/assets/images/gift-cards/` |
+| Block | Interactive 3D cube viewer | `public/js/gifts/cube-viewer.js` |
+| Figurine | Interactive 360° turntable image sequence | `public/js/gifts/figurine-viewer.js` |
+
+The **Thank-you note** has a separate static preview that lives outside the purchase flow:
+
+- File: `public/thank-you-card-preview.html`
+- This is a standalone HTML page the couple can open to see what the printed Thank-you note will look like. It is **not** part of any guest-facing screen — guests never see this preview, because they receive the actual physical note on the wedding day.
+
 ### Schema vs UI mismatch (deliberate)
 
 The `Gift.type` enum in `server/models/Gift.js` is `'cash' | 'cube' | 'figurine'`. The user-facing labels are **honeymoon card / block / figurine**. The mismatch is intentional — renaming the enum is a database migration with rollout risk, while renaming the UI labels is safe and was done first. CSS class names (`gift-cube-card`, `cube-viewer`, `gift-credit-card`) and JS function names (`createCubeViewer`, `purchaseCube`) also still use the old internal vocabulary. **Do not rename these in passing.** A future commit will do the schema + identifier rename as a single coordinated change with a migration.
