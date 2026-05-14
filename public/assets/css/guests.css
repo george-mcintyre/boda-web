@@ -2865,11 +2865,27 @@ main.main-content-full {
     padding: 8px;
     gap: 6px;
     border-radius: var(--radius-md, 6px);
+    overflow-x: visible;
   }
   .gifts-subnav__btn {
     padding: 8px 12px;
     font-size: 0.88em;
     gap: 6px;
+  }
+  .gifts-subnav__btn:not(.is-active) {
+    flex: 0 0 auto;
+    min-width: 0;
+    padding: 8px 10px;
+  }
+  .gifts-subnav__btn:not(.is-active) span {
+    display: none;
+  }
+  .gifts-subnav__btn.is-active {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .gifts-subnav__btn i {
+    font-size: 1.05em;
   }
 }
 
@@ -3557,8 +3573,21 @@ main.main-content-full {
     font-size: 0.95em;
   }
 
-  .tab-btn span {
+  .tab-btn:not(.active) span {
     display: none;
+  }
+
+  .tab-btn.active span {
+    display: inline;
+  }
+
+  .tab-btn:not(.active) {
+    flex: 0 0 auto;
+    padding: 15px 12px;
+  }
+
+  .tab-btn.active {
+    flex: 1 1 auto;
   }
 
   .tab-btn i {
