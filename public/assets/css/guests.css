@@ -5153,6 +5153,29 @@ main.main-content-full {
   .gifts-section__intro-media {
     order: -1;
   }
+
+  .gifts-section__divider {
+    gap: 10px;
+  }
+
+  .gifts-section__title {
+    white-space: normal;
+    font-size: 1.3em;
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .gifts-section__divider::before,
+  .gifts-section__divider::after {
+    display: none;
+  }
+
+  .gifts-section__title {
+    font-size: 1.2em;
+    line-height: 1.25;
+  }
 }
 
 .gifts-section--empty-state {
