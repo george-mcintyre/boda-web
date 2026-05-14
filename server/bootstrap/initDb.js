@@ -230,9 +230,34 @@ async function seedFigurineGiftsIfNeeded() {
   }
 }
 
+const CASH_GIFT_AMOUNT_OPTIONS = [25, 50, 100, 200, 500];
+
+async function migrateCashGiftsToAmountOptions() {
+  const Gift = models.Gift;
+  const result = await Gift.updateMany(
+    {
+      $and: [
+        { $or: [{ type: 'cash' }, { type: { $exists: false } }] },
+        { $or: [{ amountOptions: { $exists: false } }, { amountOptions: { $size: 0 } }] },
+      ],
+    },
+    {
+      $set: { amountOptions: CASH_GIFT_AMOUNT_OPTIONS },
+      $unset: { amount: '' },
+    }
+  );
+  if (result.modifiedCount > 0) {
+    console.log(`[DB] Migrated ${result.modifiedCount} cash gift(s) to amountOptions=[${CASH_GIFT_AMOUNT_OPTIONS.join(', ')}]`);
+  } else {
+    console.log('[DB] No cash gifts needed amountOptions migration');
+  }
+  return result;
+}
+
 module.exports = {
   ensureCollectionsAndIndexes,
   seedExampleDataIfEmpty,
   seedCubeGiftsIfNeeded,
   seedFigurineGiftsIfNeeded,
+  migrateCashGiftsToAmountOptions,
 };

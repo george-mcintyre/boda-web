@@ -1866,9 +1866,10 @@ main.main-content-full {
 }
 
 .gift-note-card {
-  --gift-note-page-height: 640px;
+  --gift-note-front-width: min(45%, 360px);
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 24px;
   color: #2c1810;
 }
@@ -1880,8 +1881,16 @@ main.main-content-full {
 }
 
 .gift-note-card__page--front {
-  width: min(55%, 520px);
-  margin-left: auto;
+  width: var(--gift-note-front-width);
+  /* Sit on the right half of the inside spread (which is centered),
+     so the right edges of the closed front and the open spread align. */
+  margin-right: 0;
+  margin-left: var(--gift-note-front-width);
+}
+
+.gift-note-card__page--inside {
+  width: calc(var(--gift-note-front-width) * 2);
+  max-width: 100%;
 }
 
 .gift-note-card__label {
@@ -1899,35 +1908,36 @@ main.main-content-full {
   border: 1px solid rgba(139, 90, 150, 0.14);
   box-shadow: 0 20px 45px rgba(44, 24, 16, 0.15);
   overflow: hidden;
-  height: var(--gift-note-page-height);
+  width: 100%;
 }
 
 .gift-note-card__front {
   position: relative;
-  padding: 28px 24px 32px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
+  aspect-ratio: 1 / 1.414;
 }
 
-.gift-note-card__front-couple {
-  flex: 1;
-  min-height: 0;
+.gift-note-card__front-art {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  object-fit: contain;
-  object-position: center bottom;
-  filter: drop-shadow(0 8px 16px rgba(44, 24, 16, 0.16));
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
 }
 
 .gift-note-card__front-caption {
-  margin-top: 18px;
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 8%;
   font-family: 'Great Vibes', 'Allura', 'Pinyon Script', 'Apple Chancery', cursive;
-  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-size: clamp(1.8rem, 3.4vw, 2.8rem);
   line-height: 1.1;
   color: #4b3127;
   text-align: center;
   letter-spacing: 0.01em;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 .gift-note-card__inside {
@@ -1935,23 +1945,18 @@ main.main-content-full {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   padding: 0;
+  min-height: calc(var(--gift-note-front-width) * 2 / 1.414);
 }
 
 .gift-note-card__inside::before {
   content: '';
   position: absolute;
-  top: 10px;
-  bottom: 10px;
+  top: 18px;
+  bottom: 18px;
   left: 50%;
-  width: 38px;
+  width: 0;
   transform: translateX(-50%);
-  background: linear-gradient(90deg,
-    rgba(44, 24, 16, 0.04) 0%,
-    rgba(44, 24, 16, 0.12) 18%,
-    rgba(255,255,255,0.96) 50%,
-    rgba(44, 24, 16, 0.12) 82%,
-    rgba(44, 24, 16, 0.04) 100%);
-  border-radius: 999px;
+  border-left: 1px dashed rgba(107, 78, 61, 0.22);
   pointer-events: none;
   z-index: 2;
 }
@@ -1966,12 +1971,10 @@ main.main-content-full {
 
 .gift-note-card__inside-page--left {
   background: #fff;
-  box-shadow: inset -16px 0 30px rgba(44, 24, 16, 0.05);
 }
 
 .gift-note-card__inside-page--right {
   background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(250, 245, 240, 0.98) 100%);
-  box-shadow: inset 16px 0 30px rgba(44, 24, 16, 0.05);
 }
 
 .gift-note-card__type-title {
@@ -2129,23 +2132,19 @@ main.main-content-full {
 }
 
 @media (max-width: 980px) {
-  .gift-note-card {
-    --gift-note-page-height: auto;
-  }
-
   .gift-note-card__page--front {
-    width: 100%;
-    margin-left: 0;
+    width: 70%;
+    margin: 0 auto;
   }
 
-  .gift-note-card__front,
-  .gift-note-card__inside {
-    height: auto;
-    min-height: 520px;
+  .gift-note-card__page--inside {
+    width: 100%;
+    margin: 0;
   }
 
   .gift-note-card__inside {
     grid-template-columns: 1fr;
+    aspect-ratio: auto;
   }
 
   .gift-note-card__inside::before {
@@ -2155,23 +2154,15 @@ main.main-content-full {
   .gift-note-card__inside-page + .gift-note-card__inside-page {
     border-top: 1px dashed rgba(139, 90, 150, 0.4);
   }
-
-  .gift-note-card__inside-page--left {
-    box-shadow: inset 0 -14px 22px rgba(44, 24, 16, 0.04);
-  }
-
-  .gift-note-card__inside-page--right {
-    box-shadow: none;
-  }
 }
 
 @media (max-width: 640px) {
-  .gift-note-card__front {
-    padding: 20px 16px 24px;
+  .gift-note-card__page--front {
+    width: 100%;
   }
 
   .gift-note-card__front-caption {
-    font-size: clamp(1.7rem, 8vw, 2.4rem);
+    font-size: clamp(1.5rem, 7vw, 2.2rem);
   }
 
   .gift-note-card__inside-page {

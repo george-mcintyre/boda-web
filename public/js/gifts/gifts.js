@@ -392,7 +392,7 @@ function renderGiftNoteHtml({ giftType, giftTitle, giftDescription, giftAmount, 
       <section class="gift-note-card__page gift-note-card__page--front">
         <div class="gift-note-card__label" data-i18n="guests:gifts.giftNote.previewFront">${translate('guests:gifts.giftNote.previewFront')}</div>
         <div class="gift-note-card__front">
-          <img src="${COUPLE_CUTOUT_URL}" alt="" class="gift-note-card__front-couple">
+          <img src="/assets/images/gift-cards/gift-note-cover.jpg" alt="" class="gift-note-card__front-art">
           <div class="gift-note-card__front-caption" data-i18n="guests:gifts.card.frontCaption">${translate('guests:gifts.card.frontCaption')}</div>
         </div>
       </section>
@@ -1511,8 +1511,18 @@ window.purchaseGift = async (giftId) => {
     return;
   }
   const giftTitle = gift.title || '';
-  const giftAmount = gift.amount;
   const giftDescription = gift.description || '';
+  const cashAmountOptions = Array.isArray(gift.amountOptions) && gift.amountOptions.length
+    ? gift.amountOptions
+    : (typeof gift.amount === 'number' ? [gift.amount] : []);
+  const initialAmount = cashAmountOptions[0];
+
+  const priceOptionsHtml = cashAmountOptions.map((amt, idx) => `
+    <label class="cube-price-option">
+      <input type="radio" name="cashAmount" value="${amt}" ${idx === 0 ? 'checked' : ''} />
+      <span class="cube-price-option__chip">€${amt}</span>
+    </label>
+  `).join('');
 
   const overlay = document.createElement('div');
   overlay.className = 'gift-purchase-overlay cash-gift-preview-overlay';
@@ -1523,15 +1533,22 @@ window.purchaseGift = async (giftId) => {
         <h3>${escapeHtml(giftTitle)}</h3>
     </div>
     <div class="gift-purchase-content">
-        <div class="gift-purchase-summary">
-        <strong><span data-i18n="guests:giftsPurchaseAbout">${translate('guests:giftsPurchaseAbout')}</span></strong>
-        <span class="gift-purchase-amount">€${giftAmount}</span>
-        </div>
         ${renderHoneymoonCardPreviewHtml({
           giftTitle,
           giftDescription,
           imageUrl: gift.imageUrl,
         })}
+        ${cashAmountOptions.length > 1 ? `
+        <div class="cube-price-selector">
+          <label class="cube-price-selector__label" data-i18n="guests:gifts.card.priceLabel">${translate('guests:gifts.card.priceLabel')}</label>
+          <div class="cube-price-options">${priceOptionsHtml}</div>
+        </div>
+        ` : `
+        <div class="gift-purchase-summary">
+          <strong><span data-i18n="guests:giftsPurchaseAbout">${translate('guests:giftsPurchaseAbout')}</span></strong>
+          <span class="gift-purchase-amount">€${initialAmount}</span>
+        </div>
+        `}
         ${renderGiftFromFieldHtml('giftFromInput')}
         <div class="gift-message-input">
         <label for="giftMessage"><span data-i18n="guests:giftsPurchaseMessageLabel">${translate('guests:giftsPurchaseMessageLabel')}</span></label>
@@ -1578,11 +1595,16 @@ window.purchaseGift = async (giftId) => {
   overlay.querySelector('#giftMessage').addEventListener('input', updatePreviewMessage);
   overlay.querySelector('#giftFromInput').addEventListener('input', updatePreviewSigner);
 
+  const getSelectedCashAmount = () => {
+    const selected = overlay.querySelector('input[name="cashAmount"]:checked');
+    return selected ? Number(selected.value) : initialAmount;
+  };
+
   attachShowGiftNoteHandler(overlay, () => ({
     giftType: 'cash',
     giftTitle,
     giftDescription,
-    giftAmount,
+    giftAmount: getSelectedCashAmount(),
     giftImageUrl: gift.imageUrl,
     message: overlay.querySelector('#giftMessage').value.trim(),
     signerName: resolveGiftFromValue(overlay.querySelector('#giftFromInput').value),
@@ -1605,9 +1627,9 @@ window.purchaseGift = async (giftId) => {
   overlay.querySelector('.btn-confirm-purchase').addEventListener('click', async () => {
     const message = document.getElementById('giftMessage').value.trim();
     const giftFrom = resolveGiftFromValue(document.getElementById('giftFromInput').value);
+    const amount = getSelectedCashAmount();
     const confirmBtn = overlay.querySelector('.btn-confirm-purchase');
 
-    // Show loading state
     confirmBtn.disabled = true;
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="guests:giftsPurchaseProcessing">' + translate('guests:giftsPurchaseProcessing') + '</span>';
 
@@ -1618,7 +1640,7 @@ window.purchaseGift = async (giftId) => {
           'Content-Type': 'application/json',
           'Authorization': window.token
         },
-        body: JSON.stringify({giftId, message, giftFrom})
+        body: JSON.stringify({giftId, message, giftFrom, amount})
       });
 
       const data = await response.json();

@@ -29,16 +29,24 @@ const giftSchema = new Schema({
 }, { timestamps: true });
 
 giftSchema.path('amount').validate(function (value) {
-  if (this.type === 'cash') return typeof value === 'number';
+  if (this.type === 'cash') {
+    const hasOptions = Array.isArray(this.amountOptions) && this.amountOptions.length > 0;
+    if (hasOptions) return value === undefined || value === null;
+    return typeof value === 'number';
+  }
   return value === undefined || value === null;
-}, '`amount` is required for cash gifts and must be absent for non-cash gifts');
+}, 'cash gifts must have either `amount` (legacy single price) or `amountOptions` (price tiers); non-cash gifts must not have `amount`');
 
 giftSchema.path('amountOptions').validate(function (value) {
   if (this.type === 'cube' || this.type === 'figurine') {
     return Array.isArray(value) && value.length > 0;
   }
+  if (this.type === 'cash') {
+    return value === undefined || value === null || value.length === 0
+      || (Array.isArray(value) && value.length > 0);
+  }
   return value === undefined || value === null || value.length === 0;
-}, '`amountOptions` is required for cube and figurine gifts and must be empty for cash gifts');
+}, '`amountOptions` is required for cube and figurine gifts; for cash gifts it is optional but if present must be a non-empty array');
 
 giftSchema.path('cubeId').validate(function (value) {
   if (this.type === 'cube') {

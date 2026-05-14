@@ -457,6 +457,7 @@ const translations = {
     'guests:gifts.figurine.alreadySold': 'This figurine has just been claimed by another guest. Please choose another.',
     'guests:gifts.figurine.buyButton': 'Claim this figurine',
     'guests:gifts.card.buyButton': 'Choose this card',
+    'guests:gifts.card.priceLabel': 'Choose your contribution',
 
     //--------------------------------
     // Gift Sections (Figurines / Blocks / Cards)
@@ -1395,6 +1396,7 @@ const translations = {
     'guests:gifts.figurine.alreadySold': 'Esta figurita acaba de ser reservada por otro invitado. Por favor, elige otra.',
     'guests:gifts.figurine.buyButton': 'Reservar esta figurita',
     'guests:gifts.card.buyButton': 'Elegir esta tarjeta',
+    'guests:gifts.card.priceLabel': 'Elige tu contribución',
 
     //--------------------------------
     // Gift Sections (Figurines / Blocks / Cards)
@@ -1426,7 +1428,7 @@ const translations = {
     'guests:gifts.card.previewMessagePlaceholder': 'Mensaje personal opcional',
     'guests:gifts.card.previewNamePlaceholder': 'Aquí aparecerán vuestros nombres',
     'guests:gifts.card.previewWritingSpace': 'Espacio para añadir más a mano y firmar el día de la boda.',
-    'guests:gifts.card.frontCaption': 'Un regalo de boda para ti …',
+    'guests:gifts.card.frontCaption': 'Un regalo de boda para vosotros …',
     'guests:gifts.card.insertAttachedLabel': 'Tarjeta de luna de miel adjunta aquí',
     'guests:gifts.card.insertPreviewLabel': 'Vista previa de la tarjeta de luna de miel',
     'guests:gifts.card.insertPreviewFront': 'Portada de la tarjeta de luna de miel',
@@ -1436,10 +1438,10 @@ const translations = {
     'guests:gifts.giftNote.previewInside': 'Interior de la nota de regalo',
     'guests:gifts.giftNote.honeymoonWish': 'Esperamos que nuestra contribución a vuestro fondo de luna de miel haga que vuestro viaje sea inolvidable.',
     'guests:gifts.giftNote.dialogTitle': 'La nota de regalo que acompañará este regalo',
-    'guests:gifts.giftNote.title.cash': 'Aquí tienes tu tarjeta de luna de miel',
-    'guests:gifts.giftNote.title.cube': 'Aquí tienes un bloque para la escultura de la boda',
-    'guests:gifts.giftNote.title.figurine': 'Aquí tienes una figurita para la tarta de boda y la escultura',
-    'guests:gifts.giftNote.deliveryNote': 'Esta nota estará en tu mesa el día de la boda, lista para que la firmes y la entregues a los novios junto con tu regalo.',
+    'guests:gifts.giftNote.title.cash': 'Aquí tenéis vuestra tarjeta de luna de miel',
+    'guests:gifts.giftNote.title.cube': 'Aquí tenéis un bloque para la escultura de la boda',
+    'guests:gifts.giftNote.title.figurine': 'Aquí tenéis una figurita para la tarta de boda y la escultura',
+    'guests:gifts.giftNote.deliveryNote': 'Esta nota estará en vuestra mesa el día de la boda, lista para que la firméis y la entreguéis a los novios junto con vuestro regalo.',
     'guests:gifts.giftNote.messageLabel': 'Mensaje personal',
     'guests:gifts.giftNote.fromLabel': 'De',
     'guests:gifts.giftNote.amountLabel': 'Importe',
@@ -2333,6 +2335,7 @@ const translations = {
     'guests:gifts.figurine.alreadySold': 'Cette figurine vient d\'être réservée par un autre invité. Veuillez en choisir une autre.',
     'guests:gifts.figurine.buyButton': 'Réserver cette figurine',
     'guests:gifts.card.buyButton': 'Choisir cette carte',
+    'guests:gifts.card.priceLabel': 'Choisissez votre contribution',
 
     //--------------------------------
     // Gift Sections (Figurines / Blocks / Cards)
@@ -3271,6 +3274,7 @@ const translations = {
     'guests:gifts.figurine.alreadySold': 'Diese Figur wurde gerade von einem anderen Gast reserviert. Bitte wähle eine andere.',
     'guests:gifts.figurine.buyButton': 'Diese Figur sichern',
     'guests:gifts.card.buyButton': 'Diese Karte wählen',
+    'guests:gifts.card.priceLabel': 'Wähle deinen Beitrag',
 
     //--------------------------------
     // Gift Sections (Figurines / Blocks / Cards)
@@ -3302,7 +3306,7 @@ const translations = {
     'guests:gifts.card.previewMessagePlaceholder': 'Optionale persönliche Nachricht',
     'guests:gifts.card.previewNamePlaceholder': 'Eure Namen erscheinen hier',
     'guests:gifts.card.previewWritingSpace': 'Platz, um am Hochzeitstag noch etwas per Hand zu ergänzen und zu unterschreiben.',
-    'guests:gifts.card.frontCaption': 'Ein Hochzeitsgeschenk für dich …',
+    'guests:gifts.card.frontCaption': 'Ein Hochzeitsgeschenk für euch …',
     'guests:gifts.card.insertAttachedLabel': 'Hochzeitsreise-Karte hier befestigt',
     'guests:gifts.card.insertPreviewLabel': 'Vorschau der Hochzeitsreise-Karte',
     'guests:gifts.card.insertPreviewFront': 'Vorderseite der Hochzeitsreise-Karte',
@@ -3312,10 +3316,10 @@ const translations = {
     'guests:gifts.giftNote.previewInside': 'Innenseite der Geschenkkarte',
     'guests:gifts.giftNote.honeymoonWish': 'Wir hoffen, dass unser Beitrag zu eurer Hochzeitsreise-Kasse eure Reise wirklich unvergesslich macht.',
     'guests:gifts.giftNote.dialogTitle': 'Die Geschenkkarte, die mit diesem Geschenk kommt',
-    'guests:gifts.giftNote.title.cash': 'Hier ist deine Hochzeitsreise-Karte',
+    'guests:gifts.giftNote.title.cash': 'Hier ist eure Hochzeitsreise-Karte',
     'guests:gifts.giftNote.title.cube': 'Hier ist ein Block für die Hochzeitsskulptur',
     'guests:gifts.giftNote.title.figurine': 'Hier ist eine Figur für die Hochzeitstorte und die Skulptur',
-    'guests:gifts.giftNote.deliveryNote': 'Diese Karte liegt am Hochzeitstag auf deinem Tisch, bereit zum Unterschreiben und zur Übergabe an das Brautpaar zusammen mit deinem Geschenk.',
+    'guests:gifts.giftNote.deliveryNote': 'Diese Karte liegt am Hochzeitstag auf eurem Tisch, bereit zum Unterschreiben und zur Übergabe an das Brautpaar zusammen mit eurem Geschenk.',
     'guests:gifts.giftNote.messageLabel': 'Persönliche Nachricht',
     'guests:gifts.giftNote.fromLabel': 'Von',
     'guests:gifts.giftNote.amountLabel': 'Betrag',

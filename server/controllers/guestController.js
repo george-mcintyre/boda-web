@@ -297,12 +297,18 @@ async function getGifts(req, res, next) {
         throw new Error(`Cannot find image for gift ${gift._id}`);
       }
 
+      const cashOptions = Array.isArray(gift.amountOptions) && gift.amountOptions.length
+        ? gift.amountOptions
+        : null;
+      const cashMinPrice = cashOptions ? Math.min(...cashOptions) : gift.amount;
+
       return {
         ...baseItem,
-        amount: gift.amount,
+        amount: cashOptions ? undefined : gift.amount,
+        amountOptions: cashOptions,
         image: gift.image,
         imageUrl,
-        priceDisplay: `€${gift.amount}`,
+        priceDisplay: cashOptions ? `€${cashMinPrice}+` : `€${gift.amount}`,
       };
     });
 
@@ -386,7 +392,8 @@ async function createPaymentSession(req, res, next) {
 
     const giftType = gift.type || 'cash';
     let chargeAmount;
-    if (giftType === 'cube' || giftType === 'figurine') {
+    const hasAmountOptions = Array.isArray(gift.amountOptions) && gift.amountOptions.length > 0;
+    if (giftType === 'cube' || giftType === 'figurine' || hasAmountOptions) {
       const options = gift.amountOptions || [];
       const parsedAmount = Number(requestedAmount);
       if (!Number.isFinite(parsedAmount) || !options.includes(parsedAmount)) {

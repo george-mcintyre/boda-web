@@ -409,15 +409,20 @@ async function createGift(req, res, next) {
         imageData = `data:${populatedGift.image.contentType};base64,${base64Data}`;
     }
 
+    const createdFallbackPrice = gift.amount
+        ?? (Array.isArray(gift.amountOptions) && gift.amountOptions.length
+            ? Math.min(...gift.amountOptions)
+            : null);
     res.status(201).json({
         id: gift._id.toString(),
         title: localize(gift.title, lang),
         description: localize(gift.description, lang),
         amount: gift.amount,
+        amountOptions: gift.amountOptions,
         available: gift.available,
         purchased: 0,
         image: imageData,
-        priceDisplay: `€${gift.amount}`
+        priceDisplay: createdFallbackPrice != null ? `€${createdFallbackPrice}` : '—'
     });
   } catch (e) { next(e); }
 }
@@ -471,15 +476,20 @@ async function updateGift(req, res, next) {
             imageData = gift.image;
         }
 
+        const updatedFallbackPrice = gift.amount
+            ?? (Array.isArray(gift.amountOptions) && gift.amountOptions.length
+                ? Math.min(...gift.amountOptions)
+                : null);
         res.json({
             id: gift._id.toString(),
             title: localize(gift.title, lang),
             description: localize(gift.description, lang),
             amount: gift.amount,
+            amountOptions: gift.amountOptions,
             available: gift.available,
             purchased: purchaseCount,
             image: imageData,
-            priceDisplay: `€${gift.amount}`
+            priceDisplay: updatedFallbackPrice != null ? `€${updatedFallbackPrice}` : '—'
         });
     } catch (e) { next(e); }
 }
