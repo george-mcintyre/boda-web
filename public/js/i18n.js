@@ -361,12 +361,53 @@ const translations = {
     //--------------------------------
     'guests:giftsLoading': 'Loading gifts...',
     'guests:giftsPageTitle': 'Gifts list',
-    'guests:giftsPageDescription': 'Your presence is our gift. If you would still like to contribute to our honeymoon, choose from the gifts below. For every gift you choose we will print a personal gift note and deliver it to your table on the wedding day with your message already inside, plus space for you to add more by hand and sign before giving it to the bride and groom.',
+    'guests:giftsPageDescription:rich': `
+      <p>
+        Your presence is our gift. If you would still like to contribute to our honeymoon,
+        choose from one of the three kinds of gift below.
+      </p>
+      <ul class="gifts-intro-types">
+        <li data-gifts-jump-to="figurine" role="button" tabindex="0">
+          <i class="fas fa-user" aria-hidden="true"></i>
+          <div>
+            <strong>Figurine</strong> <span class="gifts-intro-types__price">€250–€500</span><br>
+            A 3D figurine of the bride and groom — first it tops our wedding cake, then it joins the sculpture as a permanent keepsake.
+          </div>
+        </li>
+        <li data-gifts-jump-to="cube" role="button" tabindex="0">
+          <i class="fas fa-cube" aria-hidden="true"></i>
+          <div>
+            <strong>Block</strong> <span class="gifts-intro-types__price">€50–€500</span><br>
+            A printed block that becomes part of our wedding sculpture — a piece of art that will always remind us of the friends who celebrated with us.
+          </div>
+        </li>
+        <li data-gifts-jump-to="card" role="button" tabindex="0">
+          <i class="fas fa-envelope-open-text" aria-hidden="true"></i>
+          <div>
+            <strong>Honeymoon card</strong> <span class="gifts-intro-types__price">€25–€500</span><br>
+            A physical keepsake card that includes a small honeymoon perk we'll enjoy thanks to you.
+          </div>
+        </li>
+      </ul>
+      <p>
+        On the wedding day we'll deliver your gift to your table, together with a personal gift note we've already printed with your message —
+        with space for you to add more by hand and sign before handing both to the bride and groom.
+      </p>
+      <p class="gifts-intro-footer">
+        <i class="fas fa-heart" aria-hidden="true"></i>
+        All proceeds go to our honeymoon fund.
+      </p>
+    `,
+    'guests:gifts.subnav.aria': 'Jump to a gift section',
+    'guests:gifts.subnav.summary': 'Gifts Registry summary',
+    'guests:gifts.subnav.figurine': 'Figurines',
+    'guests:gifts.subnav.block': 'Sculpture Blocks',
+    'guests:gifts.subnav.card': 'Honeymoon Cards',
     'guests:giftsThankYouTitle': 'Thank You for Your Generosity!',
     'guests:giftsThankYouMessage': 'We are so grateful for your wonderful gifts',
     'guests:giftsDonatedOn:rich': 'Donated on {{date}}',
     'guests:giftsRegistryTitle': 'Gift Registry',
-    'guests:giftsRegistrySubtitle': 'Choose from our carefully selected gifts',
+    'guests:giftsRegistrySubtitle': 'Choose from one of our carefully created gifts',
     'guests:giftsNoAvailable': 'No gifts available',
     'guests:giftsNoAvailableDescription': 'Please check back later for our gift registry.',
     'guests:giftsAvailable': 'available',
@@ -1242,13 +1283,54 @@ const translations = {
     // Gifts Page
     //--------------------------------
     'guests:giftsPageTitle': 'Lista de regalos',
-    'guests:giftsPageDescription': 'Tu presencia es nuestro regalo. Si aun así quieres contribuir a nuestra luna de miel, elige uno de los regalos de abajo. Con cada regalo que elijas imprimiremos una nota de regalo personal y la entregaremos en tu mesa el día de la boda con tu mensaje ya colocado en el interior, además de espacio para que añadas más a mano y la firmes antes de dársela a los novios.',
+    'guests:giftsPageDescription:rich': `
+      <p>
+        Tu presencia es nuestro regalo. Si aun así quieres contribuir a nuestra luna de miel,
+        elige uno de los tres tipos de regalo de abajo.
+      </p>
+      <ul class="gifts-intro-types">
+        <li data-gifts-jump-to="figurine" role="button" tabindex="0">
+          <i class="fas fa-user" aria-hidden="true"></i>
+          <div>
+            <strong>Figurita</strong> <span class="gifts-intro-types__price">€250–€500</span><br>
+            Una figurita 3D de los novios — primero corona nuestra tarta nupcial y después pasa a formar parte permanente de la escultura.
+          </div>
+        </li>
+        <li data-gifts-jump-to="cube" role="button" tabindex="0">
+          <i class="fas fa-cube" aria-hidden="true"></i>
+          <div>
+            <strong>Bloque</strong> <span class="gifts-intro-types__price">€50–€500</span><br>
+            Un bloque impreso que se incorpora a nuestra escultura de boda — una pieza de arte que siempre nos recordará a quienes celebraron con nosotros.
+          </div>
+        </li>
+        <li data-gifts-jump-to="card" role="button" tabindex="0">
+          <i class="fas fa-envelope-open-text" aria-hidden="true"></i>
+          <div>
+            <strong>Tarjeta de luna de miel</strong> <span class="gifts-intro-types__price">€25–€500</span><br>
+            Una tarjeta-recuerdo física que incluye un pequeño detalle del que disfrutaremos en la luna de miel gracias a ti.
+          </div>
+        </li>
+      </ul>
+      <p>
+        El día de la boda entregaremos tu regalo en tu mesa, junto con una nota de regalo personal que ya habremos impreso con tu mensaje —
+        con espacio para que añadas más a mano y la firmes antes de entregar ambos a los novios.
+      </p>
+      <p class="gifts-intro-footer">
+        <i class="fas fa-heart" aria-hidden="true"></i>
+        Todo lo recaudado va a nuestro fondo para la luna de miel.
+      </p>
+    `,
+    'guests:gifts.subnav.aria': 'Ir a una sección de regalos',
+    'guests:gifts.subnav.summary': 'Resumen de la lista',
+    'guests:gifts.subnav.figurine': 'Figuritas',
+    'guests:gifts.subnav.block': 'Bloques de la escultura',
+    'guests:gifts.subnav.card': 'Tarjetas de luna de miel',
     'guests:giftsLoading': 'Cargando regalos...',
     'guests:giftsThankYouTitle': '¡Gracias por tu generosidad!',
     'guests:giftsThankYouMessage': 'Estamos muy agradecidos por tus maravillosos regalos',
     'guests:giftsDonatedOn:rich': 'Donado el {{date}}',
     'guests:giftsRegistryTitle': 'Lista de regalos',
-    'guests:giftsRegistrySubtitle': 'Elige entre nuestros regalos seleccionados con cariño',
+    'guests:giftsRegistrySubtitle': 'Elige uno de nuestros regalos creados con cariño',
     'guests:giftsNoAvailable': 'No hay regalos disponibles',
     'guests:giftsNoAvailableDescription': 'Por favor, vuelve a consultar más tarde nuestra lista de regalos.',
     'guests:giftsAvailable': 'disponibles',
@@ -2124,13 +2206,54 @@ const translations = {
     // Gifts Page
     //--------------------------------
     'guests:giftsPageTitle': 'Liste de cadeaux',
-    'guests:giftsPageDescription': 'Votre présence est déjà notre plus beau cadeau. Si vous souhaitez tout de même contribuer à notre lune de miel, choisissez l’un des cadeaux ci-dessous. Pour chaque cadeau que vous choisirez, nous imprimerons un mot d’accompagnement personnel et le livrerons à votre table le jour du mariage, avec votre message déjà placé à l’intérieur et de la place pour en ajouter à la main et le signer avant de le remettre aux mariés.',
+    'guests:giftsPageDescription:rich': `
+      <p>
+        Votre présence est déjà notre plus beau cadeau. Si vous souhaitez tout de même contribuer à notre lune de miel,
+        choisissez l'un des trois types de cadeaux ci-dessous.
+      </p>
+      <ul class="gifts-intro-types">
+        <li data-gifts-jump-to="figurine" role="button" tabindex="0">
+          <i class="fas fa-user" aria-hidden="true"></i>
+          <div>
+            <strong>Figurine</strong> <span class="gifts-intro-types__price">€250–€500</span><br>
+            Une figurine 3D des mariés — elle ornera d'abord notre pièce montée, puis rejoindra la sculpture comme souvenir permanent.
+          </div>
+        </li>
+        <li data-gifts-jump-to="cube" role="button" tabindex="0">
+          <i class="fas fa-cube" aria-hidden="true"></i>
+          <div>
+            <strong>Bloc</strong> <span class="gifts-intro-types__price">€50–€500</span><br>
+            Un bloc imprimé qui s'intègre à notre sculpture de mariage — une œuvre d'art qui nous rappellera toujours les ami·e·s qui ont célébré avec nous.
+          </div>
+        </li>
+        <li data-gifts-jump-to="card" role="button" tabindex="0">
+          <i class="fas fa-envelope-open-text" aria-hidden="true"></i>
+          <div>
+            <strong>Carte lune de miel</strong> <span class="gifts-intro-types__price">€25–€500</span><br>
+            Une carte-souvenir physique qui inclut un petit plaisir dont nous profiterons en lune de miel grâce à vous.
+          </div>
+        </li>
+      </ul>
+      <p>
+        Le jour du mariage, nous livrerons votre cadeau à votre table, accompagné d'un mot d'accompagnement personnel que nous aurons déjà imprimé avec votre message —
+        avec de la place pour en ajouter à la main et le signer avant de remettre les deux aux mariés.
+      </p>
+      <p class="gifts-intro-footer">
+        <i class="fas fa-heart" aria-hidden="true"></i>
+        Tous les fonds sont reversés à notre cagnotte lune de miel.
+      </p>
+    `,
+    'guests:gifts.subnav.aria': 'Accéder à une section de cadeaux',
+    'guests:gifts.subnav.summary': 'Résumé de la liste',
+    'guests:gifts.subnav.figurine': 'Figurines',
+    'guests:gifts.subnav.block': 'Blocs de la sculpture',
+    'guests:gifts.subnav.card': 'Cartes lune de miel',
     'guests:giftsLoading': 'Chargement des cadeaux...',
     'guests:giftsThankYouTitle': 'Merci pour votre générosité !',
     'guests:giftsThankYouMessage': 'Nous sommes très reconnaissants pour vos merveilleux cadeaux',
     'guests:giftsDonatedOn:rich': 'Offert le {{date}}',
     'guests:giftsRegistryTitle': 'Liste de mariage',
-    'guests:giftsRegistrySubtitle': 'Choisissez parmi nos cadeaux soigneusement sélectionnés',
+    'guests:giftsRegistrySubtitle': 'Choisissez l’un de nos cadeaux conçus avec soin',
     'guests:giftsNoAvailable': 'Aucun cadeau disponible',
     'guests:giftsNoAvailableDescription': 'Veuillez revenir plus tard pour consulter notre liste de cadeaux.',
     'guests:giftsAvailable': 'disponible(s)',
@@ -3006,13 +3129,54 @@ const translations = {
     // Gifts Page
     //--------------------------------
     'guests:giftsPageTitle': 'Geschenkeliste',
-    'guests:giftsPageDescription': 'Deine Anwesenheit ist bereits unser Geschenk. Wenn du trotzdem zu unserer Hochzeitsreise beitragen möchtest, wähle unten eines der Geschenke aus. Zu jedem Geschenk drucken wir eine persönliche Geschenkkarte und liefern sie am Hochzeitstag an deinen Tisch – mit deiner Nachricht bereits innen eingedruckt und mit Platz, damit du noch etwas per Hand ergänzen und unterschreiben kannst, bevor du sie dem Brautpaar gibst.',
+    'guests:giftsPageDescription:rich': `
+      <p>
+        Deine Anwesenheit ist bereits unser Geschenk. Wenn du trotzdem zu unserer Hochzeitsreise beitragen möchtest,
+        wähle unten eine der drei Geschenkarten aus.
+      </p>
+      <ul class="gifts-intro-types">
+        <li data-gifts-jump-to="figurine" role="button" tabindex="0">
+          <i class="fas fa-user" aria-hidden="true"></i>
+          <div>
+            <strong>Figur</strong> <span class="gifts-intro-types__price">€250–€500</span><br>
+            Eine 3D-Figur des Brautpaars — sie ziert zunächst unsere Hochzeitstorte und wird danach fester Bestandteil der Skulptur.
+          </div>
+        </li>
+        <li data-gifts-jump-to="cube" role="button" tabindex="0">
+          <i class="fas fa-cube" aria-hidden="true"></i>
+          <div>
+            <strong>Block</strong> <span class="gifts-intro-types__price">€50–€500</span><br>
+            Ein gedruckter Block, der Teil unserer Hochzeitsskulptur wird — ein Kunstwerk, das uns immer an die Menschen erinnern wird, die mit uns gefeiert haben.
+          </div>
+        </li>
+        <li data-gifts-jump-to="card" role="button" tabindex="0">
+          <i class="fas fa-envelope-open-text" aria-hidden="true"></i>
+          <div>
+            <strong>Hochzeitsreise-Karte</strong> <span class="gifts-intro-types__price">€25–€500</span><br>
+            Eine physische Andenken-Karte mit einer kleinen Annehmlichkeit, die wir dank dir auf unserer Hochzeitsreise genießen werden.
+          </div>
+        </li>
+      </ul>
+      <p>
+        Am Hochzeitstag liefern wir dein Geschenk an deinen Tisch, zusammen mit einer persönlichen Geschenkkarte, die wir bereits mit deiner Nachricht bedruckt haben —
+        mit Platz, damit du noch etwas per Hand ergänzen und unterschreiben kannst, bevor du beides dem Brautpaar überreichst.
+      </p>
+      <p class="gifts-intro-footer">
+        <i class="fas fa-heart" aria-hidden="true"></i>
+        Der gesamte Erlös geht in unsere Hochzeitsreise-Kasse.
+      </p>
+    `,
+    'guests:gifts.subnav.aria': 'Zu einem Geschenkbereich springen',
+    'guests:gifts.subnav.summary': 'Übersicht der Geschenkliste',
+    'guests:gifts.subnav.figurine': 'Figuren',
+    'guests:gifts.subnav.block': 'Skulpturblöcke',
+    'guests:gifts.subnav.card': 'Hochzeitsreise-Karten',
     'guests:giftsLoading': 'Lade Geschenke...',
     'guests:giftsThankYouTitle': 'Vielen Dank für deine Großzügigkeit!',
     'guests:giftsThankYouMessage': 'Wir sind dir für deine wunderbaren Geschenke sehr dankbar',
     'guests:giftsDonatedOn:rich': 'Gespendet am {{date}}',
     'guests:giftsRegistryTitle': 'Geschenkliste',
-    'guests:giftsRegistrySubtitle': 'Wähle aus unseren sorgfältig ausgewählten Geschenken',
+    'guests:giftsRegistrySubtitle': 'Wähle eines unserer mit Sorgfalt gestalteten Geschenke',
     'guests:giftsNoAvailable': 'Keine Geschenke verfügbar',
     'guests:giftsNoAvailableDescription': 'Bitte schaue später noch einmal in unsere Geschenkliste.',
     'guests:giftsAvailable': 'verfügbar',

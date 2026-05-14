@@ -144,7 +144,7 @@ function renderGiftSection({ key, icon, gifts, renderCard }) {
     : 'gifts-section__intro';
 
   return `
-    <section class="gifts-section gifts-section--${key}">
+    <section class="gifts-section gifts-section--${key}" id="gifts-section-${key}" data-gifts-section="${key}">
       <div class="gifts-section__divider">
         <h3 class="gifts-section__title">
           <i class="fas ${icon}"></i>
@@ -178,6 +178,85 @@ function renderGiftSection({ key, icon, gifts, renderCard }) {
 
 function getCashGiftPreviewMessage(message) {
   return message || translate('guests:gifts.card.previewMessagePlaceholder');
+}
+
+function initGiftsSubnav(rootEl) {
+  if (!rootEl) return;
+  const subnav = rootEl.querySelector('.gifts-subnav');
+  if (!subnav) return;
+  const buttons = Array.from(subnav.querySelectorAll('.gifts-subnav__btn'));
+  if (buttons.length === 0) return;
+
+  const targets = buttons
+    .map(btn => {
+      const id = btn.getAttribute('data-gifts-subnav-target');
+      const section = id ? rootEl.querySelector(`#${id}`) : null;
+      return section ? { btn, section } : null;
+    })
+    .filter(Boolean);
+
+  if (targets.length === 0) {
+    subnav.style.display = 'none';
+    return;
+  }
+
+  const availableWrapper = rootEl.querySelector('.gifts-available-section');
+
+  const showOnly = (activeBtn) => {
+    buttons.forEach(btn => {
+      const isActive = btn === activeBtn;
+      btn.classList.toggle('is-active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    targets.forEach(({ btn, section }) => {
+      section.classList.toggle('is-hidden', btn !== activeBtn);
+    });
+    if (availableWrapper) {
+      const anyVisibleInWrapper = targets.some(({ btn, section }) =>
+        btn === activeBtn && availableWrapper.contains(section)
+      );
+      availableWrapper.classList.toggle('is-hidden', !anyVisibleInWrapper);
+    }
+  };
+
+  showOnly(targets[0].btn);
+
+  const activateByKey = (key) => {
+    const targetId = `gifts-section-${key}`;
+    const match = targets.find(t => t.section.id === targetId);
+    if (!match) return false;
+    showOnly(match.btn);
+    const subnavTop = subnav.getBoundingClientRect().top + window.scrollY;
+    if (window.scrollY > subnavTop) {
+      window.scrollTo({ top: Math.max(0, subnavTop - 12), behavior: 'smooth' });
+    }
+    return true;
+  };
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      showOnly(btn);
+      const subnavTop = subnav.getBoundingClientRect().top + window.scrollY;
+      if (window.scrollY > subnavTop) {
+        window.scrollTo({ top: Math.max(0, subnavTop - 12), behavior: 'smooth' });
+      }
+    });
+  });
+
+  rootEl.addEventListener('click', (e) => {
+    const trigger = e.target.closest('[data-gifts-jump-to]');
+    if (!trigger || !rootEl.contains(trigger)) return;
+    const key = trigger.getAttribute('data-gifts-jump-to');
+    if (activateByKey(key)) e.preventDefault();
+  });
+
+  rootEl.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const trigger = e.target.closest('[data-gifts-jump-to]');
+    if (!trigger || !rootEl.contains(trigger)) return;
+    const key = trigger.getAttribute('data-gifts-jump-to');
+    if (activateByKey(key)) e.preventDefault();
+  });
 }
 
 function getDefaultGiftFromValue() {
@@ -427,13 +506,34 @@ async function loadGiftsContent() {
     let html = '<div class="gifts-container">';
 
     html += `
-    <div class="intro-card intro-section">
-    <h2 class="card-title">
-        <div data-i18n="guests:giftsPageTitle">${translate('guests:giftsPageTitle')}</div>
-    </h2>
-    <p class="card-description">
-        <div data-i18n="guests:giftsPageDescription">${translate('guests:giftsPageDescription')}</div>
-    </p>
+    <nav class="gifts-subnav" role="tablist" aria-label="${translate('guests:gifts.subnav.aria')}">
+      <button type="button" class="gifts-subnav__btn" data-gifts-subnav-target="gifts-section-summary" role="tab">
+        <i class="fas fa-list-ul" aria-hidden="true"></i>
+        <span data-i18n="guests:gifts.subnav.summary">${translate('guests:gifts.subnav.summary')}</span>
+      </button>
+      <button type="button" class="gifts-subnav__btn" data-gifts-subnav-target="gifts-section-figurine" role="tab">
+        <i class="fas fa-user" aria-hidden="true"></i>
+        <span data-i18n="guests:gifts.subnav.figurine">${translate('guests:gifts.subnav.figurine')}</span>
+      </button>
+      <button type="button" class="gifts-subnav__btn" data-gifts-subnav-target="gifts-section-cube" role="tab">
+        <i class="fas fa-cube" aria-hidden="true"></i>
+        <span data-i18n="guests:gifts.subnav.block">${translate('guests:gifts.subnav.block')}</span>
+      </button>
+      <button type="button" class="gifts-subnav__btn" data-gifts-subnav-target="gifts-section-card" role="tab">
+        <i class="fas fa-envelope-open-text" aria-hidden="true"></i>
+        <span data-i18n="guests:gifts.subnav.card">${translate('guests:gifts.subnav.card')}</span>
+      </button>
+    </nav>
+`;
+
+    html += `
+    <section class="gifts-section gifts-section--summary" id="gifts-section-summary" data-gifts-section="summary">
+    <div class="gifts-registry-card">
+        <div class="available-gifts-header">
+            <i class="fas fa-gift"></i>
+            <h3><span data-i18n="guests:giftsRegistryTitle">${translate('guests:giftsRegistryTitle')}</span></h3>
+            <p><span data-i18n="guests:giftsRegistrySubtitle">${translate('guests:giftsRegistrySubtitle')}</span></p>
+        </div>
     </div>
 `;
 
@@ -512,6 +612,24 @@ async function loadGiftsContent() {
     `;
     }
 
+    html += `
+    <div class="intro-card intro-section gifts-intro-card">
+      <div class="gifts-intro-card__text">
+        <h2 class="card-title">
+          <div data-i18n="guests:giftsPageTitle">${translate('guests:giftsPageTitle')}</div>
+        </h2>
+        <div class="card-description gifts-intro-description" data-i18n="guests:giftsPageDescription:rich"></div>
+      </div>
+      <figure class="gifts-intro-card__couple" aria-hidden="true">
+        <img src="/assets/images/gift-cards/couple-cutout.png"
+             alt=""
+             loading="lazy"
+             class="gifts-intro-card__couple-img">
+      </figure>
+    </div>
+    </section>
+    `;
+
     // ========== Section 2: Available Gifts (split by type) ==========
     const figurineGifts = gifts.filter(g => g && g.type === 'figurine');
     const cubeGifts = gifts.filter(g => g && g.type === 'cube');
@@ -519,11 +637,6 @@ async function loadGiftsContent() {
 
     html += `
     <div class="gifts-available-section">
-        <div class="available-gifts-header">
-            <i class="fas fa-gift"></i>
-            <h3><span data-i18n="guests:giftsRegistryTitle">${translate('guests:giftsRegistryTitle')}</span></h3>
-            <p><span data-i18n="guests:giftsRegistrySubtitle">${translate('guests:giftsRegistrySubtitle')}</span></p>
-        </div>
     `;
 
     if (gifts.length === 0) {
@@ -571,6 +684,7 @@ async function loadGiftsContent() {
     mountCubeViewers(gifts);
     mountFigurineViewers(gifts);
     mountPurchasedCubeThumbs(giftChoices);
+    initGiftsSubnav(giftsContent);
 
 // Translate the newly loaded content
     if (typeof updatePageContent === 'function') {

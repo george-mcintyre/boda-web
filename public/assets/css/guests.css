@@ -2617,6 +2617,262 @@ main.main-content-full {
   gap: 30px;
 }
 
+/* Gifts intro card — couple cutout + text two-column layout */
+.gifts-intro-card {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: 24px;
+  overflow: hidden;
+}
+
+.gifts-intro-card__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.gifts-intro-card__couple {
+  position: relative;
+  flex: 0 0 clamp(180px, 26%, 280px);
+  margin: 0;
+  align-self: flex-end;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.gifts-intro-card__couple::before {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 8%;
+  right: 8%;
+  height: 14px;
+  background: radial-gradient(ellipse at center,
+              rgba(0, 0, 0, 0.18) 0%,
+              rgba(0, 0, 0, 0.08) 40%,
+              rgba(0, 0, 0, 0) 75%);
+  filter: blur(2px);
+  z-index: 0;
+}
+
+.gifts-intro-card__couple-img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 460px;
+  object-fit: contain;
+  object-position: bottom center;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.12));
+}
+
+@media (max-width: 760px) {
+  .gifts-intro-card {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .gifts-intro-card__couple {
+    order: -1;
+    flex: 0 0 auto;
+    width: 70%;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  .gifts-intro-card__couple-img {
+    max-height: 240px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .gifts-intro-card__couple-img {
+    animation: gifts-intro-couple-rise 0.9s ease-out both;
+  }
+}
+
+@keyframes gifts-intro-couple-rise {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* Gifts intro — three-type breakdown inside the intro card */
+.gifts-intro-types {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gifts-intro-types li {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--accent-color, #F4E4D6);
+  border-radius: var(--radius-md, 6px);
+  line-height: 1.45;
+}
+
+.gifts-intro-types li[data-gifts-jump-to] {
+  cursor: pointer;
+  transition: transform var(--transition-normal, 0.3s ease),
+              box-shadow var(--transition-normal, 0.3s ease),
+              background var(--transition-normal, 0.3s ease);
+  border: 1px solid transparent;
+}
+
+.gifts-intro-types li[data-gifts-jump-to]:hover {
+  transform: translateY(-2px);
+  background: var(--white);
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(139, 90, 150, 0.18);
+}
+
+.gifts-intro-types li[data-gifts-jump-to]:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.gifts-intro-types li[data-gifts-jump-to]:active {
+  transform: translateY(0);
+}
+
+.gifts-intro-types li > i {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--primary-color);
+  font-size: 0.95em;
+  margin-top: 2px;
+}
+
+.gifts-intro-types strong {
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.gifts-intro-types__price {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--primary-color);
+  font-size: 0.85em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.gifts-intro-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0;
+  font-weight: 500;
+  color: var(--primary-color);
+}
+
+.gifts-intro-footer i {
+  color: var(--secondary-color, #D4A5A5);
+}
+
+@media (max-width: 540px) {
+  .gifts-intro-types li {
+    padding: 12px;
+    gap: 10px;
+  }
+  .gifts-intro-types__price {
+    margin-left: 0;
+    display: inline-block;
+    margin-top: 2px;
+  }
+}
+
+/* Gifts sub-tab navigation (Summary / Figurines / Blocks / Honeymoon cards) */
+.gifts-subnav {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  margin: 0;
+  background: var(--white);
+  border: 1px solid var(--gray-200, #dee2e6);
+  border-radius: var(--radius-lg, 10px);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.06));
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.gifts-section.is-hidden,
+.gifts-container > .is-hidden {
+  display: none !important;
+}
+
+.gifts-subnav__btn {
+  flex: 1 1 0;
+  min-width: max-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md, 6px);
+  background: transparent;
+  color: var(--text-light);
+  font-size: 0.95em;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all var(--transition-normal, 0.3s ease);
+}
+
+.gifts-subnav__btn:hover {
+  color: var(--primary-color);
+  background: var(--gray-50, #f8f9fa);
+  border-color: var(--gray-200, #dee2e6);
+}
+
+.gifts-subnav__btn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.gifts-subnav__btn.is-active {
+  color: var(--white);
+  background: var(--gradient-primary, var(--primary-color));
+  border-color: transparent;
+  box-shadow: 0 2px 6px rgba(139, 90, 150, 0.25);
+}
+
+.gifts-subnav__btn i {
+  font-size: 1em;
+}
+
+@media (max-width: 540px) {
+  .gifts-subnav {
+    padding: 8px;
+    gap: 6px;
+    border-radius: var(--radius-md, 6px);
+  }
+  .gifts-subnav__btn {
+    padding: 8px 12px;
+    font-size: 0.88em;
+    gap: 6px;
+  }
+}
+
 /* Thank You Section */
 .gifts-thank-you-section {
   background: var(--gradient-primary);
@@ -2704,12 +2960,17 @@ main.main-content-full {
 }
 
 /* Available Gifts Section */
-.gifts-available-section {
+.gifts-available-section,
+.gifts-registry-card {
   background: var(--white);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-md);
   border: 1px solid var(--gray-100);
   padding: 25px;
+}
+
+.gifts-registry-card .available-gifts-header {
+  margin-bottom: 0;
 }
 
 .available-gifts-header {
