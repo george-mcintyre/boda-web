@@ -3,6 +3,7 @@
 const CASH_GIFT_COUPLE_INSIDE_URL = '/assets/images/gift-cards/couple-inside-transparent.png';
 const CASH_GIFT_COUPLE_PREVIEW_URL = '/assets/images/gift-cards/couple-preview-square.png';
 const CUBE_GIFT_PREVIEW_URL = '/assets/images/gift-cards/blocks-section-hero.png';
+const COUPLE_CUTOUT_URL = '/assets/images/gift-cards/couple-cutout.png';
 
 const GIFT_FROM_MAX_LENGTH = 80;
 const GIFT_MESSAGE_MAX_LENGTH = 240;
@@ -33,7 +34,6 @@ function renderCashGiftCardHtml(gift, isAvailable) {
                 <div class="gift-card-image-overlay">
                     <h4 class="gift-card-title">${titleEsc}</h4>
                     <div class="gift-card-price">${escapeHtml(gift.priceDisplay)}</div>
-                    ${isAvailable ? `<span class="gift-card-preview-chip" data-i18n="guests:giftsPreviewCard">${translate('guests:giftsPreviewCard')}</span>` : ''}
                 </div>
             </div>
             <div class="gift-card-details">
@@ -47,7 +47,7 @@ function renderCashGiftCardHtml(gift, isAvailable) {
                 ${isAvailable ? `
                 <button class="btn-base btn-primary btn-sm" onclick="event.stopPropagation();purchaseGift('${gift.id}')">
                     <i class="fas fa-envelope-open-text"></i>
-                    <span data-i18n="guests:giftsPreviewCard">${translate('guests:giftsPreviewCard')}</span>
+                    <span data-i18n="guests:gifts.card.buyButton">${translate('guests:gifts.card.buyButton')}</span>
                 </button>
                 ` : `
                 <button class="btn-disabled" disabled>
@@ -337,6 +337,161 @@ function renderCashGiftInsertBackHtml({ giftTitle, giftDescription, message, sig
       </div>
     </div>
   `;
+}
+
+function renderHoneymoonCardPreviewHtml({ giftTitle, giftDescription, imageUrl, message = '', signerName }) {
+  const resolvedSigner = signerName != null ? signerName : resolveGiftFromValue('');
+  return `
+    <div class="honeymoon-card-preview" aria-hidden="true">
+      <div class="honeymoon-card-preview__side">
+        <div class="honeymoon-card-preview__label" data-i18n="guests:gifts.card.insertPreviewFront">${translate('guests:gifts.card.insertPreviewFront')}</div>
+        ${renderCashGiftInsertFrontHtml({ giftTitle, imageUrl })}
+      </div>
+      <div class="honeymoon-card-preview__side">
+        <div class="honeymoon-card-preview__label" data-i18n="guests:gifts.card.insertPreviewBack">${translate('guests:gifts.card.insertPreviewBack')}</div>
+        ${renderCashGiftInsertBackHtml({ giftTitle, giftDescription, message, signerName: resolvedSigner })}
+      </div>
+    </div>
+  `;
+}
+
+function getGiftNoteTitleKey(giftType) {
+  if (giftType === 'cube') return 'guests:gifts.giftNote.title.cube';
+  if (giftType === 'figurine') return 'guests:gifts.giftNote.title.figurine';
+  return 'guests:gifts.giftNote.title.cash';
+}
+
+function getGiftNoteTypeIcon(giftType) {
+  if (giftType === 'cube') return 'fa-cube';
+  if (giftType === 'figurine') return 'fa-user';
+  return 'fa-envelope-open-text';
+}
+
+function renderGiftNoteHtml({ giftType, giftTitle, giftDescription, giftAmount, giftImageUrl, message, signerName }) {
+  const titleKey = getGiftNoteTitleKey(giftType);
+  const iconClass = getGiftNoteTypeIcon(giftType);
+  const titleEsc = escapeHtml(giftTitle || '');
+  const descEsc = escapeHtml(giftDescription || '');
+  const messageText = getCashGiftPreviewMessage(message);
+  const messageEmptyAttr = message ? 'false' : 'true';
+  const signerEsc = escapeHtml(signerName || resolveGiftFromValue(''));
+  const amountDisplay = (typeof giftAmount === 'number' || (typeof giftAmount === 'string' && giftAmount !== ''))
+    ? `€${giftAmount}` : '';
+
+  const attachedHtml = (giftType === 'cash' && giftImageUrl) ? `
+    <div class="gift-note-card__attached-slot">
+      <div class="gift-note-card__attached-label" data-i18n="guests:gifts.card.insertAttachedLabel">${translate('guests:gifts.card.insertAttachedLabel')}</div>
+      <div class="gift-note-card__attached-surface">
+        ${renderCashGiftInsertFrontHtml({ giftTitle, imageUrl: giftImageUrl, isAttached: true })}
+      </div>
+    </div>
+  ` : '';
+
+  return `
+    <div class="gift-note-card gift-note-card--${escapeHtml(giftType)}" aria-hidden="true">
+      <section class="gift-note-card__page gift-note-card__page--front">
+        <div class="gift-note-card__label" data-i18n="guests:gifts.giftNote.previewFront">${translate('guests:gifts.giftNote.previewFront')}</div>
+        <div class="gift-note-card__front">
+          <img src="${COUPLE_CUTOUT_URL}" alt="" class="gift-note-card__front-couple">
+          <div class="gift-note-card__front-caption" data-i18n="guests:gifts.card.frontCaption">${translate('guests:gifts.card.frontCaption')}</div>
+        </div>
+      </section>
+      <section class="gift-note-card__page gift-note-card__page--inside">
+        <div class="gift-note-card__label" data-i18n="guests:gifts.giftNote.previewInside">${translate('guests:gifts.giftNote.previewInside')}</div>
+        <div class="gift-note-card__inside">
+          <div class="gift-note-card__inside-page gift-note-card__inside-page--left">
+            <h4 class="gift-note-card__type-title" data-i18n="${titleKey}">${translate(titleKey)}</h4>
+            <div class="gift-note-card__gift">
+              <div class="gift-note-card__gift-text">
+                <h5 class="gift-note-card__gift-title">${titleEsc}</h5>
+                ${descEsc ? `<p class="gift-note-card__gift-description">${descEsc}</p>` : ''}
+              </div>
+              ${amountDisplay ? `<span class="gift-note-card__amount" aria-label="${translate('guests:gifts.giftNote.amountLabel')}">${amountDisplay}</span>` : ''}
+            </div>
+            <div class="gift-note-card__wish" data-i18n="guests:gifts.giftNote.honeymoonWish">${translate('guests:gifts.giftNote.honeymoonWish')}</div>
+            ${attachedHtml}
+          </div>
+          <div class="gift-note-card__inside-page gift-note-card__inside-page--right">
+            <div class="gift-note-card__message" data-gift-note-message="true" data-empty="${messageEmptyAttr}">${escapeHtml(messageText)}</div>
+            <div class="gift-note-card__handwriting" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="gift-note-card__signoff">
+              <div class="gift-note-card__field-label" data-i18n="guests:gifts.giftNote.fromLabel">${translate('guests:gifts.giftNote.fromLabel')}</div>
+              <div class="gift-note-card__signer" data-gift-note-signer="true">${signerEsc}</div>
+            </div>
+            <div class="gift-note-card__signature-space" aria-hidden="true"></div>
+          </div>
+        </div>
+      </section>
+      <p class="gift-note-card__delivery" data-i18n="guests:gifts.giftNote.deliveryNote">${translate('guests:gifts.giftNote.deliveryNote')}</p>
+    </div>
+  `;
+}
+
+function renderShowGiftNoteButtonHtml() {
+  return `
+    <button type="button" class="btn-base btn-outline btn-sm show-gift-note-button" data-show-gift-note="true">
+      <i class="fas fa-envelope-open-text"></i>
+      <span data-i18n="guests:gifts.giftNote.showButton">${translate('guests:gifts.giftNote.showButton')}</span>
+    </button>
+  `;
+}
+
+function showGiftNoteOverlay({ giftType, giftTitle, giftDescription, giftAmount, giftImageUrl, message, signerName }) {
+  const overlay = document.createElement('div');
+  overlay.className = 'gift-purchase-overlay gift-note-overlay';
+  overlay.innerHTML = `
+    <div class="gift-purchase-dialog gift-note-dialog">
+      <div class="gift-purchase-header">
+        <i class="fas fa-envelope-open-text"></i>
+        <h3 data-i18n="guests:gifts.giftNote.dialogTitle">${translate('guests:gifts.giftNote.dialogTitle')}</h3>
+      </div>
+      <div class="gift-purchase-content gift-note-dialog__content">
+        ${renderGiftNoteHtml({ giftType, giftTitle, giftDescription, giftAmount, giftImageUrl, message, signerName })}
+      </div>
+      <div class="action-container">
+        <button class="btn-base btn-primary btn-sm btn-close-gift-note">
+          <span data-i18n="guests:giftsPurchaseClose">${translate('guests:giftsPurchaseClose')}</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.add('show'), 10);
+
+  const cleanup = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    }, 300);
+    document.removeEventListener('keydown', handleEscape);
+  };
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      cleanup();
+    }
+  };
+  document.addEventListener('keydown', handleEscape);
+
+  overlay.querySelector('.btn-close-gift-note').addEventListener('click', cleanup);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) cleanup();
+  });
+}
+
+function attachShowGiftNoteHandler(rootEl, getPayload) {
+  if (!rootEl) return;
+  const btn = rootEl.querySelector('[data-show-gift-note="true"]');
+  if (!btn) return;
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const payload = typeof getPayload === 'function' ? getPayload() : getPayload;
+    if (payload) showGiftNoteOverlay(payload);
+  });
 }
 
 function renderFigurineGiftCardHtml(gift, isAvailable) {
@@ -799,6 +954,9 @@ function showPurchasedCubeDialog(choice) {
           <textarea id="cubePurchasedMessage" rows="3" readonly>${messageValue}</textarea>
         </div>
         ` : ''}
+        <div class="gift-note-cta" data-reflection-zone="below">
+          ${renderShowGiftNoteButtonHtml()}
+        </div>
       </div>
       <div class="action-container" data-live="true" data-reflection-zone="below">
         <button class="btn-base btn-primary btn-sm btn-close-purchased">
@@ -821,6 +979,18 @@ function showPurchasedCubeDialog(choice) {
     });
     mount.appendChild(detailViewer);
   }
+
+  const fallbackPartyNames = formatPartyNames(Array.isArray(window._partyDataCache) ? window._partyDataCache : []);
+  const purchasedSignerName = (choice.giftFrom || '').trim() || fallbackPartyNames;
+  attachShowGiftNoteHandler(overlay, {
+    giftType: 'cube',
+    giftTitle: choice.giftTitle,
+    giftDescription: choice.giftDescription || translate('guests:gifts.cube.description'),
+    giftAmount: choice.giftAmount,
+    giftImageUrl: '',
+    message: choice.message || '',
+    signerName: purchasedSignerName,
+  });
 
   const cleanup = () => {
     if (detailViewer && typeof detailViewer.cubeViewerDestroy === 'function') {
@@ -878,6 +1048,9 @@ function showPurchasedFigurineDialog(choice) {
           ${signerName ? `<div class="gift-purchased-signer">— ${escapeHtml(signerName)}</div>` : ''}
         </div>
         ` : ''}
+        <div class="gift-note-cta">
+          ${renderShowGiftNoteButtonHtml()}
+        </div>
       </div>
       <div class="action-container">
         <button class="btn-base btn-primary btn-sm btn-close-purchased">
@@ -896,6 +1069,16 @@ function showPurchasedFigurineDialog(choice) {
     detailViewer = window.createFigurineViewer(choice.figurineId, { mode: 'detail' });
     mount.appendChild(detailViewer);
   }
+
+  attachShowGiftNoteHandler(overlay, {
+    giftType: 'figurine',
+    giftTitle: choice.giftTitle,
+    giftDescription: choice.giftDescription || '',
+    giftAmount: choice.giftAmount,
+    giftImageUrl: '',
+    message: choice.message || '',
+    signerName,
+  });
 
   const cleanup = () => {
     if (detailViewer && typeof detailViewer.figurineViewerDestroy === 'function') {
@@ -932,20 +1115,6 @@ function showPurchasedCashDialog(choice) {
   const fallbackPartyNames = formatPartyNames(Array.isArray(window._partyDataCache) ? window._partyDataCache : []);
   const signerName = (choice.giftFrom || '').trim() || fallbackPartyNames;
   const messageValue = (choice.message || '').replace(/</g, '&lt;');
-  const messageEmptyAttr = choice.message ? 'false' : 'true';
-  const previewMessage = getCashGiftPreviewMessage(choice.message);
-
-  const insertFrontHtml = renderCashGiftInsertFrontHtml({
-    giftTitle,
-    imageUrl: giftImageUrl,
-    isAttached: true,
-  });
-  const insertBackHtml = renderCashGiftInsertBackHtml({
-    giftTitle,
-    giftDescription,
-    message: choice.message || '',
-    signerName,
-  });
 
   overlay.innerHTML = `
     <div class="gift-purchase-dialog cash-gift-preview-dialog">
@@ -954,61 +1123,13 @@ function showPurchasedCashDialog(choice) {
         <h3>${escapeHtml(giftTitle)}</h3>
       </div>
       <div class="gift-purchase-content">
-        <div class="gift-purchase-summary">
-          <strong><span data-i18n="guests:giftsPurchaseAbout">${translate('guests:giftsPurchaseAbout')}</span></strong>
-          <span class="gift-purchase-amount">€${giftAmount}</span>
-        </div>
-        <div class="cash-gift-preview-grid">
-          <section class="cash-card-preview-page cash-card-preview-page--front">
-            <div class="cash-card-preview-page__label" data-i18n="guests:gifts.card.previewFront">${translate('guests:gifts.card.previewFront')}</div>
-            <div class="cash-card-front-surface" style="background-image: url('${escapeHtml(giftImageUrl)}');">
-              <div class="cash-card-front-copy">
-                <h4>${escapeHtml(giftTitle)}</h4>
-              </div>
-            </div>
-          </section>
-          <section class="cash-card-preview-page cash-card-preview-page--inside">
-            <div class="cash-card-preview-page__label" data-i18n="guests:gifts.card.previewInside">${translate('guests:gifts.card.previewInside')}</div>
-            <div class="cash-card-inside-preview">
-              <div class="cash-card-inside-panel cash-card-inside-panel--image">
-                <img src="${CASH_GIFT_COUPLE_INSIDE_URL}" alt="${translate('guests:gifts.card.insideImageAlt')}" class="cash-card-inside-image">
-              </div>
-              <div class="cash-card-inside-panel cash-card-inside-panel--copy">
-                <div class="cash-card-inside-copy">
-                  <h4>${escapeHtml(giftTitle)}</h4>
-                  <p>${escapeHtml(giftDescription)}</p>
-                  <div class="cash-card-message-preview" data-empty="${messageEmptyAttr}">${escapeHtml(previewMessage)}</div>
-                  <div class="cash-card-insert-slot">
-                    <div class="cash-card-insert-slot__label" data-i18n="guests:gifts.card.insertAttachedLabel">${translate('guests:gifts.card.insertAttachedLabel')}</div>
-                    <div class="cash-card-insert-slot__surface">
-                      ${insertFrontHtml}
-                    </div>
-                  </div>
-                  <div class="cash-card-writing-space">
-                    <div class="cash-card-writing-lines" aria-hidden="true">
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
-        <section class="cash-insert-card-gallery">
-          <div class="cash-insert-card-gallery__label" data-i18n="guests:gifts.card.insertPreviewLabel">${translate('guests:gifts.card.insertPreviewLabel')}</div>
-          <div class="cash-insert-card-gallery__grid">
-            <div class="cash-insert-card-gallery__item">
-              <div class="cash-insert-card-gallery__item-label" data-i18n="guests:gifts.card.insertPreviewFront">${translate('guests:gifts.card.insertPreviewFront')}</div>
-              ${renderCashGiftInsertFrontHtml({ giftTitle, imageUrl: giftImageUrl })}
-            </div>
-            <div class="cash-insert-card-gallery__item">
-              <div class="cash-insert-card-gallery__item-label" data-i18n="guests:gifts.card.insertPreviewBack">${translate('guests:gifts.card.insertPreviewBack')}</div>
-              ${insertBackHtml}
-            </div>
-          </div>
-        </section>
+        ${renderHoneymoonCardPreviewHtml({
+          giftTitle,
+          giftDescription,
+          imageUrl: giftImageUrl,
+          message: choice.message || '',
+          signerName,
+        })}
         ${choice.message ? `
         <div class="gift-message-input">
           <label for="cashPurchasedMessage" data-i18n="guests:giftsPurchasedMessageLabel">${translate('guests:giftsPurchasedMessageLabel')}</label>
@@ -1016,6 +1137,9 @@ function showPurchasedCashDialog(choice) {
           ${signerName ? `<div class="gift-purchased-signer">— ${escapeHtml(signerName)}</div>` : ''}
         </div>
         ` : ''}
+        <div class="gift-note-cta">
+          ${renderShowGiftNoteButtonHtml()}
+        </div>
       </div>
       <div class="action-container">
         <button class="btn-base btn-primary btn-sm btn-close-purchased">
@@ -1027,6 +1151,16 @@ function showPurchasedCashDialog(choice) {
 
   document.body.appendChild(overlay);
   setTimeout(() => overlay.classList.add('show'), 10);
+
+  attachShowGiftNoteHandler(overlay, {
+    giftType: 'cash',
+    giftTitle,
+    giftDescription,
+    giftAmount,
+    giftImageUrl,
+    message: choice.message || '',
+    signerName,
+  });
 
   const cleanup = () => {
     overlay.classList.remove('show');
@@ -1090,6 +1224,9 @@ window.purchaseCube = async (giftId) => {
           <textarea id="cubeMessage" placeholder="${translate('guests:gifts.cube.messagePlaceholder')}" rows="3" maxlength="${GIFT_MESSAGE_MAX_LENGTH}" data-char-counter-target="cubeMessage-counter"></textarea>
         <div class="char-counter" id="cubeMessage-counter" aria-live="polite">0/${GIFT_MESSAGE_MAX_LENGTH}</div>
         </div>
+        <div class="gift-note-cta" data-reflection-zone="below">
+          ${renderShowGiftNoteButtonHtml()}
+        </div>
       </div>
       <div class="action-container" data-live="true" data-reflection-zone="below">
         <button class="btn-base btn-outline btn-sm btn-cancel-purchase">
@@ -1119,6 +1256,20 @@ window.purchaseCube = async (giftId) => {
     });
     mount.appendChild(detailViewer);
   }
+
+  attachShowGiftNoteHandler(overlay, () => {
+    const selected = overlay.querySelector('input[name="cubeAmount"]:checked');
+    const amount = selected ? Number(selected.value) : (gift.amountOptions && gift.amountOptions[0]);
+    return {
+      giftType: 'cube',
+      giftTitle: gift.title || translate('guests:gifts.cube.title'),
+      giftDescription: gift.description || translate('guests:gifts.cube.description'),
+      giftAmount: amount,
+      giftImageUrl: '',
+      message: overlay.querySelector('#cubeMessage').value.trim(),
+      signerName: resolveGiftFromValue(overlay.querySelector('#cubeGiftFromInput').value),
+    };
+  });
 
   const cleanup = () => {
     if (detailViewer && typeof detailViewer.cubeViewerDestroy === 'function') {
@@ -1234,6 +1385,9 @@ window.purchaseFigurine = async (giftId) => {
           <textarea id="figurineMessage" placeholder="${translate('guests:gifts.figurine.messagePlaceholder')}" rows="3" maxlength="${GIFT_MESSAGE_MAX_LENGTH}" data-char-counter-target="figurineMessage-counter"></textarea>
           <div class="char-counter" id="figurineMessage-counter" aria-live="polite">0/${GIFT_MESSAGE_MAX_LENGTH}</div>
         </div>
+        <div class="gift-note-cta">
+          ${renderShowGiftNoteButtonHtml()}
+        </div>
       </div>
       <div class="action-container" data-live="true">
         <button class="btn-base btn-outline btn-sm btn-cancel-purchase">
@@ -1259,6 +1413,20 @@ window.purchaseFigurine = async (giftId) => {
     detailViewer = window.createFigurineViewer(gift.figurineId, { mode: 'detail' });
     mount.appendChild(detailViewer);
   }
+
+  attachShowGiftNoteHandler(overlay, () => {
+    const selected = overlay.querySelector('input[name="figurineAmount"]:checked');
+    const amount = selected ? Number(selected.value) : (gift.amountOptions && gift.amountOptions[0]);
+    return {
+      giftType: 'figurine',
+      giftTitle: gift.title || '',
+      giftDescription: gift.description || '',
+      giftAmount: amount,
+      giftImageUrl: '',
+      message: overlay.querySelector('#figurineMessage').value.trim(),
+      signerName: resolveGiftFromValue(overlay.querySelector('#figurineGiftFromInput').value),
+    };
+  });
 
   const cleanup = () => {
     if (detailViewer && typeof detailViewer.figurineViewerDestroy === 'function') {
@@ -1345,18 +1513,6 @@ window.purchaseGift = async (giftId) => {
   const giftTitle = gift.title || '';
   const giftAmount = gift.amount;
   const giftDescription = gift.description || '';
-  const initialSignerName = resolveGiftFromValue('');
-  const insertFrontHtml = renderCashGiftInsertFrontHtml({
-    giftTitle,
-    imageUrl: gift.imageUrl,
-    isAttached: true,
-  });
-  const insertBackHtml = renderCashGiftInsertBackHtml({
-    giftTitle,
-    giftDescription,
-    message: '',
-    signerName: initialSignerName,
-  });
 
   const overlay = document.createElement('div');
   overlay.className = 'gift-purchase-overlay cash-gift-preview-overlay';
@@ -1371,62 +1527,19 @@ window.purchaseGift = async (giftId) => {
         <strong><span data-i18n="guests:giftsPurchaseAbout">${translate('guests:giftsPurchaseAbout')}</span></strong>
         <span class="gift-purchase-amount">€${giftAmount}</span>
         </div>
-        <div class="cash-gift-preview-grid">
-          <section class="cash-card-preview-page cash-card-preview-page--front">
-            <div class="cash-card-preview-page__label" data-i18n="guests:gifts.card.previewFront">${translate('guests:gifts.card.previewFront')}</div>
-            <div class="cash-card-front-surface" style="background-image: url('${escapeHtml(gift.imageUrl)}');">
-              <div class="cash-card-front-copy">
-                <h4>${escapeHtml(giftTitle)}</h4>
-              </div>
-            </div>
-          </section>
-          <section class="cash-card-preview-page cash-card-preview-page--inside">
-            <div class="cash-card-preview-page__label" data-i18n="guests:gifts.card.previewInside">${translate('guests:gifts.card.previewInside')}</div>
-            <div class="cash-card-inside-preview">
-              <div class="cash-card-inside-panel cash-card-inside-panel--image">
-                <img src="${CASH_GIFT_COUPLE_INSIDE_URL}" alt="${translate('guests:gifts.card.insideImageAlt')}" class="cash-card-inside-image">
-              </div>
-              <div class="cash-card-inside-panel cash-card-inside-panel--copy">
-                <div class="cash-card-inside-copy">
-                  <h4>${escapeHtml(giftTitle)}</h4>
-                  <p>${escapeHtml(giftDescription)}</p>
-                  <div class="cash-card-message-preview" data-card-message-preview="true" data-empty="true">${translate('guests:gifts.card.previewMessagePlaceholder')}</div>
-                  <div class="cash-card-insert-slot">
-                    <div class="cash-card-insert-slot__label" data-i18n="guests:gifts.card.insertAttachedLabel">${translate('guests:gifts.card.insertAttachedLabel')}</div>
-                    <div class="cash-card-insert-slot__surface">
-                      ${insertFrontHtml}
-                    </div>
-                  </div>
-                  <div class="cash-card-writing-space">
-                    <div class="cash-card-writing-lines" aria-hidden="true">
-                      <span></span>
-                      <span></span>
-                      <span></span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-        </div>
-        <section class="cash-insert-card-gallery">
-          <div class="cash-insert-card-gallery__label" data-i18n="guests:gifts.card.insertPreviewLabel">${translate('guests:gifts.card.insertPreviewLabel')}</div>
-          <div class="cash-insert-card-gallery__grid">
-            <div class="cash-insert-card-gallery__item">
-              <div class="cash-insert-card-gallery__item-label" data-i18n="guests:gifts.card.insertPreviewFront">${translate('guests:gifts.card.insertPreviewFront')}</div>
-              ${renderCashGiftInsertFrontHtml({ giftTitle, imageUrl: gift.imageUrl })}
-            </div>
-            <div class="cash-insert-card-gallery__item">
-              <div class="cash-insert-card-gallery__item-label" data-i18n="guests:gifts.card.insertPreviewBack">${translate('guests:gifts.card.insertPreviewBack')}</div>
-              ${insertBackHtml}
-            </div>
-          </div>
-        </section>
+        ${renderHoneymoonCardPreviewHtml({
+          giftTitle,
+          giftDescription,
+          imageUrl: gift.imageUrl,
+        })}
         ${renderGiftFromFieldHtml('giftFromInput')}
         <div class="gift-message-input">
         <label for="giftMessage"><span data-i18n="guests:giftsPurchaseMessageLabel">${translate('guests:giftsPurchaseMessageLabel')}</span></label>
         <textarea id="giftMessage" placeholder="${translate('guests:giftsPurchaseMessage:placeholder')}" data-i18n="guests:giftsPurchaseMessage:placeholder" rows="3" maxlength="${GIFT_MESSAGE_MAX_LENGTH}" data-char-counter-target="giftMessage-counter"></textarea>
         <div class="char-counter" id="giftMessage-counter" aria-live="polite">0/${GIFT_MESSAGE_MAX_LENGTH}</div>
+        </div>
+        <div class="gift-note-cta">
+          ${renderShowGiftNoteButtonHtml()}
         </div>
     </div>
     <div class="action-container">
@@ -1447,15 +1560,12 @@ window.purchaseGift = async (giftId) => {
 
   const updatePreviewMessage = () => {
     const textarea = overlay.querySelector('#giftMessage');
-    const pagePreview = overlay.querySelector('[data-card-message-preview="true"]');
-    const insertPreview = overlay.querySelector('[data-insert-card-message="true"]');
-    if (!textarea || !pagePreview || !insertPreview) return;
+    const messageEl = overlay.querySelector('[data-insert-card-message="true"]');
+    if (!textarea || !messageEl) return;
     const nextMessage = textarea.value.trim();
     const previewText = getCashGiftPreviewMessage(nextMessage);
-    pagePreview.textContent = previewText;
-    pagePreview.setAttribute('data-empty', nextMessage ? 'false' : 'true');
-    insertPreview.textContent = previewText;
-    insertPreview.setAttribute('data-empty', nextMessage ? 'false' : 'true');
+    messageEl.textContent = previewText;
+    messageEl.setAttribute('data-empty', nextMessage ? 'false' : 'true');
   };
 
   const updatePreviewSigner = () => {
@@ -1467,6 +1577,16 @@ window.purchaseGift = async (giftId) => {
 
   overlay.querySelector('#giftMessage').addEventListener('input', updatePreviewMessage);
   overlay.querySelector('#giftFromInput').addEventListener('input', updatePreviewSigner);
+
+  attachShowGiftNoteHandler(overlay, () => ({
+    giftType: 'cash',
+    giftTitle,
+    giftDescription,
+    giftAmount,
+    giftImageUrl: gift.imageUrl,
+    message: overlay.querySelector('#giftMessage').value.trim(),
+    signerName: resolveGiftFromValue(overlay.querySelector('#giftFromInput').value),
+  }));
 
   const cleanup = () => {
     overlay.classList.remove('show');

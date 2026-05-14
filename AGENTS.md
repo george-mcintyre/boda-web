@@ -195,11 +195,17 @@ The wedding portal has five distinct physical gift artefacts. They were previous
 
 | Concept | EN | ES | FR | DE |
 |---|---|---|---|---|
-| Physical card delivered with **every** gift, with the purchaser's name and personal message and space to handwrite more on the day | **Gift note** | **Nota de regalo** | **Mot d'accompagnement** | **Geschenkkarte** |
-| Card from the bride and groom thanking each gift purchaser | **Thank-you note** | **Nota de agradecimiento** | **Mot de remerciement** | **Dankeskarte** |
-| Credit-card-shaped gift voucher that funds the honeymoon — gift type `'cash'` in the Gift schema | **Honeymoon card** | **Tarjeta de luna de miel** | **Carte lune de miel** | **Hochzeitsreise-Karte** |
+| Folded greeting card (front cover + inside spread) delivered with **every** gift. Front shows the couple cutout + cursive caption "A wedding gift for you …". Inside-left has a gift summary (type header, title, description, amount, and for cash gifts an attached Honeymoon card); inside-right has the purchaser's personal message, From signoff, and space to handwrite more and sign on the day | **Gift note** | **Nota de regalo** | **Mot d'accompagnement** | **Geschenkkarte** |
+| Folded greeting card from the bride and groom thanking each gift purchaser. Front shows the couple + "Thank You" title. Inside is a bilingual spread (English / Spanish) with a gift summary, a typed thank-you message, and signature space. See `public/thank-you-card-preview.html` for the canonical visual | **Thank-you note** | **Nota de agradecimiento** | **Mot de remerciement** | **Dankeskarte** |
+| Credit-card-shaped gift voucher that funds the honeymoon — gift type `'cash'` in the Gift schema. Has a **front** (per-perk artwork with the title overlaid) and a **back** (title, description, the purchaser's personal message, and signer). Visually clipped/taped onto the inside-left of the Gift note for cash purchases | **Honeymoon card** | **Tarjeta de luna de miel** | **Carte lune de miel** | **Hochzeitsreise-Karte** |
 | The printed-cube gift assembled into the wedding sculpture — gift type `'cube'` in the Gift schema (enum unchanged) | **Block** | **Bloque** | **Bloc** | **Block** |
 | The 3D figurine of the couple (4 variants: bride, groom, bride-on-lounger, groom-on-lounger) — gift type `'figurine'` in the Gift schema | **Figurine** | **Figurita** | **Figurine** | **Figur** |
+
+**Critical distinction:** The **Gift note** and the **Honeymoon card** are two DIFFERENT artefacts and must never be conflated.
+- The Gift note is always a folded greeting card — same shape for all three gift types.
+- The Honeymoon card is a credit-card-shaped voucher that exists only when the gift type is `'cash'`.
+- For cash gifts the Honeymoon card sits **inside** the Gift note (visually clipped on at a slight angle with tape).
+- When labelling the parts of one artefact (e.g. "front of the X", "inside of the X"), use the name of THAT artefact — not the other one. UI strings like "Honeymoon card front" must only appear when labelling the credit-card voucher; the folded greeting card's parts are labelled "Gift note front" / "Gift note inside".
 
 ### Where these names live
 
