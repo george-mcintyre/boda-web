@@ -370,21 +370,21 @@ const translations = {
         <li data-gifts-jump-to="figurine" role="button" tabindex="0">
           <i class="fas fa-user" aria-hidden="true"></i>
           <div>
-            <strong>Figurine</strong> <span class="gifts-intro-types__price">€250–€500</span><br>
+            <strong>Figurine</strong> <span class="gifts-intro-types__price">From €250</span><br>
             A 3D figurine of the bride and groom — first it tops our wedding cake, then it joins the sculpture as a permanent keepsake.
           </div>
         </li>
         <li data-gifts-jump-to="cube" role="button" tabindex="0">
           <i class="fas fa-cube" aria-hidden="true"></i>
           <div>
-            <strong>Block</strong> <span class="gifts-intro-types__price">€50–€500</span><br>
+            <strong>Block</strong> <span class="gifts-intro-types__price">From €50</span><br>
             A printed block that becomes part of our wedding sculpture — a piece of art that will always remind us of the friends who celebrated with us.
           </div>
         </li>
         <li data-gifts-jump-to="card" role="button" tabindex="0">
           <i class="fas fa-envelope-open-text" aria-hidden="true"></i>
           <div>
-            <strong>Honeymoon card</strong> <span class="gifts-intro-types__price">€25–€500</span><br>
+            <strong>Honeymoon card</strong> <span class="gifts-intro-types__price">From €25</span><br>
             A physical keepsake card that includes a small honeymoon perk we'll enjoy thanks to you.
           </div>
         </li>
@@ -1292,21 +1292,21 @@ const translations = {
         <li data-gifts-jump-to="figurine" role="button" tabindex="0">
           <i class="fas fa-user" aria-hidden="true"></i>
           <div>
-            <strong>Figurita</strong> <span class="gifts-intro-types__price">€250–€500</span><br>
+            <strong>Figurita</strong> <span class="gifts-intro-types__price">Desde €250</span><br>
             Una figurita 3D de los novios — primero corona nuestra tarta nupcial y después pasa a formar parte permanente de la escultura.
           </div>
         </li>
         <li data-gifts-jump-to="cube" role="button" tabindex="0">
           <i class="fas fa-cube" aria-hidden="true"></i>
           <div>
-            <strong>Bloque</strong> <span class="gifts-intro-types__price">€50–€500</span><br>
+            <strong>Bloque</strong> <span class="gifts-intro-types__price">Desde €50</span><br>
             Un bloque impreso que se incorpora a nuestra escultura de boda — una pieza de arte que siempre nos recordará a quienes celebraron con nosotros.
           </div>
         </li>
         <li data-gifts-jump-to="card" role="button" tabindex="0">
           <i class="fas fa-envelope-open-text" aria-hidden="true"></i>
           <div>
-            <strong>Tarjeta de luna de miel</strong> <span class="gifts-intro-types__price">€25–€500</span><br>
+            <strong>Tarjeta de luna de miel</strong> <span class="gifts-intro-types__price">Desde €25</span><br>
             Una tarjeta-recuerdo física que incluye un pequeño detalle del que disfrutaremos en la luna de miel gracias a ti.
           </div>
         </li>
@@ -2215,21 +2215,21 @@ const translations = {
         <li data-gifts-jump-to="figurine" role="button" tabindex="0">
           <i class="fas fa-user" aria-hidden="true"></i>
           <div>
-            <strong>Figurine</strong> <span class="gifts-intro-types__price">€250–€500</span><br>
+            <strong>Figurine</strong> <span class="gifts-intro-types__price">À partir de €250</span><br>
             Une figurine 3D des mariés — elle ornera d'abord notre pièce montée, puis rejoindra la sculpture comme souvenir permanent.
           </div>
         </li>
         <li data-gifts-jump-to="cube" role="button" tabindex="0">
           <i class="fas fa-cube" aria-hidden="true"></i>
           <div>
-            <strong>Bloc</strong> <span class="gifts-intro-types__price">€50–€500</span><br>
+            <strong>Bloc</strong> <span class="gifts-intro-types__price">À partir de €50</span><br>
             Un bloc imprimé qui s'intègre à notre sculpture de mariage — une œuvre d'art qui nous rappellera toujours les ami·e·s qui ont célébré avec nous.
           </div>
         </li>
         <li data-gifts-jump-to="card" role="button" tabindex="0">
           <i class="fas fa-envelope-open-text" aria-hidden="true"></i>
           <div>
-            <strong>Carte lune de miel</strong> <span class="gifts-intro-types__price">€25–€500</span><br>
+            <strong>Carte lune de miel</strong> <span class="gifts-intro-types__price">À partir de €25</span><br>
             Une carte-souvenir physique qui inclut un petit plaisir dont nous profiterons en lune de miel grâce à vous.
           </div>
         </li>
@@ -3138,21 +3138,21 @@ const translations = {
         <li data-gifts-jump-to="figurine" role="button" tabindex="0">
           <i class="fas fa-user" aria-hidden="true"></i>
           <div>
-            <strong>Figur</strong> <span class="gifts-intro-types__price">€250–€500</span><br>
+            <strong>Figur</strong> <span class="gifts-intro-types__price">Ab €250</span><br>
             Eine 3D-Figur des Brautpaars — sie ziert zunächst unsere Hochzeitstorte und wird danach fester Bestandteil der Skulptur.
           </div>
         </li>
         <li data-gifts-jump-to="cube" role="button" tabindex="0">
           <i class="fas fa-cube" aria-hidden="true"></i>
           <div>
-            <strong>Block</strong> <span class="gifts-intro-types__price">€50–€500</span><br>
+            <strong>Block</strong> <span class="gifts-intro-types__price">Ab €50</span><br>
             Ein gedruckter Block, der Teil unserer Hochzeitsskulptur wird — ein Kunstwerk, das uns immer an die Menschen erinnern wird, die mit uns gefeiert haben.
           </div>
         </li>
         <li data-gifts-jump-to="card" role="button" tabindex="0">
           <i class="fas fa-envelope-open-text" aria-hidden="true"></i>
           <div>
-            <strong>Hochzeitsreise-Karte</strong> <span class="gifts-intro-types__price">€25–€500</span><br>
+            <strong>Hochzeitsreise-Karte</strong> <span class="gifts-intro-types__price">Ab €25</span><br>
             Eine physische Andenken-Karte mit einer kleinen Annehmlichkeit, die wir dank dir auf unserer Hochzeitsreise genießen werden.
           </div>
         </li>

@@ -436,6 +436,42 @@ function mountPurchasedCubeThumbs(giftChoices) {
   });
 }
 
+function mountPurchasedFigurineThumbs(giftChoices) {
+  if (!Array.isArray(giftChoices) || typeof window.createFigurineViewer !== 'function') return;
+  const choiceById = new Map(giftChoices.map(c => [c.id, c]));
+  document.querySelectorAll('.donated-gift-card--figurine').forEach(card => {
+    const choiceId = card.getAttribute('data-purchase-choice-id');
+    const choice = choiceById.get(choiceId);
+    if (!choice || !choice.figurineId) return;
+    const mount = card.querySelector('[data-figurine-thumb-mount="true"]');
+    if (mount) {
+      mount.innerHTML = '';
+      const viewer = window.createFigurineViewer(choice.figurineId, { mode: 'thumb' });
+      mount.appendChild(viewer);
+    }
+    const open = () => showPurchasedFigurineDialog(choice);
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+  });
+}
+
+function attachPurchasedCashCardHandlers(giftChoices) {
+  if (!Array.isArray(giftChoices)) return;
+  const choiceById = new Map(giftChoices.map(c => [c.id, c]));
+  document.querySelectorAll('.donated-gift-card--cash').forEach(card => {
+    const choiceId = card.getAttribute('data-purchase-choice-id');
+    const choice = choiceById.get(choiceId);
+    if (!choice) return;
+    const open = () => showPurchasedCashDialog(choice);
+    card.addEventListener('click', open);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
+    });
+  });
+}
+
 window._cubeGiftCache = null;
 window._figurineGiftCache = null;
 window._cashGiftCache = null;
@@ -577,13 +613,32 @@ async function loadGiftsContent() {
 
       giftChoices.forEach(choice => {
         const donatedOnText = translateWithVars('guests:giftsDonatedOn:rich', {date: formatDate(choice.date)});
-        const isCube = choice.giftType === 'cube';
-        const cardClasses = `donated-gift-card${isCube ? ' donated-gift-card--cube is-clickable' : ''}`;
-        const cardStyle = isCube ? '' : `style="background-image: url('${escapeHtml(choice.giftImageUrl)}');"`;
-        const cardData = isCube ? `data-purchase-choice-id="${escapeHtml(choice.id)}" role="button" tabindex="0"` : '';
+        const giftType = choice.giftType || 'cash';
+        const isCube = giftType === 'cube';
+        const isFigurine = giftType === 'figurine';
+        const hasOwnImage = !isCube && !isFigurine && !!choice.giftImageUrl;
+
+        const typeModifier = isCube
+          ? ' donated-gift-card--cube'
+          : isFigurine
+            ? ' donated-gift-card--figurine'
+            : ' donated-gift-card--cash';
+        const cardClasses = `donated-gift-card is-clickable${typeModifier}`;
+        const cardStyle = hasOwnImage
+          ? `style="background-image: url('${escapeHtml(choice.giftImageUrl)}');"`
+          : '';
+        const cardData = `data-purchase-choice-id="${escapeHtml(choice.id)}" data-purchase-choice-type="${giftType}" role="button" tabindex="0"`;
+        const thumbMountHtml = isCube
+          ? `<div class="donated-gift-cube-thumb" data-cube-thumb-mount="true"></div>`
+          : isFigurine
+            ? `<div class="donated-gift-figurine-thumb" data-figurine-thumb-mount="true"></div>`
+            : '';
+        const typeIconClass = isCube ? 'fa-cube' : isFigurine ? 'fa-user' : 'fa-envelope-open-text';
+
         html += `
         <div class="${cardClasses}" ${cardStyle} ${cardData}>
-            ${isCube ? `<div class="donated-gift-cube-thumb" data-cube-thumb-mount="true"></div>` : ''}
+            ${thumbMountHtml}
+            <div class="donated-gift-type-badge" aria-hidden="true"><i class="fas ${typeIconClass}"></i></div>
             <div class="donated-gift-overlay">
                 <div class="donated-gift-content">
                     <h4 class="donated-gift-title">${escapeHtml(choice.giftTitle)}</h4>
@@ -684,6 +739,8 @@ async function loadGiftsContent() {
     mountCubeViewers(gifts);
     mountFigurineViewers(gifts);
     mountPurchasedCubeThumbs(giftChoices);
+    mountPurchasedFigurineThumbs(giftChoices);
+    attachPurchasedCashCardHandlers(giftChoices);
     initGiftsSubnav(giftsContent);
 
 // Translate the newly loaded content
@@ -769,6 +826,209 @@ function showPurchasedCubeDialog(choice) {
     if (detailViewer && typeof detailViewer.cubeViewerDestroy === 'function') {
       detailViewer.cubeViewerDestroy();
     }
+    overlay.classList.remove('show');
+    setTimeout(() => {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    }, 300);
+    document.removeEventListener('keydown', handleEscape);
+  };
+
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') cleanup();
+  };
+  document.addEventListener('keydown', handleEscape);
+
+  overlay.querySelector('.btn-close-purchased').addEventListener('click', cleanup);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) cleanup();
+  });
+}
+
+function showPurchasedFigurineDialog(choice) {
+  if (!choice || !choice.figurineId) return;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'gift-purchase-overlay figurine-purchase-overlay figurine-purchased-overlay';
+
+  const priceChipHtml = `
+    <span class="cube-price-option__chip cube-price-option__chip--locked">€${choice.giftAmount}</span>
+  `;
+  const messageValue = (choice.message || '').replace(/</g, '&lt;');
+  const purchasedDescriptionHtml = escapeHtml(choice.giftDescription || '');
+  const fallbackPartyNames = formatPartyNames(Array.isArray(window._partyDataCache) ? window._partyDataCache : []);
+  const signerName = (choice.giftFrom || '').trim() || fallbackPartyNames;
+
+  overlay.innerHTML = `
+    <div class="gift-purchase-dialog cube-purchase-dialog">
+      <div class="gift-purchase-header">
+        <i class="fas fa-user"></i>
+        <h3>${escapeHtml(choice.giftTitle)}</h3>
+      </div>
+      <div class="gift-purchase-content">
+        <div class="figurine-purchase-viewer" data-figurine-detail-mount="true"></div>
+        ${purchasedDescriptionHtml ? `<p class="cube-purchase-description">${purchasedDescriptionHtml}</p>` : ''}
+        <div class="cube-price-selector">
+          <label class="cube-price-selector__label" data-i18n="guests:gifts.cube.priceLabelYour">${translate('guests:gifts.cube.priceLabelYour')}</label>
+          <div class="cube-price-options cube-price-options--locked">${priceChipHtml}</div>
+        </div>
+        ${choice.message ? `
+        <div class="gift-message-input">
+          <label for="figurinePurchasedMessage" data-i18n="guests:giftsPurchasedMessageLabel">${translate('guests:giftsPurchasedMessageLabel')}</label>
+          <textarea id="figurinePurchasedMessage" rows="3" readonly>${messageValue}</textarea>
+          ${signerName ? `<div class="gift-purchased-signer">— ${escapeHtml(signerName)}</div>` : ''}
+        </div>
+        ` : ''}
+      </div>
+      <div class="action-container">
+        <button class="btn-base btn-primary btn-sm btn-close-purchased">
+          <span data-i18n="guests:giftsPurchaseClose">${translate('guests:giftsPurchaseClose')}</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.add('show'), 10);
+
+  let detailViewer = null;
+  const mount = overlay.querySelector('[data-figurine-detail-mount="true"]');
+  if (mount && typeof window.createFigurineViewer === 'function') {
+    detailViewer = window.createFigurineViewer(choice.figurineId, { mode: 'detail' });
+    mount.appendChild(detailViewer);
+  }
+
+  const cleanup = () => {
+    if (detailViewer && typeof detailViewer.figurineViewerDestroy === 'function') {
+      detailViewer.figurineViewerDestroy();
+    }
+    overlay.classList.remove('show');
+    setTimeout(() => {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    }, 300);
+    document.removeEventListener('keydown', handleEscape);
+  };
+
+  const handleEscape = (e) => {
+    if (e.key === 'Escape') cleanup();
+  };
+  document.addEventListener('keydown', handleEscape);
+
+  overlay.querySelector('.btn-close-purchased').addEventListener('click', cleanup);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) cleanup();
+  });
+}
+
+function showPurchasedCashDialog(choice) {
+  if (!choice) return;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'gift-purchase-overlay cash-gift-preview-overlay cash-gift-purchased-overlay';
+
+  const giftTitle = choice.giftTitle || '';
+  const giftAmount = choice.giftAmount;
+  const giftDescription = choice.giftDescription || '';
+  const giftImageUrl = choice.giftImageUrl || '';
+  const fallbackPartyNames = formatPartyNames(Array.isArray(window._partyDataCache) ? window._partyDataCache : []);
+  const signerName = (choice.giftFrom || '').trim() || fallbackPartyNames;
+  const messageValue = (choice.message || '').replace(/</g, '&lt;');
+  const messageEmptyAttr = choice.message ? 'false' : 'true';
+  const previewMessage = getCashGiftPreviewMessage(choice.message);
+
+  const insertFrontHtml = renderCashGiftInsertFrontHtml({
+    giftTitle,
+    imageUrl: giftImageUrl,
+    isAttached: true,
+  });
+  const insertBackHtml = renderCashGiftInsertBackHtml({
+    giftTitle,
+    giftDescription,
+    message: choice.message || '',
+    signerName,
+  });
+
+  overlay.innerHTML = `
+    <div class="gift-purchase-dialog cash-gift-preview-dialog">
+      <div class="gift-purchase-header">
+        <i class="fas fa-envelope-open-text"></i>
+        <h3>${escapeHtml(giftTitle)}</h3>
+      </div>
+      <div class="gift-purchase-content">
+        <div class="gift-purchase-summary">
+          <strong><span data-i18n="guests:giftsPurchaseAbout">${translate('guests:giftsPurchaseAbout')}</span></strong>
+          <span class="gift-purchase-amount">€${giftAmount}</span>
+        </div>
+        <div class="cash-gift-preview-grid">
+          <section class="cash-card-preview-page cash-card-preview-page--front">
+            <div class="cash-card-preview-page__label" data-i18n="guests:gifts.card.previewFront">${translate('guests:gifts.card.previewFront')}</div>
+            <div class="cash-card-front-surface" style="background-image: url('${escapeHtml(giftImageUrl)}');">
+              <div class="cash-card-front-copy">
+                <h4>${escapeHtml(giftTitle)}</h4>
+              </div>
+            </div>
+          </section>
+          <section class="cash-card-preview-page cash-card-preview-page--inside">
+            <div class="cash-card-preview-page__label" data-i18n="guests:gifts.card.previewInside">${translate('guests:gifts.card.previewInside')}</div>
+            <div class="cash-card-inside-preview">
+              <div class="cash-card-inside-panel cash-card-inside-panel--image">
+                <img src="${CASH_GIFT_COUPLE_INSIDE_URL}" alt="${translate('guests:gifts.card.insideImageAlt')}" class="cash-card-inside-image">
+              </div>
+              <div class="cash-card-inside-panel cash-card-inside-panel--copy">
+                <div class="cash-card-inside-copy">
+                  <h4>${escapeHtml(giftTitle)}</h4>
+                  <p>${escapeHtml(giftDescription)}</p>
+                  <div class="cash-card-message-preview" data-empty="${messageEmptyAttr}">${escapeHtml(previewMessage)}</div>
+                  <div class="cash-card-insert-slot">
+                    <div class="cash-card-insert-slot__label" data-i18n="guests:gifts.card.insertAttachedLabel">${translate('guests:gifts.card.insertAttachedLabel')}</div>
+                    <div class="cash-card-insert-slot__surface">
+                      ${insertFrontHtml}
+                    </div>
+                  </div>
+                  <div class="cash-card-writing-space">
+                    <div class="cash-card-writing-lines" aria-hidden="true">
+                      <span></span>
+                      <span></span>
+                      <span></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <section class="cash-insert-card-gallery">
+          <div class="cash-insert-card-gallery__label" data-i18n="guests:gifts.card.insertPreviewLabel">${translate('guests:gifts.card.insertPreviewLabel')}</div>
+          <div class="cash-insert-card-gallery__grid">
+            <div class="cash-insert-card-gallery__item">
+              <div class="cash-insert-card-gallery__item-label" data-i18n="guests:gifts.card.insertPreviewFront">${translate('guests:gifts.card.insertPreviewFront')}</div>
+              ${renderCashGiftInsertFrontHtml({ giftTitle, imageUrl: giftImageUrl })}
+            </div>
+            <div class="cash-insert-card-gallery__item">
+              <div class="cash-insert-card-gallery__item-label" data-i18n="guests:gifts.card.insertPreviewBack">${translate('guests:gifts.card.insertPreviewBack')}</div>
+              ${insertBackHtml}
+            </div>
+          </div>
+        </section>
+        ${choice.message ? `
+        <div class="gift-message-input">
+          <label for="cashPurchasedMessage" data-i18n="guests:giftsPurchasedMessageLabel">${translate('guests:giftsPurchasedMessageLabel')}</label>
+          <textarea id="cashPurchasedMessage" rows="3" readonly>${messageValue}</textarea>
+          ${signerName ? `<div class="gift-purchased-signer">— ${escapeHtml(signerName)}</div>` : ''}
+        </div>
+        ` : ''}
+      </div>
+      <div class="action-container">
+        <button class="btn-base btn-primary btn-sm btn-close-purchased">
+          <span data-i18n="guests:giftsPurchaseClose">${translate('guests:giftsPurchaseClose')}</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.classList.add('show'), 10);
+
+  const cleanup = () => {
     overlay.classList.remove('show');
     setTimeout(() => {
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
