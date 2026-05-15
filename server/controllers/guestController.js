@@ -508,7 +508,7 @@ async function createPaymentSession(req, res, next) {
   }
 }
 
-async function sendGiftPurchaseEmails({ guestId, giftId, giftChoice }) {
+async function sendGiftPurchaseEmails({ guestId, giftId, giftChoice, langOverride }) {
   const [guest, gift] = await Promise.all([
     Guest.findById(guestId).lean().catch(() => null),
     Gift.findById(giftId).lean().catch(() => null),
@@ -517,8 +517,12 @@ async function sendGiftPurchaseEmails({ guestId, giftId, giftChoice }) {
     console.warn('[email] Skipping post-purchase emails — guest or gift not found', { guestId, giftId });
     return;
   }
+  const ALLOWED = ['en', 'es', 'fr', 'de'];
+  const buyerGuest = (langOverride && ALLOWED.includes(langOverride))
+    ? { ...guest, lang: langOverride }
+    : guest;
   const tasks = [
-    emailService.sendGiftConfirmationToBuyer({ guest, gift, giftChoice })
+    emailService.sendGiftConfirmationToBuyer({ guest: buyerGuest, gift, giftChoice })
       .catch(err => console.error('[email] Buyer confirmation failed:', err && err.message ? err.message : err)),
     emailService.sendGiftNotificationToCouple({ guest, gift, giftChoice })
       .catch(err => console.error('[email] Couple notification failed:', err && err.message ? err.message : err)),
@@ -552,7 +556,7 @@ async function handleStripeWebhook(req, res) {
     }
 
     try {
-      const { giftId, guestId, message, giftFrom, giftAmount } = session.metadata || {};
+      const { giftId, guestId, message, giftFrom, giftAmount, lang: purchaseLang } = session.metadata || {};
       const parsedAmount = giftAmount != null ? Number(giftAmount) : null;
 
       const existing = await GiftChoice.findOne({ stripeSessionId: session.id });
@@ -573,7 +577,7 @@ async function handleStripeWebhook(req, res) {
 
       console.log(`Gift choice created for guest ${guestId}, gift ${giftId}`);
 
-      sendGiftPurchaseEmails({ guestId, giftId, giftChoice }).catch(err => {
+      sendGiftPurchaseEmails({ guestId, giftId, giftChoice, langOverride: purchaseLang }).catch(err => {
         console.error('[email] Post-purchase email dispatch failed:', err && err.message ? err.message : err);
       });
     } catch (err) {

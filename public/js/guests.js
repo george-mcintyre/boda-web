@@ -54,6 +54,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (response.ok) {
       const name = data.name || data.name || 'guest';
       console.log(`Welcome, ${name}!`);
+      const uiLang = window.currentLanguage;
+      const storedLang = data.lang;
+      if (uiLang && uiLang !== storedLang) {
+        fetch('/api/guest/me/lang', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': window.token },
+          body: JSON.stringify({ lang: uiLang }),
+        }).catch(() => {});
+      }
     } else {
       localStorage.removeItem('token');
       window.location.href = 'login.html';
