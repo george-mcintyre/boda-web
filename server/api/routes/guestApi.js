@@ -6,6 +6,7 @@ const eventCtrl = require('../../controllers/eventController');
 
 // Guest Profile (existing functionality - just renamed route)
 router.get('/profile', auth('guest'), guestCtrl.getMe);
+router.put('/me/lang', auth('guest'), guestCtrl.updateMyLang);
 
 // Party Management
 router.get('/party', auth('guest'), guestCtrl.getParty);

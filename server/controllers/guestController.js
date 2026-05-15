@@ -5,6 +5,7 @@ const stripe = require('../config/stripe');
 const { APP_URL } = require('../config/env');
 const { getLang, localize } = require('../utils/localized');
 const { loadCubes, resolveCubeFaces } = require('../data/cubes-loader');
+const emailService = require('../services/email');
 
 function buildCubeFacesById() {
   const facesById = new Map();
@@ -24,7 +25,23 @@ async function getMe(req, res, next) {
   try {
     const me = await guestService.getByEmail(req.user.email);
     if (!me) return res.status(404).json({ error: 'Guest not found' });
-    res.json({ name: me.name, email: me.email, partyMembers: me.partyMembers, specialMenu: me.specialMenu, message: me.message });
+    res.json({ name: me.name, email: me.email, partyMembers: me.partyMembers, specialMenu: me.specialMenu, message: me.message, lang: me.lang || 'en' });
+  } catch (e) { next(e); }
+}
+
+const ALLOWED_LANGS = ['en', 'es', 'fr', 'de'];
+async function updateMyLang(req, res, next) {
+  try {
+    const requested = (req.body && req.body.lang) ? String(req.body.lang).toLowerCase() : '';
+    if (!ALLOWED_LANGS.includes(requested)) {
+      return res.status(400).json({ error: 'Invalid language; must be one of en, es, fr, de' });
+    }
+    const me = await guestService.getByEmail(req.user.email);
+    if (!me) return res.status(404).json({ error: 'Guest not found' });
+    if (me.lang === requested) return res.json({ lang: me.lang });
+    me.lang = requested;
+    await me.save();
+    res.json({ lang: me.lang });
   } catch (e) { next(e); }
 }
 
@@ -491,6 +508,24 @@ async function createPaymentSession(req, res, next) {
   }
 }
 
+async function sendGiftPurchaseEmails({ guestId, giftId, giftChoice }) {
+  const [guest, gift] = await Promise.all([
+    Guest.findById(guestId).lean().catch(() => null),
+    Gift.findById(giftId).lean().catch(() => null),
+  ]);
+  if (!guest || !gift) {
+    console.warn('[email] Skipping post-purchase emails — guest or gift not found', { guestId, giftId });
+    return;
+  }
+  const tasks = [
+    emailService.sendGiftConfirmationToBuyer({ guest, gift, giftChoice })
+      .catch(err => console.error('[email] Buyer confirmation failed:', err && err.message ? err.message : err)),
+    emailService.sendGiftNotificationToCouple({ guest, gift, giftChoice })
+      .catch(err => console.error('[email] Couple notification failed:', err && err.message ? err.message : err)),
+  ];
+  await Promise.all(tasks);
+}
+
 // Stripe webhook handler for payment confirmation
 async function handleStripeWebhook(req, res) {
   const sig = req.headers['stripe-signature'];
@@ -526,7 +561,7 @@ async function handleStripeWebhook(req, res) {
         return res.json({ received: true });
       }
 
-      await GiftChoice.create({
+      const giftChoice = await GiftChoice.create({
         giftId,
         guestId,
         message: message || null,
@@ -537,6 +572,10 @@ async function handleStripeWebhook(req, res) {
       });
 
       console.log(`Gift choice created for guest ${guestId}, gift ${giftId}`);
+
+      sendGiftPurchaseEmails({ guestId, giftId, giftChoice }).catch(err => {
+        console.error('[email] Post-purchase email dispatch failed:', err && err.message ? err.message : err);
+      });
     } catch (err) {
       console.error('Error creating gift choice after payment:', err);
       return res.status(500).send('Webhook handler error');
@@ -702,6 +741,7 @@ async function getTableCompanions(req, res, next) {
 
 module.exports = {
   getMe,
+  updateMyLang,
   getParty,
   updateParty,
   getPartyByGuestId,

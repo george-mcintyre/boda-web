@@ -1,7 +1,7 @@
 // server/vercel-handler.js
 const { app } = require('./app');
 const { connectDB } = require('./config/db');
-const { ensureCollectionsAndIndexes, seedExampleDataIfEmpty, seedCubeGiftsIfNeeded, seedFigurineGiftsIfNeeded, migrateCashGiftsToAmountOptions } = require('./bootstrap/initDb');
+const { ensureCollectionsAndIndexes, seedExampleDataIfEmpty, seedCubeGiftsIfNeeded, seedFigurineGiftsIfNeeded, migrateCashGiftsToAmountOptions, migrateGuestsAddLang } = require('./bootstrap/initDb');
 
 let isInitialized = false;
 
@@ -22,6 +22,9 @@ async function init() {
   );
   await migrateCashGiftsToAmountOptions().catch(err =>
     console.warn('[DB] Cash gifts migration warning:', err.message)
+  );
+  await migrateGuestsAddLang().catch(err =>
+    console.warn('[DB] Guest lang migration warning:', err.message)
   );
   isInitialized = true;
 }

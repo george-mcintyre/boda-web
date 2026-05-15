@@ -13,7 +13,8 @@ const guestSchema = new Schema({
   email: { type: String, unique: true, sparse: true },
   adult: { type: Boolean, default: true },
   partyMembers: [partyMemberSchema],
-  specialMenu: { type: String, default: '' }
+  specialMenu: { type: String, default: '' },
+  lang: { type: String, enum: ['en', 'es', 'fr', 'de'], default: 'en' }
 }, { timestamps: true });
 
 module.exports = model('Guest', guestSchema);

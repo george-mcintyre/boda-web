@@ -3,10 +3,15 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR/server"
 
-# Load env from project root if present
+# Load env from project root if present.
+# Use `set -a` so every assignment in .env is auto-exported, then source the file
+# directly — this preserves quoting and shell-special characters (e.g. `&` in
+# `EMAIL_FROM_NAME="Iluminada & George"`) without xargs word-splitting them.
 if [ -f "$SCRIPT_DIR/.env" ]; then
-  # shellcheck disable=SC2046
-  export $(grep -v '^#' "$SCRIPT_DIR/.env" | xargs)
+  set -a
+  # shellcheck disable=SC1091
+  . "$SCRIPT_DIR/.env"
+  set +a
 else
   echo "[WARN] .env not found at project root. If needed, env defaults will be used on macOS only."
 fi

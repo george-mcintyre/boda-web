@@ -4,7 +4,7 @@ const https = require('https');
 const { app } = require('./app');
 const { connectDB } = require('./config/db');
 const { PORT, HTTPS_PORT, DEV_HTTPS, SSL_KEY_PATH, SSL_CERT_PATH, SSL_CA_PATH } = require('./config/env');
-const { ensureCollectionsAndIndexes, seedExampleDataIfEmpty, seedCubeGiftsIfNeeded, seedFigurineGiftsIfNeeded, migrateCashGiftsToAmountOptions } = require('./bootstrap/initDb');
+const { ensureCollectionsAndIndexes, seedExampleDataIfEmpty, seedCubeGiftsIfNeeded, seedFigurineGiftsIfNeeded, migrateCashGiftsToAmountOptions, migrateGuestsAddLang } = require('./bootstrap/initDb');
 
 function tryCreateHttpsServer(appInstance) {
   try {
@@ -31,6 +31,7 @@ function tryCreateHttpsServer(appInstance) {
   await seedCubeGiftsIfNeeded().catch(err => console.warn('[DB] Cube seed warning:', err.message));
   await seedFigurineGiftsIfNeeded().catch(err => console.warn('[DB] Figurine seed warning:', err.message));
   await migrateCashGiftsToAmountOptions().catch(err => console.warn('[DB] Cash gifts migration warning:', err.message));
+  await migrateGuestsAddLang().catch(err => console.warn('[DB] Guest lang migration warning:', err.message));
 
   // Always start HTTP server for dev convenience and LAN access
   app.listen(PORT, '0.0.0.0', () => console.log(`HTTP server running on http://localhost:${PORT} (bound 0.0.0.0)`));

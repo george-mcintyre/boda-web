@@ -254,10 +254,25 @@ async function migrateCashGiftsToAmountOptions() {
   return result;
 }
 
+async function migrateGuestsAddLang() {
+  const Guest = models.Guest;
+  const result = await Guest.updateMany(
+    { lang: { $exists: false } },
+    { $set: { lang: 'en' } }
+  );
+  if (result.modifiedCount > 0) {
+    console.log(`[DB] Set lang='en' on ${result.modifiedCount} existing guest(s)`);
+  } else {
+    console.log('[DB] No guests needed lang migration');
+  }
+  return result;
+}
+
 module.exports = {
   ensureCollectionsAndIndexes,
   seedExampleDataIfEmpty,
   seedCubeGiftsIfNeeded,
   seedFigurineGiftsIfNeeded,
   migrateCashGiftsToAmountOptions,
+  migrateGuestsAddLang,
 };

@@ -148,6 +148,9 @@ router.post('/messages/:id/reaction', auth('admin'), messageCtrl.reactAdmin);
 router.put('/messages/:id', auth('admin'), messageCtrl.updateAdminMessage);
 router.delete('/messages/:id', auth('admin'), messageCtrl.deleteAdminMessage);
 
+// Email test endpoint (for previewing buyer/couple emails without a real purchase)
+router.post('/email/test', auth('admin'), adminCtrl.testEmail);
+
 // Gifts Management (existing functionality)
 router.get('/gifts', auth('admin'), adminCtrl.listGifts);
 router.post('/gifts', auth('admin'), adminCtrl.createGift);

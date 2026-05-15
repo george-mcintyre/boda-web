@@ -48,4 +48,9 @@ module.exports = {
   SSL_KEY_PATH: optional('SSL_KEY_PATH', ''),
   SSL_CERT_PATH: optional('SSL_CERT_PATH', ''),
   SSL_CA_PATH: optional('SSL_CA_PATH', ''),
+  // Email (Brevo) — optional at boot; when missing, email-sending features no-op with a log warning.
+  BREVO_API_KEY: optional('BREVO_API_KEY', ''),
+  EMAIL_FROM_ADDRESS: optional('EMAIL_FROM_ADDRESS', 'rsvp@george-and-iluminada.com'),
+  EMAIL_FROM_NAME: optional('EMAIL_FROM_NAME', 'Iluminada & George'),
+  COUPLE_NOTIFICATION_EMAILS: optional('COUPLE_NOTIFICATION_EMAILS', 'rsvp@george-and-iluminada.com'),
 };

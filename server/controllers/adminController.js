@@ -1,8 +1,9 @@
-const { Config, Gift, Event, GiftChoice, CourseOptionImage } = require('../models');
+const { Config, Gift, Event, GiftChoice, CourseOptionImage, Guest } = require('../models');
 const { getAvailableGiftCardImages } = require('../utils/imageUtils');
 const { formatEventForApi, formatCourseForApi, formatCourseOptionForApi } = require('../utils/formatters');
 const { mergeLocalizedString, localize, getLang } = require('../utils/localized');
 const { loadCubes, resolveCubeFaces } = require('../data/cubes-loader');
+const emailService = require('../services/email');
 
 let cubeFacesByIdCache = null;
 function getCubeFacesById() {
@@ -639,6 +640,46 @@ async function uploadGiftImage(req, res, next) {
   } catch (e) { next(e); }
 }
 
+async function testEmail(req, res, next) {
+  try {
+    const { type = 'buyer', guestEmail, lang } = req.body || {};
+    if (!['buyer', 'couple', 'both'].includes(type)) {
+      return res.status(400).json({ error: 'type must be one of: buyer, couple, both' });
+    }
+    const guest = guestEmail
+      ? await Guest.findOne({ email: guestEmail }).lean()
+      : await Guest.findOne({ email: req.user.email }).lean();
+    if (!guest) {
+      return res.status(404).json({ error: 'Guest not found for email: ' + (guestEmail || req.user.email) });
+    }
+    if (lang && ['en', 'es', 'fr', 'de'].includes(lang)) {
+      guest.lang = lang;
+    }
+    const sampleGift = (await Gift.findOne({ type: 'cash' }).lean()) || (await Gift.findOne().lean());
+    if (!sampleGift) {
+      return res.status(500).json({ error: 'No gifts in database to use for sample' });
+    }
+    const sampleGiftChoice = {
+      amount: 75,
+      message: 'Wishing you both a wonderful honeymoon — this is a test email.',
+      giftFrom: guest.name || 'Test Sender',
+      date: new Date(),
+      stripeSessionId: 'test_session_' + Date.now(),
+    };
+
+    const results = {};
+    if (type === 'buyer' || type === 'both') {
+      results.buyer = await emailService.sendGiftConfirmationToBuyer({ guest, gift: sampleGift, giftChoice: sampleGiftChoice })
+        .catch(err => ({ error: err.message || String(err) }));
+    }
+    if (type === 'couple' || type === 'both') {
+      results.couple = await emailService.sendGiftNotificationToCouple({ guest, gift: sampleGift, giftChoice: sampleGiftChoice })
+        .catch(err => ({ error: err.message || String(err) }));
+    }
+    res.json({ ok: true, results, guestUsed: { name: guest.name, email: guest.email, lang: guest.lang } });
+  } catch (e) { next(e); }
+}
+
 module.exports = {
   // gifts
   listGifts, createGift, updateGift, deleteGift, getGiftChoices, getGiftCardImages, uploadGiftImage,
@@ -648,6 +689,8 @@ module.exports = {
   uploadCourseOptionImage,
   // settings
   getSettings, updateSettings,
+  // email
+  testEmail,
   formatCourseForApi, formatCourseOptionForApi
 };
 

@@ -3953,7 +3953,9 @@ async function changeLanguage(lang) {
     window.currentLanguage = lang;
     
     localStorage.setItem('i18nextLng', lang);
-    
+
+    persistGuestLanguage(lang);
+
     // Update document direction
     updateDocumentDirection();
     
@@ -3974,6 +3976,18 @@ async function changeLanguage(lang) {
     console.error(`Error changing language: ${error.message}`);
     return false;
   }
+}
+
+function persistGuestLanguage(lang) {
+  if (!window.token) return;
+  fetch('/api/guest/me/lang', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': window.token,
+    },
+    body: JSON.stringify({ lang }),
+  }).catch(() => {});
 }
 
 function detectAndSetBrowserLanguage() {
