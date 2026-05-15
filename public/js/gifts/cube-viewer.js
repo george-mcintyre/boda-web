@@ -246,6 +246,10 @@
       }
       // Cloned radios must not share a name group with the live ones, otherwise selecting
       // the live radio would deselect siblings inside the cloned reflection (and vice versa).
+      // Also: setting clone.innerHTML reparses radios with the SAME name group as the source,
+      // which causes the browser to unselect the previously-checked source radio. We restore
+      // the live source's checked state from its `checked` HTML attribute if nothing in the
+      // group is selected after this clone pass.
       const cloneRadios = [
         ...entry.aboveSlot.querySelectorAll('input[type="radio"]'),
         ...entry.belowSlot.querySelectorAll('input[type="radio"]'),
@@ -254,6 +258,27 @@
         cloneRadios[i].removeAttribute('name');
         cloneRadios[i].removeAttribute('id');
         cloneRadios[i].tabIndex = -1;
+      }
+      const sourceGroupsRestored = new Set();
+      for (let i = 0; i < sourceRadios.length; i += 1) {
+        const src = sourceRadios[i];
+        const groupName = src.getAttribute('name');
+        if (groupName && !sourceGroupsRestored.has(groupName)) {
+          const group = reflectionRoot.querySelectorAll(`[data-reflection-zone] input[type="radio"][name="${groupName}"]`);
+          let anyChecked = false;
+          for (let g = 0; g < group.length; g += 1) {
+            if (group[g].checked) { anyChecked = true; break; }
+          }
+          if (!anyChecked) {
+            for (let g = 0; g < group.length; g += 1) {
+              if (group[g].hasAttribute('checked')) {
+                group[g].checked = true;
+                break;
+              }
+            }
+          }
+          sourceGroupsRestored.add(groupName);
+        }
       }
       for (let i = 0; i < sourceRadios.length && i < cloneRadios.length; i += 1) {
         cloneRadios[i].checked = sourceRadios[i].checked;

@@ -366,6 +366,13 @@ const translations = {
         Your presence is our gift. If you would still like to contribute to our honeymoon,
         choose from one of the three kinds of gift below.
       </p>
+      <div class="gifts-intro-sculpture">
+        <i class="fas fa-cubes" aria-hidden="true"></i>
+        <div>
+          <strong>We're building a Wedding Sculpture.</strong>
+          Every Block and Figurine becomes a permanent piece of it — a piece of art we'll keep forever, made by the friends who celebrated with us. Pick a piece and add yours to it.
+        </div>
+      </div>
       <ul class="gifts-intro-types">
         <li data-gifts-jump-to="figurine" role="button" tabindex="0">
           <i class="fas fa-user" aria-hidden="true"></i>
@@ -1309,6 +1316,13 @@ const translations = {
         Tu presencia es nuestro regalo. Si aun así quieres contribuir a nuestra luna de miel,
         elige uno de los tres tipos de regalo de abajo.
       </p>
+      <div class="gifts-intro-sculpture">
+        <i class="fas fa-cubes" aria-hidden="true"></i>
+        <div>
+          <strong>Estamos construyendo una Escultura de Boda.</strong>
+          Cada Bloque y Figurita se convierte en una pieza permanente de ella — una obra de arte que conservaremos para siempre, hecha por las personas que celebraron con nosotros. Elige una pieza y añade la tuya.
+        </div>
+      </div>
       <ul class="gifts-intro-types">
         <li data-gifts-jump-to="figurine" role="button" tabindex="0">
           <i class="fas fa-user" aria-hidden="true"></i>
@@ -2253,6 +2267,13 @@ const translations = {
         Votre présence est déjà notre plus beau cadeau. Si vous souhaitez tout de même contribuer à notre lune de miel,
         choisissez l'un des trois types de cadeaux ci-dessous.
       </p>
+      <div class="gifts-intro-sculpture">
+        <i class="fas fa-cubes" aria-hidden="true"></i>
+        <div>
+          <strong>Nous construisons une Sculpture de Mariage.</strong>
+          Chaque Bloc et chaque Figurine en deviendra une pièce permanente — une œuvre d'art que nous garderons pour toujours, façonnée par les ami·e·s qui ont célébré avec nous. Choisissez une pièce et ajoutez la vôtre.
+        </div>
+      </div>
       <ul class="gifts-intro-types">
         <li data-gifts-jump-to="figurine" role="button" tabindex="0">
           <i class="fas fa-user" aria-hidden="true"></i>
@@ -3197,6 +3218,13 @@ const translations = {
         Deine Anwesenheit ist bereits unser Geschenk. Wenn du trotzdem zu unserer Hochzeitsreise beitragen möchtest,
         wähle unten eine der drei Geschenkarten aus.
       </p>
+      <div class="gifts-intro-sculpture">
+        <i class="fas fa-cubes" aria-hidden="true"></i>
+        <div>
+          <strong>Wir bauen eine Hochzeitsskulptur.</strong>
+          Jeder Block und jede Figur wird ein dauerhaftes Stück davon — ein Kunstwerk, das wir für immer behalten, erschaffen von den Menschen, die mit uns gefeiert haben. Wähle ein Stück und füge deins hinzu.
+        </div>
+      </div>
       <ul class="gifts-intro-types">
         <li data-gifts-jump-to="figurine" role="button" tabindex="0">
           <i class="fas fa-user" aria-hidden="true"></i>

@@ -796,6 +796,7 @@ main.main-content-full {
   margin: 0;
   font-size: 1.3em;
   font-weight: 600;
+  color: var(--white);
 }
 
 .course-group-content {
@@ -1451,18 +1452,24 @@ main.main-content-full {
 /* ========================================
    GIFT PURCHASE DIALOG
    ======================================== */
+html:has(.gift-purchase-overlay),
+body:has(.gift-purchase-overlay) {
+  overflow: hidden;
+  height: 100%;
+  touch-action: none;
+}
+
 .gift-purchase-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 24px 16px;
   z-index: 1000;
   opacity: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   transition: opacity var(--transition-normal);
 }
 
@@ -1475,10 +1482,17 @@ main.main-content-full {
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-xl);
   max-width: 450px;
-  width: 90%;
+  width: 100%;
+  margin: 0 auto;
   overflow: hidden;
   transform: scale(0.9);
   transition: transform var(--transition-normal);
+}
+
+@media (max-width: 540px) {
+  .gift-purchase-overlay {
+    padding: 12px;
+  }
 }
 
 .gift-purchase-overlay.show .gift-purchase-dialog {
@@ -1499,6 +1513,7 @@ main.main-content-full {
 
 .gift-purchase-header h3 {
   margin: 0;
+  color: var(--white);
 }
 
 .gift-purchase-content {
@@ -1607,9 +1622,6 @@ main.main-content-full {
 
 .cash-gift-preview-dialog {
   max-width: 1120px;
-  width: min(1120px, 100%);
-  max-height: calc(100vh - 48px);
-  overflow: auto;
 }
 
 .cash-gift-preview-dialog .gift-purchase-summary {
@@ -1860,9 +1872,6 @@ main.main-content-full {
 
 .gift-note-dialog {
   max-width: 960px;
-  width: min(960px, 100%);
-  max-height: calc(100vh - 48px);
-  overflow: auto;
 }
 
 .gift-note-card {
@@ -2755,6 +2764,42 @@ main.main-content-full {
 @keyframes gifts-intro-couple-rise {
   from { transform: translateY(12px); opacity: 0; }
   to   { transform: translateY(0); opacity: 1; }
+}
+
+.gifts-intro-sculpture {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  margin: 20px 0 8px;
+  background: linear-gradient(135deg, rgba(139, 90, 150, 0.08) 0%, rgba(139, 90, 150, 0.18) 100%);
+  border: 1px solid rgba(139, 90, 150, 0.28);
+  border-radius: var(--radius-md, 6px);
+  line-height: 1.5;
+  color: var(--text-dark);
+}
+
+.gifts-intro-sculpture > i {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--primary-color);
+  font-size: 1.05em;
+  margin-top: 2px;
+}
+
+.gifts-intro-sculpture strong {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text-dark);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.08em;
+  font-weight: 700;
 }
 
 /* Gifts intro — three-type breakdown inside the intro card */
@@ -5331,7 +5376,7 @@ main.main-content-full {
   will-change: opacity;
   transform: translateZ(0);
   backface-visibility: hidden;
-  transition: opacity 90ms linear;
+  transition: opacity 16ms linear;
 }
 
 .figurine-viewer__frame.is-current {
@@ -5443,7 +5488,6 @@ main.main-content-full {
 @media (max-width: 640px) {
   .figurine-purchase-overlay {
     padding: 12px 0;
-    align-items: flex-start;
   }
   .figurine-purchase-viewer {
     height: 340px;

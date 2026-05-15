@@ -59,10 +59,10 @@ const FIGURINES = [
       de: 'Der Bräutigam auf einer Sonnenliege',
     },
     description: {
-      en: 'A 3D figurine of the groom on a sun-lounger — beverage in hand, no further plans for the day. The off-duty companion piece. Cake first, sculpture forever, dignity entirely optional.',
-      es: 'Una figurita 3D del novio en una tumbona — bebida en mano, sin más planes por ese día. La pieza compañera en modo "fuera de servicio". Primero la tarta, después la escultura para siempre, la dignidad totalmente opcional.',
-      fr: 'Une figurine 3D du marié sur un transat — boisson à la main, plus aucun projet pour la journée. La pièce compagne en mode "off". D\'abord le gâteau, ensuite la sculpture pour toujours, dignité entièrement facultative.',
-      de: 'Eine 3D-Figur des Bräutigams auf einer Sonnenliege — Getränk in der Hand, keine weiteren Pläne für den Tag. Das Pendant im Feierabend-Modus. Erst die Torte, dann ewig die Skulptur, Würde völlig optional.',
+      en: 'A 3D figurine of the groom on a sun-lounger — doing absolutely nothing with great commitment. The off-duty companion piece. Cake first, sculpture forever, dignity entirely optional.',
+      es: 'Una figurita 3D del novio en una tumbona — haciendo absolutamente nada, y con gran convicción. La pieza compañera en modo "fuera de servicio". Primero la tarta, después la escultura para siempre, la dignidad totalmente opcional.',
+      fr: 'Une figurine 3D du marié sur un transat — ne faisant absolument rien, avec un dévouement total. La pièce compagne en mode "off". D\'abord le gâteau, ensuite la sculpture pour toujours, dignité entièrement facultative.',
+      de: 'Eine 3D-Figur des Bräutigams auf einer Sonnenliege — tut entschlossen absolut nichts. Das Pendant im Feierabend-Modus. Erst die Torte, dann ewig die Skulptur, Würde völlig optional.',
     },
   },
 ];

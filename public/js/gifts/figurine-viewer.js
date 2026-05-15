@@ -159,6 +159,8 @@
     let autoRotateRaf = 0;
     const DRAG_INTENT_THRESHOLD_PX = 8;
 
+    const AUTO_ROTATE_HZ = 0.5;
+
     const startAutoRotate = () => {
       const start = performance.now();
       const baseFrame = currentFrame;
@@ -169,7 +171,7 @@
           return;
         }
         const elapsed = (now - start) / 1000;
-        const advance = (elapsed * FRAME_COUNT) % FRAME_COUNT;
+        const advance = (elapsed * AUTO_ROTATE_HZ * FRAME_COUNT) % FRAME_COUNT;
         setCurrentFrame(Math.floor(baseFrame + advance));
         autoRotateRaf = requestAnimationFrame(tick);
       };
