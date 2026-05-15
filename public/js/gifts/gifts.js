@@ -494,6 +494,121 @@ function attachShowGiftNoteHandler(rootEl, getPayload) {
   });
 }
 
+function renderPriceSelectorHtml({ name, amountOptions, labelKey, wrapperAttrs = '' }) {
+  const presetChips = amountOptions.map((amt, idx) => `
+    <label class="cube-price-option">
+      <input type="radio" name="${name}" value="${amt}" data-price-mode="preset" ${idx === 0 ? 'checked' : ''} />
+      <span class="cube-price-option__chip">€${amt}</span>
+    </label>
+  `).join('');
+  const customChip = `
+    <label class="cube-price-option cube-price-option--custom">
+      <input type="radio" name="${name}" value="__custom__" data-price-mode="custom" />
+      <span class="cube-price-option__chip" data-i18n="guests:gifts.priceCustom.chip">${translate('guests:gifts.priceCustom.chip')}</span>
+    </label>
+  `;
+  return `
+    <div class="cube-price-selector" data-custom-price-selector="true" ${wrapperAttrs}>
+      <label class="cube-price-selector__label" data-i18n="${labelKey}">${translate(labelKey)}</label>
+      <div class="cube-price-options">${presetChips}${customChip}</div>
+      <div class="custom-price-input" data-custom-price-input hidden>
+        <span class="custom-price-input__currency" aria-hidden="true">€</span>
+        <input type="number" inputmode="numeric" min="1" step="1"
+               class="custom-price-input__field"
+               data-custom-price-field
+               placeholder="${translate('guests:gifts.priceCustom.placeholder')}">
+        <div class="custom-price-input__hint" data-custom-price-hint></div>
+      </div>
+    </div>
+  `;
+}
+
+function attachPriceSelectorHandlers(rootEl, { name, amountOptions, onChange }) {
+  if (!rootEl) return null;
+  const selector = rootEl.querySelector('[data-custom-price-selector="true"]');
+  if (!selector) return null;
+  const customWrapper = selector.querySelector('[data-custom-price-input]');
+  const customField = selector.querySelector('[data-custom-price-field]');
+  const customHint = selector.querySelector('[data-custom-price-hint]');
+  const radios = selector.querySelectorAll(`input[name="${name}"]`);
+  const maxPreset = Math.max(...amountOptions);
+
+  const setHint = (text, isError) => {
+    if (!customHint) return;
+    customHint.textContent = text || '';
+    customHint.classList.toggle('is-error', !!isError);
+  };
+
+  const showCustomInput = (visible) => {
+    if (!customWrapper) return;
+    customWrapper.hidden = !visible;
+    if (visible) {
+      setHint(translateWithVars('guests:gifts.priceCustom.hint', { max: maxPreset }), false);
+      setTimeout(() => customField && customField.focus(), 0);
+    } else {
+      setHint('', false);
+    }
+  };
+
+  const handleChange = () => {
+    const checked = selector.querySelector(`input[name="${name}"]:checked`);
+    const isCustom = checked && checked.getAttribute('data-price-mode') === 'custom';
+    showCustomInput(!!isCustom);
+    if (typeof onChange === 'function') onChange();
+  };
+
+  radios.forEach(r => r.addEventListener('change', handleChange));
+  if (customField) {
+    customField.addEventListener('input', () => {
+      const value = Number(customField.value);
+      if (!customField.value.trim()) {
+        setHint(translateWithVars('guests:gifts.priceCustom.hint', { max: maxPreset }), false);
+      } else if (!Number.isInteger(value) || value <= maxPreset) {
+        setHint(translateWithVars('guests:gifts.priceCustom.errorTooLow', { max: maxPreset }), true);
+      } else {
+        setHint('', false);
+      }
+      if (typeof onChange === 'function') onChange();
+    });
+  }
+
+  const getSelectedAmount = () => {
+    const checked = selector.querySelector(`input[name="${name}"]:checked`);
+    if (!checked) return null;
+    if (checked.getAttribute('data-price-mode') === 'custom') {
+      const value = Number(customField && customField.value);
+      return Number.isInteger(value) && value > maxPreset ? value : null;
+    }
+    return Number(checked.value);
+  };
+
+  const validate = () => {
+    const checked = selector.querySelector(`input[name="${name}"]:checked`);
+    if (!checked) {
+      return { ok: false, message: '' };
+    }
+    if (checked.getAttribute('data-price-mode') !== 'custom') {
+      return { ok: true, amount: Number(checked.value) };
+    }
+    if (!customField || !customField.value.trim()) {
+      const msg = translate('guests:gifts.priceCustom.errorMissing');
+      setHint(msg, true);
+      customField && customField.focus();
+      return { ok: false, message: msg };
+    }
+    const value = Number(customField.value);
+    if (!Number.isInteger(value) || value <= maxPreset) {
+      const msg = translateWithVars('guests:gifts.priceCustom.errorTooLow', { max: maxPreset });
+      setHint(msg, true);
+      customField && customField.focus();
+      return { ok: false, message: msg };
+    }
+    return { ok: true, amount: value };
+  };
+
+  return { getSelectedAmount, validate };
+}
+
 function renderFigurineGiftCardHtml(gift, isAvailable) {
   const minPrice = Array.isArray(gift.amountOptions) && gift.amountOptions.length
     ? Math.min(...gift.amountOptions)
@@ -1196,13 +1311,7 @@ window.purchaseCube = async (giftId) => {
   const overlay = document.createElement('div');
   overlay.className = 'gift-purchase-overlay cube-purchase-overlay';
 
-  const priceOptionsHtml = (gift.amountOptions || []).map((amt, idx) => `
-    <label class="cube-price-option">
-      <input type="radio" name="cubeAmount" value="${amt}" ${idx === 0 ? 'checked' : ''} />
-      <span class="cube-price-option__chip">€${amt}</span>
-    </label>
-  `).join('');
-
+  const cubeAmountOptions = Array.isArray(gift.amountOptions) ? gift.amountOptions : [];
   const purchaseDescriptionHtml = escapeHtml(gift.description || translate('guests:gifts.cube.description'));
 
   overlay.innerHTML = `
@@ -1214,10 +1323,12 @@ window.purchaseCube = async (giftId) => {
       <div class="gift-purchase-content" data-live="true">
         <div class="cube-purchase-viewer" data-cube-detail-mount="true"></div>
         <p class="cube-purchase-description" data-reflection-zone="below">${purchaseDescriptionHtml}</p>
-        <div class="cube-price-selector" data-reflection-zone="below">
-          <label class="cube-price-selector__label" data-i18n="guests:gifts.cube.priceLabel">${translate('guests:gifts.cube.priceLabel')}</label>
-          <div class="cube-price-options">${priceOptionsHtml}</div>
-        </div>
+        ${renderPriceSelectorHtml({
+          name: 'cubeAmount',
+          amountOptions: cubeAmountOptions,
+          labelKey: 'guests:gifts.cube.priceLabel',
+          wrapperAttrs: 'data-reflection-zone="below"',
+        })}
         ${renderGiftFromFieldHtml('cubeGiftFromInput')}
         <div class="gift-message-input" data-reflection-zone="below">
           <label for="cubeMessage" data-i18n="guests:giftsPurchaseMessageLabel">${translate('guests:giftsPurchaseMessageLabel')}</label>
@@ -1257,9 +1368,13 @@ window.purchaseCube = async (giftId) => {
     mount.appendChild(detailViewer);
   }
 
+  const cubePriceCtl = attachPriceSelectorHandlers(overlay, {
+    name: 'cubeAmount',
+    amountOptions: cubeAmountOptions,
+  });
+
   attachShowGiftNoteHandler(overlay, () => {
-    const selected = overlay.querySelector('input[name="cubeAmount"]:checked');
-    const amount = selected ? Number(selected.value) : (gift.amountOptions && gift.amountOptions[0]);
+    const amount = (cubePriceCtl && cubePriceCtl.getSelectedAmount()) ?? (cubeAmountOptions[0] || 0);
     return {
       giftType: 'cube',
       giftTitle: gift.title || translate('guests:gifts.cube.title'),
@@ -1296,12 +1411,13 @@ window.purchaseCube = async (giftId) => {
   });
 
   liveActions.querySelector('.btn-confirm-cube-purchase').addEventListener('click', async () => {
-    const selected = liveContent.querySelector('input[name="cubeAmount"]:checked');
-    const amount = selected ? Number(selected.value) : null;
-    if (!amount) {
-      showToast(translate('guests:gifts.cube.priceLabel'), 'error');
+    const validation = cubePriceCtl ? cubePriceCtl.validate() : { ok: false };
+    if (!validation.ok) {
+      if (validation.message) showToast(validation.message, 'error');
+      else showToast(translate('guests:gifts.cube.priceLabel'), 'error');
       return;
     }
+    const amount = validation.amount;
     const message = liveContent.querySelector('#cubeMessage').value.trim();
     const cubeGiftFromInputEl = liveContent.querySelector('#cubeGiftFromInput');
     const giftFrom = resolveGiftFromValue(cubeGiftFromInputEl ? cubeGiftFromInputEl.value : '');
@@ -1357,13 +1473,7 @@ window.purchaseFigurine = async (giftId) => {
   const overlay = document.createElement('div');
   overlay.className = 'gift-purchase-overlay figurine-purchase-overlay';
 
-  const priceOptionsHtml = (gift.amountOptions || []).map((amt, idx) => `
-    <label class="cube-price-option">
-      <input type="radio" name="figurineAmount" value="${amt}" ${idx === 0 ? 'checked' : ''} />
-      <span class="cube-price-option__chip">€${amt}</span>
-    </label>
-  `).join('');
-
+  const figurineAmountOptions = Array.isArray(gift.amountOptions) ? gift.amountOptions : [];
   const purchaseDescriptionHtml = escapeHtml(gift.description || '');
 
   overlay.innerHTML = `
@@ -1375,10 +1485,11 @@ window.purchaseFigurine = async (giftId) => {
       <div class="gift-purchase-content" data-live="true">
         <div class="figurine-purchase-viewer" data-figurine-detail-mount="true"></div>
         <p class="cube-purchase-description">${purchaseDescriptionHtml}</p>
-        <div class="cube-price-selector">
-          <label class="cube-price-selector__label" data-i18n="guests:gifts.figurine.priceLabel">${translate('guests:gifts.figurine.priceLabel')}</label>
-          <div class="cube-price-options">${priceOptionsHtml}</div>
-        </div>
+        ${renderPriceSelectorHtml({
+          name: 'figurineAmount',
+          amountOptions: figurineAmountOptions,
+          labelKey: 'guests:gifts.figurine.priceLabel',
+        })}
         ${renderGiftFromFieldHtml('figurineGiftFromInput')}
         <div class="gift-message-input">
           <label for="figurineMessage" data-i18n="guests:giftsPurchaseMessageLabel">${translate('guests:giftsPurchaseMessageLabel')}</label>
@@ -1414,9 +1525,13 @@ window.purchaseFigurine = async (giftId) => {
     mount.appendChild(detailViewer);
   }
 
+  const figurinePriceCtl = attachPriceSelectorHandlers(overlay, {
+    name: 'figurineAmount',
+    amountOptions: figurineAmountOptions,
+  });
+
   attachShowGiftNoteHandler(overlay, () => {
-    const selected = overlay.querySelector('input[name="figurineAmount"]:checked');
-    const amount = selected ? Number(selected.value) : (gift.amountOptions && gift.amountOptions[0]);
+    const amount = (figurinePriceCtl && figurinePriceCtl.getSelectedAmount()) ?? (figurineAmountOptions[0] || 0);
     return {
       giftType: 'figurine',
       giftTitle: gift.title || '',
@@ -1452,12 +1567,13 @@ window.purchaseFigurine = async (giftId) => {
   });
 
   liveActions.querySelector('.btn-confirm-figurine-purchase').addEventListener('click', async () => {
-    const selected = liveContent.querySelector('input[name="figurineAmount"]:checked');
-    const amount = selected ? Number(selected.value) : null;
-    if (!amount) {
-      showToast(translate('guests:gifts.figurine.priceLabel'), 'error');
+    const validation = figurinePriceCtl ? figurinePriceCtl.validate() : { ok: false };
+    if (!validation.ok) {
+      if (validation.message) showToast(validation.message, 'error');
+      else showToast(translate('guests:gifts.figurine.priceLabel'), 'error');
       return;
     }
+    const amount = validation.amount;
     const message = liveContent.querySelector('#figurineMessage').value.trim();
     const figurineGiftFromInputEl = liveContent.querySelector('#figurineGiftFromInput');
     const giftFrom = resolveGiftFromValue(figurineGiftFromInputEl ? figurineGiftFromInputEl.value : '');
@@ -1517,13 +1633,6 @@ window.purchaseGift = async (giftId) => {
     : (typeof gift.amount === 'number' ? [gift.amount] : []);
   const initialAmount = cashAmountOptions[0];
 
-  const priceOptionsHtml = cashAmountOptions.map((amt, idx) => `
-    <label class="cube-price-option">
-      <input type="radio" name="cashAmount" value="${amt}" ${idx === 0 ? 'checked' : ''} />
-      <span class="cube-price-option__chip">€${amt}</span>
-    </label>
-  `).join('');
-
   const overlay = document.createElement('div');
   overlay.className = 'gift-purchase-overlay cash-gift-preview-overlay';
   overlay.innerHTML = `
@@ -1538,12 +1647,11 @@ window.purchaseGift = async (giftId) => {
           giftDescription,
           imageUrl: gift.imageUrl,
         })}
-        ${cashAmountOptions.length > 1 ? `
-        <div class="cube-price-selector">
-          <label class="cube-price-selector__label" data-i18n="guests:gifts.card.priceLabel">${translate('guests:gifts.card.priceLabel')}</label>
-          <div class="cube-price-options">${priceOptionsHtml}</div>
-        </div>
-        ` : `
+        ${cashAmountOptions.length >= 1 ? renderPriceSelectorHtml({
+          name: 'cashAmount',
+          amountOptions: cashAmountOptions,
+          labelKey: 'guests:gifts.card.priceLabel',
+        }) : `
         <div class="gift-purchase-summary">
           <strong><span data-i18n="guests:giftsPurchaseAbout">${translate('guests:giftsPurchaseAbout')}</span></strong>
           <span class="gift-purchase-amount">€${initialAmount}</span>
@@ -1595,16 +1703,16 @@ window.purchaseGift = async (giftId) => {
   overlay.querySelector('#giftMessage').addEventListener('input', updatePreviewMessage);
   overlay.querySelector('#giftFromInput').addEventListener('input', updatePreviewSigner);
 
-  const getSelectedCashAmount = () => {
-    const selected = overlay.querySelector('input[name="cashAmount"]:checked');
-    return selected ? Number(selected.value) : initialAmount;
-  };
+  const cashPriceCtl = attachPriceSelectorHandlers(overlay, {
+    name: 'cashAmount',
+    amountOptions: cashAmountOptions,
+  });
 
   attachShowGiftNoteHandler(overlay, () => ({
     giftType: 'cash',
     giftTitle,
     giftDescription,
-    giftAmount: getSelectedCashAmount(),
+    giftAmount: (cashPriceCtl && cashPriceCtl.getSelectedAmount()) ?? initialAmount,
     giftImageUrl: gift.imageUrl,
     message: overlay.querySelector('#giftMessage').value.trim(),
     signerName: resolveGiftFromValue(overlay.querySelector('#giftFromInput').value),
@@ -1618,16 +1726,19 @@ window.purchaseGift = async (giftId) => {
     document.removeEventListener('keydown', handleEscape);
   };
 
-// Handle cancel
   overlay.querySelector('.btn-cancel-purchase').addEventListener('click', () => {
     cleanup();
   });
 
-// Handle confirm
   overlay.querySelector('.btn-confirm-purchase').addEventListener('click', async () => {
     const message = document.getElementById('giftMessage').value.trim();
     const giftFrom = resolveGiftFromValue(document.getElementById('giftFromInput').value);
-    const amount = getSelectedCashAmount();
+    const validation = cashPriceCtl ? cashPriceCtl.validate() : { ok: true, amount: initialAmount };
+    if (!validation.ok) {
+      if (validation.message) showToast(validation.message, 'error');
+      return;
+    }
+    const amount = validation.amount;
     const confirmBtn = overlay.querySelector('.btn-confirm-purchase');
 
     confirmBtn.disabled = true;

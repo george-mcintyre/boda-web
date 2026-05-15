@@ -395,11 +395,17 @@ async function createPaymentSession(req, res, next) {
     const hasAmountOptions = Array.isArray(gift.amountOptions) && gift.amountOptions.length > 0;
     if (giftType === 'cube' || giftType === 'figurine' || hasAmountOptions) {
       const options = gift.amountOptions || [];
+      const maxOption = options.length ? Math.max(...options) : 0;
       const parsedAmount = Number(requestedAmount);
-      if (!Number.isFinite(parsedAmount) || !options.includes(parsedAmount)) {
+      const isPresetMatch = options.includes(parsedAmount);
+      const isCustomAboveMax = Number.isFinite(parsedAmount)
+        && Number.isInteger(parsedAmount)
+        && parsedAmount > maxOption;
+      if (!Number.isFinite(parsedAmount) || (!isPresetMatch && !isCustomAboveMax)) {
         return res.status(400).json({
-          error: `Invalid amount for ${giftType} gift; must be one of amountOptions`,
+          error: `Invalid amount for ${giftType} gift; must be one of amountOptions or a custom integer amount greater than €${maxOption}`,
           amountOptions: options,
+          maxPresetAmount: maxOption,
         });
       }
       chargeAmount = parsedAmount;

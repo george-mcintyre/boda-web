@@ -458,6 +458,11 @@ const translations = {
     'guests:gifts.figurine.buyButton': 'Claim this figurine',
     'guests:gifts.card.buyButton': 'Choose this card',
     'guests:gifts.card.priceLabel': 'Choose your contribution',
+    'guests:gifts.priceCustom.chip': 'Other',
+    'guests:gifts.priceCustom.placeholder': 'Custom amount',
+    'guests:gifts.priceCustom.hint': 'Enter an amount greater than €{{max}}',
+    'guests:gifts.priceCustom.errorTooLow': 'For €{{max}} or less, click one of the other amounts above.',
+    'guests:gifts.priceCustom.errorMissing': 'Please enter a custom amount',
 
     //--------------------------------
     // Gift Sections (Figurines / Blocks / Cards)
@@ -1397,6 +1402,11 @@ const translations = {
     'guests:gifts.figurine.buyButton': 'Reservar esta figurita',
     'guests:gifts.card.buyButton': 'Elegir esta tarjeta',
     'guests:gifts.card.priceLabel': 'Elige tu contribución',
+    'guests:gifts.priceCustom.chip': 'Otra',
+    'guests:gifts.priceCustom.placeholder': 'Cantidad personalizada',
+    'guests:gifts.priceCustom.hint': 'Introduce una cantidad mayor de €{{max}}',
+    'guests:gifts.priceCustom.errorTooLow': 'Para €{{max}} o menos, haz clic en una de las otras cantidades de arriba.',
+    'guests:gifts.priceCustom.errorMissing': 'Por favor, introduce una cantidad',
 
     //--------------------------------
     // Gift Sections (Figurines / Blocks / Cards)
@@ -2336,6 +2346,11 @@ const translations = {
     'guests:gifts.figurine.buyButton': 'Réserver cette figurine',
     'guests:gifts.card.buyButton': 'Choisir cette carte',
     'guests:gifts.card.priceLabel': 'Choisissez votre contribution',
+    'guests:gifts.priceCustom.chip': 'Autre',
+    'guests:gifts.priceCustom.placeholder': 'Montant personnalisé',
+    'guests:gifts.priceCustom.hint': 'Saisissez un montant supérieur à €{{max}}',
+    'guests:gifts.priceCustom.errorTooLow': 'Pour €{{max}} ou moins, cliquez sur l’un des autres montants ci-dessus.',
+    'guests:gifts.priceCustom.errorMissing': 'Veuillez saisir un montant',
 
     //--------------------------------
     // Gift Sections (Figurines / Blocks / Cards)
@@ -3275,6 +3290,11 @@ const translations = {
     'guests:gifts.figurine.buyButton': 'Diese Figur sichern',
     'guests:gifts.card.buyButton': 'Diese Karte wählen',
     'guests:gifts.card.priceLabel': 'Wähle deinen Beitrag',
+    'guests:gifts.priceCustom.chip': 'Anderer',
+    'guests:gifts.priceCustom.placeholder': 'Eigener Betrag',
+    'guests:gifts.priceCustom.hint': 'Gib einen Betrag größer als €{{max}} ein',
+    'guests:gifts.priceCustom.errorTooLow': 'Für €{{max}} oder weniger, klicke einen der anderen Beträge oben an.',
+    'guests:gifts.priceCustom.errorMissing': 'Bitte gib einen Betrag ein',
 
     //--------------------------------
     // Gift Sections (Figurines / Blocks / Cards)

@@ -500,3 +500,62 @@
   outline: 2px solid #d4a5a5;
   outline-offset: 2px;
 }
+
+.cube-price-option--custom .cube-price-option__chip {
+  border-style: dashed;
+}
+
+.custom-price-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.custom-price-input[hidden] {
+  display: none;
+}
+
+.custom-price-input__currency {
+  font-weight: 700;
+  color: var(--color-text-dark, #2c1810);
+  font-size: 1.05em;
+}
+
+.custom-price-input__field {
+  flex: 0 1 140px;
+  min-width: 100px;
+  padding: 8px 12px;
+  border: 2px solid rgba(139, 90, 150, 0.35);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--color-text-dark, #2c1810);
+  font-size: 1em;
+  font-weight: 600;
+  -moz-appearance: textfield;
+}
+
+.custom-price-input__field::-webkit-outer-spin-button,
+.custom-price-input__field::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.custom-price-input__field:focus {
+  outline: none;
+  border-color: #8b5a96;
+}
+
+.custom-price-input__hint {
+  flex-basis: 100%;
+  font-size: 0.85em;
+  color: var(--color-text-light, #6b4e3d);
+  line-height: 1.4;
+  min-height: 1.2em;
+}
+
+.custom-price-input__hint.is-error {
+  color: #b9326e;
+  font-weight: 600;
+}
