@@ -27,27 +27,60 @@ function parseArgs(argv) {
   };
   const validGender = new Set(['m', 'f', 'mixed']);
   const validNumber = new Set(['1', 'n', 'auto']);
+
+  // Accept every long flag in BOTH `--flag value` and `--flag=value` forms.
+  // Unknown `--flag` tokens throw; we used to silently treat them as positional,
+  // which led to `--overrides path/to.json` being parsed as "--overrides is an
+  // unknown flag, ignore it; path/to.json is a positional".
+  const flagValue = (name, raw, i) => {
+    if (raw === name) {
+      if (i + 1 >= argv.length) throw new Error(`Flag ${name} requires a value`);
+      return { value: argv[i + 1], consumed: 2 };
+    }
+    if (raw.startsWith(name + '=')) {
+      return { value: raw.slice(name.length + 1), consumed: 1 };
+    }
+    return null;
+  };
+
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--out' || a === '-o') {
+
+    if (a === '--help' || a === '-h') { args.help = true; continue; }
+    if (a === '-o') {
+      if (i + 1 >= argv.length) throw new Error('Flag -o requires a value');
       args.outDir = path.resolve(argv[++i]);
-    } else if (a.startsWith('--out=')) {
-      args.outDir = path.resolve(a.slice('--out='.length));
-    } else if (a === '--help' || a === '-h') {
-      args.help = true;
-    } else if (a.startsWith('--salutation-gender=')) {
-      const v = a.slice('--salutation-gender='.length);
-      if (!validGender.has(v)) throw new Error(`--salutation-gender must be one of m|f|mixed (got '${v}')`);
-      args.defaultGender = v;
-    } else if (a.startsWith('--salutation-number=')) {
-      const v = a.slice('--salutation-number='.length);
-      if (!validNumber.has(v)) throw new Error(`--salutation-number must be one of 1|n|auto (got '${v}')`);
-      args.defaultNumber = v;
-    } else if (a.startsWith('--overrides=')) {
-      args.overridesPath = path.resolve(a.slice('--overrides='.length));
-    } else {
-      args.positional.push(a);
+      continue;
     }
+
+    let m;
+    if ((m = flagValue('--out', a, i))) {
+      args.outDir = path.resolve(m.value);
+      i += m.consumed - 1;
+      continue;
+    }
+    if ((m = flagValue('--salutation-gender', a, i))) {
+      if (!validGender.has(m.value)) throw new Error(`--salutation-gender must be one of m|f|mixed (got '${m.value}')`);
+      args.defaultGender = m.value;
+      i += m.consumed - 1;
+      continue;
+    }
+    if ((m = flagValue('--salutation-number', a, i))) {
+      if (!validNumber.has(m.value)) throw new Error(`--salutation-number must be one of 1|n|auto (got '${m.value}')`);
+      args.defaultNumber = m.value;
+      i += m.consumed - 1;
+      continue;
+    }
+    if ((m = flagValue('--overrides', a, i))) {
+      args.overridesPath = path.resolve(m.value);
+      i += m.consumed - 1;
+      continue;
+    }
+
+    if (a.startsWith('-')) {
+      throw new Error(`Unknown flag: ${a}. Run with --help to see supported flags.`);
+    }
+    args.positional.push(a);
   }
   return args;
 }
