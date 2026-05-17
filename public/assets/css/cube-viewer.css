@@ -427,24 +427,24 @@
 /*
  * Modal/overlay base styles used by the admin "View 3D block" dialog.
  *
- * These base classes (.gift-purchase-overlay, .gift-purchase-dialog,
- * .gift-purchase-header, .gift-purchase-content,
- * .gift-purchase-dialog .action-container) are also defined in guests.css for
- * the guest-facing gift-purchase flow. They are duplicated here — rather than
- * extracted into a shared file — so that admin.html does not have to load the
- * large guests.css stylesheet just to show the cube viewer modal.
- *
- * Keep the two copies visually equivalent. If you change one, change both,
- * or extract them into a dedicated stylesheet loaded by both pages.
+ * Every rule below is scoped to `.cube-purchase-overlay` (the admin-only
+ * overlay class) so this file doesn't override the guest-facing
+ * `.gift-purchase-*` rules in guests.css when both stylesheets are loaded
+ * on the same page (guests.html loads cube-viewer.css after guests.css).
+ * Without this scoping, the duplicated `.gift-purchase-dialog` rule below
+ * (max-width: 450px) wins on equal specificity but later source order
+ * and clobbers the guests' wider dialog variants like
+ * `.gift-note-dialog { max-width: 960px }` and
+ * `.cash-gift-preview-dialog { max-width: 1120px }`.
  */
-html:has(.gift-purchase-overlay),
-body:has(.gift-purchase-overlay) {
+html:has(.cube-purchase-overlay),
+body:has(.cube-purchase-overlay) {
   overflow: hidden;
   height: 100%;
   touch-action: none;
 }
 
-.gift-purchase-overlay {
+.cube-purchase-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
@@ -458,11 +458,11 @@ body:has(.gift-purchase-overlay) {
   transition: opacity var(--transition-normal, 0.3s ease);
 }
 
-.gift-purchase-overlay.show {
+.cube-purchase-overlay.show {
   opacity: 1;
 }
 
-.gift-purchase-dialog {
+.cube-purchase-overlay .gift-purchase-dialog {
   background: var(--white, #ffffff);
   border-radius: var(--radius-xl, 12px);
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
@@ -475,42 +475,42 @@ body:has(.gift-purchase-overlay) {
 }
 
 @media (max-width: 540px) {
-  .gift-purchase-overlay {
+  .cube-purchase-overlay {
     padding: 12px;
   }
 }
 
-.gift-purchase-overlay.show .gift-purchase-dialog {
+.cube-purchase-overlay.show .gift-purchase-dialog {
   transform: scale(1);
 }
 
-.gift-purchase-header {
+.cube-purchase-overlay .gift-purchase-header {
   background: var(--gradient-primary, linear-gradient(135deg, #8b5a96 0%, #4a2c5a 100%));
   color: var(--white, #ffffff);
   padding: 20px;
   text-align: center;
 }
 
-.gift-purchase-header i {
+.cube-purchase-overlay .gift-purchase-header i {
   font-size: 2em;
   margin-bottom: 10px;
 }
 
-.gift-purchase-header h3 {
+.cube-purchase-overlay .gift-purchase-header h3 {
   margin: 0;
   color: var(--white, #ffffff);
 }
 
-.gift-purchase-content {
+.cube-purchase-overlay .gift-purchase-content {
   padding: 25px;
 }
 
-.gift-purchase-content > p {
+.cube-purchase-overlay .gift-purchase-content > p {
   color: var(--text-light, #605047);
   margin: 0 0 10px 0;
 }
 
-.gift-purchase-dialog .action-container {
+.cube-purchase-overlay .gift-purchase-dialog .action-container {
   padding: 0 25px 25px 25px;
   margin: 0;
   display: flex;
