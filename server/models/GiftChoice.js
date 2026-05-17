@@ -7,6 +7,7 @@ const giftChoiceSchema = new Schema({
   message: { type: String },
   giftFrom: { type: String },
   amount: { type: Number },
+  lang: { type: String, enum: ['en', 'es', 'fr', 'de'], default: 'en' },
   stripeSessionId: { type: String, required: true, unique: true }
 }, { timestamps: true });
 

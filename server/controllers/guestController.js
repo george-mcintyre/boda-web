@@ -571,6 +571,7 @@ async function handleStripeWebhook(req, res) {
         message: message || null,
         giftFrom: giftFrom || null,
         amount: Number.isFinite(parsedAmount) ? parsedAmount : undefined,
+        lang: (purchaseLang && ['en','es','fr','de'].includes(purchaseLang)) ? purchaseLang : 'en',
         date: new Date(),
         stripeSessionId: session.id,
       });

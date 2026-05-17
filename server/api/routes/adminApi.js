@@ -323,6 +323,7 @@ router.get('/gift-purchases', auth('admin'), adminExpCtrl.getGiftPurchases);
 router.get('/gift-purchases/descriptors.json', auth('admin'), adminExpCtrl.getGiftPurchaseDescriptorsBundle);
 router.get('/gift-purchases/:id/descriptor.json', auth('admin'), adminExpCtrl.getGiftPurchaseDescriptor);
 router.delete('/gift-purchases/:id', auth('admin'), adminExpCtrl.undoGiftPurchase);
+router.patch('/gift-purchases/:id', auth('admin'), adminExpCtrl.updateGiftPurchase);
 
 // Event Choices (for table assignment filtering)
 router.get('/event-choices', auth('admin'), adminExpCtrl.getAdminEventChoices);

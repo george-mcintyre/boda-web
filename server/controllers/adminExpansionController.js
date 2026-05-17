@@ -1054,6 +1054,28 @@ async function undoGiftPurchase(req, res, next) {
   } catch (e) { next(e); }
 }
 
+const ALLOWED_LANGS = ['en', 'es', 'fr', 'de'];
+
+async function updateGiftPurchase(req, res, next) {
+  try {
+    const { id } = req.params;
+    const update = {};
+    if (req.body && typeof req.body.lang === 'string') {
+      const lang = req.body.lang.toLowerCase();
+      if (!ALLOWED_LANGS.includes(lang)) {
+        return res.status(400).json({ error: `lang must be one of ${ALLOWED_LANGS.join(', ')}` });
+      }
+      update.lang = lang;
+    }
+    if (Object.keys(update).length === 0) {
+      return res.status(400).json({ error: 'No mutable fields provided. Currently supported: lang' });
+    }
+    const result = await GiftChoice.findByIdAndUpdate(id, update, { new: true, runValidators: true });
+    if (!result) return res.status(404).json({ error: 'Purchase not found' });
+    res.json({ ok: true, id, updated: update });
+  } catch (e) { next(e); }
+}
+
 // ========== Print Artefact Descriptors ==========
 // One self-contained JSON per purchase, embedding everything the local print
 // script (scripts/print/render-artefacts.js) needs to render the printer-ready
@@ -1192,6 +1214,7 @@ async function buildCombinedDescriptor(choice) {
       name: guestName,
       email: guest ? (guest.email || null) : null,
       slug: slugify(guestName),
+      lang: (guest && guest.lang) || 'en',
     },
     purchase: {
       date: choice.date ? choice.date.toISOString() : null,
@@ -1716,6 +1739,7 @@ module.exports = {
   getGiftPurchaseDescriptor,
   getGiftPurchaseDescriptorsBundle,
   undoGiftPurchase,
+  updateGiftPurchase,
   getAdminEventChoices,
   updateAdminEventChoices,
   getGuestsWithoutEventChoices,
