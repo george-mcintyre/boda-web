@@ -2,7 +2,7 @@ const { Guest, Event, EventChoice, MenuChoice, ChefProfile, ChefProfileImage, Da
 const crypto = require('crypto');
 const QRCode = require('qrcode');
 const { mergeLocalizedString, localize, getLang } = require('../utils/localized');
-const { loadCubes, resolveCubeFaces } = require('../data/cubes-loader');
+const { loadCubes, resolveCubeFaces, getCubePosition } = require('../data/cubes-loader');
 const fs = require('fs');
 const path = require('path');
 
@@ -15,6 +15,17 @@ function getCubeFacesById() {
     }
   }
   return cubeFacesByIdCache;
+}
+
+let cubePositionByIdCache = null;
+function getCubePositionById() {
+  if (!cubePositionByIdCache) {
+    cubePositionByIdCache = new Map();
+    for (const cube of loadCubes()) {
+      cubePositionByIdCache.set(cube.id, getCubePosition(cube));
+    }
+  }
+  return cubePositionByIdCache;
 }
 
 // ========== Guest Summary ==========
@@ -1021,6 +1032,7 @@ async function getGiftPurchases(req, res, next) {
         cubeDescriptionSnippet: isCube ? buildCubeDescriptionSnippet(gift.description, lang) : null,
         cubeDescription: isCube ? localize(gift.description, lang) : null,
         cubeFaces: isCube ? (getCubeFacesById().get(gift.cubeId) || null) : null,
+        cubePosition: isCube ? (getCubePositionById().get(gift.cubeId) || null) : null,
         giftTitle: gift ? localize(gift.title, lang) : 'Unknown',
         giftAmount: amount,
         date: choice.date ? choice.date.toISOString() : null,
@@ -1153,6 +1165,7 @@ async function buildCombinedDescriptor(choice) {
     imageDataUri: cashImageDataUri,
     cubeId: isCube ? gift.cubeId : null,
     cubeFaces: cubeFacesData,
+    cubePosition: isCube ? (getCubePositionById().get(gift.cubeId) || null) : null,
     figurineId: isFigurine ? gift.figurineId : null,
     figurineThumbDataUri,
   };

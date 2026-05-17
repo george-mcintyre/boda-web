@@ -73,12 +73,22 @@ function resolveCubeFaces(cube) {
   };
 }
 
+function getCubePosition(cube) {
+  if (!cube || !cube.position) return null;
+  const { col, row, level } = cube.position;
+  if (!Number.isInteger(col) || !Number.isInteger(row) || !Number.isInteger(level)) {
+    return null;
+  }
+  return { col, row, level };
+}
+
 module.exports = {
   loadCubes,
   computeImageCount,
   computeAmountOptions,
   resolveFaceValue,
   resolveCubeFaces,
+  getCubePosition,
   isImageRef,
   CUBE_IMAGE_BASE_URL,
   DISPLAYED_FACES,

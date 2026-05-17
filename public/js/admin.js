@@ -917,18 +917,30 @@
 
       const purchaseById = new Map(data.purchases.map(p => [p.id, p]));
 
+      const formatCubePosition = (pos) => {
+        if (!pos) return '';
+        return `col ${pos.col}, row ${pos.row}, level ${pos.level}`;
+      };
+      const cubePositionTooltip = 'Position in the assembled sculpture. '
+        + 'col 0-3: left→right across the heart wall. '
+        + 'row 0-3: 0 = front (heart wall), 3 = back. '
+        + 'level 1-4: 1 = base, 4 = top.';
+
       const rows = data.purchases.map(p => {
         const date = p.date ? new Date(p.date).toLocaleDateString() : '—';
         const snippetHtml = p.cubeDescriptionSnippet
           ? ` — <span style="color:var(--text-light);font-style:italic;">"${escapeHtml(p.cubeDescriptionSnippet)}"</span>`
           : '';
+        const positionHtml = p.cubePosition
+          ? ` <span style="color:var(--text-light);font-size:.9em;" title="${escapeHtml(cubePositionTooltip)}">(${escapeHtml(formatCubePosition(p.cubePosition))})</span>`
+          : '';
         const giftCell = p.cubeId
           ? (p.cubeFaces
-              ? `<button type="button" data-action="view-block" data-purchase-id="${p.id}" title="View 3D block" style="background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left;">Block #${p.cubeId}${snippetHtml} <i class="fas fa-cube" style="margin-left:6px;color:var(--primary-color,#8B5A96);"></i></button>`
-              : `Block #${p.cubeId}${snippetHtml}`)
+              ? `<button type="button" data-action="view-block" data-purchase-id="${p.id}" title="View 3D block" style="background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left;">Block #${p.cubeId}${positionHtml}${snippetHtml} <i class="fas fa-cube" style="margin-left:6px;color:var(--primary-color,#8B5A96);"></i></button>`
+              : `Block #${p.cubeId}${positionHtml}${snippetHtml}`)
           : escapeHtml(p.giftTitle);
         const undoTitle = p.cubeId
-          ? `Block #${p.cubeId}${p.cubeDescriptionSnippet ? ` — ${p.cubeDescriptionSnippet}` : ''}`
+          ? `Block #${p.cubeId}${p.cubePosition ? ' (' + formatCubePosition(p.cubePosition) + ')' : ''}${p.cubeDescriptionSnippet ? ` — ${p.cubeDescriptionSnippet}` : ''}`
           : (p.giftTitle || '');
         const downloadBtn = p.id
           ? `<button class="admin-action" data-action="download-descriptor" data-id="${p.id}" title="Download print artefact descriptor (JSON)"><i class="fas fa-download"></i></button>`
@@ -1022,11 +1034,28 @@
   }
 
   function showCubeViewerDialog(purchase) {
-    if (!purchase || !purchase.cubeFaces || typeof window.createCubeViewer !== 'function') return;
+    if (!purchase) {
+      console.warn('[cube viewer] no purchase passed');
+      return;
+    }
+    if (!purchase.cubeFaces) {
+      console.warn('[cube viewer] purchase has no cubeFaces; cubeId=', purchase.cubeId, 'purchase=', purchase);
+      notify('Cannot show 3D viewer: cube face data is missing for this purchase. Reload the page to refresh the data.', 'error');
+      return;
+    }
+    if (typeof window.createCubeViewer !== 'function') {
+      console.warn('[cube viewer] window.createCubeViewer is not defined; cube-viewer.js may not have loaded');
+      notify('Cannot show 3D viewer: cube-viewer.js failed to load. Hard-refresh the page (Cmd+Shift+R).', 'error');
+      return;
+    }
 
     const escapeHtml = (s) => String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const positionLine = purchase.cubePosition
+      ? `<div style="font-size:.85em;opacity:.9;margin-top:4px;">col ${purchase.cubePosition.col}, row ${purchase.cubePosition.row}, level ${purchase.cubePosition.level}</div>`
+      : '';
 
     const overlay = document.createElement('div');
     overlay.className = 'gift-purchase-overlay cube-purchase-overlay';
@@ -1035,6 +1064,7 @@
         <div class="gift-purchase-header">
           <i class="fas fa-cube"></i>
           <h3>Block #${purchase.cubeId}</h3>
+          ${positionLine}
         </div>
         <div class="gift-purchase-content">
           <div class="cube-purchase-viewer" data-cube-detail-mount="true"></div>
