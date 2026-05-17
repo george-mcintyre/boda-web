@@ -31,6 +31,8 @@ function parseArgs(argv) {
     const a = argv[i];
     if (a === '--out' || a === '-o') {
       args.outDir = path.resolve(argv[++i]);
+    } else if (a.startsWith('--out=')) {
+      args.outDir = path.resolve(a.slice('--out='.length));
     } else if (a === '--help' || a === '-h') {
       args.help = true;
     } else if (a.startsWith('--salutation-gender=')) {
@@ -54,10 +56,10 @@ function loadOverrides(overridesPath) {
   if (!overridesPath) return {};
   const raw = fs.readFileSync(overridesPath, 'utf8');
   const parsed = JSON.parse(raw);
-  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-    throw new Error(`Overrides file must be a JSON object keyed by purchaseId (got ${typeof parsed})`);
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) || !parsed.purchases) {
+    throw new Error(`Overrides file must be the shape { purchases: { "<purchaseId>": {...} } } — the same shape this CLI emits.`);
   }
-  return parsed;
+  return parsed.purchases;
 }
 
 // Heuristic: a signer string represents multiple people if it contains a
@@ -105,6 +107,47 @@ function buildSalutation(params) {
   return { en, es };
 }
 
+function pickOverridesOutputPath(outDir) {
+  const primary = path.join(outDir, 'salutation-overrides.json');
+  if (!fs.existsSync(primary)) return primary;
+  // Don't clobber an existing (likely hand-edited) overrides file. Stamp the
+  // new emission with a timestamp so the operator can diff and merge.
+  const now = new Date();
+  const stamp = now.getFullYear().toString()
+    + String(now.getMonth() + 1).padStart(2, '0')
+    + String(now.getDate()).padStart(2, '0')
+    + '-'
+    + String(now.getHours()).padStart(2, '0')
+    + String(now.getMinutes()).padStart(2, '0')
+    + String(now.getSeconds()).padStart(2, '0');
+  return path.join(outDir, `salutation-overrides.${stamp}.json`);
+}
+
+function writeOverridesTemplate(outDir, decisions) {
+  const outPath = pickOverridesOutputPath(outDir);
+  // Build the JSON in stable purchaseId order so re-runs produce a clean diff.
+  const ordered = {};
+  const sortedIds = Object.keys(decisions).sort();
+  for (const id of sortedIds) {
+    const d = decisions[id];
+    ordered[id] = {
+      gender: d.gender,
+      number: d.number,
+      _signer: d.signer,
+      _autoDetected: !d.overridden,
+    };
+  }
+  const payload = {
+    _readme: 'Edit `gender` (m|f|mixed) and `number` (1|n) for any purchase '
+      + 'whose Spanish salutation came out wrong. Re-run render-artefacts.js '
+      + 'with --overrides=<this file> to apply. Fields starting with `_` are '
+      + 'informational and ignored by the CLI.',
+    purchases: ordered,
+  };
+  fs.writeFileSync(outPath, JSON.stringify(payload, null, 2) + '\n', 'utf8');
+  return outPath;
+}
+
 function printHelp() {
   process.stdout.write(`Usage:
   node scripts/print/render-artefacts.js [OPTIONS] <descriptor.json | bundle.json | folder>
@@ -148,13 +191,27 @@ Spanish salutation forms:
 
   English is always "Dear <name>," (gender-neutral, number-agnostic).
 
-Overrides JSON shape:
+Overrides JSON shape (same shape the CLI emits — see below):
   {
-    "65f3abc...": { "gender": "f", "number": "n" },
-    "65f3def...": { "gender": "m" }
+    "_readme": "...",
+    "purchases": {
+      "65f3abc...": { "gender": "f", "number": "n", "_signer": "María", "_autoDetected": false },
+      "65f3def...": { "gender": "m" }
+    }
   }
-  Either or both keys may be omitted; missing values fall back to the
-  defaults (CLI flag → auto-detection).
+  Either or both of gender/number may be omitted on any entry; missing
+  values fall back to the CLI defaults, then to auto-detection. The
+  "_readme", "_signer", and "_autoDetected" fields are informational
+  only and the CLI ignores them on read.
+
+Auto-emitted overrides template:
+  Every run writes <outDir>/salutation-overrides.json containing the
+  CLI's decision for every purchase (with the signer name as a hint).
+  Edit the few wrong ones and re-run with
+  --overrides=<outDir>/salutation-overrides.json. If that file already
+  exists (i.e. you have hand-edited it), the CLI writes
+  salutation-overrides.<YYYYMMDD-HHMMSS>.json instead so your edits
+  are never clobbered.
 
 Format:
   Each PDF includes 3 mm bleed and corner crop marks suitable for
@@ -275,15 +332,21 @@ async function main() {
   const entries = loadDescriptorsFromPath(input);
   entries.forEach(({ descriptor, source }) => validateDescriptor(descriptor, source));
 
+  const salutationDecisions = {};
   for (const { descriptor } of entries) {
     const params = resolveSalutationParams(descriptor, args, overrides);
     descriptor.salutation = buildSalutation(params);
+    salutationDecisions[descriptor.purchaseId] = params;
     const tag = params.overridden ? 'override' : 'auto';
     process.stdout.write(
       `[salutation] ${descriptor.purchaseId} "${params.signer || '?'}"`
       + ` → ${descriptor.salutation.es} (${tag}: number=${params.number}, gender=${params.gender})\n`
     );
   }
+
+  const overridesOutPath = writeOverridesTemplate(outDir, salutationDecisions);
+  process.stdout.write(`\n[salutation] Wrote editable overrides template: ${overridesOutPath}\n`);
+  process.stdout.write(`[salutation]   Edit any wrong entries and re-run with --overrides=${path.relative(process.cwd(), overridesOutPath) || overridesOutPath}\n\n`);
 
   process.stdout.write(`Rendering ${entries.length} descriptor(s) → ${outDir}\n`);
 

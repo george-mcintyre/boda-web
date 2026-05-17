@@ -48,6 +48,14 @@ no Chromium-on-serverless wrangling. Playwright is already in
    See `node scripts/print/render-artefacts.js --help` for the full Spanish
    salutation matrix and the overrides JSON shape.
 
+   **Tip:** every run writes `prints/salutation-overrides.json` containing
+   the CLI's salutation decision for every purchase (with the signer name
+   as a hint). Open the file, edit any wrong rows, and re-run with
+   `--overrides=prints/salutation-overrides.json` to fix them. If you've
+   already edited that file, the next run writes a timestamped sibling
+   (`salutation-overrides.<YYYYMMDD-HHMMSS>.json`) so your edits are never
+   overwritten.
+
 3. **Send the PDFs to the printer**
 
    Output (default `./prints/`) contains one PDF per artefact per purchase,
