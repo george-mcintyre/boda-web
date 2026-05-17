@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Honeymoon card</title>
+<style>
+  @page { size: 91mm 61mm; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; color: #2c1810;
+    font-family: Georgia, "Times New Roman", serif;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .card {
+    position: relative;
+    width: 91mm; height: 61mm;
+    padding: 3mm;
+    page-break-after: always;
+  }
+  .card:last-child { page-break-after: auto; }
+
+  .crop { position: absolute; background: #000; }
+  .crop.tl-h { top: 0; left: 0; width: 2mm; height: 0.25mm; }
+  .crop.tl-v { top: 0; left: 0; width: 0.25mm; height: 2mm; }
+  .crop.tr-h { top: 0; right: 0; width: 2mm; height: 0.25mm; }
+  .crop.tr-v { top: 0; right: 0; width: 0.25mm; height: 2mm; }
+  .crop.bl-h { bottom: 0; left: 0; width: 2mm; height: 0.25mm; }
+  .crop.bl-v { bottom: 0; left: 0; width: 0.25mm; height: 2mm; }
+  .crop.br-h { bottom: 0; right: 0; width: 2mm; height: 0.25mm; }
+  .crop.br-v { bottom: 0; right: 0; width: 0.25mm; height: 2mm; }
+
+  .inner {
+    position: relative;
+    width: 85mm; height: 55mm;
+    overflow: hidden;
+    background: #faf6ef;
+  }
+
+  .front-art {
+    position: absolute; inset: 0;
+    background-size: cover;
+    background-position: center;
+  }
+  .front-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%);
+  }
+  .front-copy {
+    position: absolute;
+    left: 4mm; right: 4mm; bottom: 4mm;
+    color: #fff;
+    z-index: 1;
+  }
+  .front-copy h1 {
+    margin: 0;
+    font-size: 11pt;
+    line-height: 1.25;
+    font-weight: 700;
+  }
+  .front-copy .subtitle {
+    margin: 1mm 0 0;
+    font-size: 7.5pt;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+
+  .back {
+    padding: 4mm 5mm;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2mm;
+  }
+  .back h2 {
+    margin: 0;
+    font-size: 10pt;
+    line-height: 1.25;
+    font-weight: 700;
+    color: #4b3127;
+  }
+  .back .desc {
+    margin: 0;
+    font-size: 7.5pt;
+    line-height: 1.4;
+    color: #5b4337;
+    flex: 0 0 auto;
+  }
+  .back .msg-label {
+    margin: 1mm 0 0;
+    font-size: 6.5pt;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8a7a6f;
+  }
+  .back .msg {
+    margin: 0;
+    font-size: 8pt;
+    line-height: 1.4;
+    color: #2c1810;
+    flex: 1;
+    white-space: pre-line;
+  }
+  .back .signer {
+    margin: 0;
+    text-align: right;
+    font-size: 8pt;
+    color: #5b4337;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+  <section class="card" aria-label="Front">
+    <span class="crop tl-h"></span><span class="crop tl-v"></span>
+    <span class="crop tr-h"></span><span class="crop tr-v"></span>
+    <span class="crop bl-h"></span><span class="crop bl-v"></span>
+    <span class="crop br-h"></span><span class="crop br-v"></span>
+    <div class="inner">
+      <div class="front-art" id="front-art"></div>
+      <div class="front-overlay"></div>
+      <div class="front-copy">
+        <h1 id="front-title"></h1>
+        <div class="subtitle">Honeymoon Card</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-label="Back">
+    <span class="crop tl-h"></span><span class="crop tl-v"></span>
+    <span class="crop tr-h"></span><span class="crop tr-v"></span>
+    <span class="crop bl-h"></span><span class="crop bl-v"></span>
+    <span class="crop br-h"></span><span class="crop br-v"></span>
+    <div class="inner">
+      <div class="back">
+        <h2 id="back-title"></h2>
+        <p class="desc" id="back-description"></p>
+        <p class="msg-label">Message</p>
+        <p class="msg" id="back-message"></p>
+        <p class="signer" id="back-signer"></p>
+      </div>
+    </div>
+  </section>
+
+  <!--INJECT-DATA-->
+  <script>
+    (function () {
+      var d = window.__DESCRIPTOR__;
+      if (!d) { window.__TEMPLATE_READY__ = true; return; }
+      if (d.gift.type !== 'cash') {
+        document.body.innerHTML = '<div style="padding:20mm;font-family:sans-serif;">No honeymoon card for non-cash gift.</div>';
+        window.__TEMPLATE_READY__ = true;
+        return;
+      }
+      var title = (d.gift.title && d.gift.title.en) || '';
+      var desc = (d.gift.description && d.gift.description.en) || '';
+      var img = (d.artefacts && d.artefacts.honeymoonCard && d.artefacts.honeymoonCard.imageDataUri)
+        || d.gift.imageDataUri || '';
+      if (img) document.getElementById('front-art').style.backgroundImage = 'url("' + img + '")';
+      document.getElementById('front-title').textContent = title;
+      document.getElementById('back-title').textContent = title;
+      document.getElementById('back-description').textContent = desc;
+      var msg = (d.purchase.message || '').trim();
+      document.getElementById('back-message').textContent = msg || '(No message)';
+      document.getElementById('back-signer').textContent = '\u2014 ' + (d.purchase.signerName || d.guest.name || '');
+      window.__TEMPLATE_READY__ = true;
+    })();
+  </script>
+</body>
+</html>

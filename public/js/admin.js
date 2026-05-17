@@ -31,6 +31,32 @@
     return fetch(path + sep + `_t=${Date.now()}`, options);
   }
 
+  async function downloadAuthenticatedFile(path) {
+    try {
+      const res = await api(path);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        notify(err.error || 'Download failed', 'error');
+        return;
+      }
+      const disposition = res.headers.get('Content-Disposition') || '';
+      const match = disposition.match(/filename="?([^";]+)"?/i);
+      const filename = match ? match[1] : 'download.json';
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      console.error('Download failed', err);
+      notify('Download failed', 'error');
+    }
+  }
+
   // Load images that require auth headers (blob URL approach)
   function loadAuthImages(container) {
     if (!container) return;
@@ -889,30 +915,42 @@
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
+      const purchaseById = new Map(data.purchases.map(p => [p.id, p]));
+
       const rows = data.purchases.map(p => {
         const date = p.date ? new Date(p.date).toLocaleDateString() : '—';
-        const blockLabel = p.cubeId
-          ? `Block #${p.cubeId}${p.cubeDescriptionSnippet ? ` — <span style="color:var(--text-light);font-style:italic;">"${escapeHtml(p.cubeDescriptionSnippet)}"</span>` : ''}`
-          : null;
-        const giftCell = blockLabel || escapeHtml(p.giftTitle);
+        const snippetHtml = p.cubeDescriptionSnippet
+          ? ` — <span style="color:var(--text-light);font-style:italic;">"${escapeHtml(p.cubeDescriptionSnippet)}"</span>`
+          : '';
+        const giftCell = p.cubeId
+          ? (p.cubeFaces
+              ? `<button type="button" data-action="view-block" data-purchase-id="${p.id}" title="View 3D block" style="background:none;border:none;padding:0;font:inherit;color:inherit;cursor:pointer;text-align:left;">Block #${p.cubeId}${snippetHtml} <i class="fas fa-cube" style="margin-left:6px;color:var(--primary-color,#8B5A96);"></i></button>`
+              : `Block #${p.cubeId}${snippetHtml}`)
+          : escapeHtml(p.giftTitle);
         const undoTitle = p.cubeId
           ? `Block #${p.cubeId}${p.cubeDescriptionSnippet ? ` — ${p.cubeDescriptionSnippet}` : ''}`
           : (p.giftTitle || '');
+        const downloadBtn = p.id
+          ? `<button class="admin-action" data-action="download-descriptor" data-id="${p.id}" title="Download print artefact descriptor (JSON)"><i class="fas fa-download"></i></button>`
+          : '';
         const undoBtn = p.id
           ? `<button class="admin-action danger" data-action="undo-purchase" data-id="${p.id}" data-gift-title="${escapeHtml(undoTitle)}" data-guest-name="${escapeHtml(p.guestName)}" title="Undo purchase (TESTING ONLY)"><i class="fas fa-undo"></i></button>`
           : '';
         const giftFromCell = p.giftFrom ? escapeHtml(p.giftFrom) : '—';
         const messageCell = p.message ? escapeHtml(p.message) : '—';
-        return `<tr><td>${escapeHtml(p.guestName)}</td><td>${giftCell}</td><td>€${p.giftAmount}</td><td>${date}</td><td>${giftFromCell}</td><td>${messageCell}</td><td>${undoBtn}</td></tr>`;
+        return `<tr><td>${escapeHtml(p.guestName)}</td><td>${giftCell}</td><td>€${p.giftAmount}</td><td>${date}</td><td>${giftFromCell}</td><td>${messageCell}</td><td>${downloadBtn} ${undoBtn}</td></tr>`;
       }).join('');
 
       target.innerHTML = `
         <div class="admin-content">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
             <h3 style="margin:0;"><i class="fas fa-shopping-cart"></i> ${translate('admin:subtab.giftPurchases')}</h3>
-            <div class="stat-card" style="margin:0;">
-              <div class="stat-number">€${data.totalAmount}</div>
-              <div class="stat-label">Total</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <button id="downloadAllDescriptors" class="admin-action" title="Download all print artefact descriptors as a single JSON bundle"><i class="fas fa-cloud-download-alt"></i> Download all artefacts</button>
+              <div class="stat-card" style="margin:0;">
+                <div class="stat-number">€${data.totalAmount}</div>
+                <div class="stat-label">Total</div>
+              </div>
             </div>
           </div>
           <div class="table-container">
@@ -923,8 +961,26 @@
           </div>
         </div>`;
 
+      const bulkBtn = target.querySelector('#downloadAllDescriptors');
+      if (bulkBtn) {
+        bulkBtn.addEventListener('click', () => {
+          downloadAuthenticatedFile('/api/admin/gift-purchases/descriptors.json');
+        });
+      }
+
       const tbody = target.querySelector('tbody');
       tbody.addEventListener('click', async (e) => {
+        const viewBlockBtn = e.target.closest('button[data-action="view-block"]');
+        if (viewBlockBtn) {
+          const purchase = purchaseById.get(viewBlockBtn.dataset.purchaseId);
+          if (purchase) showCubeViewerDialog(purchase);
+          return;
+        }
+        const downloadBtn = e.target.closest('button[data-action="download-descriptor"]');
+        if (downloadBtn) {
+          downloadAuthenticatedFile(`/api/admin/gift-purchases/${downloadBtn.dataset.id}/descriptor.json`);
+          return;
+        }
         const btn = e.target.closest('button[data-action="undo-purchase"]');
         if (!btn) return;
         const id = btn.dataset.id;
@@ -963,6 +1019,64 @@
       console.error('Error loading gift purchases:', e);
       target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
     }
+  }
+
+  function showCubeViewerDialog(purchase) {
+    if (!purchase || !purchase.cubeFaces || typeof window.createCubeViewer !== 'function') return;
+
+    const escapeHtml = (s) => String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const overlay = document.createElement('div');
+    overlay.className = 'gift-purchase-overlay cube-purchase-overlay';
+    overlay.innerHTML = `
+      <div class="gift-purchase-dialog cube-purchase-dialog">
+        <div class="gift-purchase-header">
+          <i class="fas fa-cube"></i>
+          <h3>Block #${purchase.cubeId}</h3>
+        </div>
+        <div class="gift-purchase-content">
+          <div class="cube-purchase-viewer" data-cube-detail-mount="true"></div>
+          ${purchase.cubeDescription ? `<p class="cube-purchase-description">${escapeHtml(purchase.cubeDescription)}</p>` : ''}
+          <div style="margin-top:12px;font-size:.9em;color:var(--text-light);">
+            Purchased by <strong>${escapeHtml(purchase.guestName)}</strong>
+          </div>
+        </div>
+        <div class="action-container">
+          <button type="button" class="btn-base btn-primary btn-sm btn-close-cube-viewer">Close</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+    setTimeout(() => overlay.classList.add('show'), 10);
+
+    const mount = overlay.querySelector('[data-cube-detail-mount="true"]');
+    const viewer = window.createCubeViewer(purchase.cubeFaces, {
+      mode: 'detail',
+      sold: false,
+    });
+    mount.appendChild(viewer);
+
+    const cleanup = () => {
+      if (viewer && typeof viewer.cubeViewerDestroy === 'function') {
+        viewer.cubeViewerDestroy();
+      }
+      overlay.classList.remove('show');
+      setTimeout(() => {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      }, 300);
+      document.removeEventListener('keydown', handleEscape);
+    };
+
+    const handleEscape = (e) => { if (e.key === 'Escape') cleanup(); };
+    document.addEventListener('keydown', handleEscape);
+
+    overlay.querySelector('.btn-close-cube-viewer').addEventListener('click', cleanup);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) cleanup();
+    });
   }
 
   // Event No Choices sub-tab

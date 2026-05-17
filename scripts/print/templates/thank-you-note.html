@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Thank-you note</title>
+<style>
+  @page { size: 297mm 210mm; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; color: #2c1810;
+    font-family: Georgia, "Times New Roman", serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .sheet {
+    position: relative;
+    width: 297mm; height: 210mm;
+    padding: 3mm;
+    page-break-after: always;
+  }
+  .sheet:last-child { page-break-after: auto; }
+
+  .crop { position: absolute; background: #000; }
+  .crop.tl-h { top: 0; left: 0; width: 3mm; height: 0.3mm; }
+  .crop.tl-v { top: 0; left: 0; width: 0.3mm; height: 3mm; }
+  .crop.tr-h { top: 0; right: 0; width: 3mm; height: 0.3mm; }
+  .crop.tr-v { top: 0; right: 0; width: 0.3mm; height: 3mm; }
+  .crop.bl-h { bottom: 0; left: 0; width: 3mm; height: 0.3mm; }
+  .crop.bl-v { bottom: 0; left: 0; width: 0.3mm; height: 3mm; }
+  .crop.br-h { bottom: 0; right: 0; width: 3mm; height: 0.3mm; }
+  .crop.br-v { bottom: 0; right: 0; width: 0.3mm; height: 3mm; }
+  .fold {
+    position: absolute;
+    top: 3mm; bottom: 3mm;
+    left: 50%;
+    border-left: 0.2mm dashed rgba(0,0,0,0.35);
+  }
+
+  .spread {
+    width: 291mm; height: 204mm;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+  }
+
+  .page {
+    padding: 14mm;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .page-back { background: linear-gradient(180deg, #fff 0%, #fbf6ef 100%); }
+  .page-front {
+    background: linear-gradient(180deg, #fff 0%, #fbf6ef 100%);
+    align-items: center;
+    justify-content: space-between;
+    padding: 18mm 16mm;
+  }
+  .front-art {
+    width: 100%;
+    max-height: 130mm;
+    object-fit: contain;
+  }
+  .thank-you-title {
+    margin: 6mm 0 0;
+    font-size: 28pt;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #4b3127;
+    text-align: center;
+  }
+  .back-text {
+    margin: auto;
+    text-align: center;
+    color: #8a7a6f;
+    font-size: 10pt;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .page-inside-left { background: #fff; }
+  .page-inside-right { background: linear-gradient(180deg, #fff 0%, #fbf6ef 100%); justify-content: space-between; }
+
+  .parallel { display: grid; grid-template-columns: 1fr 1fr; gap: 7mm; align-items: start; }
+  .col { min-width: 0; }
+  .col.es { font-style: italic; }
+  .section-title {
+    margin: 0 0 3mm;
+    color: #8b5a96;
+    font-size: 9pt;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .gift-summary {
+    padding: 6mm 7mm;
+    background: rgba(139, 90, 150, 0.08);
+    border: 0.3mm solid rgba(139, 90, 150, 0.18);
+    margin-top: 4mm;
+  }
+  .gift-card-preview {
+    margin: 0 auto 5mm;
+    width: 70mm;
+    aspect-ratio: 1.586 / 1;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    box-shadow: 0 2mm 5mm rgba(44, 24, 16, 0.16);
+    overflow: hidden;
+  }
+  .gift-card-preview::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.55) 100%);
+  }
+  .gift-card-preview-title {
+    position: absolute;
+    left: 3mm; right: 3mm; bottom: 2mm;
+    z-index: 1;
+    color: #fff;
+    font-size: 8.5pt;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .gift-summary-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4mm;
+    align-items: start;
+  }
+  .gift-type-label {
+    margin: 0 0 1mm;
+    font-size: 8pt;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #6f4f7c;
+    font-weight: 700;
+  }
+  .gift-title-text {
+    margin: 0;
+    font-size: 11pt;
+    line-height: 1.4;
+    font-weight: 700;
+  }
+  .gift-description-text {
+    margin: 1mm 0 0;
+    font-size: 9.5pt;
+    line-height: 1.55;
+  }
+  .amount-badge {
+    padding: 2mm 4mm;
+    border: 0.3mm solid rgba(139, 90, 150, 0.32);
+    background: #fff;
+    color: #5b4337;
+    font-weight: 700;
+    font-size: 10pt;
+    white-space: nowrap;
+    align-self: start;
+  }
+
+  .body-copy {
+    margin: 0;
+    font-size: 10pt;
+    line-height: 1.65;
+    white-space: pre-line;
+  }
+  .salutation { margin-bottom: 2mm; font-weight: 700; }
+  .handwriting-area {
+    flex: 1;
+    min-height: 35mm;
+    margin-top: 5mm;
+    background-image: repeating-linear-gradient(
+      transparent, transparent 8mm, rgba(44, 24, 16, 0.06) 8mm, rgba(44, 24, 16, 0.06) 8.2mm
+    );
+  }
+  .signoff { margin-top: 5mm; }
+  .signoff-text {
+    margin: 0 0 3mm;
+    font-size: 10pt;
+    text-align: center;
+  }
+  .couple {
+    margin: 0;
+    text-align: center;
+    font-size: 13pt;
+    font-weight: 700;
+  }
+  .signature-space {
+    margin-top: 4mm;
+    height: 16mm;
+  }
+</style>
+</head>
+<body>
+  <section class="sheet" aria-label="Outside spread">
+    <span class="crop tl-h"></span><span class="crop tl-v"></span>
+    <span class="crop tr-h"></span><span class="crop tr-v"></span>
+    <span class="crop bl-h"></span><span class="crop bl-v"></span>
+    <span class="crop br-h"></span><span class="crop br-v"></span>
+    <div class="fold"></div>
+    <div class="spread">
+      <div class="page page-back">
+        <div class="back-text">From Iluminada &amp; George</div>
+      </div>
+      <div class="page page-front">
+        <img id="front-art" class="front-art" alt="">
+        <h1 class="thank-you-title">Thank You</h1>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" aria-label="Inside spread">
+    <span class="crop tl-h"></span><span class="crop tl-v"></span>
+    <span class="crop tr-h"></span><span class="crop tr-v"></span>
+    <span class="crop bl-h"></span><span class="crop bl-v"></span>
+    <span class="crop br-h"></span><span class="crop br-v"></span>
+    <div class="fold"></div>
+    <div class="spread">
+      <div class="page page-inside-left">
+        <div class="gift-card-preview" id="gift-card-preview" hidden>
+          <div class="gift-card-preview-title" id="gift-card-preview-title"></div>
+        </div>
+        <div class="gift-summary">
+          <div class="parallel">
+            <div class="col en">
+              <p class="section-title">Gift received</p>
+              <p class="gift-type-label" id="type-label-en"></p>
+              <div class="gift-summary-item">
+                <div>
+                  <p class="gift-title-text" id="gift-title-en"></p>
+                  <p class="gift-description-text" id="gift-description-en"></p>
+                </div>
+                <span class="amount-badge" id="amount-en"></span>
+              </div>
+            </div>
+            <div class="col es">
+              <p class="section-title">Regalo</p>
+              <p class="gift-type-label" id="type-label-es"></p>
+              <div class="gift-summary-item">
+                <div>
+                  <p class="gift-title-text" id="gift-title-es"></p>
+                  <p class="gift-description-text" id="gift-description-es"></p>
+                </div>
+                <span class="amount-badge" id="amount-es"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="page page-inside-right">
+        <div>
+          <div class="parallel">
+            <div class="col en">
+              <p class="section-title salutation" id="salutation-en">Dear friend,</p>
+              <p class="body-copy">Thank you so much for your thoughtful gift and for celebrating this special time with us. Your love, generosity, and presence mean the world as we begin our married life together. We are so grateful to have you in our lives and feel blessed to share this joyful season with you.</p>
+            </div>
+            <div class="col es">
+              <p class="section-title salutation" id="salutation-es">Querido/a amigo/a,</p>
+              <p class="body-copy">Muchísimas gracias por vuestro precioso regalo y por celebrar con nosotros este momento tan especial. Vuestro cariño, generosidad y compañía significan muchísimo para nosotros al comenzar nuestra vida de casados. Estamos profundamente agradecidos de teneros en nuestras vidas y nos sentimos muy afortunados de compartir esta etapa tan feliz con vosotros.</p>
+            </div>
+          </div>
+          <div class="handwriting-area"></div>
+        </div>
+        <div class="signoff">
+          <div class="parallel">
+            <div class="col en"><p class="signoff-text">With love and gratitude,</p></div>
+            <div class="col es"><p class="signoff-text">Con amor y gratitud,</p></div>
+          </div>
+          <p class="couple" id="couple-names">Iluminada &amp; George</p>
+          <div class="signature-space"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!--INJECT-DATA-->
+  <script>
+    (function () {
+      var d = window.__DESCRIPTOR__;
+      if (!d) { window.__TEMPLATE_READY__ = true; return; }
+
+      var coupleUri = d.artefacts && d.artefacts.thankYouNote && d.artefacts.thankYouNote.coupleImageDataUri;
+      var artImg = document.getElementById('front-art');
+      if (coupleUri) artImg.src = coupleUri;
+      else artImg.style.visibility = 'hidden';
+
+      var typeEn = 'Gift', typeEs = 'Regalo';
+      if (d.gift.type === 'cash') { typeEn = 'Honeymoon card'; typeEs = 'Tarjeta de luna de miel'; }
+      else if (d.gift.type === 'cube') { typeEn = 'Block #' + d.gift.cubeId; typeEs = 'Bloque #' + d.gift.cubeId; }
+      else if (d.gift.type === 'figurine') { typeEn = 'Figurine'; typeEs = 'Figurita'; }
+      document.getElementById('type-label-en').textContent = typeEn;
+      document.getElementById('type-label-es').textContent = typeEs;
+
+      document.getElementById('gift-title-en').textContent = (d.gift.title && d.gift.title.en) || '';
+      document.getElementById('gift-title-es').textContent = (d.gift.title && d.gift.title.es) || '';
+      document.getElementById('gift-description-en').textContent = (d.gift.description && d.gift.description.en) || '';
+      document.getElementById('gift-description-es').textContent = (d.gift.description && d.gift.description.es) || '';
+
+      var amount = d.purchase.amount;
+      if (typeof amount === 'number' && amount > 0) {
+        document.getElementById('amount-en').textContent = '\u20ac' + amount;
+        document.getElementById('amount-es').textContent = '\u20ac' + amount;
+      } else {
+        document.getElementById('amount-en').hidden = true;
+        document.getElementById('amount-es').hidden = true;
+      }
+
+      var name = d.guest.name || 'friend';
+      document.getElementById('salutation-en').textContent = 'Dear ' + name + ',';
+      document.getElementById('salutation-es').textContent = 'Queridos ' + name + ',';
+      document.getElementById('couple-names').textContent = (d.couple && d.couple.names) || 'Iluminada & George';
+
+      var preview = document.getElementById('gift-card-preview');
+      if (d.gift.type === 'cash' && d.gift.imageDataUri) {
+        preview.style.backgroundImage = 'url("' + d.gift.imageDataUri + '")';
+        preview.hidden = false;
+        document.getElementById('gift-card-preview-title').textContent = (d.gift.title && d.gift.title.en) || '';
+      }
+
+      window.__TEMPLATE_READY__ = true;
+    })();
+  </script>
+</body>
+</html>

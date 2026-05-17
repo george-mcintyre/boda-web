@@ -1,9 +1,21 @@
-const { Guest, Event, EventChoice, MenuChoice, ChefProfile, ChefProfileImage, DayMenu, DayMenuImage, Table, TableAssignment, GiftChoice, Gift, Course, CourseOption, Config } = require('../models');
+const { Guest, Event, EventChoice, MenuChoice, ChefProfile, ChefProfileImage, DayMenu, DayMenuImage, Table, TableAssignment, GiftChoice, Gift, GiftImage, Course, CourseOption, Config } = require('../models');
 const crypto = require('crypto');
 const QRCode = require('qrcode');
 const { mergeLocalizedString, localize, getLang } = require('../utils/localized');
+const { loadCubes, resolveCubeFaces } = require('../data/cubes-loader');
 const fs = require('fs');
 const path = require('path');
+
+let cubeFacesByIdCache = null;
+function getCubeFacesById() {
+  if (!cubeFacesByIdCache) {
+    cubeFacesByIdCache = new Map();
+    for (const cube of loadCubes()) {
+      cubeFacesByIdCache.set(cube.id, resolveCubeFaces(cube));
+    }
+  }
+  return cubeFacesByIdCache;
+}
 
 // ========== Guest Summary ==========
 async function getGuestSummary(req, res, next) {
@@ -1007,6 +1019,8 @@ async function getGiftPurchases(req, res, next) {
         giftType: gift ? gift.type : null,
         cubeId: isCube ? gift.cubeId : null,
         cubeDescriptionSnippet: isCube ? buildCubeDescriptionSnippet(gift.description, lang) : null,
+        cubeDescription: isCube ? localize(gift.description, lang) : null,
+        cubeFaces: isCube ? (getCubeFacesById().get(gift.cubeId) || null) : null,
         giftTitle: gift ? localize(gift.title, lang) : 'Unknown',
         giftAmount: amount,
         date: choice.date ? choice.date.toISOString() : null,
@@ -1025,6 +1039,200 @@ async function undoGiftPurchase(req, res, next) {
     const result = await GiftChoice.findByIdAndDelete(id);
     if (!result) return res.status(404).json({ error: 'Purchase not found' });
     res.json({ ok: true, deletedId: id });
+  } catch (e) { next(e); }
+}
+
+// ========== Print Artefact Descriptors ==========
+// One self-contained JSON per purchase, embedding everything the local print
+// script (scripts/print/render-artefacts.js) needs to render the printer-ready
+// PDFs: guest details, gift details (localised in all 4 languages), the
+// buyer's message, the signer, and base64-embedded image data. The descriptor
+// is the source of truth: the local script never needs to call the API or
+// fetch any URL — it can be re-run months later from a saved descriptor.
+//
+// IMPORTANT: The schemaVersion field is the contract between this server
+// builder and scripts/print/render-artefacts.js. Bump it on breaking changes.
+const DESCRIPTOR_SCHEMA_VERSION = 1;
+const COUPLE_NAMES = 'Iluminada & George';
+
+function slugify(s) {
+  return String(s || 'unknown')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 40) || 'unknown';
+}
+
+function toFourLangs(localized) {
+  const get = (lang) => localize(localized, lang) || '';
+  return { en: get('en'), es: get('es'), fr: get('fr'), de: get('de') };
+}
+
+// Reads a static asset under public/ and returns it as a base64 data URI.
+// Returns null if the file is missing — the print script should treat a null
+// dataUri as "render a placeholder" rather than crash, so a single missing
+// asset doesn't block the whole batch.
+function readStaticAssetAsDataUri(absoluteUrl) {
+  if (!absoluteUrl || typeof absoluteUrl !== 'string' || !absoluteUrl.startsWith('/')) return null;
+  const publicRoot = path.join(__dirname, '..', '..', 'public');
+  const filePath = path.join(publicRoot, absoluteUrl);
+  if (!filePath.startsWith(publicRoot)) return null;
+  try {
+    const buf = fs.readFileSync(filePath);
+    const ext = path.extname(filePath).toLowerCase();
+    const mimeByExt = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
+    const mime = mimeByExt[ext] || 'application/octet-stream';
+    return `data:${mime};base64,${buf.toString('base64')}`;
+  } catch (_e) {
+    return null;
+  }
+}
+
+function cubeFacesToDataUris(faces) {
+  if (!faces || typeof faces !== 'object') return null;
+  const out = {};
+  for (const key of Object.keys(faces)) {
+    const v = faces[key];
+    if (v === 'white' || v === 'mirror') out[key] = v;
+    else out[key] = readStaticAssetAsDataUri(v);
+  }
+  return out;
+}
+
+async function buildGiftImageDataUri(giftImageRef) {
+  if (!giftImageRef) return null;
+  try {
+    const id = (giftImageRef._id || giftImageRef).toString();
+    const img = await GiftImage.findById(id).lean();
+    if (!img || !img.data) return null;
+    return `data:${img.contentType || 'image/jpeg'};base64,${img.data.toString('base64')}`;
+  } catch (_e) {
+    return null;
+  }
+}
+
+async function buildCombinedDescriptor(choice) {
+  const gift = choice.giftId;
+  if (!gift) return null;
+  const guest = choice.guestId;
+
+  const fallbackAmount = gift.amount
+    ?? (Array.isArray(gift.amountOptions) && gift.amountOptions.length
+        ? Math.min(...gift.amountOptions)
+        : 0);
+  const amount = Number.isFinite(choice.amount) ? choice.amount : fallbackAmount;
+
+  const isCash = gift.type === 'cash';
+  const isCube = gift.type === 'cube' && Number.isFinite(gift.cubeId);
+  const isFigurine = gift.type === 'figurine' && Number.isFinite(gift.figurineId);
+
+  const giftTitleLocalised = toFourLangs(gift.title);
+  const giftDescriptionLocalised = toFourLangs(gift.description);
+
+  const cashImageDataUri = isCash ? await buildGiftImageDataUri(gift.image) : null;
+  const cubeFacesData = isCube ? cubeFacesToDataUris(getCubeFacesById().get(gift.cubeId)) : null;
+  const figurineThumbDataUri = isFigurine
+    ? (readStaticAssetAsDataUri(`/assets/figurines/figurine-${gift.figurineId}/thumb.png`)
+        || readStaticAssetAsDataUri(`/assets/figurines/figurine-${gift.figurineId}/thumb.webp`))
+    : null;
+
+  const giftNoteCoverDataUri = readStaticAssetAsDataUri('/assets/images/gift-cards/gift-note-cover.jpg');
+  const coupleInsideDataUri = readStaticAssetAsDataUri('/assets/images/gift-cards/couple-inside-transparent.png');
+
+  const purchaseId = choice._id.toString();
+  const guestName = guest ? (guest.name || guest.email || 'Unknown') : 'Unknown';
+  const signerName = (choice.giftFrom && choice.giftFrom.trim()) || guestName;
+  const message = choice.message || '';
+
+  const giftBlock = {
+    type: gift.type,
+    title: giftTitleLocalised,
+    description: giftDescriptionLocalised,
+    amount,
+    imageDataUri: cashImageDataUri,
+    cubeId: isCube ? gift.cubeId : null,
+    cubeFaces: cubeFacesData,
+    figurineId: isFigurine ? gift.figurineId : null,
+    figurineThumbDataUri,
+  };
+
+  const artefacts = {
+    giftNote: {
+      coverImageDataUri: giftNoteCoverDataUri,
+    },
+    thankYouNote: {
+      coupleImageDataUri: coupleInsideDataUri,
+    },
+  };
+  if (isCash) {
+    artefacts.honeymoonCard = {
+      imageDataUri: cashImageDataUri,
+    };
+  }
+
+  return {
+    schemaVersion: DESCRIPTOR_SCHEMA_VERSION,
+    purchaseId,
+    generatedAt: new Date().toISOString(),
+    guest: {
+      name: guestName,
+      email: guest ? (guest.email || null) : null,
+      slug: slugify(guestName),
+    },
+    purchase: {
+      date: choice.date ? choice.date.toISOString() : null,
+      message,
+      signerName,
+      amount,
+    },
+    gift: giftBlock,
+    couple: { names: COUPLE_NAMES },
+    artefacts,
+  };
+}
+
+async function getGiftPurchaseDescriptor(req, res, next) {
+  try {
+    const { id } = req.params;
+    const choice = await GiftChoice.findById(id)
+      .populate('giftId', 'title description amount amountOptions type cubeId figurineId image')
+      .populate('guestId', 'name email')
+      .lean();
+    if (!choice) return res.status(404).json({ error: 'Purchase not found' });
+    const descriptor = await buildCombinedDescriptor(choice);
+    if (!descriptor) return res.status(404).json({ error: 'Gift no longer exists for this purchase' });
+    const filename = `purchase-${descriptor.purchaseId}-${descriptor.guest.slug}.json`;
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(JSON.stringify(descriptor, null, 2));
+  } catch (e) { next(e); }
+}
+
+async function getGiftPurchaseDescriptorsBundle(_req, res, next) {
+  try {
+    const choices = await GiftChoice.find({})
+      .populate('giftId', 'title description amount amountOptions type cubeId figurineId image')
+      .populate('guestId', 'name email')
+      .sort({ date: -1 })
+      .lean();
+
+    const descriptors = [];
+    for (const choice of choices) {
+      const d = await buildCombinedDescriptor(choice);
+      if (d) descriptors.push(d);
+    }
+
+    const bundle = {
+      schemaVersion: DESCRIPTOR_SCHEMA_VERSION,
+      generatedAt: new Date().toISOString(),
+      count: descriptors.length,
+      descriptors,
+    };
+    const today = new Date().toISOString().slice(0, 10);
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="wedding-print-bundle-${today}.json"`);
+    res.send(JSON.stringify(bundle, null, 2));
   } catch (e) { next(e); }
 }
 
@@ -1492,6 +1700,8 @@ module.exports = {
   reorderTableSeats,
   getMenuResponses,
   getGiftPurchases,
+  getGiftPurchaseDescriptor,
+  getGiftPurchaseDescriptorsBundle,
   undoGiftPurchase,
   getAdminEventChoices,
   updateAdminEventChoices,
