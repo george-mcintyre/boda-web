@@ -301,7 +301,12 @@
         document.getElementById('amount-es').hidden = true;
       }
 
-      var name = d.guest.name || 'friend';
+      // The salutation uses the buyer's signer field ("From <signer>") rather
+      // than the guest's full account name, because the same guest account
+      // may purchase on behalf of a couple/family ("María & José"), use a
+      // nickname, or just a first name. signerName falls back to guest.name
+      // when the buyer didn't fill in a From value.
+      var name = d.purchase.signerName || d.guest.name || 'friend';
       document.getElementById('salutation-en').textContent = 'Dear ' + name + ',';
       document.getElementById('salutation-es').textContent = 'Queridos ' + name + ',';
       document.getElementById('couple-names').textContent = (d.couple && d.couple.names) || 'Iluminada & George';

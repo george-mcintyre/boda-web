@@ -123,7 +123,15 @@
     color: #6f4f7c;
     font-style: italic;
   }
-  .honeymoon-attached {
+  /*
+   * The `:not([hidden])` qualifier is REQUIRED. The element starts with the
+   * HTML `hidden` attribute set (and the inline JS only clears it for cash
+   * gifts). A plain `display: flex` rule would override the user-agent's
+   * implicit `[hidden] { display: none }` and make this element visible for
+   * cube/figurine gifts too — that bug rendered an empty grey insert below
+   * the gift summary on every non-cash printed gift note.
+   */
+  .honeymoon-attached:not([hidden]) {
     margin-top: 8mm;
     display: flex;
     flex-direction: column;
