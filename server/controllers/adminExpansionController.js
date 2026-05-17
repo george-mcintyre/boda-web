@@ -1221,6 +1221,7 @@ async function buildCombinedDescriptor(choice) {
       message,
       signerName,
       amount,
+      lang: (choice.lang && ['en','es','fr','de'].includes(choice.lang)) ? choice.lang : 'en',
     },
     gift: giftBlock,
     couple: { names: COUPLE_NAMES },

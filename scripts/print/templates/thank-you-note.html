@@ -211,11 +211,11 @@
     <div class="fold"></div>
     <div class="spread">
       <div class="page page-back">
-        <div class="back-text">From Iluminada &amp; George</div>
+        <div class="back-text" id="back-text"></div>
       </div>
       <div class="page page-front">
         <img id="front-art" class="front-art" alt="">
-        <h1 class="thank-you-title">Thank You</h1>
+        <h1 class="thank-you-title" id="thank-you-title"></h1>
       </div>
     </div>
   </section>
@@ -279,9 +279,33 @@
 
   <!--INJECT-DATA-->
   <script>
+    /*
+     * Per-language chrome strings for the printed thank-you note's OUTSIDE
+     * (front cover + back). The INSIDE spread is intentionally bilingual
+     * EN/ES side-by-side and not affected by buyer language — see the
+     * existing .parallel layout in this file.
+     */
+    var OUTSIDE_STRINGS = {
+      en: { thankYouTitle: 'Thank You', backText: 'From Iluminada & George' },
+      es: { thankYouTitle: 'Gracias',   backText: 'De Iluminada y George' },
+      fr: { thankYouTitle: 'Merci',     backText: 'De la part d\u2019Iluminada et George' },
+      de: { thankYouTitle: 'Danke',     backText: 'Von Iluminada & George' },
+    };
+
+    function pickLang(d) {
+      var raw = d && d.purchase && d.purchase.lang;
+      var lang = (typeof raw === 'string' ? raw : 'en').toLowerCase();
+      return OUTSIDE_STRINGS[lang] ? lang : 'en';
+    }
+
     (function () {
       var d = window.__DESCRIPTOR__;
       if (!d) { window.__TEMPLATE_READY__ = true; return; }
+      var lang = pickLang(d);
+      var OS = OUTSIDE_STRINGS[lang];
+
+      document.getElementById('thank-you-title').textContent = OS.thankYouTitle;
+      document.getElementById('back-text').textContent = OS.backText;
 
       var coupleUri = d.artefacts && d.artefacts.thankYouNote && d.artefacts.thankYouNote.coupleImageDataUri;
       var artImg = document.getElementById('front-art');

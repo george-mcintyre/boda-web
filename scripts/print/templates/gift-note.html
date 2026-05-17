@@ -213,11 +213,11 @@
     <div class="fold"></div>
     <div class="spread">
       <div class="page page-back">
-        <div class="back-text">A wedding gift for you</div>
+        <div class="back-text" id="back-text"></div>
       </div>
       <div class="page page-front">
         <img id="front-art" class="front-art" alt="">
-        <div class="front-caption" id="front-caption">A wedding gift for you…</div>
+        <div class="front-caption" id="front-caption"></div>
       </div>
     </div>
   </section>
@@ -238,9 +238,9 @@
           </div>
           <div class="gift-amount" id="gift-amount"></div>
         </div>
-        <div class="wish">May this small gift help launch your wonderful new adventure together. With every fondest wish for your journey ahead.</div>
+        <div class="wish" id="wish"></div>
         <div class="honeymoon-attached" id="honeymoon-attached" hidden>
-          <div class="honeymoon-attached-label">Honeymoon card attached</div>
+          <div class="honeymoon-attached-label" id="honeymoon-attached-label"></div>
           <div class="honeymoon-card-stub" id="honeymoon-card-stub">
             <div class="honeymoon-card-stub-title" id="honeymoon-card-stub-title"></div>
           </div>
@@ -262,18 +262,92 @@
 
   <!--INJECT-DATA-->
   <script>
+    /*
+     * Per-language chrome strings for the printed gift note. Sourced from
+     * public/js/i18n.js where equivalents exist; new strings added here are
+     * marked with a comment so they can be back-ported into i18n.js if any
+     * live UI ever needs them. Keep all four languages in sync — every key
+     * should have an en/es/fr/de entry.
+     */
+    var STRINGS = {
+      en: {
+        backText: 'A wedding gift for you',
+        frontCaption: 'A wedding gift for you \u2026',
+        typeLabel: { cash: 'Honeymoon card', cube: 'Block #{n} for our wedding sculpture', figurine: 'Figurine', fallback: 'Gift' },
+        wish: 'May this small gift help launch your wonderful new adventure together. With every fondest wish for your journey ahead.',
+        attachedLabel: 'Honeymoon card attached',
+        emptyMessage: '(Add a handwritten message on the day if you wish.)',
+      },
+      es: {
+        backText: 'Un regalo de boda para vosotros',
+        frontCaption: 'Un regalo de boda para vosotros \u2026',
+        typeLabel: { cash: 'Tarjeta de luna de miel', cube: 'Bloque #{n} para nuestra escultura de boda', figurine: 'Figurita', fallback: 'Regalo' },
+        wish: 'Ojalá este pequeño regalo os ayude a iniciar una nueva aventura maravillosa juntos. Con todo nuestro cariño para el camino que tenéis por delante.',
+        attachedLabel: 'Tarjeta de luna de miel adjunta',
+        emptyMessage: '(Añade un mensaje a mano el día de la boda si quieres.)',
+      },
+      fr: {
+        backText: 'Un cadeau de mariage pour vous',
+        frontCaption: 'Un cadeau de mariage pour vous \u2026',
+        typeLabel: { cash: 'Carte lune de miel', cube: 'Bloc #{n} pour notre sculpture de mariage', figurine: 'Figurine', fallback: 'Cadeau' },
+        wish: 'Que ce petit cadeau vous aide à lancer votre merveilleuse nouvelle aventure ensemble. Avec tous nos v\u0153ux les plus chaleureux pour le voyage qui vous attend.',
+        attachedLabel: 'Carte lune de miel fixée',
+        emptyMessage: '(Ajoutez un mot \u00e0 la main le jour du mariage si vous le souhaitez.)',
+      },
+      de: {
+        backText: 'Ein Hochzeitsgeschenk für euch',
+        frontCaption: 'Ein Hochzeitsgeschenk für euch \u2026',
+        typeLabel: { cash: 'Hochzeitsreise-Karte', cube: 'Block #{n} für unsere Hochzeitsskulptur', figurine: 'Figur', fallback: 'Geschenk' },
+        wish: 'M\u00f6ge dieses kleine Geschenk euch dabei helfen, euer wundervolles neues Abenteuer gemeinsam zu beginnen. Mit den herzlichsten W\u00fcnschen f\u00fcr die Reise, die vor euch liegt.',
+        attachedLabel: 'Hochzeitsreise-Karte beigeheftet',
+        emptyMessage: '(F\u00fcgt am Hochzeitstag gerne eine handgeschriebene Nachricht hinzu.)',
+      },
+    };
+
+    function pickLang(d) {
+      var raw = d && d.purchase && d.purchase.lang;
+      var lang = (typeof raw === 'string' ? raw : 'en').toLowerCase();
+      return STRINGS[lang] ? lang : 'en';
+    }
+
+    /*
+     * Mirrors server/utils/localized.js `localize()`: pick the requested
+     * language, fall back to English, then to any non-empty value. Used for
+     * the per-gift title/description (which the server stores as a
+     * 4-language dict).
+     */
+    function localize(obj, lang) {
+      if (!obj || typeof obj !== 'object') return '';
+      var direct = obj[lang];
+      if (direct && String(direct).trim() !== '') return direct;
+      if (lang !== 'en' && obj.en && String(obj.en).trim() !== '') return obj.en;
+      for (var k in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, k) && obj[k] && String(obj[k]).trim() !== '') return obj[k];
+      }
+      return '';
+    }
+
     (function () {
       var d = window.__DESCRIPTOR__;
       if (!d) { window.__TEMPLATE_READY__ = true; return; }
+      var lang = pickLang(d);
+      var S = STRINGS[lang];
+
+      // Localised front + back cover.
+      document.getElementById('back-text').textContent = S.backText;
+      document.getElementById('front-caption').textContent = S.frontCaption;
+
       var coverUri = d.artefacts && d.artefacts.giftNote && d.artefacts.giftNote.coverImageDataUri;
       var artImg = document.getElementById('front-art');
       if (coverUri) artImg.src = coverUri;
       else artImg.style.visibility = 'hidden';
 
-      var titleEn = d.gift.title && d.gift.title.en || '';
-      var descEn = d.gift.description && d.gift.description.en || '';
-      document.getElementById('gift-title').textContent = titleEn;
-      document.getElementById('gift-description').textContent = descEn;
+      // Per-buyer-language gift title + description. Falls back to en, then
+      // any non-empty, so missing translations don't blank out the card.
+      var title = localize(d.gift && d.gift.title, lang);
+      var desc = localize(d.gift && d.gift.description, lang);
+      document.getElementById('gift-title').textContent = title;
+      document.getElementById('gift-description').textContent = desc;
 
       var amountEl = document.getElementById('gift-amount');
       if (typeof d.purchase.amount === 'number' && d.purchase.amount > 0) {
@@ -282,11 +356,17 @@
         amountEl.hidden = true;
       }
 
-      var typeLabel = 'Gift';
-      if (d.gift.type === 'cash') typeLabel = 'Honeymoon card';
-      else if (d.gift.type === 'cube') typeLabel = 'Block #' + d.gift.cubeId + ' for our wedding sculpture';
-      else if (d.gift.type === 'figurine') typeLabel = 'Figurine';
-      document.getElementById('type-title').textContent = typeLabel;
+      // Gift-type label on the left inside page. The cube label has a
+      // {n} placeholder for the block number.
+      var t = d.gift && d.gift.type;
+      var label = S.typeLabel.fallback;
+      if (t === 'cash') label = S.typeLabel.cash;
+      else if (t === 'cube') label = S.typeLabel.cube.replace('{n}', String(d.gift.cubeId));
+      else if (t === 'figurine') label = S.typeLabel.figurine;
+      document.getElementById('type-title').textContent = label;
+
+      document.getElementById('wish').textContent = S.wish;
+      document.getElementById('honeymoon-attached-label').textContent = S.attachedLabel;
 
       var msgEl = document.getElementById('message');
       // messageDisplay is the buyer's message with any leading "Iluminada
@@ -297,7 +377,7 @@
       if (msgText.trim()) {
         msgEl.textContent = msgText;
       } else {
-        msgEl.textContent = '(Add a handwritten message on the day if you wish.)';
+        msgEl.textContent = S.emptyMessage;
         msgEl.classList.add('empty');
       }
 
@@ -309,7 +389,7 @@
         wrap.hidden = false;
         var stub = document.getElementById('honeymoon-card-stub');
         stub.style.backgroundImage = 'url("' + d.artefacts.honeymoonCard.imageDataUri + '")';
-        document.getElementById('honeymoon-card-stub-title').textContent = titleEn;
+        document.getElementById('honeymoon-card-stub-title').textContent = title;
       }
 
       window.__TEMPLATE_READY__ = true;

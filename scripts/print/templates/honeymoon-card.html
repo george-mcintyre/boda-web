@@ -120,7 +120,7 @@
       <div class="front-overlay"></div>
       <div class="front-copy">
         <h1 id="front-title"></h1>
-        <div class="subtitle">Honeymoon Card</div>
+        <div class="subtitle" id="front-subtitle"></div>
       </div>
     </div>
   </section>
@@ -134,7 +134,7 @@
       <div class="back">
         <h2 id="back-title"></h2>
         <p class="desc" id="back-description"></p>
-        <p class="msg-label">Message</p>
+        <p class="msg-label" id="msg-label"></p>
         <p class="msg" id="back-message"></p>
         <p class="signer" id="back-signer"></p>
       </div>
@@ -143,6 +143,35 @@
 
   <!--INJECT-DATA-->
   <script>
+    /*
+     * Per-language chrome strings for the printed honeymoon card. Mirrors
+     * the STRINGS table in gift-note.html; keep both in sync where keys
+     * overlap (currently only the implicit "Honeymoon Card" subtitle).
+     */
+    var STRINGS = {
+      en: { subtitle: 'Honeymoon Card', msgLabel: 'Message', noMessage: '(No message)' },
+      es: { subtitle: 'Tarjeta de luna de miel', msgLabel: 'Mensaje', noMessage: '(Sin mensaje)' },
+      fr: { subtitle: 'Carte lune de miel', msgLabel: 'Message', noMessage: '(Aucun message)' },
+      de: { subtitle: 'Hochzeitsreise-Karte', msgLabel: 'Nachricht', noMessage: '(Keine Nachricht)' },
+    };
+
+    function pickLang(d) {
+      var raw = d && d.purchase && d.purchase.lang;
+      var lang = (typeof raw === 'string' ? raw : 'en').toLowerCase();
+      return STRINGS[lang] ? lang : 'en';
+    }
+
+    function localize(obj, lang) {
+      if (!obj || typeof obj !== 'object') return '';
+      var direct = obj[lang];
+      if (direct && String(direct).trim() !== '') return direct;
+      if (lang !== 'en' && obj.en && String(obj.en).trim() !== '') return obj.en;
+      for (var k in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, k) && obj[k] && String(obj[k]).trim() !== '') return obj[k];
+      }
+      return '';
+    }
+
     (function () {
       var d = window.__DESCRIPTOR__;
       if (!d) { window.__TEMPLATE_READY__ = true; return; }
@@ -151,17 +180,22 @@
         window.__TEMPLATE_READY__ = true;
         return;
       }
-      var title = (d.gift.title && d.gift.title.en) || '';
-      var desc = (d.gift.description && d.gift.description.en) || '';
+      var lang = pickLang(d);
+      var S = STRINGS[lang];
+
+      var title = localize(d.gift && d.gift.title, lang);
+      var desc = localize(d.gift && d.gift.description, lang);
       var img = (d.artefacts && d.artefacts.honeymoonCard && d.artefacts.honeymoonCard.imageDataUri)
         || d.gift.imageDataUri || '';
       if (img) document.getElementById('front-art').style.backgroundImage = 'url("' + img + '")';
       document.getElementById('front-title').textContent = title;
+      document.getElementById('front-subtitle').textContent = S.subtitle;
       document.getElementById('back-title').textContent = title;
       document.getElementById('back-description').textContent = desc;
+      document.getElementById('msg-label').textContent = S.msgLabel;
       var msgRaw = (typeof d.purchase.messageDisplay === 'string' ? d.purchase.messageDisplay : d.purchase.message) || '';
       var msg = msgRaw.trim();
-      document.getElementById('back-message').textContent = msg || '(No message)';
+      document.getElementById('back-message').textContent = msg || S.noMessage;
       document.getElementById('back-signer').textContent = '\u2014 ' + (d.purchase.signerName || d.guest.name || '');
       window.__TEMPLATE_READY__ = true;
     })();
