@@ -177,7 +177,11 @@ function renderGiftSection({ key, icon, gifts, renderCard }) {
 }
 
 function getCashGiftPreviewMessage(message) {
-  return message || translate('guests:gifts.card.previewMessagePlaceholder');
+  // Collapse all whitespace (newlines, tabs, runs of spaces) to a single
+  // space so the honeymoon-card back preview matches the printed card,
+  // which can't render line breaks in its tight message area.
+  const collapsed = typeof message === 'string' ? message.replace(/\s+/g, ' ').trim() : '';
+  return collapsed || translate('guests:gifts.card.previewMessagePlaceholder');
 }
 
 function initGiftsSubnav(rootEl) {

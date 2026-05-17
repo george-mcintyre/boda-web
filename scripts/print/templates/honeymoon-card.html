@@ -93,7 +93,13 @@
   .back .msg {
     margin: 0;
     font-size: 8pt;
-    line-height: 1.4;
+    /*
+     * Absolute line-height (pt, not unitless): the binary-search trim in the
+     * inline script clamps the message's max-height to an exact multiple of
+     * this value so partial-line clipping (the "last line cut in half" bug)
+     * cannot happen. Keep both numbers in lock-step if either changes.
+     */
+    line-height: 11.2pt;
     color: #2c1810;
     flex: 1;
     min-height: 0;
@@ -194,20 +200,35 @@
       document.getElementById('back-title').textContent = title;
       document.getElementById('back-description').textContent = desc;
       var msgRaw = (typeof d.purchase.messageDisplay === 'string' ? d.purchase.messageDisplay : d.purchase.message) || '';
-      // Collapse all whitespace (including newlines, tabs, double-spaces)
-      // down to a single space — the honeymoon card has no room for line
-      // breaks, and many buyers wrote multi-paragraph messages that
-      // overflow the card unless they reflow into a single block.
+      // Collapse all whitespace (newlines, tabs, runs of spaces) to a
+      // single space — the card has no room for line breaks, and many
+      // buyers wrote multi-paragraph messages that overflow unless they
+      // reflow into a single block.
       var msgFlat = msgRaw.replace(/\s+/g, ' ').trim();
       var msgEl = document.getElementById('back-message');
       msgEl.textContent = msgFlat || S.noMessage;
 
-      // The card is fixed size, the message area uses overflow: hidden,
-      // and the .msg flex item below cannot reserve space for a signer
-      // that lives in a sibling element. So: after laying out the
-      // message, if it overflows its allotted height, binary-search for
-      // the longest prefix that fits with an ellipsis appended. Keeps
-      // the "— Signer" line and the divider intact in every case.
+      // Clamp the message area's height to an exact whole-line multiple.
+      //
+      // The card geometry is fixed (85x55 mm). Without an exact-line-height
+      // clamp, the browser still paints a partial extra line when the
+      // natural content height isn't a clean multiple of line-height,
+      // which gets clipped vertically by overflow:hidden and shows up as
+      // "last line cut in half" in the printed PDF.
+      //
+      // Strategy: measure the natural available height (flex-distributed),
+      // floor it to whole lines, set max-height to that exact value, then
+      // binary-search for the longest prefix that fits.
+      if (msgFlat) {
+        var msgStyle = window.getComputedStyle(msgEl);
+        var lineHeightPx = parseFloat(msgStyle.lineHeight);
+        if (lineHeightPx > 0) {
+          var availablePx = msgEl.clientHeight;
+          var maxLines = Math.max(1, Math.floor(availablePx / lineHeightPx));
+          msgEl.style.maxHeight = (maxLines * lineHeightPx) + 'px';
+        }
+      }
+
       if (msgFlat && msgEl.scrollHeight > msgEl.clientHeight) {
         var lo = 0;
         var hi = msgFlat.length;

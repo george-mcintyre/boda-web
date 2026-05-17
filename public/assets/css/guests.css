@@ -1771,7 +1771,12 @@ body:has(.gift-purchase-overlay) {
   font-size: 0.75rem;
   line-height: 1.35;
   color: var(--text-dark);
-  white-space: pre-wrap;
+  /*
+   * No `white-space: pre-wrap` here: the JS collapses newlines into single
+   * spaces before setting textContent so the preview matches the printed
+   * honeymoon card, which has no room for line breaks. The -webkit-line-clamp
+   * below gives a clean automatic ellipsis at 3 lines.
+   */
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
