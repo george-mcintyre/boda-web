@@ -140,6 +140,38 @@ function buildSalutation(params) {
   return { en, es };
 }
 
+function escapeRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function parseCoupleFirstNames(coupleNames) {
+  if (!coupleNames || typeof coupleNames !== 'string') return null;
+  const parts = coupleNames.split(/\s+(?:&|y|and)\s+/i).map((s) => s.trim()).filter(Boolean);
+  if (parts.length !== 2) return null;
+  return parts;
+}
+
+// The printed gift note now puts the couple's names as the inside-right
+// page header (the "addressed to" heading). Buyers who address their
+// message "Iluminada y George, ..." therefore duplicate that heading
+// inside the message body. Strip the leading couple-greeting (any combo
+// of name order × {&, y, and} × case) plus immediately-following
+// punctuation/whitespace so the printed message starts with the body.
+function stripLeadingCoupleSalutation(message, coupleNames) {
+  if (!message || typeof message !== 'string') return message;
+  const names = parseCoupleFirstNames(coupleNames);
+  if (!names) return message;
+  const [a, b] = names.map(escapeRegex);
+  const sep = '\\s*(?:&|y|and)\\s*';
+  const namesPattern = `(?:${a}${sep}${b}|${b}${sep}${a})`;
+  // Trailing punctuation we are willing to absorb after the greeting:
+  // comma, period, dash/em-dash, colon, semicolon, exclamation, plus any
+  // surrounding whitespace including newlines.
+  const trailing = '[\\s,.\\-\u2013\u2014:;!]+';
+  const re = new RegExp(`^\\s*${namesPattern}${trailing}`, 'i');
+  return message.replace(re, '');
+}
+
 function pickOverridesOutputPath(outDir) {
   const primary = path.join(outDir, 'salutation-overrides.json');
   if (!fs.existsSync(primary)) return primary;
@@ -375,6 +407,17 @@ async function main() {
       `[salutation] ${descriptor.purchaseId} "${params.signer || '?'}"`
       + ` → ${descriptor.salutation.es} (${tag}: number=${params.number}, gender=${params.gender})\n`
     );
+
+    if (descriptor.purchase && typeof descriptor.purchase.message === 'string') {
+      const raw = descriptor.purchase.message;
+      const coupleNames = descriptor.couple && descriptor.couple.names;
+      const cleaned = stripLeadingCoupleSalutation(raw, coupleNames);
+      descriptor.purchase.messageDisplay = cleaned;
+      if (cleaned !== raw) {
+        const stripped = raw.slice(0, raw.length - cleaned.length).replace(/\s+/g, ' ').trim();
+        process.stdout.write(`[message]    ${descriptor.purchaseId} stripped leading "${stripped}"\n`);
+      }
+    }
   }
 
   const overridesOutPath = writeOverridesTemplate(outDir, salutationDecisions);

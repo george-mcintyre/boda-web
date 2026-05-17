@@ -159,7 +159,8 @@
       document.getElementById('front-title').textContent = title;
       document.getElementById('back-title').textContent = title;
       document.getElementById('back-description').textContent = desc;
-      var msg = (d.purchase.message || '').trim();
+      var msgRaw = (typeof d.purchase.messageDisplay === 'string' ? d.purchase.messageDisplay : d.purchase.message) || '';
+      var msg = msgRaw.trim();
       document.getElementById('back-message').textContent = msg || '(No message)';
       document.getElementById('back-signer').textContent = '\u2014 ' + (d.purchase.signerName || d.guest.name || '');
       window.__TEMPLATE_READY__ = true;

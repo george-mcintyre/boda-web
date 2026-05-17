@@ -296,8 +296,13 @@
       document.getElementById('type-title').textContent = typeLabel;
 
       var msgEl = document.getElementById('message');
-      if (d.purchase.message && d.purchase.message.trim()) {
-        msgEl.textContent = d.purchase.message;
+      // messageDisplay is the buyer's message with any leading "Iluminada
+      // y/and George, " salutation stripped by the CLI to avoid duplicating
+      // the new couple-name heading above it. Fall back to the raw message
+      // if the descriptor wasn't pre-processed (e.g. opened standalone).
+      var msgText = (typeof d.purchase.messageDisplay === 'string' ? d.purchase.messageDisplay : d.purchase.message) || '';
+      if (msgText.trim()) {
+        msgEl.textContent = msgText;
       } else {
         msgEl.textContent = '(Add a handwritten message on the day if you wish.)';
         msgEl.classList.add('empty');

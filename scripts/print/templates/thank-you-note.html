@@ -159,7 +159,23 @@
     line-height: 1.65;
     white-space: pre-line;
   }
-  .salutation { margin-bottom: 2mm; font-weight: 700; }
+  /*
+   * Salutation styling: override the purple uppercase letter-spaced look
+   * inherited from .section-title so the addressed-to line reads as a
+   * normal "Dear Vanesa & Antonio," — black, bold, mixed case (preserving
+   * whatever casing the buyer typed), with the trailing comma the CLI
+   * already adds. Larger than the body so it stands out as a salutation
+   * but not so big it competes with the gift summary.
+   */
+  .salutation {
+    margin: 0 0 3mm;
+    color: #2c1810;
+    font-size: 12pt;
+    font-weight: 700;
+    font-style: normal;
+    text-transform: none;
+    letter-spacing: 0;
+  }
   .handwriting-area {
     flex: 1;
     min-height: 35mm;
