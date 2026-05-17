@@ -61,11 +61,18 @@
   }
   .page-back { background: linear-gradient(180deg, #fff 0%, #fbf6ef 100%); }
   .page-front {
+    /*
+     * The front cover overlays the caption onto the photo near the bottom
+     * edge (matching the live web preview .gift-note-card__front). The
+     * image is positioned absolutely and covers the full page; the caption
+     * sits absolutely on top of it ~14% from the bottom so it lands above
+     * the diamonds in the cropped photo. No flex / padding here — both
+     * children are absolutely positioned so the page itself becomes the
+     * positioning context.
+     */
     background: linear-gradient(180deg, #fff 0%, #fbf6ef 100%);
-    display: flex; flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    padding: 18mm 16mm;
+    position: relative;
+    padding: 0;
   }
   .page-inside-left {
     background: #fff;
@@ -76,26 +83,42 @@
   }
 
   .front-art {
+    /*
+     * Fill the entire front page with the cover image, anchored to the
+     * top so the boxes/ribbons stay visible and the diamonds at the
+     * bottom of the photo land just below the caption overlay.
+     */
+    position: absolute;
+    inset: 0;
     width: 100%;
-    max-height: 130mm;
-    object-fit: contain;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
   }
   .front-caption {
     /*
-     * Match the live web preview's front-caption styling (guests.css
-     * `.gift-note-card__front-caption`): a flowing script font, larger
-     * than body copy, dark-brown rather than purple. The web preview
-     * uses clamp(1.8rem, 3.4vw, 2.8rem) ≈ 28-45 px; at A4 landscape
-     * print size, 28pt sits in the same visual weight band.
+     * Caption overlaid on the photo near the bottom edge, matching the
+     * live web preview's `.gift-note-card__front-caption`. Sits ~14% from
+     * the bottom of the page so it visually lands above the diamond
+     * scatter in the cropped photo. Larger than the body copy (52pt is
+     * close to the preview's max ~45px scaled up to print) so the
+     * handwritten-script feel reads clearly on the printed cover.
+     *
+     * No text-shadow / background: the photo's lower portion is mostly
+     * white (the table-cloth backdrop) so black-on-white reads fine
+     * without a halo.
      */
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    bottom: 14%;
     font-family: 'Great Vibes', 'Allura', 'Pinyon Script', 'Apple Chancery', cursive;
     font-style: normal;
     text-align: center;
     color: #4b3127;
-    font-size: 28pt;
+    font-size: 52pt;
     line-height: 1.1;
     letter-spacing: 0.01em;
-    margin-top: 6mm;
   }
   .back-text {
     margin: auto;
@@ -113,6 +136,32 @@
     text-transform: uppercase;
     color: #8b5a96;
     font-weight: 700;
+  }
+
+  /*
+   * The couple-names heading and the signer line on the inside-right page
+   * share the same flowing script font as the front cover, but kept at
+   * the existing inside text sizes — small and readable, not the big
+   * cover heading. Both render in black for legibility on the cream
+   * background, overriding the purple/uppercase styling that
+   * `.type-title` and the previous bold `.signer` had.
+   */
+  #couple-names.type-title,
+  .signer {
+    font-family: 'Great Vibes', 'Allura', 'Pinyon Script', 'Apple Chancery', cursive;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #000;
+  }
+  #couple-names.type-title {
+    /*
+     * Script fonts render visually thinner than block text at the same
+     * nominal point size, so the script size is roughly doubled vs the
+     * existing 11pt block .type-title to read at a similar visual weight.
+     */
+    font-size: 22pt;
+    font-weight: 400;
+    line-height: 1.2;
   }
   .gift-block {
     background: rgba(139, 90, 150, 0.08);
@@ -212,8 +261,9 @@
     gap: 2mm;
   }
   .signer {
-    font-size: 12pt;
-    font-weight: 700;
+    font-size: 24pt;
+    font-weight: 400;
+    line-height: 1.2;
   }
   .signature-space {
     margin-top: 6mm;

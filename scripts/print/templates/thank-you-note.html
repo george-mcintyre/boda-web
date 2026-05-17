@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <title>Thank-you note</title>
 <style>
+  /*
+   * Great Vibes script font for the front-cover "Thank You" title and for
+   * the inside-right salutation + couple-names line. Same setup as the
+   * gift note template: Playwright fetches it at render time, falls back
+   * through Allura / Pinyon Script / Apple Chancery / generic cursive
+   * for offline / non-macOS hosts.
+   */
+  @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
   @page { size: 297mm 210mm; margin: 0; }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #fff; color: #2c1810;
@@ -13,6 +21,16 @@
     position: relative;
     width: 297mm; height: 210mm;
     padding: 3mm;
+    /*
+     * overflow:hidden so that any per-purchase content surprise (e.g. an
+     * unusually long signer name pushing the salutation to wrap an extra
+     * line) is clipped at the sheet boundary instead of spilling onto a
+     * spurious third page. The card geometry is two sheets — outside
+     * spread + inside spread — never more. Pair with content-side sizing
+     * choices that keep the visible layout within 210mm; this is the
+     * belt-and-braces safety against runaway content.
+     */
+    overflow: hidden;
     page-break-after: always;
   }
   .sheet:last-child { page-break-after: auto; }
@@ -59,11 +77,19 @@
     object-fit: contain;
   }
   .thank-you-title {
+    /*
+     * Front-cover greeting (the localised "Thank You" / "Gracias" / "Merci"
+     * / "Danke"). Big handwritten-script feel matching the gift note's
+     * `.front-caption` at 52pt — generous but not edge-to-edge.
+     * Black for legibility against the cream card background.
+     */
     margin: 6mm 0 0;
-    font-size: 28pt;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: #4b3127;
+    font-family: 'Great Vibes', 'Allura', 'Pinyon Script', 'Apple Chancery', cursive;
+    font-size: 52pt;
+    line-height: 1.0;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    color: #000;
     text-align: center;
   }
   .back-text {
@@ -168,11 +194,23 @@
    * but not so big it competes with the gift summary.
    */
   .salutation {
+    /*
+     * Salutation row ("Dear Vanesa & Antonio," / "Queridos María & José,").
+     * Script font matching the front cover, in black. font-style:normal
+     * overrides the .col.es default italic so both columns render
+     * identically (the script font itself already looks like flowing
+     * italic). Size kept conservative (~1.5× the previous 12pt block
+     * version) so a long signer like "Fani, Alfonso & Rosario" fits on a
+     * single line in each column without wrapping and pushing the rest
+     * of the inside page past the 210mm sheet height.
+     */
     margin: 0 0 3mm;
-    color: #2c1810;
-    font-size: 12pt;
-    font-weight: 700;
+    font-family: 'Great Vibes', 'Allura', 'Pinyon Script', 'Apple Chancery', cursive;
+    font-size: 18pt;
+    font-weight: 400;
     font-style: normal;
+    line-height: 1.2;
+    color: #000;
     text-transform: none;
     letter-spacing: 0;
   }
@@ -191,10 +229,19 @@
     text-align: center;
   }
   .couple {
+    /*
+     * Couple signature line at the bottom of the inside-right page. Same
+     * script-font treatment as the front cover and the salutation, in
+     * black. Target the visual weight of the left-page gift titles
+     * (`.gift-title-text` 11pt block); script ~2× that to look balanced.
+     */
     margin: 0;
     text-align: center;
-    font-size: 13pt;
-    font-weight: 700;
+    font-family: 'Great Vibes', 'Allura', 'Pinyon Script', 'Apple Chancery', cursive;
+    font-size: 20pt;
+    font-weight: 400;
+    line-height: 1.1;
+    color: #000;
   }
   .signature-space {
     margin-top: 4mm;

@@ -86,20 +86,37 @@
     flex: 0 0 auto;
   }
   .back .msg-divider {
-    margin: 1mm 0 0;
+    /*
+     * Near-invisible hairline divider with a modest gap above and below.
+     * The negative top/bottom margins partially cancel the flex `gap: 2mm`
+     * on `.back` so the description and message each sit ~1mm from the
+     * rule (rather than the full 2mm gap on each side, which wasted
+     * ~2mm of vertical space that long messages could claim). Frees ~2mm
+     * for an extra line of message text on full cards while still leaving
+     * the divider visually separated from the surrounding text.
+     */
+    margin: -1mm 0;
+    height: 0;
     border: 0;
-    border-top: 0.2mm solid rgba(44, 24, 16, 0.18);
+    border-top: 0.1mm solid rgba(44, 24, 16, 0.14);
   }
   .back .msg {
     margin: 0;
     font-size: 8pt;
     /*
-     * Absolute line-height (pt, not unitless): the binary-search trim in the
-     * inline script clamps the message's max-height to an exact multiple of
-     * this value so partial-line clipping (the "last line cut in half" bug)
-     * cannot happen. Keep both numbers in lock-step if either changes.
+     * Line-height generous enough to fully contain Georgia 8pt's natural
+     * descenders (p, g, y, j, q, accented characters). 11.2pt — a 1.4 ratio
+     * — turned out to be just below the font's natural leading, so glyph
+     * descenders on the bottom line poked outside the line-box and got
+     * clipped by overflow:hidden, producing the "half a character cut off
+     * at the bottom" bug. 12.4pt (≈1.55 ratio) leaves enough room.
+     *
+     * The JS below clamps max-height to an exact multiple of this value
+     * AND subtracts a tiny safety margin (1px) so subpixel rounding in
+     * Chromium's PDF rasteriser can't sneak in a partial extra line.
+     * Keep the CSS line-height and the JS comment about it in lock-step.
      */
-    line-height: 11.2pt;
+    line-height: 12.4pt;
     color: #2c1810;
     flex: 1;
     min-height: 0;
@@ -211,21 +228,38 @@
       // Clamp the message area's height to an exact whole-line multiple.
       //
       // The card geometry is fixed (85x55 mm). Without an exact-line-height
-      // clamp, the browser still paints a partial extra line when the
+      // clamp the browser still paints a partial extra line when the
       // natural content height isn't a clean multiple of line-height,
-      // which gets clipped vertically by overflow:hidden and shows up as
-      // "last line cut in half" in the printed PDF.
+      // which gets clipped by overflow:hidden and shows up as "last line
+      // cut in half" in the printed PDF.
       //
-      // Strategy: measure the natural available height (flex-distributed),
-      // floor it to whole lines, set max-height to that exact value, then
-      // binary-search for the longest prefix that fits.
+      // Strategy. The message element has `flex: 1` so the flex pass
+      // gives it most of the column's leftover height. But that leftover
+      // is generally NOT a whole-line multiple — say, 4.85 × lineHeight.
+      // Floor(4.85) = 4 lines would waste the trailing 0.85 line of
+      // physical room. Instead we round UP and explicitly set
+      // max-height = 5 × lineHeight. The extra 0.15 line is reclaimed
+      // from the signer's `margin-top: auto`, which simply absorbs less
+      // slack — the signer stays anchored at the bottom of the card.
+      //
+      // To make the partial-line check unambiguous against subpixel
+      // rounding, we test `clientHeight / lineHeightPx` against a small
+      // tolerance: if there's any fractional residue (more than 1 line is
+      // "almost" full) we promote to the next whole line. Finally we
+      // subtract 1px from the resulting max-height so subpixel rounding
+      // in Chromium's rasteriser can't paint a partial Nth+1 line past
+      // the bottom edge.
+      //
+      // The CSS line-height must be generous enough to fully contain
+      // the font's descenders inside the line-box — see .back .msg above.
       if (msgFlat) {
         var msgStyle = window.getComputedStyle(msgEl);
         var lineHeightPx = parseFloat(msgStyle.lineHeight);
         if (lineHeightPx > 0) {
           var availablePx = msgEl.clientHeight;
-          var maxLines = Math.max(1, Math.floor(availablePx / lineHeightPx));
-          msgEl.style.maxHeight = (maxLines * lineHeightPx) + 'px';
+          var rawLines = availablePx / lineHeightPx;
+          var maxLines = Math.max(1, Math.ceil(rawLines - 0.05));
+          msgEl.style.maxHeight = Math.max(1, (maxLines * lineHeightPx) - 1) + 'px';
         }
       }
 
