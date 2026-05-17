@@ -172,6 +172,70 @@ function stripLeadingCoupleSalutation(message, coupleNames) {
   return message.replace(re, '');
 }
 
+/*
+ * Swap small originals for AI-upscaled hi-res variants when present locally.
+ *
+ * The descriptor bundle comes from the deployed admin server and embeds the
+ * small original gift-card images (because Vercel doesn't have the hi-res
+ * files). When this script runs on the operator's machine, the upscaled
+ * variants do exist under public/assets/images/gift-cards/print-hires/
+ * (produced by scripts/upscale-gift-card-images.sh). We read them off
+ * disk, base64-encode them, and replace the descriptor's embedded
+ * dataUri so the rendered PDF uses the hi-res image data.
+ *
+ * Falls through silently when a hi-res file isn't found — the descriptor's
+ * existing small image stays in place and the PDF renders fine, just at
+ * the lower DPI.
+ */
+const HIRES_SUBSTITUTIONS = [
+  {
+    descriptorPath: ['artefacts', 'giftNote', 'coverImageDataUri'],
+    hiresFilePath: 'public/assets/images/gift-cards/print-hires/gift-note-cover.jpg',
+    mime: 'image/jpeg',
+  },
+  {
+    descriptorPath: ['artefacts', 'thankYouNote', 'coupleImageDataUri'],
+    hiresFilePath: 'public/assets/images/gift-cards/print-hires/couple-inside-transparent.png',
+    mime: 'image/png',
+  },
+];
+
+const hiresCache = new Map();
+function readHiresDataUri(relPath, mime) {
+  if (hiresCache.has(relPath)) return hiresCache.get(relPath);
+  const repoRoot = path.resolve(__dirname, '..', '..');
+  const abs = path.join(repoRoot, relPath);
+  let value = null;
+  try {
+    if (fs.existsSync(abs)) {
+      const buf = fs.readFileSync(abs);
+      value = `data:${mime};base64,${buf.toString('base64')}`;
+    }
+  } catch (_e) { /* ignore */ }
+  hiresCache.set(relPath, value);
+  return value;
+}
+
+function substituteHiresImages(descriptor) {
+  let swapped = 0;
+  for (const sub of HIRES_SUBSTITUTIONS) {
+    const hires = readHiresDataUri(sub.hiresFilePath, sub.mime);
+    if (!hires) continue;
+    let obj = descriptor;
+    for (let i = 0; i < sub.descriptorPath.length - 1; i++) {
+      if (!obj || typeof obj !== 'object') { obj = null; break; }
+      obj = obj[sub.descriptorPath[i]];
+    }
+    if (!obj || typeof obj !== 'object') continue;
+    const leaf = sub.descriptorPath[sub.descriptorPath.length - 1];
+    if (obj[leaf]) {
+      obj[leaf] = hires;
+      swapped++;
+    }
+  }
+  return swapped;
+}
+
 function pickOverridesOutputPath(outDir) {
   const primary = path.join(outDir, 'salutation-overrides.json');
   if (!fs.existsSync(primary)) return primary;
@@ -398,6 +462,7 @@ async function main() {
   entries.forEach(({ descriptor, source }) => validateDescriptor(descriptor, source));
 
   const salutationDecisions = {};
+  let totalHiresSwapped = 0;
   for (const { descriptor } of entries) {
     const params = resolveSalutationParams(descriptor, args, overrides);
     descriptor.salutation = buildSalutation(params);
@@ -418,6 +483,14 @@ async function main() {
         process.stdout.write(`[message]    ${descriptor.purchaseId} stripped leading "${stripped}"\n`);
       }
     }
+
+    totalHiresSwapped += substituteHiresImages(descriptor);
+  }
+
+  if (totalHiresSwapped > 0) {
+    process.stdout.write(`[hires]     Swapped ${totalHiresSwapped} small image(s) for local print-hires upscales\n`);
+  } else {
+    process.stdout.write(`[hires]     No print-hires/ upscales found locally; PDFs will use the small images embedded in the descriptor\n`);
   }
 
   const overridesOutPath = writeOverridesTemplate(outDir, salutationDecisions);
