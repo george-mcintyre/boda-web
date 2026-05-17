@@ -254,7 +254,7 @@
       </div>
       <div class="page page-inside-right">
         <div>
-          <div class="type-title">Your message</div>
+          <div class="type-title" id="couple-names"></div>
           <div class="message" id="message"></div>
           <div class="handwriting-area"></div>
         </div>
@@ -304,6 +304,7 @@
       }
 
       document.getElementById('signer').textContent = d.purchase.signerName || d.guest.name || '';
+      document.getElementById('couple-names').textContent = (d.couple && d.couple.names) || 'Iluminada & George';
 
       if (d.gift.type === 'cash' && d.artefacts.honeymoonCard && d.artefacts.honeymoonCard.imageDataUri) {
         var wrap = document.getElementById('honeymoon-attached');
