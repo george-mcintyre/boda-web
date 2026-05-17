@@ -112,6 +112,10 @@ models/
 # Python bytecode cache from scripts/
 scripts/__pycache__/
 
+# Generated printer-ready PDFs from scripts/print/render-artefacts.js
+# (output only — descriptors live elsewhere, and PDFs are per-purchase)
+prints/
+
 
 
 
