@@ -85,12 +85,10 @@
     color: #5b4337;
     flex: 0 0 auto;
   }
-  .back .msg-label {
+  .back .msg-divider {
     margin: 1mm 0 0;
-    font-size: 6.5pt;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #8a7a6f;
+    border: 0;
+    border-top: 0.2mm solid rgba(44, 24, 16, 0.18);
   }
   .back .msg {
     margin: 0;
@@ -98,7 +96,10 @@
     line-height: 1.4;
     color: #2c1810;
     flex: 1;
-    white-space: pre-line;
+    min-height: 0;
+    overflow: hidden;
+    white-space: normal;
+    word-wrap: break-word;
   }
   .back .signer {
     margin: 0;
@@ -134,7 +135,7 @@
       <div class="back">
         <h2 id="back-title"></h2>
         <p class="desc" id="back-description"></p>
-        <p class="msg-label" id="msg-label"></p>
+        <hr class="msg-divider" aria-hidden="true">
         <p class="msg" id="back-message"></p>
         <p class="signer" id="back-signer"></p>
       </div>
@@ -149,10 +150,10 @@
      * overlap (currently only the implicit "Honeymoon Card" subtitle).
      */
     var STRINGS = {
-      en: { subtitle: 'Honeymoon Card', msgLabel: 'Message', noMessage: '(No message)' },
-      es: { subtitle: 'Tarjeta de luna de miel', msgLabel: 'Mensaje', noMessage: '(Sin mensaje)' },
-      fr: { subtitle: 'Carte lune de miel', msgLabel: 'Message', noMessage: '(Aucun message)' },
-      de: { subtitle: 'Hochzeitsreise-Karte', msgLabel: 'Nachricht', noMessage: '(Keine Nachricht)' },
+      en: { subtitle: 'Honeymoon Card', noMessage: '(No message)' },
+      es: { subtitle: 'Tarjeta de luna de miel', noMessage: '(Sin mensaje)' },
+      fr: { subtitle: 'Carte lune de miel', noMessage: '(Aucun message)' },
+      de: { subtitle: 'Hochzeitsreise-Karte', noMessage: '(Keine Nachricht)' },
     };
 
     function pickLang(d) {
@@ -192,10 +193,41 @@
       document.getElementById('front-subtitle').textContent = S.subtitle;
       document.getElementById('back-title').textContent = title;
       document.getElementById('back-description').textContent = desc;
-      document.getElementById('msg-label').textContent = S.msgLabel;
       var msgRaw = (typeof d.purchase.messageDisplay === 'string' ? d.purchase.messageDisplay : d.purchase.message) || '';
-      var msg = msgRaw.trim();
-      document.getElementById('back-message').textContent = msg || S.noMessage;
+      // Collapse all whitespace (including newlines, tabs, double-spaces)
+      // down to a single space — the honeymoon card has no room for line
+      // breaks, and many buyers wrote multi-paragraph messages that
+      // overflow the card unless they reflow into a single block.
+      var msgFlat = msgRaw.replace(/\s+/g, ' ').trim();
+      var msgEl = document.getElementById('back-message');
+      msgEl.textContent = msgFlat || S.noMessage;
+
+      // The card is fixed size, the message area uses overflow: hidden,
+      // and the .msg flex item below cannot reserve space for a signer
+      // that lives in a sibling element. So: after laying out the
+      // message, if it overflows its allotted height, binary-search for
+      // the longest prefix that fits with an ellipsis appended. Keeps
+      // the "— Signer" line and the divider intact in every case.
+      if (msgFlat && msgEl.scrollHeight > msgEl.clientHeight) {
+        var lo = 0;
+        var hi = msgFlat.length;
+        var ellipsis = '\u2026';
+        // Trim back to a word boundary so we don't cut a word in half.
+        var trimToWord = function (s) {
+          var i = s.length;
+          while (i > 0 && !/\s/.test(s[i - 1])) i--;
+          return (i > 0 ? s.slice(0, i) : s).replace(/[\s.,;:!?\-\u2013\u2014]+$/, '');
+        };
+        // Binary search for the largest prefix whose rendered height fits.
+        while (lo < hi) {
+          var mid = Math.ceil((lo + hi) / 2);
+          msgEl.textContent = msgFlat.slice(0, mid) + ellipsis;
+          if (msgEl.scrollHeight > msgEl.clientHeight) hi = mid - 1;
+          else lo = mid;
+        }
+        msgEl.textContent = trimToWord(msgFlat.slice(0, lo)) + ellipsis;
+      }
+
       document.getElementById('back-signer').textContent = '\u2014 ' + (d.purchase.signerName || d.guest.name || '');
       window.__TEMPLATE_READY__ = true;
     })();
