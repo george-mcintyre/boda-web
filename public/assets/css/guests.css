@@ -1815,11 +1815,19 @@ body:has(.gift-purchase-overlay) {
 
 /* ========================================
    HONEYMOON CARD PREVIEW (credit-card front + back)
+
+   Stacked vertically rather than side-by-side: the gift-purchase dialog
+   is too narrow on every viewport to render two credit-card-aspect-ratio
+   (1.586:1) cards plus labels at a readable size. At ~480px dialog width
+   minus padding, each side-by-side card would clamp under ~220px wide,
+   crushing the title/description/message into illegible strips. Full
+   width per card gives the layout enough room for the title to fit on
+   one or two lines and the message panel to claim its flex:1 height.
    ======================================== */
 .honeymoon-card-preview {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   margin: 12px 0 24px;
 }
 
@@ -1835,12 +1843,6 @@ body:has(.gift-purchase-overlay) {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--primary-color);
-}
-
-@media (max-width: 720px) {
-  .honeymoon-card-preview {
-    grid-template-columns: 1fr;
-  }
 }
 
 /* ========================================
