@@ -18,13 +18,31 @@ const ARTEFACT_TEMPLATE_FILE = {
 };
 
 function parseArgs(argv) {
-  const args = { positional: [], outDir: DEFAULT_OUT_DIR };
+  const args = {
+    positional: [],
+    outDir: DEFAULT_OUT_DIR,
+    defaultGender: 'mixed',
+    defaultNumber: 'auto',
+    overridesPath: null,
+  };
+  const validGender = new Set(['m', 'f', 'mixed']);
+  const validNumber = new Set(['1', 'n', 'auto']);
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--out' || a === '-o') {
       args.outDir = path.resolve(argv[++i]);
     } else if (a === '--help' || a === '-h') {
       args.help = true;
+    } else if (a.startsWith('--salutation-gender=')) {
+      const v = a.slice('--salutation-gender='.length);
+      if (!validGender.has(v)) throw new Error(`--salutation-gender must be one of m|f|mixed (got '${v}')`);
+      args.defaultGender = v;
+    } else if (a.startsWith('--salutation-number=')) {
+      const v = a.slice('--salutation-number='.length);
+      if (!validNumber.has(v)) throw new Error(`--salutation-number must be one of 1|n|auto (got '${v}')`);
+      args.defaultNumber = v;
+    } else if (a.startsWith('--overrides=')) {
+      args.overridesPath = path.resolve(a.slice('--overrides='.length));
     } else {
       args.positional.push(a);
     }
@@ -32,14 +50,83 @@ function parseArgs(argv) {
   return args;
 }
 
+function loadOverrides(overridesPath) {
+  if (!overridesPath) return {};
+  const raw = fs.readFileSync(overridesPath, 'utf8');
+  const parsed = JSON.parse(raw);
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error(`Overrides file must be a JSON object keyed by purchaseId (got ${typeof parsed})`);
+  }
+  return parsed;
+}
+
+// Heuristic: a signer string represents multiple people if it contains a
+// separator that is *unambiguously* between names. The separators below match
+// the typical "Maria & José" / "Juan y Pedro" / "Ana, Lucía y Sofía" /
+// "Tom and Sarah" forms used at checkout. Single hyphenated names like
+// "Maria-José" deliberately fall through to singular — buyer can override.
+const PLURAL_SEPARATOR_RE = /,| & | y | & | and /i;
+
+function detectNumberFromSigner(signer) {
+  if (!signer || typeof signer !== 'string') return '1';
+  return PLURAL_SEPARATOR_RE.test(signer) ? 'n' : '1';
+}
+
+function resolveSalutationParams(descriptor, defaults, overrides) {
+  const purchaseId = descriptor.purchaseId;
+  const override = (overrides && overrides[purchaseId]) || {};
+  const signer = (descriptor.purchase && descriptor.purchase.signerName) || '';
+
+  let number = override.number || defaults.defaultNumber;
+  if (number === 'auto') number = detectNumberFromSigner(signer);
+  if (number !== '1' && number !== 'n') number = '1';
+
+  let gender = override.gender || defaults.defaultGender;
+  if (!['m', 'f', 'mixed'].includes(gender)) gender = 'mixed';
+  // 'mixed' only makes sense in plural; collapse to 'm' for one person.
+  if (number === '1' && gender === 'mixed') gender = 'm';
+
+  return { number, gender, signer, overridden: Boolean(override.gender || override.number) };
+}
+
+function buildSalutation(params) {
+  const name = params.signer || 'friend';
+  // English: "Dear" is gender-neutral and works for singular and plural.
+  const en = `Dear ${name},`;
+
+  let esWord;
+  if (params.number === '1') {
+    esWord = params.gender === 'f' ? 'Querida' : 'Querido';
+  } else {
+    esWord = params.gender === 'f' ? 'Queridas' : 'Queridos';
+  }
+  const es = `${esWord} ${name},`;
+
+  return { en, es };
+}
+
 function printHelp() {
   process.stdout.write(`Usage:
-  node scripts/print/render-artefacts.js [--out DIR] <descriptor.json | bundle.json | folder>
+  node scripts/print/render-artefacts.js [OPTIONS] <descriptor.json | bundle.json | folder>
 
 Modes:
   Single descriptor:  one JSON file as exported per-row from admin
   Bulk bundle:        the JSON exported by "Download all artefacts"
   Folder:             processes every *.json file in the folder
+
+Options:
+  --out DIR, -o DIR              Output directory (default: ./prints)
+  --salutation-gender=m|f|mixed  Default Spanish gender for the thank-you
+                                 salutation. Default: 'mixed' (yields
+                                 "Queridos" for plural — the masculine
+                                 plural is correct for mixed groups in
+                                 Spanish).
+  --salutation-number=1|n|auto   Default number for the salutation.
+                                 'auto' (default) detects plural when the
+                                 signer string contains ',', '&', ' y ',
+                                 ' and '.
+  --overrides=FILE.json          Per-purchase salutation overrides keyed
+                                 by purchaseId. See below.
 
 Output:
   PDFs are written to ./prints/ by default (override with --out).
@@ -52,6 +139,22 @@ Output:
     gift-note-65f3a..._maria-jose.pdf
     thank-you-note-65f3a..._maria-jose.pdf
     honeymoon-card-65f3a..._maria-jose.pdf   (cash gifts only)
+
+Spanish salutation forms:
+  number=1 gender=m  → "Querido <name>,"
+  number=1 gender=f  → "Querida <name>,"
+  number=n gender=m  → "Queridos <name>,"   (also: gender=mixed)
+  number=n gender=f  → "Queridas <name>,"
+
+  English is always "Dear <name>," (gender-neutral, number-agnostic).
+
+Overrides JSON shape:
+  {
+    "65f3abc...": { "gender": "f", "number": "n" },
+    "65f3def...": { "gender": "m" }
+  }
+  Either or both keys may be omitted; missing values fall back to the
+  defaults (CLI flag → auto-detection).
 
 Format:
   Each PDF includes 3 mm bleed and corner crop marks suitable for
@@ -167,8 +270,20 @@ async function main() {
 
   fs.mkdirSync(outDir, { recursive: true });
 
+  const overrides = loadOverrides(args.overridesPath);
+
   const entries = loadDescriptorsFromPath(input);
   entries.forEach(({ descriptor, source }) => validateDescriptor(descriptor, source));
+
+  for (const { descriptor } of entries) {
+    const params = resolveSalutationParams(descriptor, args, overrides);
+    descriptor.salutation = buildSalutation(params);
+    const tag = params.overridden ? 'override' : 'auto';
+    process.stdout.write(
+      `[salutation] ${descriptor.purchaseId} "${params.signer || '?'}"`
+      + ` → ${descriptor.salutation.es} (${tag}: number=${params.number}, gender=${params.gender})\n`
+    );
+  }
 
   process.stdout.write(`Rendering ${entries.length} descriptor(s) → ${outDir}\n`);
 

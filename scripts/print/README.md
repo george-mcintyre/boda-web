@@ -33,7 +33,20 @@ no Chromium-on-serverless wrangling. Playwright is already in
 
    # Custom output directory:
    node scripts/print/render-artefacts.js --out ~/Desktop/prints/ ~/Downloads/wedding-print-bundle.json
+
+   # Force a Spanish salutation form for all purchases (default: masculine plural):
+   node scripts/print/render-artefacts.js --salutation-gender=f ~/Downloads/wedding-print-bundle.json
+
+   # Override individual purchases (e.g. set a couple as feminine plural, a
+   # single man as masculine singular). Other purchases use the auto-detected
+   # number and the default gender:
+   node scripts/print/render-artefacts.js \
+     --overrides=~/Downloads/salutation-overrides.json \
+     ~/Downloads/wedding-print-bundle.json
    ```
+
+   See `node scripts/print/render-artefacts.js --help` for the full Spanish
+   salutation matrix and the overrides JSON shape.
 
 3. **Send the PDFs to the printer**
 

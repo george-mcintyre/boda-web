@@ -301,14 +301,21 @@
         document.getElementById('amount-es').hidden = true;
       }
 
-      // The salutation uses the buyer's signer field ("From <signer>") rather
-      // than the guest's full account name, because the same guest account
-      // may purchase on behalf of a couple/family ("María & José"), use a
-      // nickname, or just a first name. signerName falls back to guest.name
-      // when the buyer didn't fill in a From value.
+      // Salutation comes from the CLI (render-artefacts.js) which knows the
+      // gender (m/f/mixed) and number (1/n) chosen by the operator, and
+      // produces the correctly-agreed Spanish form (Querido/Querida/
+      // Queridos/Queridas). The template intentionally only renders what
+      // the descriptor was given; it does NOT recompute the salutation,
+      // so the printed output matches the CLI's [salutation] log line.
+      //
+      // The fallback path (no `salutation` on the descriptor) preserves the
+      // earlier behaviour so that opening this template directly in a
+      // browser for design preview still renders something.
       var name = d.purchase.signerName || d.guest.name || 'friend';
-      document.getElementById('salutation-en').textContent = 'Dear ' + name + ',';
-      document.getElementById('salutation-es').textContent = 'Queridos ' + name + ',';
+      var enText = (d.salutation && d.salutation.en) || ('Dear ' + name + ',');
+      var esText = (d.salutation && d.salutation.es) || ('Queridos ' + name + ',');
+      document.getElementById('salutation-en').textContent = enText;
+      document.getElementById('salutation-es').textContent = esText;
       document.getElementById('couple-names').textContent = (d.couple && d.couple.names) || 'Iluminada & George';
 
       var preview = document.getElementById('gift-card-preview');
