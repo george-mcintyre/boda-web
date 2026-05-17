@@ -961,11 +961,26 @@ async function getMenuResponses(req, res, next) {
 }
 
 // ========== Gift Purchases ==========
+// Returns ~80 chars of the cube's description, trimmed at a word boundary, with
+// an ellipsis. Used by the admin Gift Purchases list to disambiguate the 38
+// blocks, which all share the same generic title "A Block for Our Wedding
+// Sculpture". The localised description per cubeId lives on gift.description
+// (seeded from server/data/cube-text.js — see seedCubes.js).
+function buildCubeDescriptionSnippet(localizedDescription, lang, maxLen = 80) {
+  const full = localize(localizedDescription, lang);
+  if (!full) return '';
+  if (full.length <= maxLen) return full;
+  const truncated = full.slice(0, maxLen);
+  const lastSpace = truncated.lastIndexOf(' ');
+  const cut = lastSpace > 40 ? truncated.slice(0, lastSpace) : truncated;
+  return cut.replace(/[\s.,;:!?-]+$/, '') + '…';
+}
+
 async function getGiftPurchases(req, res, next) {
   try {
     const lang = getLang(req);
     const giftChoices = await GiftChoice.find({})
-      .populate('giftId', 'title amount amountOptions')
+      .populate('giftId', 'title amount amountOptions type cubeId description')
       .populate('guestId', 'name email')
       .sort({ date: -1 })
       .lean();
@@ -981,12 +996,17 @@ async function getGiftPurchases(req, res, next) {
         : 0;
       const amount = Number.isFinite(choice.amount) ? choice.amount : fallbackAmount;
       totalAmount += amount;
+
+      const isCube = gift && gift.type === 'cube' && Number.isFinite(gift.cubeId);
       return {
         id: choice._id.toString(),
         guestId: choice.guestId ? choice.guestId._id.toString() : null,
         guestName: choice.guestId ? (choice.guestId.name || choice.guestId.email) : 'Unknown',
         guestEmail: choice.guestId ? choice.guestId.email : null,
         giftId: gift ? gift._id.toString() : null,
+        giftType: gift ? gift.type : null,
+        cubeId: isCube ? gift.cubeId : null,
+        cubeDescriptionSnippet: isCube ? buildCubeDescriptionSnippet(gift.description, lang) : null,
         giftTitle: gift ? localize(gift.title, lang) : 'Unknown',
         giftAmount: amount,
         date: choice.date ? choice.date.toISOString() : null,

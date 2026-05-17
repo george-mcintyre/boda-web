@@ -885,18 +885,25 @@
         return;
       }
 
+      const escapeHtml = (s) => String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
       const rows = data.purchases.map(p => {
         const date = p.date ? new Date(p.date).toLocaleDateString() : '—';
+        const blockLabel = p.cubeId
+          ? `Block #${p.cubeId}${p.cubeDescriptionSnippet ? ` — <span style="color:var(--text-light);font-style:italic;">"${escapeHtml(p.cubeDescriptionSnippet)}"</span>` : ''}`
+          : null;
+        const giftCell = blockLabel || escapeHtml(p.giftTitle);
+        const undoTitle = p.cubeId
+          ? `Block #${p.cubeId}${p.cubeDescriptionSnippet ? ` — ${p.cubeDescriptionSnippet}` : ''}`
+          : (p.giftTitle || '');
         const undoBtn = p.id
-          ? `<button class="admin-action danger" data-action="undo-purchase" data-id="${p.id}" data-gift-title="${(p.giftTitle || '').replace(/"/g, '&quot;')}" data-guest-name="${(p.guestName || '').replace(/"/g, '&quot;')}" title="Undo purchase (TESTING ONLY)"><i class="fas fa-undo"></i></button>`
+          ? `<button class="admin-action danger" data-action="undo-purchase" data-id="${p.id}" data-gift-title="${escapeHtml(undoTitle)}" data-guest-name="${escapeHtml(p.guestName)}" title="Undo purchase (TESTING ONLY)"><i class="fas fa-undo"></i></button>`
           : '';
-        const giftFromCell = p.giftFrom
-          ? p.giftFrom.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-          : '—';
-        const messageCell = p.message
-          ? p.message.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-          : '—';
-        return `<tr><td>${p.guestName}</td><td>${p.giftTitle}</td><td>€${p.giftAmount}</td><td>${date}</td><td>${giftFromCell}</td><td>${messageCell}</td><td>${undoBtn}</td></tr>`;
+        const giftFromCell = p.giftFrom ? escapeHtml(p.giftFrom) : '—';
+        const messageCell = p.message ? escapeHtml(p.message) : '—';
+        return `<tr><td>${escapeHtml(p.guestName)}</td><td>${giftCell}</td><td>€${p.giftAmount}</td><td>${date}</td><td>${giftFromCell}</td><td>${messageCell}</td><td>${undoBtn}</td></tr>`;
       }).join('');
 
       target.innerHTML = `
