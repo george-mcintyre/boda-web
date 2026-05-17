@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <title>Gift note</title>
 <style>
+  /*
+   * Fetch the same flowing script font the live web preview uses on the
+   * front-cover caption. Playwright (the renderer) downloads it once
+   * per render run. Cursive fallbacks chain to system fonts so the print
+   * still renders something legible if the host is offline at render
+   * time — Apple Chancery on macOS, the generic 'cursive' family on
+   * Linux/Windows.
+   */
+  @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
   @page { size: 297mm 210mm; margin: 0; }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #fff; color: #2c1810;
@@ -72,11 +81,20 @@
     object-fit: contain;
   }
   .front-caption {
-    font-style: italic;
+    /*
+     * Match the live web preview's front-caption styling (guests.css
+     * `.gift-note-card__front-caption`): a flowing script font, larger
+     * than body copy, dark-brown rather than purple. The web preview
+     * uses clamp(1.8rem, 3.4vw, 2.8rem) ≈ 28-45 px; at A4 landscape
+     * print size, 28pt sits in the same visual weight band.
+     */
+    font-family: 'Great Vibes', 'Allura', 'Pinyon Script', 'Apple Chancery', cursive;
+    font-style: normal;
     text-align: center;
-    color: #6f4f7c;
-    font-size: 11pt;
-    line-height: 1.5;
+    color: #4b3127;
+    font-size: 28pt;
+    line-height: 1.1;
+    letter-spacing: 0.01em;
     margin-top: 6mm;
   }
   .back-text {
@@ -274,7 +292,7 @@
         backText: 'A wedding gift for you',
         frontCaption: 'A wedding gift for you \u2026',
         typeLabel: { cash: 'Honeymoon card', cube: 'Block #{n} for our wedding sculpture', figurine: 'Figurine', fallback: 'Gift' },
-        wish: 'May this small gift help launch your wonderful new adventure together. With every fondest wish for your journey ahead.',
+        wish: 'We hope our contribution to your honeymoon fund helps make your voyage truly memorable.',
         attachedLabel: 'Honeymoon card attached',
         emptyMessage: '(Add a handwritten message on the day if you wish.)',
       },
@@ -282,23 +300,23 @@
         backText: 'Un regalo de boda para vosotros',
         frontCaption: 'Un regalo de boda para vosotros \u2026',
         typeLabel: { cash: 'Tarjeta de luna de miel', cube: 'Bloque #{n} para nuestra escultura de boda', figurine: 'Figurita', fallback: 'Regalo' },
-        wish: 'Ojalá este pequeño regalo os ayude a iniciar una nueva aventura maravillosa juntos. Con todo nuestro cariño para el camino que tenéis por delante.',
+        wish: 'Esperamos que nuestra contribuci\u00f3n a vuestro fondo de luna de miel haga que vuestro viaje sea inolvidable.',
         attachedLabel: 'Tarjeta de luna de miel adjunta',
-        emptyMessage: '(Añade un mensaje a mano el día de la boda si quieres.)',
+        emptyMessage: '(A\u00f1ade un mensaje a mano el d\u00eda de la boda si quieres.)',
       },
       fr: {
         backText: 'Un cadeau de mariage pour vous',
         frontCaption: 'Un cadeau de mariage pour vous \u2026',
         typeLabel: { cash: 'Carte lune de miel', cube: 'Bloc #{n} pour notre sculpture de mariage', figurine: 'Figurine', fallback: 'Cadeau' },
-        wish: 'Que ce petit cadeau vous aide à lancer votre merveilleuse nouvelle aventure ensemble. Avec tous nos v\u0153ux les plus chaleureux pour le voyage qui vous attend.',
-        attachedLabel: 'Carte lune de miel fixée',
+        wish: 'Nous esp\u00e9rons que notre contribution \u00e0 votre cagnotte lune de miel rendra votre voyage vraiment inoubliable.',
+        attachedLabel: 'Carte lune de miel fix\u00e9e',
         emptyMessage: '(Ajoutez un mot \u00e0 la main le jour du mariage si vous le souhaitez.)',
       },
       de: {
-        backText: 'Ein Hochzeitsgeschenk für euch',
-        frontCaption: 'Ein Hochzeitsgeschenk für euch \u2026',
-        typeLabel: { cash: 'Hochzeitsreise-Karte', cube: 'Block #{n} für unsere Hochzeitsskulptur', figurine: 'Figur', fallback: 'Geschenk' },
-        wish: 'M\u00f6ge dieses kleine Geschenk euch dabei helfen, euer wundervolles neues Abenteuer gemeinsam zu beginnen. Mit den herzlichsten W\u00fcnschen f\u00fcr die Reise, die vor euch liegt.',
+        backText: 'Ein Hochzeitsgeschenk f\u00fcr euch',
+        frontCaption: 'Ein Hochzeitsgeschenk f\u00fcr euch \u2026',
+        typeLabel: { cash: 'Hochzeitsreise-Karte', cube: 'Block #{n} f\u00fcr unsere Hochzeitsskulptur', figurine: 'Figur', fallback: 'Geschenk' },
+        wish: 'Wir hoffen, dass unser Beitrag zu eurer Hochzeitsreise-Kasse eure Reise wirklich unvergesslich macht.',
         attachedLabel: 'Hochzeitsreise-Karte beigeheftet',
         emptyMessage: '(F\u00fcgt am Hochzeitstag gerne eine handgeschriebene Nachricht hinzu.)',
       },
