@@ -118,11 +118,10 @@
     font-weight: 700;
     line-height: 1.2;
   }
-  .gift-summary-item {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 4mm;
-    align-items: start;
+  .gift-amount-row {
+    margin-top: 5mm;
+    display: flex;
+    justify-content: center;
   }
   .gift-type-label {
     margin: 0 0 1mm;
@@ -221,25 +220,18 @@
             <div class="col en">
               <p class="section-title">Gift received</p>
               <p class="gift-type-label" id="type-label-en"></p>
-              <div class="gift-summary-item">
-                <div>
-                  <p class="gift-title-text" id="gift-title-en"></p>
-                  <p class="gift-description-text" id="gift-description-en"></p>
-                </div>
-                <span class="amount-badge" id="amount-en"></span>
-              </div>
+              <p class="gift-title-text" id="gift-title-en"></p>
+              <p class="gift-description-text" id="gift-description-en"></p>
             </div>
             <div class="col es">
               <p class="section-title">Regalo</p>
               <p class="gift-type-label" id="type-label-es"></p>
-              <div class="gift-summary-item">
-                <div>
-                  <p class="gift-title-text" id="gift-title-es"></p>
-                  <p class="gift-description-text" id="gift-description-es"></p>
-                </div>
-                <span class="amount-badge" id="amount-es"></span>
-              </div>
+              <p class="gift-title-text" id="gift-title-es"></p>
+              <p class="gift-description-text" id="gift-description-es"></p>
             </div>
+          </div>
+          <div class="gift-amount-row">
+            <span class="amount-badge" id="amount"></span>
           </div>
         </div>
       </div>
@@ -292,13 +284,12 @@
       document.getElementById('gift-description-en').textContent = (d.gift.description && d.gift.description.en) || '';
       document.getElementById('gift-description-es').textContent = (d.gift.description && d.gift.description.es) || '';
 
+      var amountEl = document.getElementById('amount');
       var amount = d.purchase.amount;
       if (typeof amount === 'number' && amount > 0) {
-        document.getElementById('amount-en').textContent = '\u20ac' + amount;
-        document.getElementById('amount-es').textContent = '\u20ac' + amount;
+        amountEl.textContent = '\u20ac' + amount;
       } else {
-        document.getElementById('amount-en').hidden = true;
-        document.getElementById('amount-es').hidden = true;
+        amountEl.hidden = true;
       }
 
       // Salutation comes from the CLI (render-artefacts.js) which knows the
