@@ -1123,6 +1123,29 @@ function readStaticAssetAsDataUri(absoluteUrl) {
   }
 }
 
+/*
+ * Print-aware variant of readStaticAssetAsDataUri.
+ *
+ * For images that appear on the printed gift-card artefacts (gift note,
+ * thank-you note, honeymoon card), we prefer an AI-upscaled high-DPI
+ * version stored under .../print-hires/<filename> when it exists, so the
+ * printed PDF uses ~300 DPI image data even though the live web site
+ * keeps using the small, fast-loading originals at the canonical path.
+ *
+ * The print-hires directory is gitignored (the files are 10-20 MB each
+ * and only matter at print time), so this fallback safely degrades to
+ * the original whenever the hi-res copy isn't available — for example
+ * when running render-artefacts.js on a machine that hasn't run the
+ * upscale step. scripts/upscale-gift-card-images.sh produces them.
+ */
+function readPrintAssetAsDataUri(absoluteUrl) {
+  if (!absoluteUrl || typeof absoluteUrl !== 'string' || !absoluteUrl.startsWith('/')) return null;
+  const dir = path.posix.dirname(absoluteUrl);
+  const file = path.posix.basename(absoluteUrl);
+  const hires = readStaticAssetAsDataUri(path.posix.join(dir, 'print-hires', file));
+  return hires || readStaticAssetAsDataUri(absoluteUrl);
+}
+
 function cubeFacesToDataUris(faces) {
   if (!faces || typeof faces !== 'object') return null;
   const out = {};
@@ -1171,8 +1194,8 @@ async function buildCombinedDescriptor(choice) {
         || readStaticAssetAsDataUri(`/assets/figurines/figurine-${gift.figurineId}/thumb.webp`))
     : null;
 
-  const giftNoteCoverDataUri = readStaticAssetAsDataUri('/assets/images/gift-cards/gift-note-cover.jpg');
-  const coupleInsideDataUri = readStaticAssetAsDataUri('/assets/images/gift-cards/couple-inside-transparent.png');
+  const giftNoteCoverDataUri = readPrintAssetAsDataUri('/assets/images/gift-cards/gift-note-cover.jpg');
+  const coupleInsideDataUri = readPrintAssetAsDataUri('/assets/images/gift-cards/couple-inside-transparent.png');
 
   const purchaseId = choice._id.toString();
   const guestName = guest ? (guest.name || guest.email || 'Unknown') : 'Unknown';

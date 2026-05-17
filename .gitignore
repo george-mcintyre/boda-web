@@ -117,6 +117,12 @@ scripts/__pycache__/
 # (output only — descriptors live elsewhere, and PDFs are per-purchase)
 prints/
 
+# AI-upscaled high-DPI variants of the gift-card front images, produced
+# by scripts/upscale-gift-card-images.sh. 10-20 MB per file and only
+# needed when running the print pipeline locally. Vercel/the live web
+# site keeps using the small originals at the canonical path.
+public/assets/images/gift-cards/print-hires/
+
 
 
 
