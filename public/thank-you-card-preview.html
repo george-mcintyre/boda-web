@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thank You Card Preview</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5efe8;
+      --panel: #ffffff;
+      --panel-soft: #fbf6ef;
+      --ink: #2c1810;
+      --muted: #82665a;
+      --accent: #8b5a96;
+      --card-preview-height: 940px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #f8f4ef 0%, var(--bg) 100%);
+      color: var(--ink);
+      font-family: Georgia, "Times New Roman", serif;
+      padding: 32px;
+    }
+
+    .page {
+      max-width: 1320px;
+      margin: 0 auto;
+    }
+
+    .header {
+      margin-bottom: 28px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+    }
+
+    .header p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .preview-stack {
+      display: grid;
+      gap: 28px;
+    }
+
+    .preview-block {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .preview-block--front {
+      width: min(50%, 670px);
+      margin-left: auto;
+    }
+
+    .preview-label {
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #8a8782;
+      font-weight: 700;
+    }
+
+    .card-shell,
+    .card-spread {
+      border-radius: 0;
+      background: var(--panel);
+      border: 1px solid rgba(139, 90, 150, 0.12);
+      box-shadow: 0 24px 60px rgba(44, 24, 16, 0.14);
+      overflow: hidden;
+    }
+
+    .card-shell {
+      display: flex;
+      flex-direction: column;
+      padding: 28px 24px 30px;
+      background: linear-gradient(180deg, #fff 0%, var(--panel-soft) 100%);
+      min-height: var(--card-preview-height);
+      height: var(--card-preview-height);
+    }
+
+    .card-shell img {
+      width: 100%;
+      flex: 1;
+      min-height: 0;
+      object-fit: contain;
+      object-position: center center;
+    }
+
+    .thank-you-title {
+      margin: 12px 0 0;
+      text-align: center;
+      font-size: clamp(2.25rem, 4vw, 3.8rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #4b3127;
+    }
+
+    .card-spread {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: var(--card-preview-height);
+      height: var(--card-preview-height);
+    }
+
+    .card-spread::before {
+      content: '';
+      position: absolute;
+      top: 14px;
+      bottom: 14px;
+      left: 50%;
+      width: 40px;
+      transform: translateX(-50%);
+      background: linear-gradient(90deg, rgba(44, 24, 16, 0.04) 0%, rgba(44, 24, 16, 0.12) 18%, rgba(255,255,255,0.96) 50%, rgba(44, 24, 16, 0.12) 82%, rgba(44, 24, 16, 0.04) 100%);
+      border-radius: 999px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .spread-page {
+      position: relative;
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .spread-page--left {
+      background: #fff;
+      box-shadow: inset -18px 0 28px rgba(44, 24, 16, 0.05);
+    }
+
+    .spread-page--right {
+      background: linear-gradient(180deg, #fff 0%, var(--panel-soft) 100%);
+      box-shadow: inset 18px 0 28px rgba(44, 24, 16, 0.05);
+    }
+
+    .inside-page {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .inside-page--left {
+      justify-content: center;
+    }
+
+    .inside-page--right {
+      justify-content: space-between;
+    }
+
+    .parallel-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .language-column {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .language-column--spanish {
+      font-style: italic;
+    }
+
+    .section-title {
+      margin: 0 0 10px;
+      color: var(--accent);
+      font-size: 0.82rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .gift-summary {
+      padding: 16px 18px;
+      background: rgba(139, 90, 150, 0.08);
+      border: 1px solid rgba(139, 90, 150, 0.16);
+    }
+
+    .gift-summary-item {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .gift-summary-item + .gift-summary-item {
+      margin-top: 8px;
+    }
+
+    .amount-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: start;
+      padding: 6px 12px;
+      border: 1px solid rgba(139, 90, 150, 0.24);
+      background: rgba(255, 255, 255, 0.72);
+      color: #5b4337;
+      font-size: 0.96rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .gift-summary-type {
+      margin: 0;
+      font-size: 0.76rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #6f4f7c;
+      font-weight: 700;
+    }
+
+    .gift-summary-title {
+      margin: 0;
+      font-size: 1.06rem;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .gift-summary-details {
+      margin: 0;
+      font-size: 0.98rem;
+      line-height: 1.6;
+    }
+
+    .gift-summary strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1.05rem;
+    }
+
+    .gift-summary span {
+      display: block;
+      line-height: 1.5;
+    }
+
+    .gift-summary .parallel-columns,
+    .message-section .parallel-columns,
+    .signoff-section .parallel-columns {
+      gap: 20px;
+    }
+
+    .body-copy {
+      margin: 0;
+      white-space: pre-line;
+      font-size: 1.06rem;
+      line-height: 1.72;
+    }
+
+    .handwritten-area {
+      flex: 1;
+      min-height: 220px;
+    }
+
+    .signoff-section {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .signoff-section .parallel-columns {
+      align-items: center;
+    }
+
+    .signoff-copy {
+      margin: 0;
+      white-space: pre-line;
+      font-size: 1rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .couple-signoff {
+      margin: 0;
+      text-align: center;
+      font-size: 1.08rem;
+      line-height: 1.4;
+      font-weight: 700;
+    }
+
+    .signature-space {
+      min-height: 120px;
+    }
+
+    .gift-image-slot {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0 0 18px;
+    }
+
+    .gift-preview-card {
+      position: relative;
+      width: min(320px, 78%);
+      aspect-ratio: 1.586 / 1;
+      overflow: hidden;
+      background-size: cover;
+      background-position: center;
+      border-radius: 18px;
+      box-shadow: 0 14px 28px rgba(44, 24, 16, 0.18);
+    }
+
+    .gift-preview-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(44, 24, 16, 0.08) 0%, rgba(44, 24, 16, 0.68) 100%);
+    }
+
+    .gift-preview-card__copy {
+      position: absolute;
+      inset: auto 14px 14px;
+      z-index: 1;
+      color: #fff;
+    }
+
+    .gift-preview-card__copy h4 {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.15;
+    }
+
+    @media (max-width: 1100px) {
+      .preview-block--front {
+        width: min(70%, 670px);
+      }
+    }
+
+    @media (max-width: 760px) {
+      body { padding: 16px; }
+      .preview-block--front {
+        width: 100%;
+      }
+      .card-spread { grid-template-columns: 1fr; }
+      .card-spread::before { display: none; }
+      .spread-page { padding: 24px; }
+      .spread-page--left, .spread-page--right { box-shadow: none; }
+      .spread-page--right {
+        margin-top: 28px;
+        padding-top: 36px;
+        border-top: 1px dashed rgba(139, 90, 150, 0.4);
+        position: relative;
+      }
+      .spread-page--right::before {
+        content: '';
+        position: absolute;
+        top: -7px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 14px;
+        background: var(--bg);
+        border-radius: 999px;
+      }
+      .parallel-columns { grid-template-columns: 1fr; }
+      .handwritten-area { min-height: 120px; }
+      .card-shell,
+      .card-spread { height: auto; }
+      .gift-summary-item { grid-template-columns: 1fr; }
+      .amount-badge { justify-self: start; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <h1>Thank you card preview</h1>
+      <p>Static sample with hard-coded guest names, gift, and amount so you can judge the full greeting-card format.</p>
+    </header>
+
+    <section class="preview-stack">
+      <article class="preview-block preview-block--front">
+        <div class="preview-label">Front of card</div>
+        <div class="card-shell">
+          <img src="/assets/images/gift-cards/couple-inside-transparent.png" alt="Iluminada and George">
+          <h2 class="thank-you-title">Thank You</h2>
+        </div>
+      </article>
+
+      <article class="preview-block">
+        <div class="preview-label">Inside spread of card</div>
+        <div class="card-spread">
+          <section class="spread-page spread-page--left inside-page inside-page--left">
+            <div class="gift-image-slot">
+              <div class="gift-preview-card" role="img" aria-label="George trying to impress the sharks gift card"
+                   style="background-image: url('/assets/images/gift-cards/samples/01-shark.jpg');">
+                <div class="gift-preview-card__copy">
+                  <h4>George trying to impress the sharks</h4>
+                </div>
+              </div>
+            </div>
+            <div class="gift-summary">
+              <div class="parallel-columns">
+                <div class="language-column language-column--english">
+                  <p class="section-title">Gift received</p>
+                  <p class="gift-summary-type">Gift card</p>
+                  <div class="gift-summary-item">
+                    <div>
+                      <p class="gift-summary-title">George trying to impress the sharks</p>
+                      <p class="gift-summary-details">If I do not come back, share my things fairly. The good shoes go to whoever can run fastest.</p>
+                    </div>
+                    <span class="amount-badge">€150</span>
+                  </div>
+                </div>
+                <div class="language-column language-column--spanish">
+                  <p class="section-title">Regalo</p>
+                  <p class="gift-summary-type">Tarjeta regalo</p>
+                  <div class="gift-summary-item">
+                    <div>
+                      <p class="gift-summary-title">George intentando impresionar a los tiburones</p>
+                      <p class="gift-summary-details">Si no vuelvo, repartid mis cosas con justicia. Los zapatos buenos son para quien pueda correr más rápido.</p>
+                    </div>
+                    <span class="amount-badge">€150</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="spread-page spread-page--right inside-page inside-page--right">
+            <div class="message-section">
+              <div class="parallel-columns">
+                <div class="language-column language-column--english">
+                  <p class="section-title">Dear Maria and José,</p>
+                  <p class="body-copy">Thank you so much for your thoughtful gift and for celebrating this special time with us. Your love, generosity, and presence mean the world as we begin our married life together. We are so grateful to have you in our lives and feel blessed to share this joyful season with you.</p>
+                </div>
+                <div class="language-column language-column--spanish">
+                  <p class="section-title">Queridos Maria y José,</p>
+                  <p class="body-copy">Muchísimas gracias por vuestro precioso regalo y por celebrar con nosotros este momento tan especial. Vuestro cariño, generosidad y compañía significan muchísimo para nosotros al comenzar nuestra vida de casados. Estamos profundamente agradecidos de teneros en nuestras vidas y nos sentimos muy afortunados de compartir esta etapa tan feliz con vosotros.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="handwritten-area"></div>
+
+            <div class="signoff-section">
+              <div class="parallel-columns">
+                <div class="language-column language-column--english">
+                  <p class="signoff-copy">With love and gratitude,</p>
+                </div>
+                <div class="language-column language-column--spanish">
+                  <p class="signoff-copy">Con amor y gratitud,</p>
+                </div>
+              </div>
+              <p class="couple-signoff">Iluminada &amp; George</p>
+              <div class="signature-space"></div>
+            </div>
+          </section>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>

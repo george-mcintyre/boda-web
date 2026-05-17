@@ -1,0 +1,299 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <defs>
+    <!-- Soft Storybook Drop Shadows -->
+    <filter id="shadow-light" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="8" flood-color="#2a222a" flood-opacity="0.25"/>
+    </filter>
+    <filter id="shadow-deep" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="15" flood-color="#1a111a" flood-opacity="0.35"/>
+    </filter>
+
+    <!-- Gradients for Soft Dimensionality -->
+    <!-- Groom Skin: Deep Brown -->
+    <radialGradient id="groomSkin" cx="40%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#8a472c" />
+      <stop offset="50%" stop-color="#5a2a18" />
+      <stop offset="100%" stop-color="#2a1105" />
+    </radialGradient>
+
+    <!-- Groom Skin Highlight for Bald Head -->
+    <radialGradient id="groomSkinHigh" cx="35%" cy="15%" r="50%">
+      <stop offset="0%" stop-color="#a65e3c" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#8a472c" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Bride Skin: Pale Peach / Warm -->
+    <radialGradient id="brideSkin" cx="45%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#fff2ec" />
+      <stop offset="40%" stop-color="#fae3d9" />
+      <stop offset="100%" stop-color="#d6a28e" />
+    </radialGradient>
+
+    <!-- Bride Blush -->
+    <radialGradient id="blush" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff8da1" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#ff8da1" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Hair: Rich Dark -->
+    <linearGradient id="hairDark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#362d2d" />
+      <stop offset="30%" stop-color="#1a1515" />
+      <stop offset="100%" stop-color="#0a0808" />
+    </linearGradient>
+
+    <!-- Tuxedo Gradients -->
+    <linearGradient id="tuxBase" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#35313f" />
+      <stop offset="100%" stop-color="#0f0f12" />
+    </linearGradient>
+    <linearGradient id="tuxLapel" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1f1d24" />
+      <stop offset="100%" stop-color="#000000" />
+    </linearGradient>
+
+    <!-- White Cloth (Shirt/Dress) -->
+    <linearGradient id="clothWhite" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="70%" stop-color="#f0eff2" />
+      <stop offset="100%" stop-color="#d2cdd6" />
+    </linearGradient>
+    <radialGradient id="dressVolume" cx="50%" cy="20%" r="80%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="60%" stop-color="#f4f1f7" />
+      <stop offset="100%" stop-color="#cfc9d6" />
+    </radialGradient>
+
+    <!-- Veil Gradient -->
+    <linearGradient id="veilGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.75" />
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.0" />
+    </linearGradient>
+
+    <!-- Pearl Gradient -->
+    <radialGradient id="pearl" cx="30%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#fdfbf9"/>
+      <stop offset="100%" stop-color="#bcafc4"/>
+    </radialGradient>
+
+    <!-- Rose Gradient -->
+    <radialGradient id="roseWhite" cx="35%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#c9c5d1"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Canvas Group -->
+  <g transform="translate(0, 30)">
+    
+    <!-- ========================================================= -->
+    <!-- BACKGROUND ELEMENTS (Bride's Back Hair & Back Veil)       -->
+    <!-- ========================================================= -->
+    
+    <!-- Bride Back Hair -->
+    <path d="M 450 300 C 400 450 400 650 420 800 L 680 800 C 650 650 630 450 560 300 Z" fill="url(#hairDark)" />
+    
+    <!-- Veil (Back Layer) -->
+    <path d="M 400 250 C 300 400 320 650 320 800 L 750 800 C 720 650 680 400 600 250 Z" fill="url(#veilGrad)" />
+
+    <!-- ========================================================= -->
+    <!-- GROOM (Left - Realistic/Graceful Proportions)             -->
+    <!-- ========================================================= -->
+    <g transform="translate(0, 0)">
+      
+      <!-- Torso / Tuxedo -->
+      <!-- Broad Shoulders -->
+      <path d="M 90 800 C 90 480 160 380 290 380 C 420 380 470 480 480 800 Z" fill="url(#tuxBase)" filter="url(#shadow-deep)"/>
+      
+      <!-- White Shirt -->
+      <path d="M 230 800 L 290 440 L 350 800 Z" fill="url(#clothWhite)" />
+      
+      <!-- Tuxedo Lapels -->
+      <path d="M 90 800 C 180 600 240 440 290 440 C 230 550 230 800 230 800 Z" fill="url(#tuxLapel)" filter="url(#shadow-light)"/>
+      <path d="M 480 800 C 390 600 340 440 290 440 C 350 550 350 800 350 800 Z" fill="url(#tuxLapel)" filter="url(#shadow-light)"/>
+
+      <!-- Bow Tie (Elegant, proportionate) -->
+      <g transform="translate(290, 435)" filter="url(#shadow-light)">
+        <path d="M -30 -10 C -20 -15 -10 -5 0 0 C -10 5 -20 15 -30 10 Z" fill="#111"/>
+        <path d="M 30 -10 C 20 -15 10 -5 0 0 C 10 5 20 15 30 10 Z" fill="#111"/>
+        <ellipse cx="0" cy="0" rx="7" ry="9" fill="#222"/>
+        <ellipse cx="-2" cy="-2" rx="2" ry="3" fill="#444"/> <!-- tie highlight -->
+      </g>
+      
+      <!-- Boutonniere (White Rose) -->
+      <g transform="translate(190, 500)" filter="url(#shadow-light)">
+        <!-- Leaves -->
+        <path d="M -6 6 Q -20 20 -12 28 Q 0 15 0 6 Z" fill="#4a7c36"/>
+        <path d="M 6 6 Q 20 15 15 25 Q 0 15 0 6 Z" fill="#386027"/>
+        <!-- Rose bud -->
+        <circle cx="0" cy="0" r="12" fill="url(#roseWhite)"/>
+        <!-- Petal swirls -->
+        <path d="M -5 0 C -5 -8 5 -8 5 0" fill="none" stroke="#a39fa8" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M -8 3 C -10 -6 8 -6 8 3" fill="none" stroke="#a39fa8" stroke-width="1.2" stroke-linecap="round"/>
+      </g>
+
+      <!-- Groom Neck -->
+      <path d="M 260 300 L 320 300 L 315 400 L 265 400 Z" fill="url(#groomSkin)" />
+      <path d="M 260 300 Q 290 330 320 300 L 315 400 L 265 400 Z" fill="#1c0b03" opacity="0.6"/> <!-- Neck shadow -->
+
+      <!-- Groom Head (Realistic proportions, soft contours) -->
+      <g filter="url(#shadow-deep)">
+        <!-- Base face -->
+        <path d="M 235 240 C 235 150 255 120 290 120 C 325 120 345 150 345 240 C 345 300 330 330 290 330 C 250 330 235 300 235 240 Z" fill="url(#groomSkin)"/>
+        <!-- Bald Highlight -->
+        <path d="M 245 210 C 245 140 265 125 290 125 C 315 125 335 140 335 210 C 320 160 260 160 245 210 Z" fill="url(#groomSkinHigh)"/>
+      </g>
+
+      <!-- Ears -->
+      <ellipse cx="235" cy="245" rx="8" ry="16" fill="url(#groomSkin)" filter="url(#shadow-light)"/>
+      <ellipse cx="345" cy="245" rx="8" ry="16" fill="url(#groomSkin)" filter="url(#shadow-light)"/>
+      
+      <!-- Face Details -->
+      <g transform="translate(290, 240)">
+        <!-- Eyebrows (Masculine, structured) -->
+        <path d="M -35 -25 Q -25 -30 -12 -25" fill="none" stroke="#111" stroke-width="4" stroke-linecap="round"/>
+        <path d="M 12 -25 Q 25 -30 35 -25" fill="none" stroke="#111" stroke-width="4" stroke-linecap="round"/>
+
+        <!-- Eyes (Proportionate, expressive) -->
+        <path d="M -32 -10 Q -24 -18 -14 -10 Q -24 -6 -32 -10 Z" fill="#ffffff" opacity="0.9"/>
+        <path d="M 14 -10 Q 24 -18 32 -10 Q 24 -6 14 -10 Z" fill="#ffffff" opacity="0.9"/>
+        
+        <circle cx="-23" cy="-11" r="5" fill="#110a08"/>
+        <circle cx="23" cy="-11" r="5" fill="#110a08"/>
+        
+        <!-- Catchlights -->
+        <circle cx="-24" cy="-12" r="1.5" fill="#ffffff"/>
+        <circle cx="22" cy="-12" r="1.5" fill="#ffffff"/>
+
+        <!-- Nose -->
+        <path d="M 0 -10 L -4 18 Q 0 24 4 18 Z" fill="#2a1105" opacity="0.15"/>
+        <path d="M -8 20 Q 0 26 8 20" fill="none" stroke="#2a1105" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+
+        <!-- Smile (Confident, teeth showing elegantly) -->
+        <path d="M -22 45 Q 0 60 22 45 Q 0 65 -22 45 Z" fill="#ffffff" filter="url(#shadow-light)"/>
+        <!-- Upper lip / shadow -->
+        <path d="M -22 45 Q 0 52 22 45" fill="none" stroke="#2a1105" stroke-width="1.5" opacity="0.6"/>
+        <path d="M -22 45 Q 0 65 22 45" fill="none" stroke="#2a1105" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+        
+        <!-- Smile creases -->
+        <path d="M -28 35 Q -25 45 -28 55" fill="none" stroke="#2a1105" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+        <path d="M 28 35 Q 25 45 28 55" fill="none" stroke="#2a1105" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+      </g>
+    </g>
+
+    <!-- ========================================================= -->
+    <!-- BRIDE (Right - Realistic/Graceful Proportions)            -->
+    <!-- ========================================================= -->
+    <g transform="translate(0, 0)">
+      
+      <!-- Torso / Dress (Elegant silhouette) -->
+      <!-- Dress Volume -->
+      <path d="M 370 800 C 370 520 440 430 500 430 C 560 430 650 520 660 800 Z" fill="url(#dressVolume)" filter="url(#shadow-light)"/>
+      
+      <!-- Dress Bodice / Front -->
+      <path d="M 400 800 C 400 500 460 460 500 470 C 540 460 620 500 630 800 Z" fill="url(#clothWhite)" />
+      
+      <!-- Subtle fold/drape lines in dress -->
+      <path d="M 460 540 C 460 650 440 750 440 800" fill="none" stroke="#d2cdd6" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M 540 540 C 540 650 560 750 560 800" fill="none" stroke="#d2cdd6" stroke-width="1.5" stroke-linecap="round"/>
+
+      <!-- Arms / Shoulders Bare -->
+      <path d="M 370 800 C 370 600 390 480 430 430 C 440 440 430 520 400 800 Z" fill="url(#brideSkin)" />
+      <path d="M 660 800 C 660 600 630 480 580 430 C 570 440 580 520 630 800 Z" fill="url(#brideSkin)" />
+
+      <!-- Dress Straps -->
+      <path d="M 440 420 L 450 480 L 415 800 Z" fill="url(#clothWhite)" opacity="0.95"/>
+      <path d="M 570 420 L 560 480 L 595 800 Z" fill="url(#clothWhite)" opacity="0.95"/>
+
+      <!-- Bride Neck -->
+      <path d="M 480 320 L 525 320 L 530 420 L 475 420 Z" fill="url(#brideSkin)" />
+      <path d="M 480 320 Q 502 345 525 320 L 530 420 L 475 420 Z" fill="#d6a28e" opacity="0.6"/> <!-- Neck shadow -->
+
+      <!-- Pearl Necklace (Elegant curve around collarbone) -->
+      <g filter="url(#shadow-light)">
+        <path d="M 455 410 Q 502 445 550 410" fill="none" stroke="#bcafc4" stroke-width="1" opacity="0.5"/>
+        <circle cx="460" cy="413" r="4.5" fill="url(#pearl)" />
+        <circle cx="470" cy="419" r="4.5" fill="url(#pearl)" />
+        <circle cx="481" cy="424" r="4.5" fill="url(#pearl)" />
+        <circle cx="493" cy="427" r="4.5" fill="url(#pearl)" />
+        <circle cx="505" cy="427" r="4.5" fill="url(#pearl)" />
+        <circle cx="517" cy="424" r="4.5" fill="url(#pearl)" />
+        <circle cx="528" cy="419" r="4.5" fill="url(#pearl)" />
+        <circle cx="538" cy="413" r="4.5" fill="url(#pearl)" />
+      </g>
+
+      <!-- Bride Head (Elegant, graceful proportions) -->
+      <g filter="url(#shadow-deep)">
+        <!-- Face base -->
+        <path d="M 455 250 C 455 160 475 130 502 130 C 530 130 550 160 550 250 C 550 310 535 340 502 340 C 470 340 455 310 455 250 Z" fill="url(#brideSkin)"/>
+      </g>
+
+      <!-- Cheeks / Blush -->
+      <ellipse cx="475" cy="275" rx="14" ry="9" fill="url(#blush)"/>
+      <ellipse cx="530" cy="275" rx="14" ry="9" fill="url(#blush)"/>
+
+      <!-- Face Details -->
+      <g transform="translate(502, 250)">
+        <!-- Eyebrows (Elegant arch) -->
+        <path d="M -32 -25 Q -22 -32 -10 -26" fill="none" stroke="#2c2424" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M 10 -26 Q 22 -32 32 -25" fill="none" stroke="#2c2424" stroke-width="2.5" stroke-linecap="round"/>
+
+        <!-- Eyes (Almond shape, expressive but realistic) -->
+        <path d="M -30 -10 Q -20 -18 -10 -10 Q -20 -5 -30 -10 Z" fill="#ffffff" opacity="0.9"/>
+        <path d="M 10 -10 Q 20 -18 30 -10 Q 20 -5 10 -10 Z" fill="#ffffff" opacity="0.9"/>
+        
+        <circle cx="-20" cy="-11" r="4.5" fill="#1a1515"/>
+        <circle cx="20" cy="-11" r="4.5" fill="#1a1515"/>
+        
+        <!-- Catchlights -->
+        <circle cx="-21" cy="-12" r="1.5" fill="#ffffff"/>
+        <circle cx="19" cy="-12" r="1.5" fill="#ffffff"/>
+
+        <!-- Eyeliner / Lashes -->
+        <path d="M -32 -8 Q -20 -19 -9 -10" fill="none" stroke="#1a1515" stroke-width="2" stroke-linecap="round"/>
+        <path d="M -32 -8 Q -35 -11 -37 -14" fill="none" stroke="#1a1515" stroke-width="1.5" stroke-linecap="round"/> <!-- Wing -->
+        
+        <path d="M 9 -10 Q 20 -19 32 -8" fill="none" stroke="#1a1515" stroke-width="2" stroke-linecap="round"/>
+        <path d="M 32 -8 Q 35 -11 37 -14" fill="none" stroke="#1a1515" stroke-width="1.5" stroke-linecap="round"/> <!-- Wing -->
+
+        <!-- Nose (Soft, refined) -->
+        <path d="M -4 16 Q 0 22 4 16" fill="none" stroke="#d6a28e" stroke-width="2" stroke-linecap="round"/>
+        <path d="M 0 0 L 0 12" fill="none" stroke="#d6a28e" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+
+        <!-- Smile (Warm, bright) -->
+        <path d="M -18 42 Q 0 52 18 42 Q 0 60 -18 42 Z" fill="#ffffff" /> <!-- Teeth -->
+        <path d="M -18 42 Q 0 55 18 42 Q 0 62 -18 42 Z" fill="none" stroke="#b56f76" stroke-width="2" stroke-linecap="round"/> <!-- Lips contour -->
+        <path d="M -10 50 Q 0 46 10 50 Q 0 56 -10 50 Z" fill="#ff7a8a" /> <!-- Inner mouth -->
+      </g>
+
+      <!-- Bride Front Hair (Center Part, Sweeping Gracefully) -->
+      <g filter="url(#shadow-deep)">
+        <!-- Left sweeping frame -->
+        <path d="M 502 120 C 440 120 420 200 420 300 C 420 400 440 440 450 480 C 430 380 440 200 502 120 Z" fill="url(#hairDark)"/>
+        <!-- Right sweeping frame -->
+        <path d="M 502 120 C 560 120 580 200 580 300 C 580 400 560 440 550 480 C 570 380 560 200 502 120 Z" fill="url(#hairDark)"/>
+        <!-- Volume at the crown -->
+        <path d="M 445 180 C 445 100 560 100 560 180 C 540 120 465 120 445 180 Z" fill="#1a1515"/>
+      </g>
+
+    </g>
+
+    <!-- ========================================================= -->
+    <!-- FOREGROUND ELEMENTS (Veil overlapping softly)             -->
+    <!-- ========================================================= -->
+    <!-- Veil Top / Cascade over shoulders -->
+    <path d="M 420 200 C 500 130 580 200 620 300 C 650 400 620 500 530 500 C 440 500 390 400 420 200 Z" fill="url(#veilGrad)" filter="url(#shadow-light)" opacity="0.8"/>
+    
+    <!-- Delicate Floral/Pearl Headpiece -->
+    <g transform="translate(502, 195)" filter="url(#shadow-light)">
+      <circle cx="-20" cy="5" r="3.5" fill="#fdfbf9"/>
+      <circle cx="-10" cy="-2" r="4.5" fill="#fdfbf9"/>
+      <circle cx="0" cy="-5" r="5" fill="#ffffff"/>
+      <circle cx="10" cy="-2" r="4.5" fill="#fdfbf9"/>
+      <circle cx="20" cy="5" r="3.5" fill="#fdfbf9"/>
+    </g>
+
+  </g>
+</svg>
