@@ -1203,6 +1203,7 @@ async function buildCombinedDescriptor(choice) {
   const message = choice.message || '';
 
   const giftBlock = {
+    id: gift._id ? gift._id.toString() : null,
     type: gift.type,
     title: giftTitleLocalised,
     description: giftDescriptionLocalised,
