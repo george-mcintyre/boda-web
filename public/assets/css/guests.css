@@ -1452,10 +1452,25 @@ main.main-content-full {
 /* ========================================
    GIFT PURCHASE DIALOG
    ======================================== */
+/*
+ * Lock background scrolling while a gift-purchase overlay is open.
+ *
+ * Use `overflow: clip` (without `height: 100%`) so the document's
+ * scrollable height is unchanged and the current scrollTop stays valid.
+ * Previously we set `overflow: hidden; height: 100%`, which collapsed the
+ * <html> scroll container to viewport height and forced the browser to
+ * snap scrollTop to 0 — so opening a dialog from deep in a long gift list
+ * jumped the page to the top, and closing the dialog left the guest
+ * stranded at the top instead of back where they clicked.
+ *
+ * `overflow: clip` is supported in all evergreen browsers (Chrome 90+,
+ * Safari 16+, Firefox 81+). On older browsers it degrades to the default
+ * (background still scrolls behind the overlay) which is strictly better
+ * than the scroll-jump bug.
+ */
 html:has(.gift-purchase-overlay),
 body:has(.gift-purchase-overlay) {
-  overflow: hidden;
-  height: 100%;
+  overflow: clip;
   touch-action: none;
 }
 

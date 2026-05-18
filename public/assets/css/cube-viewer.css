@@ -437,10 +437,12 @@
  * `.gift-note-dialog { max-width: 960px }` and
  * `.cash-gift-preview-dialog { max-width: 1120px }`.
  */
+/* See guests.css "gift-purchase-overlay" scroll-lock note: use
+ * `overflow: clip` without `height: 100%` so the document scroll height
+ * is preserved and opening the dialog doesn't snap the page to top. */
 html:has(.cube-purchase-overlay),
 body:has(.cube-purchase-overlay) {
-  overflow: hidden;
-  height: 100%;
+  overflow: clip;
   touch-action: none;
 }
 
