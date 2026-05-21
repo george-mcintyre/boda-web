@@ -534,6 +534,13 @@ const translations = {
     'gifts:term.figurine': 'Figurine',
     'gifts:term.figurine.plural': 'Figurines',
 
+    'gifts:anonBuyerEmail.label': 'Your email (for the receipt)',
+    'gifts:anonBuyerEmail.hint': "We'll send the gift receipt here.",
+    'gifts:anonBuyerEmail.required': 'Please enter an email so we can send you the receipt.',
+    'gifts:anonBuyerEmail.invalid': 'Please enter a valid email address.',
+    'gifts:anonBuyerEmail.cannotBeInvitado': 'Please enter your own email, not the shared guest email.',
+    'gifts:anonGiftFrom.required': 'Please enter a name so the couple knows who the gift is from.',
+
     //--------------------------------
     // Admin Page
     //--------------------------------
@@ -1484,6 +1491,13 @@ const translations = {
     'gifts:term.block.plural': 'Bloques',
     'gifts:term.figurine': 'Figurita',
     'gifts:term.figurine.plural': 'Figuritas',
+
+    'gifts:anonBuyerEmail.label': 'Tu correo (para el recibo)',
+    'gifts:anonBuyerEmail.hint': 'Te enviaremos el recibo del regalo aquí.',
+    'gifts:anonBuyerEmail.required': 'Por favor, introduce un correo electrónico para enviarte el recibo.',
+    'gifts:anonBuyerEmail.invalid': 'Por favor, introduce una dirección de correo válida.',
+    'gifts:anonBuyerEmail.cannotBeInvitado': 'Por favor, introduce tu propio correo, no el correo compartido de invitado.',
+    'gifts:anonGiftFrom.required': 'Por favor, indica un nombre para que la pareja sepa de parte de quién es el regalo.',
 
     //--------------------------------
     // Admin Page
@@ -2436,6 +2450,13 @@ const translations = {
     'gifts:term.figurine': 'Figurine',
     'gifts:term.figurine.plural': 'Figurines',
 
+    'gifts:anonBuyerEmail.label': 'Votre email (pour le reçu)',
+    'gifts:anonBuyerEmail.hint': 'Nous enverrons le reçu du cadeau ici.',
+    'gifts:anonBuyerEmail.required': 'Veuillez saisir un email pour que nous puissions vous envoyer le reçu.',
+    'gifts:anonBuyerEmail.invalid': 'Veuillez saisir une adresse email valide.',
+    'gifts:anonBuyerEmail.cannotBeInvitado': 'Veuillez saisir votre propre email, pas l’email partagé des invités.',
+    'gifts:anonGiftFrom.required': 'Veuillez indiquer un nom pour que le couple sache de qui vient le cadeau.',
+
     //--------------------------------
     // Admin Page
     //--------------------------------
@@ -3386,6 +3407,13 @@ const translations = {
     'gifts:term.block.plural': 'Blöcke',
     'gifts:term.figurine': 'Figur',
     'gifts:term.figurine.plural': 'Figuren',
+
+    'gifts:anonBuyerEmail.label': 'Deine E-Mail (für die Quittung)',
+    'gifts:anonBuyerEmail.hint': 'Wir senden die Geschenkquittung hierhin.',
+    'gifts:anonBuyerEmail.required': 'Bitte gib eine E-Mail-Adresse ein, damit wir dir die Quittung senden können.',
+    'gifts:anonBuyerEmail.invalid': 'Bitte gib eine gültige E-Mail-Adresse ein.',
+    'gifts:anonBuyerEmail.cannotBeInvitado': 'Bitte gib deine eigene E-Mail-Adresse ein, nicht die geteilte Gäste-E-Mail.',
+    'gifts:anonGiftFrom.required': 'Bitte gib einen Namen ein, damit das Paar weiß, von wem das Geschenk ist.',
 
     //--------------------------------
     // Admin Page

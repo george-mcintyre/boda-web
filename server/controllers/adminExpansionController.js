@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const QRCode = require('qrcode');
 const { mergeLocalizedString, localize, getLang } = require('../utils/localized');
 const { loadCubes, resolveCubeFaces, getCubePosition } = require('../data/cubes-loader');
+const { isAnonymousGuestEmail } = require('../utils/anonymousGuest');
 const fs = require('fs');
 const path = require('path');
 
@@ -1021,11 +1022,13 @@ async function getGiftPurchases(req, res, next) {
       totalAmount += amount;
 
       const isCube = gift && gift.type === 'cube' && Number.isFinite(gift.cubeId);
+      const isAnon = choice.anonymous === true
+        || (choice.guestId && isAnonymousGuestEmail(choice.guestId.email));
       return {
         id: choice._id.toString(),
-        guestId: choice.guestId ? choice.guestId._id.toString() : null,
-        guestName: choice.guestId ? (choice.guestId.name || choice.guestId.email) : 'Unknown',
-        guestEmail: choice.guestId ? choice.guestId.email : null,
+        guestId: isAnon ? null : (choice.guestId ? choice.guestId._id.toString() : null),
+        guestName: isAnon ? 'Anonymous' : (choice.guestId ? (choice.guestId.name || choice.guestId.email) : 'Unknown'),
+        guestEmail: isAnon ? null : (choice.guestId ? choice.guestId.email : null),
         giftId: gift ? gift._id.toString() : null,
         giftType: gift ? gift.type : null,
         cubeId: isCube ? gift.cubeId : null,
@@ -1036,8 +1039,9 @@ async function getGiftPurchases(req, res, next) {
         giftTitle: gift ? localize(gift.title, lang) : 'Unknown',
         giftAmount: amount,
         date: choice.date ? choice.date.toISOString() : null,
-        message: choice.message || null,
-        giftFrom: choice.giftFrom || null
+        message: isAnon ? null : (choice.message || null),
+        giftFrom: isAnon ? null : (choice.giftFrom || null),
+        anonymous: isAnon
       };
     });
 

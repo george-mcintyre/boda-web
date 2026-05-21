@@ -65,13 +65,13 @@ async function sendGiftConfirmationToBuyer({ guest, gift, giftChoice }) {
   });
 }
 
-async function sendGiftNotificationToCouple({ guest, gift, giftChoice }) {
+async function sendGiftNotificationToCouple({ guest, gift, giftChoice, anonymous = false }) {
   const recipients = parseCoupleRecipients();
   if (recipients.length === 0) {
     console.warn('[email] No COUPLE_NOTIFICATION_EMAILS configured — skipping couple notification');
     return { skipped: true };
   }
-  const tpl = require('./emails/giftNotificationCouple')({ guest, gift, giftChoice });
+  const tpl = require('./emails/giftNotificationCouple')({ guest, gift, giftChoice, anonymous });
   return sendEmail({
     to: recipients,
     subject: tpl.subject,

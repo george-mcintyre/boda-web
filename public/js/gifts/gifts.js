@@ -263,7 +263,20 @@ function initGiftsSubnav(rootEl) {
   });
 }
 
+const ANONYMOUS_GUEST_EMAIL = 'invitado@boda.com';
+const ANON_BUYER_EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function isAnonymousModeNow() {
+  try {
+    const email = (localStorage.getItem('email') || '').trim().toLowerCase();
+    return email === ANONYMOUS_GUEST_EMAIL;
+  } catch (_e) {
+    return false;
+  }
+}
+
 function getDefaultGiftFromValue() {
+  if (isAnonymousModeNow()) return '';
   const partyData = Array.isArray(window._partyDataCache) ? window._partyDataCache : [];
   const firstNames = partyData
     .map(p => (p && typeof p.name === 'string' ? p.name.trim().split(/\s+/)[0] : ''))
@@ -276,12 +289,15 @@ function getDefaultGiftFromValue() {
 
 function resolveGiftFromValue(rawInput) {
   const trimmed = typeof rawInput === 'string' ? rawInput.trim() : '';
+  if (isAnonymousModeNow()) return trimmed;
   return trimmed || getDefaultGiftFromValue();
 }
 
 function renderGiftFromFieldHtml(inputId) {
-  const defaultValue = getDefaultGiftFromValue().slice(0, GIFT_FROM_MAX_LENGTH);
+  const anon = isAnonymousModeNow();
+  const defaultValue = anon ? '' : getDefaultGiftFromValue().slice(0, GIFT_FROM_MAX_LENGTH);
   const counterId = `${inputId}-counter`;
+  const requiredAttr = anon ? 'required aria-required="true"' : '';
   return `
     <div class="gift-from-input" data-char-limited="true">
       <label for="${inputId}"><span data-i18n="guests:giftsPurchaseFromLabel">${translate('guests:giftsPurchaseFromLabel')}</span></label>
@@ -289,10 +305,82 @@ function renderGiftFromFieldHtml(inputId) {
              value="${escapeHtml(defaultValue)}"
              placeholder="${translate('guests:giftsPurchaseFrom:placeholder')}"
              data-i18n="guests:giftsPurchaseFrom:placeholder"
-             data-char-counter-target="${counterId}">
+             data-char-counter-target="${counterId}" ${requiredAttr}>
       <div class="char-counter" id="${counterId}" aria-live="polite">${defaultValue.length}/${GIFT_FROM_MAX_LENGTH}</div>
+      <div class="anon-from-error" id="${inputId}-error" style="display:none;color:#c0392b;font-size:0.9em;margin-top:4px;"></div>
     </div>
   `;
+}
+
+function renderAnonBuyerEmailFieldHtml(inputId) {
+  if (!isAnonymousModeNow()) return '';
+  const errorId = `${inputId}-error`;
+  return `
+    <div class="anon-buyer-email-input">
+      <label for="${inputId}"><span data-i18n="gifts:anonBuyerEmail.label">${translate('gifts:anonBuyerEmail.label')}</span></label>
+      <input type="email" id="${inputId}" maxlength="254" required aria-required="true"
+             autocomplete="email"
+             placeholder="you@example.com">
+      <div class="hint" data-i18n="gifts:anonBuyerEmail.hint" style="font-size:0.9em;color:var(--text-light, #666);margin-top:4px;">${translate('gifts:anonBuyerEmail.hint')}</div>
+      <div class="anon-email-error" id="${errorId}" style="display:none;color:#c0392b;font-size:0.9em;margin-top:4px;"></div>
+    </div>
+  `;
+}
+
+function validateAnonymousPurchaseInputs(overlay, fromInputId, emailInputId) {
+  if (!isAnonymousModeNow()) {
+    return { ok: true, anonymousBuyerEmail: null };
+  }
+  const fromInput = overlay.querySelector(`#${fromInputId}`);
+  const fromError = overlay.querySelector(`#${fromInputId}-error`);
+  const emailInput = overlay.querySelector(`#${emailInputId}`);
+  const emailError = overlay.querySelector(`#${emailInputId}-error`);
+
+  const fromRaw = fromInput ? fromInput.value.trim() : '';
+  const emailRaw = emailInput ? emailInput.value.trim().toLowerCase() : '';
+
+  let fromOk = true;
+  let emailOk = true;
+  if (fromError) { fromError.style.display = 'none'; fromError.textContent = ''; }
+  if (emailError) { emailError.style.display = 'none'; emailError.textContent = ''; }
+
+  if (!fromRaw) {
+    fromOk = false;
+    if (fromError) {
+      fromError.textContent = translate('gifts:anonGiftFrom.required');
+      fromError.style.display = 'block';
+    }
+  }
+
+  if (!emailRaw) {
+    emailOk = false;
+    if (emailError) {
+      emailError.textContent = translate('gifts:anonBuyerEmail.required');
+      emailError.style.display = 'block';
+    }
+  } else if (emailRaw === ANONYMOUS_GUEST_EMAIL) {
+    emailOk = false;
+    if (emailError) {
+      emailError.textContent = translate('gifts:anonBuyerEmail.cannotBeInvitado');
+      emailError.style.display = 'block';
+    }
+  } else if (!ANON_BUYER_EMAIL_REGEX.test(emailRaw) || emailRaw.length > 254) {
+    emailOk = false;
+    if (emailError) {
+      emailError.textContent = translate('gifts:anonBuyerEmail.invalid');
+      emailError.style.display = 'block';
+    }
+  }
+
+  if (!fromOk) {
+    if (fromInput) fromInput.focus();
+    return { ok: false };
+  }
+  if (!emailOk) {
+    if (emailInput) emailInput.focus();
+    return { ok: false };
+  }
+  return { ok: true, anonymousBuyerEmail: emailRaw };
 }
 
 function attachCharCounter(rootEl, inputSelector, max) {
@@ -1339,6 +1427,7 @@ window.purchaseCube = async (giftId) => {
           <textarea id="cubeMessage" placeholder="${translate('guests:gifts.cube.messagePlaceholder')}" rows="3" maxlength="${GIFT_MESSAGE_MAX_LENGTH}" data-char-counter-target="cubeMessage-counter"></textarea>
         <div class="char-counter" id="cubeMessage-counter" aria-live="polite">0/${GIFT_MESSAGE_MAX_LENGTH}</div>
         </div>
+        ${renderAnonBuyerEmailFieldHtml('cubeAnonBuyerEmailInput')}
         <div class="gift-note-cta" data-reflection-zone="below">
           ${renderShowGiftNoteButtonHtml()}
         </div>
@@ -1421,6 +1510,8 @@ window.purchaseCube = async (giftId) => {
       else showToast(translate('guests:gifts.cube.priceLabel'), 'error');
       return;
     }
+    const anonValidation = validateAnonymousPurchaseInputs(overlay, 'cubeGiftFromInput', 'cubeAnonBuyerEmailInput');
+    if (!anonValidation.ok) return;
     const amount = validation.amount;
     const message = liveContent.querySelector('#cubeMessage').value.trim();
     const cubeGiftFromInputEl = liveContent.querySelector('#cubeGiftFromInput');
@@ -1429,6 +1520,9 @@ window.purchaseCube = async (giftId) => {
     confirmBtn.disabled = true;
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="guests:giftsPurchaseProcessing">' + translate('guests:giftsPurchaseProcessing') + '</span>';
 
+    const requestBody = { giftId: gift.id, amount, message, giftFrom };
+    if (anonValidation.anonymousBuyerEmail) requestBody.anonymousBuyerEmail = anonValidation.anonymousBuyerEmail;
+
     try {
       const response = await fetch(`/api/guest/create-payment-session?lang=${window.currentLanguage}`, {
         method: 'POST',
@@ -1436,7 +1530,7 @@ window.purchaseCube = async (giftId) => {
           'Content-Type': 'application/json',
           'Authorization': window.token,
         },
-        body: JSON.stringify({ giftId: gift.id, amount, message, giftFrom }),
+        body: JSON.stringify(requestBody),
       });
       const data = await response.json();
       if (response.ok && data.checkoutUrl) {
@@ -1500,6 +1594,7 @@ window.purchaseFigurine = async (giftId) => {
           <textarea id="figurineMessage" placeholder="${translate('guests:gifts.figurine.messagePlaceholder')}" rows="3" maxlength="${GIFT_MESSAGE_MAX_LENGTH}" data-char-counter-target="figurineMessage-counter"></textarea>
           <div class="char-counter" id="figurineMessage-counter" aria-live="polite">0/${GIFT_MESSAGE_MAX_LENGTH}</div>
         </div>
+        ${renderAnonBuyerEmailFieldHtml('figurineAnonBuyerEmailInput')}
         <div class="gift-note-cta">
           ${renderShowGiftNoteButtonHtml()}
         </div>
@@ -1577,6 +1672,8 @@ window.purchaseFigurine = async (giftId) => {
       else showToast(translate('guests:gifts.figurine.priceLabel'), 'error');
       return;
     }
+    const anonValidation = validateAnonymousPurchaseInputs(overlay, 'figurineGiftFromInput', 'figurineAnonBuyerEmailInput');
+    if (!anonValidation.ok) return;
     const amount = validation.amount;
     const message = liveContent.querySelector('#figurineMessage').value.trim();
     const figurineGiftFromInputEl = liveContent.querySelector('#figurineGiftFromInput');
@@ -1585,6 +1682,9 @@ window.purchaseFigurine = async (giftId) => {
     confirmBtn.disabled = true;
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="guests:giftsPurchaseProcessing">' + translate('guests:giftsPurchaseProcessing') + '</span>';
 
+    const requestBody = { giftId: gift.id, amount, message, giftFrom };
+    if (anonValidation.anonymousBuyerEmail) requestBody.anonymousBuyerEmail = anonValidation.anonymousBuyerEmail;
+
     try {
       const response = await fetch(`/api/guest/create-payment-session?lang=${window.currentLanguage}`, {
         method: 'POST',
@@ -1592,7 +1692,7 @@ window.purchaseFigurine = async (giftId) => {
           'Content-Type': 'application/json',
           'Authorization': window.token,
         },
-        body: JSON.stringify({ giftId: gift.id, amount, message, giftFrom }),
+        body: JSON.stringify(requestBody),
       });
       const data = await response.json();
       if (response.ok && data.checkoutUrl) {
@@ -1667,6 +1767,7 @@ window.purchaseGift = async (giftId) => {
         <textarea id="giftMessage" placeholder="${translate('guests:giftsPurchaseMessage:placeholder')}" data-i18n="guests:giftsPurchaseMessage:placeholder" rows="3" maxlength="${GIFT_MESSAGE_MAX_LENGTH}" data-char-counter-target="giftMessage-counter"></textarea>
         <div class="char-counter" id="giftMessage-counter" aria-live="polite">0/${GIFT_MESSAGE_MAX_LENGTH}</div>
         </div>
+        ${renderAnonBuyerEmailFieldHtml('cashAnonBuyerEmailInput')}
         <div class="gift-note-cta">
           ${renderShowGiftNoteButtonHtml()}
         </div>
@@ -1735,18 +1836,23 @@ window.purchaseGift = async (giftId) => {
   });
 
   overlay.querySelector('.btn-confirm-purchase').addEventListener('click', async () => {
-    const message = document.getElementById('giftMessage').value.trim();
-    const giftFrom = resolveGiftFromValue(document.getElementById('giftFromInput').value);
     const validation = cashPriceCtl ? cashPriceCtl.validate() : { ok: true, amount: initialAmount };
     if (!validation.ok) {
       if (validation.message) showToast(validation.message, 'error');
       return;
     }
+    const anonValidation = validateAnonymousPurchaseInputs(overlay, 'giftFromInput', 'cashAnonBuyerEmailInput');
+    if (!anonValidation.ok) return;
+    const message = document.getElementById('giftMessage').value.trim();
+    const giftFrom = resolveGiftFromValue(document.getElementById('giftFromInput').value);
     const amount = validation.amount;
     const confirmBtn = overlay.querySelector('.btn-confirm-purchase');
 
     confirmBtn.disabled = true;
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span data-i18n="guests:giftsPurchaseProcessing">' + translate('guests:giftsPurchaseProcessing') + '</span>';
+
+    const requestBody = { giftId, message, giftFrom, amount };
+    if (anonValidation.anonymousBuyerEmail) requestBody.anonymousBuyerEmail = anonValidation.anonymousBuyerEmail;
 
     try {
       const response = await fetch(`/api/guest/create-payment-session?lang=${window.currentLanguage}`, {
@@ -1755,7 +1861,7 @@ window.purchaseGift = async (giftId) => {
           'Content-Type': 'application/json',
           'Authorization': window.token
         },
-        body: JSON.stringify({giftId, message, giftFrom, amount})
+        body: JSON.stringify(requestBody)
       });
 
       const data = await response.json();

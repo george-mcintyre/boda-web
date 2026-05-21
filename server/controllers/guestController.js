@@ -6,6 +6,9 @@ const { APP_URL } = require('../config/env');
 const { getLang, localize } = require('../utils/localized');
 const { loadCubes, resolveCubeFaces } = require('../data/cubes-loader');
 const emailService = require('../services/email');
+const { isAnonymousGuestEmail, ANONYMOUS_GUEST_EMAIL } = require('../utils/anonymousGuest');
+
+const EMAIL_SHAPE_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function buildCubeFacesById() {
   const facesById = new Map();
@@ -346,6 +349,10 @@ async function getGiftChoices(req, res, next) {
     const me = await guestService.getByEmail(req.user.email);
     if (!me) return res.status(404).json({ error: 'Guest not found' });
 
+    if (isAnonymousGuestEmail(me.email)) {
+      return res.json([]);
+    }
+
     const giftChoices = await GiftChoice.find({ guestId: me._id })
       .populate('giftId', 'title amount amountOptions description image type cubeId figurineId')
       .sort({ date: -1 })
@@ -391,10 +398,29 @@ async function getGiftChoices(req, res, next) {
 async function createPaymentSession(req, res, next) {
   try {
     const lang = getLang(req);
-    const { giftId, message, giftFrom, amount: requestedAmount } = req.body;
+    const { giftId, message, giftFrom, amount: requestedAmount, anonymousBuyerEmail: rawAnonEmail } = req.body;
 
     const me = await guestService.getByEmail(req.user.email);
     if (!me) return res.status(404).json({ error: 'Guest not found' });
+
+    const isAnonymous = isAnonymousGuestEmail(me.email);
+    let sanitizedAnonEmail = null;
+    if (isAnonymous) {
+      const trimmed = typeof rawAnonEmail === 'string' ? rawAnonEmail.trim().toLowerCase() : '';
+      if (!trimmed || trimmed.length > 254 || !EMAIL_SHAPE_REGEX.test(trimmed)) {
+        return res.status(400).json({
+          error: 'anonymousBuyerEmail required for anonymous purchases',
+          code: 'ANON_EMAIL_REQUIRED',
+        });
+      }
+      if (trimmed === ANONYMOUS_GUEST_EMAIL) {
+        return res.status(400).json({
+          error: 'anonymousBuyerEmail must not be the shared guest email',
+          code: 'ANON_EMAIL_REQUIRED',
+        });
+      }
+      sanitizedAnonEmail = trimmed;
+    }
 
     const gift = await Gift.findById(giftId).lean();
     if (!gift || !gift.enabled) {
@@ -462,6 +488,13 @@ async function createPaymentSession(req, res, next) {
       ? giftFrom.replace(/[\u0000-\u001F\u007F]/g, ' ').trim().slice(0, 80)
       : '';
 
+    if (isAnonymous && safeGiftFrom.length === 0) {
+      return res.status(400).json({
+        error: 'giftFrom required for anonymous purchases',
+        code: 'ANON_FROM_REQUIRED',
+      });
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       payment_method_types: ['card'],
@@ -484,7 +517,7 @@ async function createPaymentSession(req, res, next) {
       success_url: `${baseUrl}/guests.html?tab=gifts&payment=success&giftId=${giftId}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${baseUrl}/guests.html?tab=gifts&payment=cancelled&session_id={CHECKOUT_SESSION_ID}`,
 
-      customer_email: me.email,
+      customer_email: isAnonymous ? sanitizedAnonEmail : me.email,
 
       metadata: {
         giftId: gift._id.toString(),
@@ -498,6 +531,8 @@ async function createPaymentSession(req, res, next) {
         message: safeMessage,
         giftFrom: safeGiftFrom,
         lang,
+        anonymous: isAnonymous ? '1' : '0',
+        anonymousBuyerEmail: isAnonymous ? sanitizedAnonEmail : '',
       },
     });
 
@@ -508,7 +543,7 @@ async function createPaymentSession(req, res, next) {
   }
 }
 
-async function sendGiftPurchaseEmails({ guestId, giftId, giftChoice, langOverride }) {
+async function sendGiftPurchaseEmails({ guestId, giftId, giftChoice, langOverride, anonymous = false, anonymousBuyerEmail = null }) {
   const [guest, gift] = await Promise.all([
     Guest.findById(guestId).lean().catch(() => null),
     Gift.findById(giftId).lean().catch(() => null),
@@ -518,13 +553,20 @@ async function sendGiftPurchaseEmails({ guestId, giftId, giftChoice, langOverrid
     return;
   }
   const ALLOWED = ['en', 'es', 'fr', 'de'];
-  const buyerGuest = (langOverride && ALLOWED.includes(langOverride))
-    ? { ...guest, lang: langOverride }
-    : guest;
+  const buyerLang = (langOverride && ALLOWED.includes(langOverride)) ? langOverride : (guest.lang || 'en');
+  let buyerGuest;
+  if (anonymous && anonymousBuyerEmail) {
+    const localPart = String(anonymousBuyerEmail).split('@')[0] || '';
+    buyerGuest = { name: localPart, email: anonymousBuyerEmail, lang: buyerLang };
+  } else {
+    buyerGuest = (langOverride && ALLOWED.includes(langOverride))
+      ? { ...guest, lang: langOverride }
+      : guest;
+  }
   const tasks = [
     emailService.sendGiftConfirmationToBuyer({ guest: buyerGuest, gift, giftChoice })
       .catch(err => console.error('[email] Buyer confirmation failed:', err && err.message ? err.message : err)),
-    emailService.sendGiftNotificationToCouple({ guest, gift, giftChoice })
+    emailService.sendGiftNotificationToCouple({ guest, gift, giftChoice, anonymous })
       .catch(err => console.error('[email] Couple notification failed:', err && err.message ? err.message : err)),
   ];
   await Promise.all(tasks);
@@ -556,8 +598,13 @@ async function handleStripeWebhook(req, res) {
     }
 
     try {
-      const { giftId, guestId, message, giftFrom, giftAmount, lang: purchaseLang } = session.metadata || {};
+      const {
+        giftId, guestId, message, giftFrom, giftAmount, lang: purchaseLang,
+        anonymous: anonymousMeta, anonymousBuyerEmail: anonEmailMeta,
+      } = session.metadata || {};
       const parsedAmount = giftAmount != null ? Number(giftAmount) : null;
+      const anonymous = anonymousMeta === '1';
+      const anonymousBuyerEmail = anonymous && anonEmailMeta ? anonEmailMeta : null;
 
       const existing = await GiftChoice.findOne({ stripeSessionId: session.id });
       if (existing) {
@@ -574,11 +621,13 @@ async function handleStripeWebhook(req, res) {
         lang: (purchaseLang && ['en','es','fr','de'].includes(purchaseLang)) ? purchaseLang : 'en',
         date: new Date(),
         stripeSessionId: session.id,
+        anonymous,
+        anonymousBuyerEmail,
       });
 
-      console.log(`Gift choice created for guest ${guestId}, gift ${giftId}`);
+      console.log(`Gift choice created for guest ${guestId}, gift ${giftId}${anonymous ? ' (anonymous)' : ''}`);
 
-      sendGiftPurchaseEmails({ guestId, giftId, giftChoice, langOverride: purchaseLang }).catch(err => {
+      sendGiftPurchaseEmails({ guestId, giftId, giftChoice, langOverride: purchaseLang, anonymous, anonymousBuyerEmail }).catch(err => {
         console.error('[email] Post-purchase email dispatch failed:', err && err.message ? err.message : err);
       });
     } catch (err) {

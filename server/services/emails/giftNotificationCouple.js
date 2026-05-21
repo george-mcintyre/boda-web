@@ -9,7 +9,7 @@ function escapeHtml(s) {
     .replace(/'/g, '&#39;');
 }
 
-module.exports = function buildGiftNotificationCouple({ guest, gift, giftChoice }) {
+module.exports = function buildGiftNotificationCouple({ guest, gift, giftChoice, anonymous = false }) {
   const guestName = (guest && guest.name) || '(unknown guest)';
   const guestEmail = (guest && guest.email) || '';
   const guestLang = (guest && guest.lang) || 'en';
@@ -23,13 +23,23 @@ module.exports = function buildGiftNotificationCouple({ guest, gift, giftChoice 
 
   const subject = `New gift purchase: ${giftTitle} (${amount})`;
 
+  const buyerLine = anonymous
+    ? 'Buyer: Anonymous'
+    : `Buyer: ${guestName} <${guestEmail}> [lang=${guestLang}]`;
+  const signerLine = anonymous
+    ? 'Signer (printed on note): Anonymous'
+    : `Signer (printed on note): ${signer || '(default — uses party names)'}`;
+  const messageLine = anonymous
+    ? 'Message: (hidden — anonymous purchase)'
+    : `Message: ${message || '(none)'}`;
+
   const lines = [
     `Type: ${giftType}`,
     `Title: ${giftTitle}`,
     `Amount: ${amount}`,
-    `Buyer: ${guestName} <${guestEmail}> [lang=${guestLang}]`,
-    `Signer (printed on note): ${signer || '(default — uses party names)'}`,
-    `Message: ${message || '(none)'}`,
+    buyerLine,
+    signerLine,
+    messageLine,
     `Purchased at: ${purchasedAt}`,
     `Stripe session: ${sessionId || '(n/a)'}`,
   ];
