@@ -109,14 +109,14 @@ const translations = {
           or <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-utensils"></i>special dietary needs</button></li>
           <li>confirm who will attend each of the <button class="btn-slim btn-link" onclick="switchToTab('events')"><i class="fas fa-calendar-check"></i> wedding events</button>,</li>
           <li>view the <button class="btn-slim btn-link" onclick="switchToTab('menu')"><i class="fas fa-utensils"></i> menu</button> and choose your main dish,</li>
+          <li>browse the <button class="btn-slim btn-link" onclick="switchToTab('gifts')"><i class="fas fa-gift"></i> Gift Registry</button> and select a gift for us,</li>
           <li>and send messages to other guests (below).</li>
         </ul>
       </div>
       <div class="intro-card intro-section">
         Later we will open:
         <ul class="list-unstyled">
-          <li>the <button class="btn-slim btn-link" disabled="true" onclick="switchToTab('menu')"><i class="fas fa-chair"></i> seating chart</button> for the banquet,</li>
-          <li><button class="btn-slim btn-link" disabled="true" onclick="switchToTab('gifts')"><i class="fas fa-gift"></i> Gift Registry</button> where you will be able to select a gift for us.</li>
+          <li>the <button class="btn-slim btn-link" disabled="true" onclick="switchToTab('menu')"><i class="fas fa-chair"></i> seating chart</button> for the banquet.</li>
         </ul>
       </div>
     `,
@@ -1068,14 +1068,14 @@ const translations = {
           o <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-utensils"></i> necesidad dietética especial</button></li>
           <li>confirmar quién asistirá a cada uno de los <button class="btn-slim btn-link" onclick="switchToTab('events')"><i class="fas fa-calendar-check"></i> eventos de la boda</button>,</li>
           <li>consultar el <button class="btn-slim btn-link" onclick="switchToTab('menu')"><i class="fas fa-utensils"></i> menú</button> y elegir tu plato principal,</li>
+          <li>explorar la <button class="btn-slim btn-link" onclick="switchToTab('gifts')"><i class="fas fa-gift"></i> Lista de Regalos</button> y seleccionar un regalo para nosotros,</li>
           <li>y enviar mensajes a otros invitados (abajo).</li>
         </ul>
       </div>
       <div class="intro-card intro-section">
         Más adelante abriremos:
         <ul class="list-unstyled">
-          <li>el <button class="btn-slim btn-link" disabled="true" onclick="switchToTab('menu')"><i class="fas fa-chair"></i> plano de mesas</button> del banquete,</li>
-          <li><button class="btn-slim btn-link" disabled="true" onclick="switchToTab('gifts')"><i class="fas fa-gift"></i> Lista de Regalos</button> donde podrás seleccionar un regalo para nosotros.</li>
+          <li>el <button class="btn-slim btn-link" disabled="true" onclick="switchToTab('menu')"><i class="fas fa-chair"></i> plano de mesas</button> del banquete.</li>
         </ul>
       </div>
     `,
@@ -2026,14 +2026,14 @@ const translations = {
           ou de tout <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-utensils"></i> besoin diététique particulier</button></li>
           <li>confirmer qui participera à chacun des <button class="btn-slim btn-link" onclick="switchToTab('events')"><i class="fas fa-calendar-check"></i> événements du mariage</button>,</li>
           <li>consulter le <button class="btn-slim btn-link" onclick="switchToTab('menu')"><i class="fas fa-utensils"></i> menu</button> et choisir votre plat principal,</li>
+          <li>parcourir la <button class="btn-slim btn-link" onclick="switchToTab('gifts')"><i class="fas fa-gift"></i> Liste de Cadeaux</button> et sélectionner un cadeau pour nous,</li>
           <li>et envoyer des messages aux autres invités (ci-dessous).</li>
         </ul>
       </div>
       <div class="intro-card intro-section">
         Plus tard, nous ouvrirons :
         <ul class="list-unstyled">
-          <li>le <button class="btn-slim btn-link" disabled="true" onclick="switchToTab('menu')"><i class="fas fa-chair"></i> plan de table</button> du banquet,</li>
-          <li><button class="btn-slim btn-link" disabled="true" onclick="switchToTab('gifts')"><i class="fas fa-gift"></i> Liste de Cadeaux</button> où vous pourrez sélectionner un cadeau pour nous.</li>
+          <li>le <button class="btn-slim btn-link" disabled="true" onclick="switchToTab('menu')"><i class="fas fa-chair"></i> plan de table</button> du banquet.</li>
         </ul>
       </div>
       `,
@@ -2984,14 +2984,14 @@ const translations = {
           oder <button class="btn-slim btn-link" onclick="switchToTab('party')"><i class="fas fa-utensils"></i> besondere Ernährungsbedürfnisse</button> informieren</li>
           <li>bestätigen, wer an welchen <button class="btn-slim btn-link" onclick="switchToTab('events')"><i class="fas fa-calendar-check"></i> Hochzeitsveranstaltungen</button> teilnimmt,</li>
           <li>das <button class="btn-slim btn-link" onclick="switchToTab('menu')"><i class="fas fa-utensils"></i> Menü</button> ansehen und dein Hauptgericht auswählen,</li>
+          <li>die <button class="btn-slim btn-link" onclick="switchToTab('gifts')"><i class="fas fa-gift"></i> Geschenkliste</button> durchstöbern und ein Geschenk für uns auswählen,</li>
           <li>und Nachrichten an andere Gäste senden (unten).</li>
         </ul>
       </div>
       <div class="intro-card intro-section">
         Später werden wir freischalten:
         <ul class="list-unstyled">
-          <li>den <button class="btn-slim btn-link" disabled="true" onclick="switchToTab('menu')"><i class="fas fa-chair"></i> Sitzplan</button> für das Bankett,</li>
-          <li><button class="btn-slim btn-link" disabled="true" onclick="switchToTab('gifts')"><i class="fas fa-gift"></i> Geschenkliste</button>, wo du ein Geschenk für uns auswählen kannst.</li>
+          <li>den <button class="btn-slim btn-link" disabled="true" onclick="switchToTab('menu')"><i class="fas fa-chair"></i> Sitzplan</button> für das Bankett.</li>
         </ul>
       </div>
       `,
