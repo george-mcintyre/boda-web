@@ -617,7 +617,20 @@ function renderPriceSelectorHtml({ name, amountOptions, labelKey, wrapperAttrs =
 
 function attachPriceSelectorHandlers(rootEl, { name, amountOptions, onChange }) {
   if (!rootEl) return null;
-  const selector = rootEl.querySelector('[data-custom-price-selector="true"]');
+  // The cube viewer mirrors the dialog content into reflection pockets by cloning
+  // the [data-reflection-zone] elements (price selector included). Those clones
+  // appear earlier in DOM order than the live selector, so plain querySelector
+  // returns the clone — whose radios have had their `name` attribute stripped by
+  // the reflection patcher. Skip clones explicitly so we always bind to the live
+  // selector the user actually interacts with.
+  const candidates = rootEl.querySelectorAll('[data-custom-price-selector="true"]');
+  let selector = null;
+  for (const cand of candidates) {
+    if (!cand.closest('.cube-viewer__reflection')) {
+      selector = cand;
+      break;
+    }
+  }
   if (!selector) return null;
   const customWrapper = selector.querySelector('[data-custom-price-input]');
   const customField = selector.querySelector('[data-custom-price-field]');

@@ -222,7 +222,13 @@
   function collectHtml(nodeList) {
     let html = '';
     for (let i = 0; i < nodeList.length; i += 1) html += nodeList[i].outerHTML;
-    return html;
+    // Strip name= from radio/checkbox inputs before the HTML is reparsed into the
+    // reflection clones. Setting innerHTML on the clone slots reparses these inputs
+    // synchronously into the same document; if they share a name group with the
+    // live radios, the browser enforces "only one checked per group" at parse time,
+    // silently unchecking the user's just-clicked live radio. patchClones removes
+    // names after the fact, but by then the live state has already been clobbered.
+    return html.replace(/(<input\b[^>]*?)\sname="[^"]*"/gi, '$1');
   }
 
   function patchClones(reflectionRoot, entries) {
