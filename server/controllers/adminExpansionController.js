@@ -1345,29 +1345,50 @@ async function getGuestsWithoutEventChoices(req, res, next) {
 }
 
 // ========== Guests Without Menu Choices ==========
+const BANQUET_EVENT_ID = '69237e6b76402958d7ee1956';
+
 async function getGuestsWithoutMenuChoices(req, res, next) {
   try {
     const guests = await Guest.find({}).lean();
     const menuChoices = await MenuChoice.find({}).lean();
-    
+    const eventChoices = await EventChoice.find({}).lean();
+
+    const menuChoiceByGuestId = {};
+    menuChoices.forEach(mc => {
+      if (mc.guestId) menuChoiceByGuestId[mc.guestId.toString()] = mc;
+    });
+
+    const primaryAttendingBanquet = new Set();
+    eventChoices.forEach(ec => {
+      if (!ec.guestId) return;
+      const gid = ec.guestId.toString();
+      const primaryPc = (ec.partyChoices || []).find(pc => pc.partyGuestId === gid || pc.partyGuestId === String(gid));
+      if (!primaryPc) return;
+      const attendingBanquet = (primaryPc.choices || []).some(c => {
+        const eId = c.eventId && c.eventId.toString ? c.eventId.toString() : c.eventId;
+        return eId === BANQUET_EVENT_ID && c.attending;
+      });
+      if (attendingBanquet) primaryAttendingBanquet.add(gid);
+    });
+
     const guestsWithout = [];
-    
     guests.forEach(g => {
-      const menuChoice = menuChoices.find(mc => mc.guestId.toString() === g._id.toString());
-      
-      // Check if primary guest has choices
-      const primaryChoice = menuChoice?.partyChoices?.find(pc => pc.partyGuestId === g._id.toString());
+      const gid = g._id.toString();
+      if (!primaryAttendingBanquet.has(gid)) return;
+
+      const mc = menuChoiceByGuestId[gid];
+      const primaryChoice = mc?.partyChoices?.find(pc => pc.partyGuestId === gid);
       const hasChoices = primaryChoice && primaryChoice.choices && primaryChoice.choices.length > 0;
-      
+
       if (!hasChoices) {
         guestsWithout.push({
-          id: g._id.toString(),
+          id: gid,
           name: g.name,
           email: g.email
         });
       }
     });
-    
+
     res.json(guestsWithout);
   } catch (e) { next(e); }
 }
