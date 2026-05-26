@@ -159,12 +159,22 @@ async function getGuestSummary(req, res, next) {
       });
     });
 
-    // Guests without party members
-    const guestsWithoutPartyMembers = guests.filter(g => !g.partyMembers || g.partyMembers.length === 0).length;
+    // For both 'guests missing party members' and 'guests missing event responses',
+    // exclude the shared anonymous guest (invitado@boda.com): it's a placeholder
+    // used to attribute purchases for people not attending and is never expected
+    // to have party members OR respond to events.
+    const isRealGuest = g => !isAnonymousGuestEmail(g.email);
 
-    // Guests without event choices
+    const guestsWithoutPartyMembers = guests
+      .filter(g => !g.partyMembers || g.partyMembers.length === 0)
+      .filter(isRealGuest)
+      .length;
+
     const guestsWithEventChoices = new Set(eventChoices.map(ec => ec.guestId.toString()));
-    const guestsWithoutEventChoices = guests.filter(g => !guestsWithEventChoices.has(g._id.toString())).length;
+    const guestsWithoutEventChoices = guests
+      .filter(g => !guestsWithEventChoices.has(g._id.toString()))
+      .filter(isRealGuest)
+      .length;
 
     res.json({
       totalGuests,
@@ -1389,6 +1399,7 @@ async function getGuestsWithoutEventChoices(req, res, next) {
     const guestsWithEventChoices = new Set(eventChoices.map(ec => ec.guestId.toString()));
     const guestsWithout = guests
       .filter(g => !guestsWithEventChoices.has(g._id.toString()))
+      .filter(g => !isAnonymousGuestEmail(g.email))
       .map(g => ({
         id: g._id.toString(),
         name: g.name,
