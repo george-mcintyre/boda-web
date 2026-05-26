@@ -4,6 +4,8 @@ const { formatEventForApi, formatCourseForApi, formatCourseOptionForApi } = requ
 const { mergeLocalizedString, localize, getLang } = require('../utils/localized');
 const { loadCubes, resolveCubeFaces } = require('../data/cubes-loader');
 const emailService = require('../services/email');
+const guestCtrl = require('./guestController');
+const adminExp = require('./adminExpansionController');
 
 let cubeFacesByIdCache = null;
 function getCubeFacesById() {
@@ -303,17 +305,27 @@ async function listGifts(req, res, next) {
             .sort({ createdAt: -1 })
             .lean();
 
-        // Get purchase counts for each gift
         const giftIds = gifts.map(gift => gift._id);
-        const purchaseCounts = await GiftChoice.aggregate([
+        // Aggregate per-gift counts AND revenue, split by payment method.
+        // Existing pre-paymentMethod docs are treated as 'stripe' (all historical
+        // purchases came through Stripe before this field was added).
+        const breakdown = await GiftChoice.aggregate([
             { $match: { giftId: { $in: giftIds } } },
-            { $group: { _id: '$giftId', count: { $sum: 1 } } }
+            {
+                $group: {
+                    _id: '$giftId',
+                    count: { $sum: 1 },
+                    cashCount: { $sum: { $cond: [{ $eq: ['$paymentMethod', 'cash'] }, 1, 0] } },
+                    stripeCount: { $sum: { $cond: [{ $eq: ['$paymentMethod', 'cash'] }, 0, 1] } },
+                    cashAmount: { $sum: { $cond: [{ $eq: ['$paymentMethod', 'cash'] }, '$amount', 0] } },
+                    stripeAmount: { $sum: { $cond: [{ $eq: ['$paymentMethod', 'cash'] }, 0, '$amount'] } },
+                }
+            }
         ]);
 
-        // Create a map of giftId to purchase count
-        const purchaseCountMap = {};
-        purchaseCounts.forEach(item => {
-            purchaseCountMap[item._id.toString()] = item.count;
+        const breakdownMap = {};
+        breakdown.forEach(item => {
+            breakdownMap[item._id.toString()] = item;
         });
 
         const items = gifts.map(gift => {
@@ -340,6 +352,7 @@ async function listGifts(req, res, next) {
                     : null);
             const isCube = gift.type === 'cube';
             const faces = isCube ? (getCubeFacesById().get(gift.cubeId) || null) : null;
+            const b = breakdownMap[gift._id.toString()] || { count: 0, cashCount: 0, stripeCount: 0, cashAmount: 0, stripeAmount: 0 };
             return {
                 id: gift._id.toString(),
                 title: localize(gift.title, lang),
@@ -351,7 +364,12 @@ async function listGifts(req, res, next) {
                 figurineId: gift.figurineId,
                 faces,
                 available: gift.available,
-                purchased: purchaseCountMap[gift._id.toString()] || 0,
+                purchased: b.count,
+                cashCount: b.cashCount,
+                stripeCount: b.stripeCount,
+                cashRevenue: b.cashAmount,
+                stripeRevenue: b.stripeAmount,
+                totalRevenue: b.cashAmount + b.stripeAmount,
                 image: imageData,
                 priceDisplay: fallbackPrice != null ? `€${fallbackPrice}` : '—'
             };
@@ -493,6 +511,151 @@ async function updateGift(req, res, next) {
             priceDisplay: updatedFallbackPrice != null ? `€${updatedFallbackPrice}` : '—'
         });
     } catch (e) { next(e); }
+}
+
+async function listCashPurchases(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const choices = await GiftChoice.find({ paymentMethod: 'cash' })
+      .populate('giftId', 'title amount amountOptions type cubeId figurineId description')
+      .populate('guestId', 'name email')
+      .sort({ date: -1 })
+      .lean();
+
+    const items = choices.map(c => {
+      const gift = c.giftId || {};
+      const guest = c.guestId || {};
+      const isCube = gift.type === 'cube';
+      return {
+        id: c._id.toString(),
+        date: c.date ? c.date.toISOString() : null,
+        amount: c.amount,
+        message: c.message || '',
+        giftFrom: c.giftFrom || '',
+        guestId: guest._id ? guest._id.toString() : null,
+        guestName: guest.name || '',
+        guestEmail: guest.email || '',
+        giftId: gift._id ? gift._id.toString() : null,
+        giftTitle: gift.title ? localize(gift.title, lang) : '',
+        giftType: gift.type || 'cash',
+        cubeId: isCube && Number.isFinite(gift.cubeId) ? gift.cubeId : null,
+        cubeDescriptionSnippet: isCube ? adminExp.buildCubeDescriptionSnippet(gift.description, lang) : null,
+      };
+    });
+    res.json(items);
+  } catch (e) { next(e); }
+}
+
+async function createCashGiftPurchase(req, res, next) {
+  try {
+    const lang = getLang(req);
+    const { guestEmail, giftId, amount, message, giftFrom, sendEmails } = req.body || {};
+
+    if (!guestEmail || typeof guestEmail !== 'string') {
+      return res.status(400).json({ error: 'guestEmail is required' });
+    }
+    if (!giftId || typeof giftId !== 'string') {
+      return res.status(400).json({ error: 'giftId is required' });
+    }
+
+    const guest = await Guest.findOne({ email: String(guestEmail).trim().toLowerCase() }).lean();
+    if (!guest) {
+      return res.status(404).json({ error: 'Guest not found' });
+    }
+
+    const gift = await Gift.findById(giftId).lean();
+    if (!gift || !gift.enabled) {
+      return res.status(404).json({ error: 'Gift not found or not available' });
+    }
+
+    const purchaseCount = await GiftChoice.countDocuments({ giftId: gift._id });
+    const stock = gift.available - purchaseCount;
+    if (stock <= 0) {
+      return res.status(400).json({ error: 'Gift is out of stock' });
+    }
+
+    const giftType = gift.type || 'cash';
+    const hasAmountOptions = Array.isArray(gift.amountOptions) && gift.amountOptions.length > 0;
+    let chargeAmount;
+    if (giftType === 'cube' || giftType === 'figurine' || hasAmountOptions) {
+      const options = gift.amountOptions || [];
+      const maxOption = options.length ? Math.max(...options) : 0;
+      const parsed = Number(amount);
+      const isPresetMatch = options.includes(parsed);
+      const isCustomAboveMax = Number.isFinite(parsed) && Number.isInteger(parsed) && parsed > maxOption;
+      if (!Number.isFinite(parsed) || (!isPresetMatch && !isCustomAboveMax)) {
+        return res.status(400).json({
+          error: `Invalid amount for ${giftType} gift; must be one of amountOptions or a custom integer amount greater than €${maxOption}`,
+          amountOptions: options,
+          maxPresetAmount: maxOption,
+        });
+      }
+      chargeAmount = parsed;
+    } else {
+      chargeAmount = gift.amount;
+    }
+
+    const safeMessage = typeof message === 'string'
+      ? message.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, ' ').slice(0, 240)
+      : '';
+    const safeGiftFrom = typeof giftFrom === 'string'
+      ? giftFrom.replace(/[\u0000-\u001F\u007F]/g, ' ').trim().slice(0, 80)
+      : '';
+
+    const adminId = (req.user && req.user.id) ? req.user.id : null;
+
+    const giftChoice = await GiftChoice.create({
+      giftId: gift._id,
+      guestId: guest._id,
+      message: safeMessage || null,
+      giftFrom: safeGiftFrom || null,
+      amount: chargeAmount,
+      lang: (lang && ['en','es','fr','de'].includes(lang)) ? lang : (guest.lang || 'en'),
+      date: new Date(),
+      paymentMethod: 'cash',
+      stripeSessionId: null,
+      anonymous: false,
+      anonymousBuyerEmail: null,
+      createdByAdminId: adminId,
+    });
+
+    if (sendEmails !== false) {
+      guestCtrl.sendGiftPurchaseEmails({
+        guestId: guest._id,
+        giftId: gift._id,
+        giftChoice,
+        langOverride: giftChoice.lang,
+        anonymous: false,
+        anonymousBuyerEmail: null,
+      }).catch(err => {
+        console.error('[email] Cash purchase email dispatch failed:', err && err.message ? err.message : err);
+      });
+    }
+
+    res.status(201).json({
+      id: giftChoice._id.toString(),
+      giftId: gift._id.toString(),
+      guestId: guest._id.toString(),
+      amount: chargeAmount,
+      date: giftChoice.date.toISOString(),
+    });
+  } catch (e) {
+    console.error('Cash gift purchase creation error:', e);
+    next(e);
+  }
+}
+
+async function deleteCashGiftPurchase(req, res, next) {
+  try {
+    const { id } = req.params;
+    const choice = await GiftChoice.findById(id);
+    if (!choice) return res.status(404).json({ error: 'Purchase not found' });
+    if (choice.paymentMethod !== 'cash') {
+      return res.status(400).json({ error: 'Only cash purchases can be deleted from this endpoint' });
+    }
+    await choice.deleteOne();
+    res.json({ ok: true });
+  } catch (e) { next(e); }
 }
 
 async function deleteGift(req, res, next) {
@@ -683,6 +846,8 @@ async function testEmail(req, res, next) {
 module.exports = {
   // gifts
   listGifts, createGift, updateGift, deleteGift, getGiftChoices, getGiftCardImages, uploadGiftImage,
+  // cash gift purchases (admin-initiated, no Stripe involvement)
+  listCashPurchases, createCashGiftPurchase, deleteCashGiftPurchase,
   // agenda
   listEventsAdmin, createEventsItem, updateEventsItem, deleteEventsItem, uploadEventImage,
   // menu options

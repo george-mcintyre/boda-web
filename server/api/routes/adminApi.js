@@ -157,6 +157,11 @@ router.post('/gifts', auth('admin'), adminCtrl.createGift);
 router.put('/gifts/:id', auth('admin'), adminCtrl.updateGift);
 router.delete('/gifts/:id', auth('admin'), adminCtrl.deleteGift);
 
+// Cash gift purchases (admin records a gift bought with cash / no Stripe)
+router.get('/cash-purchases', auth('admin'), adminCtrl.listCashPurchases);
+router.post('/cash-purchases', auth('admin'), adminCtrl.createCashGiftPurchase);
+router.delete('/cash-purchases/:id', auth('admin'), adminCtrl.deleteCashGiftPurchase);
+
 // Gift image upload
 router.post('/gifts/upload-image', auth('admin'), upload.single('image'), adminCtrl.uploadGiftImage);
 

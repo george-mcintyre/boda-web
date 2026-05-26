@@ -990,8 +990,24 @@ async function getMenuResponses(req, res, next) {
 // blocks, which all share the same generic title "A Block for Our Wedding
 // Sculpture". The localised description per cubeId lives on gift.description
 // (seeded from server/data/cube-text.js — see seedCubes.js).
+const CUBE_BOILERPLATE_PREFIXES = [
+  'Help us build a sculpture with this block. ',
+  'Ayúdanos a construir una escultura con este bloque. ',
+  'Aidez-nous à construire une sculpture avec ce bloc. ',
+  'Hilf uns, mit diesem Block eine Skulptur zu bauen. ',
+];
+
+function stripCubeBoilerplate(text) {
+  if (!text) return text;
+  for (const p of CUBE_BOILERPLATE_PREFIXES) {
+    if (text.startsWith(p)) return text.slice(p.length);
+  }
+  return text;
+}
+
 function buildCubeDescriptionSnippet(localizedDescription, lang, maxLen = 80) {
-  const full = localize(localizedDescription, lang);
+  const raw = localize(localizedDescription, lang);
+  const full = stripCubeBoilerplate(raw);
   if (!full) return '';
   if (full.length <= maxLen) return full;
   const truncated = full.slice(0, maxLen);
@@ -1041,7 +1057,8 @@ async function getGiftPurchases(req, res, next) {
         date: choice.date ? choice.date.toISOString() : null,
         message: isAnon ? null : (choice.message || null),
         giftFrom: isAnon ? null : (choice.giftFrom || null),
-        anonymous: isAnon
+        anonymous: isAnon,
+        paymentMethod: choice.paymentMethod === 'cash' ? 'cash' : 'stripe'
       };
     });
 
@@ -1778,5 +1795,6 @@ module.exports = {
   getBanquetSeatingPrint,
   rotateVenuePrintToken,
   getVenuePrintTokenInfo,
-  getVenuePrintSeating
+  getVenuePrintSeating,
+  buildCubeDescriptionSnippet,
 };

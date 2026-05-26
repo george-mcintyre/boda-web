@@ -130,7 +130,8 @@
     ],
     gifts: [
       { id: 'list', i18nKey: 'admin:subtab.giftList', icon: 'fa-gift' },
-      { id: 'purchases', i18nKey: 'admin:subtab.giftPurchases', icon: 'fa-shopping-cart' }
+      { id: 'purchases', i18nKey: 'admin:subtab.giftPurchases', icon: 'fa-shopping-cart' },
+      { id: 'cashPurchases', i18nKey: 'admin:subtab.cashPurchases', icon: 'fa-money-bill-wave' }
     ]
   };
 
@@ -166,6 +167,7 @@
       case 'menu/noChoices': return showMenuNoChoices();
       case 'gifts/list': return showGifts();
       case 'gifts/purchases': return showGiftPurchases();
+      case 'gifts/cashPurchases': return showCashPurchases();
       case 'event/schedule': return showEvent();
       case 'event/attendance': return showEventAttendance();
       case 'event/noChoices': return showEventNoChoices();
@@ -950,7 +952,10 @@
           : '';
         const giftFromCell = p.giftFrom ? escapeHtml(p.giftFrom) : '—';
         const messageCell = p.message ? escapeHtml(p.message) : '—';
-        return `<tr><td>${escapeHtml(p.guestName)}</td><td>${giftCell}</td><td>€${p.giftAmount}</td><td>${date}</td><td>${giftFromCell}</td><td>${messageCell}</td><td>${downloadBtn} ${undoBtn}</td></tr>`;
+        const payMethodBadge = p.paymentMethod === 'cash'
+          ? `<span class="badge" style="background:#28a745;color:#fff;padding:2px 8px;border-radius:999px;font-size:.8em;"><i class="fas fa-money-bill-wave"></i> ${translate('admin:cashPurchases.badgeCash')}</span>`
+          : `<span class="badge" style="background:#0070ba;color:#fff;padding:2px 8px;border-radius:999px;font-size:.8em;"><i class="fas fa-credit-card"></i> ${translate('admin:cashPurchases.badgeCard')}</span>`;
+        return `<tr><td>${escapeHtml(p.guestName)}</td><td>${giftCell}</td><td>€${p.giftAmount}</td><td>${payMethodBadge}</td><td>${date}</td><td>${giftFromCell}</td><td>${messageCell}</td><td>${downloadBtn} ${undoBtn}</td></tr>`;
       }).join('');
 
       target.innerHTML = `
@@ -967,7 +972,7 @@
           </div>
           <div class="table-container">
             <table class="data-table">
-              <thead><tr><th>Guest</th><th>Gift</th><th>Amount</th><th>Date</th><th>From</th><th>Message</th><th>Actions</th></tr></thead>
+              <thead><tr><th>Guest</th><th>Gift</th><th>Amount</th><th>${translate('admin:cashPurchases.col.paymentMethod')}</th><th>Date</th><th>From</th><th>Message</th><th>Actions</th></tr></thead>
               <tbody>${rows}</tbody>
             </table>
           </div>
@@ -1031,6 +1036,451 @@
       console.error('Error loading gift purchases:', e);
       target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
     }
+  }
+
+  function formatPartyDefaultFrom(partyMembers) {
+    const firstNames = (partyMembers || [])
+      .map(p => (p && typeof p.name === 'string' ? p.name.trim().split(/\s+/)[0] : ''))
+      .filter(Boolean);
+    if (firstNames.length === 0) return '';
+    if (firstNames.length === 1) return firstNames[0];
+    if (firstNames.length === 2) return `${firstNames[0]} & ${firstNames[1]}`;
+    return `${firstNames.slice(0, -1).join(', ')} & ${firstNames[firstNames.length - 1]}`;
+  }
+
+  function escapeHtmlAdmin(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  async function showCashPurchases() {
+    const target = getContentTarget();
+    setLoading(translate('admin:subtab.cashPurchases'));
+    try {
+      const [purchasesRes, guestsRes, giftsRes] = await Promise.all([
+        api(`/api/admin/cash-purchases?lang=${getUserLanguage()}`),
+        api('/api/admin/guests?limit=9999'),
+        api(`/api/admin/gifts?lang=${getUserLanguage()}`),
+      ]);
+      const purchases = purchasesRes.ok ? await purchasesRes.json() : [];
+      const guestsData = guestsRes.ok ? await guestsRes.json() : [];
+      const guests = (guestsData.items || guestsData || []).filter(g => g && g.email);
+      const allGifts = giftsRes.ok ? await giftsRes.json() : [];
+
+      const cashTotal = purchases.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+
+      const rows = purchases.length === 0
+        ? `<tr><td colspan="7" style="text-align:center;color:var(--text-light);padding:24px;">${translate('admin:cashPurchases.empty')}</td></tr>`
+        : purchases.map(p => {
+          const date = p.date ? new Date(p.date).toLocaleDateString() : '—';
+          let giftCell;
+          if (p.giftType === 'cube' && p.cubeId != null) {
+            const snippet = p.cubeDescriptionSnippet
+              ? ` — <span style="color:var(--text-light);font-style:italic;">"${escapeHtmlAdmin(p.cubeDescriptionSnippet)}"</span>`
+              : '';
+            giftCell = `Block #${p.cubeId}${snippet}`;
+          } else {
+            giftCell = escapeHtmlAdmin(p.giftTitle);
+          }
+          return `<tr>
+            <td>${escapeHtmlAdmin(p.guestName)}<br/><small style="color:var(--text-light);">${escapeHtmlAdmin(p.guestEmail)}</small></td>
+            <td>${giftCell}</td>
+            <td>€${p.amount}</td>
+            <td>${date}</td>
+            <td>${p.giftFrom ? escapeHtmlAdmin(p.giftFrom) : '—'}</td>
+            <td>${p.message ? escapeHtmlAdmin(p.message) : '—'}</td>
+            <td><button class="admin-action danger" data-action="del-cash" data-id="${p.id}" title="${translate('admin:cashPurchases.deleteTitle')}"><i class="fas fa-trash"></i></button></td>
+          </tr>`;
+        }).join('');
+
+      target.innerHTML = `
+        <div class="admin-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
+            <h3 style="margin:0;"><i class="fas fa-money-bill-wave"></i> ${translate('admin:cashPurchases.title')}</h3>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="stat-card" style="margin:0;">
+                <div class="stat-number">€${cashTotal}</div>
+                <div class="stat-label">${translate('admin:cashPurchases.totalCash')}</div>
+              </div>
+              <button id="addCashPurchaseBtn" class="admin-action"><i class="fas fa-plus"></i> ${translate('admin:cashPurchases.add')}</button>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead><tr>
+                <th>${translate('admin:cashPurchases.col.guest')}</th>
+                <th>${translate('admin:cashPurchases.col.gift')}</th>
+                <th>${translate('admin:cashPurchases.col.amount')}</th>
+                <th>${translate('admin:cashPurchases.col.date')}</th>
+                <th>${translate('admin:cashPurchases.col.from')}</th>
+                <th>${translate('admin:cashPurchases.col.message')}</th>
+                <th>${translate('admin:cashPurchases.col.actions')}</th>
+              </tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </div>`;
+
+      target.querySelector('#addCashPurchaseBtn').addEventListener('click', () => {
+        openCashPurchaseDialog({ guests, allGifts });
+      });
+
+      target.querySelector('tbody').addEventListener('click', async (e) => {
+        const btn = e.target.closest('button[data-action="del-cash"]');
+        if (!btn) return;
+        if (!window.confirm(translate('admin:cashPurchases.deleteConfirm'))) return;
+        try {
+          const r = await api(`/api/admin/cash-purchases/${btn.dataset.id}`, { method: 'DELETE' });
+          if (!r.ok) {
+            const err = await r.json().catch(() => ({}));
+            notify(err.error || 'Failed to delete', 'error');
+            return;
+          }
+          notify(translate('admin:cashPurchases.deleted'), 'success');
+          showCashPurchases();
+        } catch (err) {
+          console.error('Delete cash purchase failed', err);
+          notify('Failed to delete', 'error');
+        }
+      });
+    } catch (e) {
+      console.error('Error loading cash purchases:', e);
+      target.innerHTML = '<div class="admin-content"><div class="error-message"><i class="fas fa-exclamation-triangle"></i><p>' + e.message + '</p></div></div>';
+    }
+  }
+
+  function openCashPurchaseDialog({ guests, allGifts }) {
+    const enabledGifts = allGifts.filter(g => g && g.type);
+    const giftTypes = Array.from(new Set(enabledGifts.map(g => g.type)));
+    const typeLabels = {
+      cash: translate('admin:cashPurchases.giftType.cash'),
+      cube: translate('admin:cashPurchases.giftType.cube'),
+      figurine: translate('admin:cashPurchases.giftType.figurine'),
+    };
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:flex;align-items:center;justify-content:center;';
+    const modal = document.createElement('div');
+    modal.style.cssText = 'background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.25);width:min(560px,92vw);max-height:92vh;overflow:auto;';
+    modal.innerHTML = `
+      <div style="padding:20px 24px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
+        <h3 style="margin:0;">${translate('admin:cashPurchases.dialog.title')}</h3>
+        <button id="cpClose" class="btn btn-secondary">${translate('admin:form.close')}</button>
+      </div>
+      <form id="cpForm" style="padding:18px 24px;display:flex;flex-direction:column;gap:14px;">
+        <div id="cpError" style="display:none;color:#dc3545;font-weight:600;"></div>
+
+        <div>
+          <label for="cpGuest" style="display:block;font-weight:600;margin-bottom:6px;">${translate('admin:cashPurchases.field.guest')} *</label>
+          <input id="cpGuest" type="text" autocomplete="off" placeholder="${translate('admin:cashPurchases.field.guestPlaceholder')}" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;">
+          <div id="cpGuestList" style="position:relative;"></div>
+          <div id="cpGuestPicked" style="display:none;margin-top:6px;font-size:.9em;color:var(--text-light);"></div>
+        </div>
+
+        <div>
+          <label for="cpFrom" style="display:block;font-weight:600;margin-bottom:6px;">${translate('admin:cashPurchases.field.from')}</label>
+          <input id="cpFrom" type="text" maxlength="80" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;" disabled>
+          <small style="color:var(--text-light);">${translate('admin:cashPurchases.field.fromHelp')}</small>
+        </div>
+
+        <div>
+          <label for="cpGiftType" style="display:block;font-weight:600;margin-bottom:6px;">${translate('admin:cashPurchases.field.giftType')} *</label>
+          <select id="cpGiftType" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;" disabled>
+            <option value="">${translate('admin:cashPurchases.field.giftTypePlaceholder')}</option>
+            ${giftTypes.map(t => `<option value="${t}">${typeLabels[t] || t}</option>`).join('')}
+          </select>
+        </div>
+
+        <div>
+          <label for="cpGift" style="display:block;font-weight:600;margin-bottom:6px;">${translate('admin:cashPurchases.field.gift')} *</label>
+          <select id="cpGift" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;" disabled>
+            <option value="">${translate('admin:cashPurchases.field.giftPlaceholder')}</option>
+          </select>
+          <div id="cpGiftSummary" style="margin-top:6px;font-size:.9em;color:var(--text-light);"></div>
+        </div>
+
+        <div>
+          <label style="display:block;font-weight:600;margin-bottom:6px;">${translate('admin:cashPurchases.field.amount')} *</label>
+          <div id="cpAmountOptions" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+          <div id="cpCustomAmountWrap" style="display:none;margin-top:8px;">
+            <input id="cpCustomAmount" type="number" min="1" step="1" placeholder="€" style="width:140px;padding:8px;border:1px solid #ddd;border-radius:8px;">
+            <small id="cpCustomHint" style="display:block;color:var(--text-light);margin-top:4px;"></small>
+          </div>
+        </div>
+
+        <div>
+          <label for="cpMessage" style="display:block;font-weight:600;margin-bottom:6px;">${translate('admin:cashPurchases.field.message')}</label>
+          <textarea id="cpMessage" rows="3" maxlength="240" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;"></textarea>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;">
+          <button type="button" id="cpCancel" class="btn btn-secondary">${translate('admin:form.cancel')}</button>
+          <button type="submit" id="cpSubmit" class="btn btn-success" disabled>${translate('admin:cashPurchases.dialog.submit')}</button>
+        </div>
+      </form>`;
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    const state = {
+      pickedGuest: null,
+      pickedGift: null,
+      pickedAmount: null,
+      customAmount: false,
+    };
+
+    function close() { document.body.removeChild(overlay); }
+    modal.querySelector('#cpClose').addEventListener('click', close);
+    modal.querySelector('#cpCancel').addEventListener('click', close);
+
+    const guestInput = modal.querySelector('#cpGuest');
+    const guestList = modal.querySelector('#cpGuestList');
+    const guestPicked = modal.querySelector('#cpGuestPicked');
+    const fromInput = modal.querySelector('#cpFrom');
+    const giftTypeSel = modal.querySelector('#cpGiftType');
+    const giftSel = modal.querySelector('#cpGift');
+    const giftSummary = modal.querySelector('#cpGiftSummary');
+    const amountOptionsEl = modal.querySelector('#cpAmountOptions');
+    const customAmountWrap = modal.querySelector('#cpCustomAmountWrap');
+    const customAmountInput = modal.querySelector('#cpCustomAmount');
+    const customHint = modal.querySelector('#cpCustomHint');
+    const submitBtn = modal.querySelector('#cpSubmit');
+    const errBox = modal.querySelector('#cpError');
+
+    function setError(msg) {
+      if (msg) { errBox.textContent = msg; errBox.style.display = 'block'; }
+      else { errBox.textContent = ''; errBox.style.display = 'none'; }
+    }
+
+    function updateSubmitEnabled() {
+      const amountOk = state.pickedAmount != null && Number.isFinite(state.pickedAmount) && state.pickedAmount > 0;
+      submitBtn.disabled = !(state.pickedGuest && state.pickedGift && amountOk);
+    }
+
+    function renderGuestSuggestions(query) {
+      const q = query.trim().toLowerCase();
+      if (!q || q.length < 2) { guestList.innerHTML = ''; return; }
+      const matches = guests.filter(g =>
+        (g.name || '').toLowerCase().includes(q) ||
+        (g.email || '').toLowerCase().includes(q)
+      ).slice(0, 8);
+      if (matches.length === 0) {
+        guestList.innerHTML = `<div style="padding:8px;color:var(--text-light);font-size:.9em;">${translate('admin:cashPurchases.field.guestNone')}</div>`;
+        return;
+      }
+      guestList.innerHTML = `<div style="border:1px solid #ddd;border-radius:8px;margin-top:4px;background:#fff;max-height:240px;overflow-y:auto;">
+        ${matches.map(g => `<div class="cp-guest-suggestion" data-email="${escapeHtmlAdmin(g.email)}" data-id="${escapeHtmlAdmin(g.id || g._id)}" style="padding:8px 10px;cursor:pointer;border-bottom:1px solid #f0f0f0;">
+          <div style="font-weight:600;">${escapeHtmlAdmin(g.name || '—')}</div>
+          <div style="font-size:.85em;color:var(--text-light);">${escapeHtmlAdmin(g.email)}</div>
+        </div>`).join('')}
+      </div>`;
+      guestList.querySelectorAll('.cp-guest-suggestion').forEach(el => {
+        el.addEventListener('mouseenter', () => { el.style.background = '#f8f9fa'; });
+        el.addEventListener('mouseleave', () => { el.style.background = '#fff'; });
+        el.addEventListener('click', () => pickGuest(el.dataset.email, el.dataset.id));
+      });
+    }
+
+    async function pickGuest(email, guestId) {
+      const g = guests.find(x => (x.email || '').toLowerCase() === (email || '').toLowerCase());
+      if (!g) return;
+      state.pickedGuest = g;
+      guestInput.value = `${g.name || ''} <${g.email}>`;
+      guestList.innerHTML = '';
+      guestPicked.style.display = 'block';
+      guestPicked.textContent = `${translate('admin:cashPurchases.field.guestSelected')}: ${g.name || g.email}`;
+      giftTypeSel.disabled = false;
+      try {
+        const partyRes = await api(`/api/admin/guests/${g.id || g._id}/party`);
+        if (partyRes.ok) {
+          const party = await partyRes.json();
+          const partyArr = Array.isArray(party) ? party : (party.partyMembers || []);
+          const def = formatPartyDefaultFrom(partyArr.length ? partyArr : [{ name: g.name }]);
+          fromInput.value = def;
+          fromInput.disabled = false;
+        } else {
+          fromInput.value = g.name || '';
+          fromInput.disabled = false;
+        }
+      } catch (err) {
+        fromInput.value = g.name || '';
+        fromInput.disabled = false;
+      }
+      updateSubmitEnabled();
+    }
+
+    guestInput.addEventListener('input', () => {
+      state.pickedGuest = null;
+      guestPicked.style.display = 'none';
+      fromInput.value = '';
+      fromInput.disabled = true;
+      giftTypeSel.disabled = true;
+      giftTypeSel.value = '';
+      giftSel.innerHTML = `<option value="">${translate('admin:cashPurchases.field.giftPlaceholder')}</option>`;
+      giftSel.disabled = true;
+      giftSummary.textContent = '';
+      amountOptionsEl.innerHTML = '';
+      customAmountWrap.style.display = 'none';
+      state.pickedGift = null;
+      state.pickedAmount = null;
+      updateSubmitEnabled();
+      renderGuestSuggestions(guestInput.value);
+    });
+
+    giftTypeSel.addEventListener('change', () => {
+      const t = giftTypeSel.value;
+      giftSel.innerHTML = `<option value="">${translate('admin:cashPurchases.field.giftPlaceholder')}</option>`;
+      giftSummary.textContent = '';
+      amountOptionsEl.innerHTML = '';
+      customAmountWrap.style.display = 'none';
+      state.pickedGift = null;
+      state.pickedAmount = null;
+      if (!t) { giftSel.disabled = true; updateSubmitEnabled(); return; }
+      const filtered = enabledGifts.filter(g => g.type === t && (Number(g.available) - Number(g.purchased || 0)) > 0);
+      if (filtered.length === 0) {
+        giftSel.innerHTML = `<option value="">${translate('admin:cashPurchases.field.giftNoneAvailable')}</option>`;
+        giftSel.disabled = true;
+      } else {
+        const BLOCK_BOILERPLATE_PREFIXES = [
+          'Help us build a sculpture with this block. ',
+          'Ayúdanos a construir una escultura con este bloque. ',
+          'Aidez-nous à construire une sculpture avec ce bloc. ',
+          'Hilf uns, mit diesem Block eine Skulptur zu bauen. ',
+        ];
+        const opts = filtered.map(g => {
+          const price = g.priceDisplay || (g.amount != null ? `€${g.amount}` : '');
+          const isBlock = g.type === 'cube';
+          let baseLabel;
+          if (isBlock && g.description) {
+            let desc = g.description;
+            for (const p of BLOCK_BOILERPLATE_PREFIXES) {
+              if (desc.startsWith(p)) { desc = desc.slice(p.length); break; }
+            }
+            baseLabel = desc.length > 80 ? desc.slice(0, 80).trimEnd() + '…' : desc;
+          } else {
+            baseLabel = g.title;
+          }
+          const label = price ? `${baseLabel} — ${price}` : baseLabel;
+          return `<option value="${g.id}">${escapeHtmlAdmin(label)}</option>`;
+        }).join('');
+        giftSel.innerHTML = `<option value="">${translate('admin:cashPurchases.field.giftPlaceholder')}</option>${opts}`;
+        giftSel.disabled = false;
+      }
+      updateSubmitEnabled();
+    });
+
+    giftSel.addEventListener('change', () => {
+      const gid = giftSel.value;
+      amountOptionsEl.innerHTML = '';
+      customAmountWrap.style.display = 'none';
+      state.pickedAmount = null;
+      if (!gid) { state.pickedGift = null; giftSummary.textContent = ''; updateSubmitEnabled(); return; }
+      const gift = enabledGifts.find(g => g.id === gid);
+      state.pickedGift = gift || null;
+      if (!gift) { updateSubmitEnabled(); return; }
+      giftSummary.textContent = (gift.description || '').slice(0, 200);
+      const options = Array.isArray(gift.amountOptions) && gift.amountOptions.length
+        ? gift.amountOptions
+        : (gift.amount ? [gift.amount] : []);
+      const maxOpt = options.length ? Math.max(...options) : 0;
+      const chips = options.map((amt, idx) => `
+        <label class="cp-amount-chip" data-amount="${amt}" style="cursor:pointer;">
+          <input type="radio" name="cpAmount" value="${amt}" ${idx === 0 ? 'checked' : ''} style="display:none;">
+          <span style="display:inline-block;padding:8px 16px;border-radius:999px;border:2px solid var(--primary-color);background:${idx === 0 ? 'var(--primary-color)' : '#fff'};color:${idx === 0 ? '#fff' : 'var(--text-dark)'};font-weight:600;">€${amt}</span>
+        </label>`).join('');
+      const otherChip = `
+        <label class="cp-amount-chip" data-amount="__custom__" style="cursor:pointer;">
+          <input type="radio" name="cpAmount" value="__custom__" style="display:none;">
+          <span style="display:inline-block;padding:8px 16px;border-radius:999px;border:2px dashed var(--primary-color);background:#fff;color:var(--text-dark);font-weight:600;">${translate('admin:cashPurchases.field.amountOther')}</span>
+        </label>`;
+      amountOptionsEl.innerHTML = chips + otherChip;
+      state.pickedAmount = options[0] || null;
+      customHint.textContent = `${translate('admin:cashPurchases.field.amountCustomHint')} €${maxOpt}`;
+
+      amountOptionsEl.querySelectorAll('.cp-amount-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          amountOptionsEl.querySelectorAll('.cp-amount-chip').forEach(c => {
+            const inp = c.querySelector('input');
+            const span = c.querySelector('span');
+            inp.checked = false;
+            const dashed = c.dataset.amount === '__custom__';
+            span.style.background = '#fff';
+            span.style.color = 'var(--text-dark)';
+            span.style.borderStyle = dashed ? 'dashed' : 'solid';
+          });
+          const inp = chip.querySelector('input');
+          inp.checked = true;
+          const span = chip.querySelector('span');
+          if (chip.dataset.amount === '__custom__') {
+            customAmountWrap.style.display = 'block';
+            span.style.background = 'var(--primary-color)';
+            span.style.color = '#fff';
+            span.style.borderStyle = 'dashed';
+            state.customAmount = true;
+            const v = Number(customAmountInput.value);
+            state.pickedAmount = (Number.isInteger(v) && v > maxOpt) ? v : null;
+          } else {
+            customAmountWrap.style.display = 'none';
+            span.style.background = 'var(--primary-color)';
+            span.style.color = '#fff';
+            state.customAmount = false;
+            state.pickedAmount = Number(chip.dataset.amount);
+          }
+          updateSubmitEnabled();
+        });
+      });
+
+      customAmountInput.addEventListener('input', () => {
+        const v = Number(customAmountInput.value);
+        if (Number.isInteger(v) && v > maxOpt) {
+          state.pickedAmount = v;
+          customHint.style.color = 'var(--text-light)';
+        } else {
+          state.pickedAmount = null;
+          customHint.style.color = '#dc3545';
+        }
+        updateSubmitEnabled();
+      });
+
+      updateSubmitEnabled();
+    });
+
+    modal.querySelector('#cpForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      setError('');
+      if (!state.pickedGuest || !state.pickedGift || !state.pickedAmount) {
+        setError(translate('admin:cashPurchases.errorIncomplete'));
+        return;
+      }
+      submitBtn.disabled = true;
+      try {
+        const r = await api('/api/admin/cash-purchases', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            guestEmail: state.pickedGuest.email,
+            giftId: state.pickedGift.id,
+            amount: state.pickedAmount,
+            message: modal.querySelector('#cpMessage').value.trim(),
+            giftFrom: fromInput.value.trim(),
+            sendEmails: true,
+          }),
+        });
+        if (!r.ok) {
+          const err = await r.json().catch(() => ({}));
+          setError(err.error || translate('admin:cashPurchases.errorSubmit'));
+          submitBtn.disabled = false;
+          return;
+        }
+        close();
+        notify(translate('admin:cashPurchases.created'), 'success');
+        showCashPurchases();
+      } catch (err) {
+        console.error('Create cash purchase failed', err);
+        setError(translate('admin:cashPurchases.errorSubmit'));
+        submitBtn.disabled = false;
+      }
+    });
   }
 
   function showCubeViewerDialog(purchase) {
@@ -2555,8 +3005,28 @@
       </tr>`;
     
     const allRows = rows + grandTotalRow;
-      
-    getContentTarget().innerHTML = renderTable({
+
+    const cashRevenueTotal = (gifts||[]).reduce((s, g) => s + (Number(g.cashRevenue) || 0), 0);
+    const stripeRevenueTotal = (gifts||[]).reduce((s, g) => s + (Number(g.stripeRevenue) || 0), 0);
+    const combinedRevenueTotal = cashRevenueTotal + stripeRevenueTotal;
+
+    const revenueBreakdownHtml = `
+      <div class="stats-grid" style="margin-bottom:var(--spacing-lg);">
+        <div class="stat-card">
+          <div class="stat-number">€${cashRevenueTotal}</div>
+          <div class="stat-label" data-i18n="admin:gifts.revenue.cash">${translate('admin:gifts.revenue.cash')}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">€${stripeRevenueTotal}</div>
+          <div class="stat-label" data-i18n="admin:gifts.revenue.card">${translate('admin:gifts.revenue.card')}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">€${combinedRevenueTotal}</div>
+          <div class="stat-label" data-i18n="admin:gifts.revenue.total">${translate('admin:gifts.revenue.total')}</div>
+        </div>
+      </div>`;
+
+    getContentTarget().innerHTML = revenueBreakdownHtml + renderTable({
       title: `<div data-i18n="admin:gifts.title">${translate('admin:gifts.title')}</div>`, 
       columns:[
         `<div data-i18n="admin:gifts.table.title">${translate('admin:gifts.table.title')}</div>`,
