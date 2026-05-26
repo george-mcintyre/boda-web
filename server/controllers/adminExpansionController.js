@@ -29,6 +29,43 @@ function getCubePositionById() {
   return cubePositionByIdCache;
 }
 
+const BANQUET_EVENT_ID = '69237e6b76402958d7ee1956';
+
+function buildCeremonyAttendeesSet(eventChoices, guests) {
+  const validPartyIds = new Map();
+  guests.forEach(g => {
+    const gid = g._id.toString();
+    const ids = new Set([gid]);
+    (g.partyMembers || []).forEach(pm => {
+      if (pm.id) ids.add(pm.id);
+      if (pm.name) ids.add(pm.name);
+    });
+    validPartyIds.set(gid, ids);
+  });
+
+  const attending = new Set();
+  eventChoices.forEach(ec => {
+    if (!ec.guestId) return;
+    const gid = ec.guestId.toString();
+    const valid = validPartyIds.get(gid);
+    if (!valid) return;
+    (ec.partyChoices || []).forEach(pc => {
+      const pmId = pc.partyGuestId;
+      if (!valid.has(pmId)) return;
+      const isCeremony = (pc.choices || []).some(c => {
+        const eId = c.eventId && c.eventId.toString ? c.eventId.toString() : c.eventId;
+        return eId === BANQUET_EVENT_ID && c.attending;
+      });
+      if (isCeremony) attending.add(`${gid}|${pmId}`);
+    });
+  });
+  return attending;
+}
+
+function attendeeKey(guestId, partyMemberId) {
+  return `${guestId}|${partyMemberId == null ? guestId : partyMemberId}`;
+}
+
 // ========== Guest Summary ==========
 async function getGuestSummary(req, res, next) {
   try {
@@ -98,31 +135,29 @@ async function getGuestSummary(req, res, next) {
       };
     });
 
-    // Count individuals without menu choices
-    // For each guest and party member, check if they have any menu choices
-    let individualsWithoutMenuChoices = 0;
-    
-    guests.forEach(g => {
-      const menuChoice = menuChoices.find(mc => mc.guestId.toString() === g._id.toString());
-      
-      // Check primary guest
-      const primaryChoice = menuChoice?.partyChoices?.find(pc => pc.partyGuestId === g._id.toString());
-      if (!primaryChoice || !primaryChoice.choices || primaryChoice.choices.length === 0) {
-        individualsWithoutMenuChoices++;
-      }
-      
-      // Check each party member
-      if (g.partyMembers && g.partyMembers.length > 0) {
-        g.partyMembers.forEach(pm => {
-          const pmChoice = menuChoice?.partyChoices?.find(pc => pc.partyGuestId === pm.name);
-          if (!pmChoice || !pmChoice.choices || pmChoice.choices.length === 0) {
-            individualsWithoutMenuChoices++;
-          }
-        });
-      }
+    // Only ceremony attendees can be missing a menu choice. Count primary +
+    // party member individuals attending the ceremony who have no menu picks.
+    const ceremonyAttendees = buildCeremonyAttendeesSet(eventChoices, guests);
+    const menuChoiceByGuestIdLocal = {};
+    menuChoices.forEach(mc => {
+      if (mc.guestId) menuChoiceByGuestIdLocal[mc.guestId.toString()] = mc;
     });
-    
-    const guestsWithoutMenuChoices = individualsWithoutMenuChoices;
+    let guestsWithoutMenuChoices = 0;
+    guests.forEach(g => {
+      const gid = g._id.toString();
+      const mc = menuChoiceByGuestIdLocal[gid];
+      if (ceremonyAttendees.has(`${gid}|${gid}`)) {
+        const primaryChoice = mc?.partyChoices?.find(pc => pc.partyGuestId === gid);
+        if (!primaryChoice || !(primaryChoice.choices || []).length) guestsWithoutMenuChoices++;
+      }
+      (g.partyMembers || []).forEach(pm => {
+        const pmId = pm.id || pm.name;
+        if (!pmId) return;
+        if (!ceremonyAttendees.has(`${gid}|${pmId}`) && !ceremonyAttendees.has(`${gid}|${pm.name}`)) return;
+        const pmChoice = mc?.partyChoices?.find(pc => pc.partyGuestId === pmId || pc.partyGuestId === pm.name);
+        if (!pmChoice || !(pmChoice.choices || []).length) guestsWithoutMenuChoices++;
+      });
+    });
 
     // Guests without party members
     const guestsWithoutPartyMembers = guests.filter(g => !g.partyMembers || g.partyMembers.length === 0).length;
@@ -808,7 +843,10 @@ async function getMenuResponses(req, res, next) {
         if (pmObj && pmObj.id == null) candidates.push('null', 'undefined');
       }
       const pc = findPartyChoice(ec, ...candidates);
-      return !!(pc?.choices || []).some(c => c.attending);
+      return !!(pc?.choices || []).some(c => {
+        const eId = c.eventId && c.eventId.toString ? c.eventId.toString() : c.eventId;
+        return eId === BANQUET_EVENT_ID && c.attending;
+      });
     };
 
     const buildPersonRow = (displayName, guest, partyMemberName, seatNumber, isFixed) => {
@@ -980,7 +1018,23 @@ async function getMenuResponses(req, res, next) {
       }
     });
 
-    res.json(result);
+    const hasAnyChoice = (g) => Array.isArray(g.choices) && g.choices.some(c => c.optionLabel && c.optionLabel !== '—');
+    let totalWithChoices = 0;
+    let totalWithoutChoices = 0;
+    result.forEach(group => {
+      group.guests.forEach(g => { if (hasAnyChoice(g)) totalWithChoices++; else totalWithoutChoices++; });
+    });
+    const filteredGroups = result
+      .map(g => ({ ...g, guests: g.guests.filter(hasAnyChoice) }))
+      .filter(g => g.guests.length > 0);
+    const totalAttendees = totalWithChoices + totalWithoutChoices;
+
+    res.json({
+      tableGroups: filteredGroups,
+      totalAttendees,
+      totalWithChoices,
+      totalWithoutChoices,
+    });
   } catch (e) { next(e); }
 }
 
@@ -1345,7 +1399,6 @@ async function getGuestsWithoutEventChoices(req, res, next) {
 }
 
 // ========== Guests Without Menu Choices ==========
-const BANQUET_EVENT_ID = '69237e6b76402958d7ee1956';
 
 async function getGuestsWithoutMenuChoices(req, res, next) {
   try {
@@ -1358,35 +1411,42 @@ async function getGuestsWithoutMenuChoices(req, res, next) {
       if (mc.guestId) menuChoiceByGuestId[mc.guestId.toString()] = mc;
     });
 
-    const primaryAttendingBanquet = new Set();
-    eventChoices.forEach(ec => {
-      if (!ec.guestId) return;
-      const gid = ec.guestId.toString();
-      const primaryPc = (ec.partyChoices || []).find(pc => pc.partyGuestId === gid || pc.partyGuestId === String(gid));
-      if (!primaryPc) return;
-      const attendingBanquet = (primaryPc.choices || []).some(c => {
-        const eId = c.eventId && c.eventId.toString ? c.eventId.toString() : c.eventId;
-        return eId === BANQUET_EVENT_ID && c.attending;
-      });
-      if (attendingBanquet) primaryAttendingBanquet.add(gid);
-    });
+    const ceremonyAttendees = buildCeremonyAttendeesSet(eventChoices, guests);
 
     const guestsWithout = [];
     guests.forEach(g => {
       const gid = g._id.toString();
-      if (!primaryAttendingBanquet.has(gid)) return;
-
       const mc = menuChoiceByGuestId[gid];
-      const primaryChoice = mc?.partyChoices?.find(pc => pc.partyGuestId === gid);
-      const hasChoices = primaryChoice && primaryChoice.choices && primaryChoice.choices.length > 0;
 
-      if (!hasChoices) {
-        guestsWithout.push({
-          id: gid,
-          name: g.name,
-          email: g.email
-        });
+      if (ceremonyAttendees.has(`${gid}|${gid}`)) {
+        const primaryChoice = mc?.partyChoices?.find(pc => pc.partyGuestId === gid);
+        const hasChoices = primaryChoice && primaryChoice.choices && primaryChoice.choices.length > 0;
+        if (!hasChoices) {
+          guestsWithout.push({
+            id: gid,
+            name: g.name,
+            email: g.email,
+            partyOf: null,
+          });
+        }
       }
+
+      (g.partyMembers || []).forEach(pm => {
+        if (!pm || !pm.name) return;
+        const pmId = pm.id || pm.name;
+        const attending = ceremonyAttendees.has(`${gid}|${pmId}`) || ceremonyAttendees.has(`${gid}|${pm.name}`);
+        if (!attending) return;
+        const pmChoice = mc?.partyChoices?.find(pc => pc.partyGuestId === pmId || pc.partyGuestId === pm.name);
+        const hasChoices = pmChoice && pmChoice.choices && pmChoice.choices.length > 0;
+        if (!hasChoices) {
+          guestsWithout.push({
+            id: `${gid}:${pmId}`,
+            name: pm.name,
+            email: g.email,
+            partyOf: g.name,
+          });
+        }
+      });
     });
 
     res.json(guestsWithout);
@@ -1597,7 +1657,10 @@ async function getBanquetSeatingPrint(req, res, next) {
         if (pmObj && pmObj.id == null) candidates.push('null', 'undefined');
       }
       const pc = findPartyChoice(ec, ...candidates);
-      return !!(pc?.choices || []).some(c => c.attending);
+      return !!(pc?.choices || []).some(c => {
+        const eId = c.eventId && c.eventId.toString ? c.eventId.toString() : c.eventId;
+        return eId === BANQUET_EVENT_ID && c.attending;
+      });
     };
 
     const buildMealChoices = (pc) => {

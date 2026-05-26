@@ -211,15 +211,15 @@
               <ul style="list-style:none;padding:0;">
                 <li style="padding:8px 0;border-bottom:1px solid var(--gray-200);">
                   <i class="fas fa-utensils" style="color:var(--primary-color);width:20px;"></i>
-                  <strong>${data.guestsWithoutMenuChoices}</strong> ${translate('admin:guests.withoutMenuChoices')}
+                  <strong>${data.guestsWithoutMenuChoices}</strong> ${translate(data.guestsWithoutMenuChoices === 1 ? 'admin:guests.withoutMenuChoices.singular' : 'admin:guests.withoutMenuChoices.plural')}
                 </li>
                 <li style="padding:8px 0;border-bottom:1px solid var(--gray-200);">
                   <i class="fas fa-calendar" style="color:var(--primary-color);width:20px;"></i>
-                  <strong>${data.guestsWithoutEventChoices}</strong> ${translate('admin:guests.withoutEventResponses')}
+                  <strong>${data.guestsWithoutEventChoices}</strong> ${translate(data.guestsWithoutEventChoices === 1 ? 'admin:guests.withoutEventResponses.singular' : 'admin:guests.withoutEventResponses.plural')}
                 </li>
                 <li style="padding:8px 0;">
                   <i class="fas fa-users" style="color:var(--primary-color);width:20px;"></i>
-                  <strong>${data.guestsWithoutPartyMembers}</strong> ${translate('admin:guests.withoutPartyMembers')}
+                  <strong>${data.guestsWithoutPartyMembers}</strong> ${translate(data.guestsWithoutPartyMembers === 1 ? 'admin:guests.withoutPartyMembers.singular' : 'admin:guests.withoutPartyMembers.plural')}
                 </li>
               </ul>
             </div>
@@ -838,12 +838,21 @@
     setLoading(translate('admin:subtab.menuResponses'));
     try {
       const res = await api(`/api/admin/menu-responses?lang=${getUserLanguage()}`);
-      const tableGroups = res.ok ? await res.json() : [];
+      const payload = res.ok ? await res.json() : { tableGroups: [], totalAttendees: 0, totalWithChoices: 0, totalWithoutChoices: 0 };
+      const tableGroups = Array.isArray(payload) ? payload : (payload.tableGroups || []);
+      const totalAttendees = Array.isArray(payload) ? tableGroups.reduce((s, g) => s + (g.guests || []).length, 0) : (payload.totalAttendees || 0);
+      const totalWithChoices = Array.isArray(payload) ? totalAttendees : (payload.totalWithChoices || 0);
+      const totalWithoutChoices = Array.isArray(payload) ? 0 : (payload.totalWithoutChoices || 0);
 
-      if (tableGroups.length === 0) {
+      const progressLine = totalAttendees > 0
+        ? `<p style="margin:6px 0 18px 0;color:var(--text-light);">${translate('admin:menuResponses.progress').replace('{done}', totalWithChoices).replace('{total}', totalAttendees).replace('{pending}', totalWithoutChoices)}</p>`
+        : '';
+
+      if (totalWithChoices === 0) {
         target.innerHTML = `
           <div class="admin-content">
-            <h3><i class="fas fa-clipboard-list"></i> ${translate('admin:subtab.menuResponses')}</h3>
+            <h3><i class="fas fa-clipboard-list"></i> ${translate('admin:subtab.menuResponses')} <span class="count-badge">0</span></h3>
+            ${progressLine}
             <div style="text-align:center;padding:40px;">
               <i class="fas fa-clipboard" style="font-size:3em;color:var(--gray-300);margin-bottom:15px;"></i>
               <p style="color:var(--text-light);">${translate('admin:menuResponses.noResponses')}</p>
@@ -856,9 +865,7 @@
       const seatBadgeRegular = `${seatBadgeStyle}background:#e8dced;color:#8B5A96;`;
       const seatBadgeFixed = `${seatBadgeStyle}background:#d4a5a5;color:#fff;`;
 
-      let totalResponses = 0;
       const groupHtml = tableGroups.map(group => {
-        totalResponses += group.guests.length;
         const guestRows = group.guests.map(g => {
           const choiceLabels = (g.choices || []).map(c => {
             if (!c.optionLabel || c.optionLabel === '—') return null;
@@ -884,7 +891,8 @@
 
       target.innerHTML = `
         <div class="admin-content">
-          <h3><i class="fas fa-clipboard-list"></i> ${translate('admin:subtab.menuResponses')} <span class="count-badge">${totalResponses}</span></h3>
+          <h3><i class="fas fa-clipboard-list"></i> ${translate('admin:subtab.menuResponses')} <span class="count-badge">${totalWithChoices}</span></h3>
+          ${progressLine}
           ${groupHtml}
         </div>`;
     } catch(e) {
@@ -1630,8 +1638,11 @@
       }
 
       const rows = guests.map(g => {
+        const partyOf = g.partyOf
+          ? `<small style="color:var(--text-light);">${translate('admin:menuNoChoices.partyOf')} ${g.partyOf}</small>`
+          : '';
         return `<tr>
-          <td>${g.name}</td>
+          <td>${g.name}${partyOf ? '<br/>' + partyOf : ''}</td>
           <td><a href="mailto:${g.email}">${g.email}</a></td>
         </tr>`;
       }).join('');
