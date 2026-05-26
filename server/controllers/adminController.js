@@ -613,7 +613,6 @@ async function createCashGiftPurchase(req, res, next) {
       lang: (lang && ['en','es','fr','de'].includes(lang)) ? lang : (guest.lang || 'en'),
       date: new Date(),
       paymentMethod: 'cash',
-      stripeSessionId: null,
       anonymous: false,
       anonymousBuyerEmail: null,
       createdByAdminId: adminId,

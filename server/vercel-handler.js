@@ -1,7 +1,7 @@
 // server/vercel-handler.js
 const { app } = require('./app');
 const { connectDB } = require('./config/db');
-const { ensureCollectionsAndIndexes, seedExampleDataIfEmpty, seedCubeGiftsIfNeeded, seedFigurineGiftsIfNeeded, migrateCashGiftsToAmountOptions, migrateGuestsAddLang } = require('./bootstrap/initDb');
+const { ensureCollectionsAndIndexes, seedExampleDataIfEmpty, seedCubeGiftsIfNeeded, seedFigurineGiftsIfNeeded, migrateCashGiftsToAmountOptions, migrateGuestsAddLang, migrateGiftChoiceStripeIndexToSparse } = require('./bootstrap/initDb');
 
 let isInitialized = false;
 
@@ -25,6 +25,9 @@ async function init() {
   );
   await migrateGuestsAddLang().catch(err =>
     console.warn('[DB] Guest lang migration warning:', err.message)
+  );
+  await migrateGiftChoiceStripeIndexToSparse().catch(err =>
+    console.warn('[DB] GiftChoice stripe index migration warning:', err.message)
   );
   isInitialized = true;
 }

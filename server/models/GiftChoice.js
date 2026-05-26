@@ -9,7 +9,7 @@ const giftChoiceSchema = new Schema({
   amount: { type: Number },
   lang: { type: String, enum: ['en', 'es', 'fr', 'de'], default: 'en' },
   paymentMethod: { type: String, enum: ['stripe', 'cash'], default: 'stripe', required: true, index: true },
-  stripeSessionId: { type: String, unique: true, sparse: true, default: null },
+  stripeSessionId: { type: String, unique: true, sparse: true },
   anonymous: { type: Boolean, default: false, index: true },
   anonymousBuyerEmail: { type: String, default: null },
   createdByAdminId: { type: Schema.Types.ObjectId, ref: 'Admin', default: null }

@@ -268,6 +268,38 @@ async function migrateGuestsAddLang() {
   return result;
 }
 
+async function migrateGiftChoiceStripeIndexToSparse() {
+  const GiftChoice = models.GiftChoice;
+  const coll = GiftChoice.collection;
+
+  // First: scrub explicit null stripeSessionId fields from any cash purchases
+  // created before this migration. Sparse indexes ignore documents where the
+  // field is ABSENT but not where it is present-and-null, so we have to unset
+  // them or two cash purchases would still collide on a unique-sparse index.
+  const nullScrub = await coll.updateMany(
+    { stripeSessionId: null },
+    { $unset: { stripeSessionId: '' } }
+  );
+  if (nullScrub.modifiedCount > 0) {
+    console.log(`[DB] Unset explicit null stripeSessionId on ${nullScrub.modifiedCount} GiftChoice document(s)`);
+  }
+
+  const indexes = await coll.indexes();
+  const existing = indexes.find(idx => idx.name === 'stripeSessionId_1');
+  if (!existing) {
+    await GiftChoice.createIndexes().catch(() => {});
+    return;
+  }
+  if (existing.sparse) {
+    console.log('[DB] GiftChoice.stripeSessionId index already sparse');
+    return;
+  }
+  console.log('[DB] Dropping non-sparse GiftChoice.stripeSessionId index so it can be recreated as sparse-unique');
+  await coll.dropIndex('stripeSessionId_1');
+  await GiftChoice.createIndexes();
+  console.log('[DB] Recreated GiftChoice.stripeSessionId index as sparse-unique');
+}
+
 module.exports = {
   ensureCollectionsAndIndexes,
   seedExampleDataIfEmpty,
@@ -275,4 +307,5 @@ module.exports = {
   seedFigurineGiftsIfNeeded,
   migrateCashGiftsToAmountOptions,
   migrateGuestsAddLang,
+  migrateGiftChoiceStripeIndexToSparse,
 };
