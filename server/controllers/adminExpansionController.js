@@ -1231,17 +1231,6 @@ function readPrintAssetAsDataUri(absoluteUrl) {
   return hires || readStaticAssetAsDataUri(absoluteUrl);
 }
 
-function cubeFacesToDataUris(faces) {
-  if (!faces || typeof faces !== 'object') return null;
-  const out = {};
-  for (const key of Object.keys(faces)) {
-    const v = faces[key];
-    if (v === 'white' || v === 'mirror') out[key] = v;
-    else out[key] = readStaticAssetAsDataUri(v);
-  }
-  return out;
-}
-
 async function buildGiftImageDataUri(giftImageRef) {
   if (!giftImageRef) return null;
   try {
@@ -1272,12 +1261,15 @@ async function buildCombinedDescriptor(choice) {
   const giftTitleLocalised = toFourLangs(gift.title);
   const giftDescriptionLocalised = toFourLangs(gift.description);
 
+  // Image-payload budget rule for the descriptor: include ONLY images that
+  // the print templates in scripts/print/templates/ actually read. Past
+  // revisions also embedded cube face textures and figurine thumbnails for
+  // print, but those templates moved to text-only layouts and the images
+  // are now dead weight (≈1-2 MB per cube purchase). The live admin UI
+  // still reads cubeFaces/cubePosition from getGiftPurchases() — that's a
+  // different endpoint, so removing them from the descriptor here doesn't
+  // affect the live block viewer dialog.
   const cashImageDataUri = isCash ? await buildGiftImageDataUri(gift.image) : null;
-  const cubeFacesData = isCube ? cubeFacesToDataUris(getCubeFacesById().get(gift.cubeId)) : null;
-  const figurineThumbDataUri = isFigurine
-    ? (readStaticAssetAsDataUri(`/assets/figurines/figurine-${gift.figurineId}/thumb.png`)
-        || readStaticAssetAsDataUri(`/assets/figurines/figurine-${gift.figurineId}/thumb.webp`))
-    : null;
 
   const giftNoteCoverDataUri = readPrintAssetAsDataUri('/assets/images/gift-cards/gift-note-cover.jpg');
   const coupleInsideDataUri = readPrintAssetAsDataUri('/assets/images/gift-cards/couple-inside-transparent.png');
@@ -1295,10 +1287,7 @@ async function buildCombinedDescriptor(choice) {
     amount,
     imageDataUri: cashImageDataUri,
     cubeId: isCube ? gift.cubeId : null,
-    cubeFaces: cubeFacesData,
-    cubePosition: isCube ? (getCubePositionById().get(gift.cubeId) || null) : null,
     figurineId: isFigurine ? gift.figurineId : null,
-    figurineThumbDataUri,
   };
 
   const artefacts = {

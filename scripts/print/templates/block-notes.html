@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Block notes — print sheet</title>
+<style>
+  /*
+   * Aggregate sheet: every purchased Block (gift type 'cube') gets one
+   * 60×60 mm self-adhesive label, laid out in a 3×4 grid on A4 portrait
+   * pages so the printer can cut all the labels from a single sheet
+   * instead of feeding twelve individual stickers.
+   *
+   * Coordinate maths (A4 = 210×297 mm):
+   *   grid block        = 3 cols × 60mm = 180mm wide, 4 rows × 60mm = 240mm tall
+   *   horizontal margin = (210 - 180) / 2 = 15 mm each side
+   *   vertical margin   = (297 - 240) / 2 = 28.5 mm top and bottom
+   *
+   * Cells are flush (no gap) and each cell carries hairline corner cut
+   * marks so the printer's guillotine has visible registration when
+   * trimming the labels apart. Background is plain white per spec —
+   * the cell content is not bled to the edge; the visible label area
+   * IS the full 60×60 mm cell.
+   *
+   * Renders ONE PDF for the whole run, taking its data from
+   * `window.__BLOCK_NOTES__` (array of { message, signer, lang,
+   * purchaseId }) injected by render-artefacts.js after it has scanned
+   * every cube descriptor in the input. Unlike the other templates this
+   * one ignores `window.__DESCRIPTOR__`.
+   */
+  @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
+  @page { size: 210mm 297mm; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    color: #2c1810;
+    font-family: Georgia, "Times New Roman", serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .sheet {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    padding: 28.5mm 15mm;
+    page-break-after: always;
+  }
+  .sheet:last-child { page-break-after: auto; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 60mm);
+    grid-template-rows: repeat(4, 60mm);
+    gap: 0;
+    width: 180mm;
+    height: 240mm;
+    margin: 0 auto;
+  }
+
+  .cell {
+    position: relative;
+    width: 60mm;
+    height: 60mm;
+    padding: 5mm 5mm 8mm 5mm;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  /*
+   * Hairline corner cut marks at every cell so the printer can trim the
+   * labels apart with a guillotine. Marks are 0.2 mm thick × 2 mm long,
+   * hugging each cell corner. Without them the printed grid is
+   * indistinguishable from a continuous block of text on the sheet.
+   */
+  .cut {
+    position: absolute;
+    background: #000;
+    z-index: 2;
+  }
+  .cut.tl-h { top: 0; left: 0; width: 2mm; height: 0.2mm; }
+  .cut.tl-v { top: 0; left: 0; width: 0.2mm; height: 2mm; }
+  .cut.tr-h { top: 0; right: 0; width: 2mm; height: 0.2mm; }
+  .cut.tr-v { top: 0; right: 0; width: 0.2mm; height: 2mm; }
+  .cut.bl-h { bottom: 0; left: 0; width: 2mm; height: 0.2mm; }
+  .cut.bl-v { bottom: 0; left: 0; width: 0.2mm; height: 2mm; }
+  .cut.br-h { bottom: 0; right: 0; width: 2mm; height: 0.2mm; }
+  .cut.br-v { bottom: 0; right: 0; width: 0.2mm; height: 2mm; }
+
+  .message {
+    /*
+     * The message text box spans the full cell minus the padding, ending
+     * a few mm above the signer corner so the two never collide on long
+     * messages. Sized by absolute positioning rather than flex so the JS
+     * auto-shrink can measure scrollHeight against a stable box.
+     */
+    position: absolute;
+    top: 5mm;
+    left: 5mm;
+    right: 5mm;
+    bottom: 12mm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.35;
+    white-space: pre-line;
+    color: #2c1810;
+    font-size: 11pt;
+  }
+  .message.empty {
+    color: #b0a59b;
+    font-style: italic;
+  }
+
+  .signer {
+    /*
+     * Bottom-right corner signoff in Great Vibes — same font and "—"
+     * prefix as the gift note's inside-right `.signer` so the block
+     * sticker visually matches the gift note that ships with it.
+     * max-width caps overrun on a very long signer; the line wraps
+     * still anchored to the bottom-right.
+     */
+    position: absolute;
+    right: 4mm;
+    bottom: 3mm;
+    font-family: 'Great Vibes', 'Allura', 'Pinyon Script', 'Apple Chancery', cursive;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16pt;
+    line-height: 1.1;
+    color: #000;
+    max-width: 50mm;
+    text-align: right;
+  }
+</style>
+</head>
+<body>
+  <div id="sheets"></div>
+
+  <!--INJECT-DATA-->
+  <script>
+    var EMPTY_MESSAGE = {
+      en: '(No message)',
+      es: '(Sin mensaje)',
+      fr: '(Aucun message)',
+      de: '(Keine Nachricht)',
+    };
+
+    function emptyMsgFor(lang) {
+      return EMPTY_MESSAGE[lang] || EMPTY_MESSAGE.en;
+    }
+
+    /*
+     * Auto-shrink the message font-size until it fits in the cell. The
+     * cell is fixed at 60×60 mm and the buyers' messages are free-form
+     * arbitrary length; without shrinking, long messages overflow and
+     * get clipped by the cell's overflow:hidden. Steps down by 0.5pt and
+     * caps at 6pt so it remains legible at print resolution.
+     */
+    function shrinkToFit(el, minPt) {
+      var cs = window.getComputedStyle(el);
+      var pxToPt = function (px) { return px * 72 / 96; };
+      var ptToPx = function (pt) { return pt * 96 / 72; };
+      var sizePt = pxToPt(parseFloat(cs.fontSize));
+      var minPx = ptToPx(minPt);
+      for (var i = 0; i < 40; i++) {
+        if (el.scrollHeight <= el.clientHeight && el.scrollWidth <= el.clientWidth) return;
+        sizePt -= 0.5;
+        var nextPx = ptToPx(sizePt);
+        if (nextPx < minPx) {
+          el.style.fontSize = minPt + 'pt';
+          return;
+        }
+        el.style.fontSize = sizePt + 'pt';
+      }
+    }
+
+    function buildCell(note) {
+      var cell = document.createElement('div');
+      cell.className = 'cell';
+
+      var corners = ['tl-h','tl-v','tr-h','tr-v','bl-h','bl-v','br-h','br-v'];
+      corners.forEach(function (c) {
+        var span = document.createElement('span');
+        span.className = 'cut ' + c;
+        cell.appendChild(span);
+      });
+
+      var msg = document.createElement('div');
+      msg.className = 'message';
+      var text = (note && note.message ? String(note.message) : '').trim();
+      if (text) {
+        msg.textContent = text;
+      } else {
+        msg.textContent = emptyMsgFor(note && note.lang);
+        msg.classList.add('empty');
+      }
+      cell.appendChild(msg);
+
+      var signer = document.createElement('div');
+      signer.className = 'signer';
+      signer.textContent = '\u2014 ' + ((note && note.signer) || '');
+      cell.appendChild(signer);
+
+      return { cell: cell, msg: msg };
+    }
+
+    (function () {
+      var notes = Array.isArray(window.__BLOCK_NOTES__) ? window.__BLOCK_NOTES__ : [];
+      var root = document.getElementById('sheets');
+      var CELLS_PER_SHEET = 12;
+
+      if (notes.length === 0) {
+        root.innerHTML = '<div style="padding:20mm;font-family:sans-serif;font-size:10pt;color:#888;">'
+          + 'No block (cube) purchases to print.</div>';
+        window.__TEMPLATE_READY__ = true;
+        return;
+      }
+
+      var pendingShrink = [];
+      for (var i = 0; i < notes.length; i += CELLS_PER_SHEET) {
+        var sheet = document.createElement('section');
+        sheet.className = 'sheet';
+        var grid = document.createElement('div');
+        grid.className = 'grid';
+        sheet.appendChild(grid);
+        root.appendChild(sheet);
+
+        for (var j = 0; j < CELLS_PER_SHEET; j++) {
+          var note = notes[i + j];
+          if (!note) {
+            var blank = document.createElement('div');
+            blank.className = 'cell';
+            grid.appendChild(blank);
+            continue;
+          }
+          var built = buildCell(note);
+          grid.appendChild(built.cell);
+          pendingShrink.push(built.msg);
+        }
+      }
+
+      pendingShrink.forEach(function (el) { shrinkToFit(el, 6); });
+
+      window.__TEMPLATE_READY__ = true;
+    })();
+  </script>
+</body>
+</html>

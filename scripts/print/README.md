@@ -59,12 +59,13 @@ no Chromium-on-serverless wrangling. Playwright is already in
 3. **Send the PDFs to the printer**
 
    Output (default `./prints/`) contains one PDF per artefact per purchase,
-   named like:
+   plus one aggregate sheet for the block (cube) labels, named like:
 
    ```
    gift-note-<purchaseId>-<guest-slug>.pdf
    thank-you-note-<purchaseId>-<guest-slug>.pdf
    honeymoon-card-<purchaseId>-<guest-slug>.pdf   (cash gifts only)
+   block-notes-sheet.pdf                          (one per run; only if there are cube purchases)
    ```
 
 ---
@@ -76,10 +77,13 @@ no Chromium-on-serverless wrangling. Playwright is already in
 | **Gift note** | A4 landscape (297×210 mm) | 2 | Outside spread + inside spread. Score down the centre, fold to A5 portrait. |
 | **Thank-you note** | A4 landscape (297×210 mm) | 2 | Same shape as gift note. Inside is bilingual (EN/ES). |
 | **Honeymoon card** | 91×61 mm (= 85×55 mm + 3 mm bleed each side) | 2 | Front + back. ISO/IEC 7810 ID-1 credit-card size. |
+| **Block notes sheet** | A4 portrait (210×297 mm) | 1 per 12 cube purchases | 3×4 grid of 60×60 mm self-adhesive labels. Print on adhesive stock and cut along the corner marks. Centred message + cursive "— signer" at bottom-right. |
 
-All PDFs include **3 mm bleed and corner crop marks** suitable for
-professional printers. They print at the native size — do not scale
-or "fit to page".
+The gift / thank-you / honeymoon PDFs include **3 mm bleed and corner
+crop marks** suitable for professional printers. They print at the
+native size — do not scale or "fit to page". The block-notes sheet
+prints onto self-adhesive A4 label stock and gets cut along the hairline
+corner marks (no bleed — the labels are flush white, edge-to-edge).
 
 ### Printer specs to give your printer
 
@@ -131,9 +135,7 @@ each item in `descriptors` has the shape below.
     "amount": 150,
     "imageDataUri": "data:image/jpeg;base64,...",   // cash only
     "cubeId": null,                  // 1..38 for cube gifts
-    "cubeFaces": null,               // { front, back, top, bottom, left, right } for cube gifts
-    "figurineId": null,              // 1..4 for figurine gifts
-    "figurineThumbDataUri": null     // figurine only
+    "figurineId": null               // 1..4 for figurine gifts
   },
 
   "couple": { "names": "Iluminada & George" },
@@ -145,6 +147,15 @@ each item in `descriptors` has the shape below.
   }
 }
 ```
+
+The descriptor deliberately omits cube face textures and figurine
+thumbnails — they used to be embedded but the print templates moved to
+text-only layouts and the images added ~1-2 MB per cube purchase to
+every bundle download for no gain. If a future template needs those
+images back, add them under `artefacts.<artefactKey>` (where the
+print-only assets live) rather than back onto `gift.*` (which mirrors
+the schema). The live admin block viewer dialog gets its faces from
+`/api/admin/gift-purchases` directly, not from the descriptor.
 
 ### Notes on the schema
 
@@ -171,7 +182,8 @@ scripts/print/
 ├── templates/
 │   ├── gift-note.html           Folded card, outside + inside spread
 │   ├── thank-you-note.html      Folded card, bilingual inside
-│   └── honeymoon-card.html      Credit-card-shaped voucher
+│   ├── honeymoon-card.html      Credit-card-shaped voucher
+│   └── block-notes.html         A4 sheet of 60×60 mm cube-label stickers
 └── README.md                    This file
 ```
 
@@ -184,15 +196,22 @@ in practice: change the wording in the template, re-run
 
 ### Template contract
 
-Each template:
-1. Loads with the marker comment `<!--INJECT-DATA-->` somewhere in the body.
+Per-descriptor templates (`gift-note.html`, `thank-you-note.html`,
+`honeymoon-card.html`):
+1. Load with the marker comment `<!--INJECT-DATA-->` somewhere in the body.
 2. The CLI substitutes that marker with a `<script>` block that sets
    `window.__DESCRIPTOR__` and `window.__ARTEFACT__`.
 3. The template's own inline script reads those globals, populates the
    DOM, and sets `window.__TEMPLATE_READY__ = true`.
 4. Playwright waits for `__TEMPLATE_READY__` before generating the PDF.
 
-If you write a new template, keep all four steps.
+The aggregate template `block-notes.html` follows the same contract but
+receives `window.__BLOCK_NOTES__` (an array of `{ message, signer, lang,
+purchaseId, cubeId }`) instead of `__DESCRIPTOR__`. The CLI builds the
+array by scanning every cube purchase in the run and emits one PDF per
+run, not per purchase.
+
+If you write a new template, keep all the steps above.
 
 ---
 

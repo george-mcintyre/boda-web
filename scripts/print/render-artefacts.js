@@ -10,12 +10,19 @@ const TEMPLATES_DIR = path.join(SCRIPT_DIR, 'templates');
 const DEFAULT_OUT_DIR = path.join(process.cwd(), 'prints');
 const SCHEMA_VERSION_SUPPORTED = 1;
 
+// Per-descriptor artefacts: one PDF emitted per descriptor per key.
 const ARTEFACTS = ['giftNote', 'thankYouNote', 'honeymoonCard'];
 const ARTEFACT_TEMPLATE_FILE = {
   giftNote: 'gift-note.html',
   thankYouNote: 'thank-you-note.html',
   honeymoonCard: 'honeymoon-card.html',
 };
+// Aggregate artefacts: one PDF emitted per RUN, gathering data across many
+// descriptors. The block-notes sheet packs every cube purchase's message +
+// signer into a 3×4 grid on A4 so the printer can cut all the 60×60 mm
+// self-adhesive labels from a single sheet.
+const BLOCK_NOTES_TEMPLATE_FILE = 'block-notes.html';
+const BLOCK_NOTES_OUTPUT_FILE = 'block-notes-sheet.pdf';
 
 function parseArgs(argv) {
   const args = {
@@ -302,15 +309,21 @@ Options:
 
 Output:
   PDFs are written to ./prints/ by default (override with --out).
-  One PDF per artefact per purchase.
+  One PDF per artefact per purchase, plus one aggregate sheet for the
+  block (cube) labels.
 
-  Filename pattern:
+  Per-purchase filename pattern:
     <artefact>-<purchaseId>-<guestSlug>.pdf
 
   Example:
     gift-note-65f3a..._maria-jose.pdf
     thank-you-note-65f3a..._maria-jose.pdf
     honeymoon-card-65f3a..._maria-jose.pdf   (cash gifts only)
+
+  Aggregate:
+    block-notes-sheet.pdf                    (3×4 grid on A4 portrait;
+                                              one 60×60 mm self-adhesive
+                                              label per cube purchase)
 
 Spanish salutation forms:
   number=1 gender=m  → "Querido <name>,"
@@ -440,6 +453,62 @@ function pdfOptionsForArtefact(artefactKey) {
   return { format: 'A4', landscape: true };
 }
 
+function collectBlockNotes(entries) {
+  // Only cube purchases get a block sticker. For each, take the same
+  // message that goes on the gift note's inside-right (messageDisplay,
+  // with any duplicated couple-name salutation already stripped by the
+  // pre-pass loop in main()) and the same signer name that signs the
+  // gift note.
+  const notes = [];
+  for (const { descriptor: d } of entries) {
+    if (!d || !d.gift || d.gift.type !== 'cube') continue;
+    const purchase = d.purchase || {};
+    const guest = d.guest || {};
+    const message = typeof purchase.messageDisplay === 'string'
+      ? purchase.messageDisplay
+      : (purchase.message || '');
+    notes.push({
+      purchaseId: d.purchaseId,
+      message,
+      signer: purchase.signerName || guest.name || '',
+      lang: purchase.lang || guest.lang || 'en',
+      cubeId: d.gift.cubeId || null,
+    });
+  }
+  // Stable ordering: by cubeId when present (so the printed sheet maps
+  // sensibly onto the sculpture's block numbering), with anything missing
+  // a cubeId trailing at the end.
+  notes.sort((a, b) => {
+    const ax = Number.isFinite(a.cubeId) ? a.cubeId : Infinity;
+    const bx = Number.isFinite(b.cubeId) ? b.cubeId : Infinity;
+    if (ax !== bx) return ax - bx;
+    return String(a.purchaseId).localeCompare(String(b.purchaseId));
+  });
+  return notes;
+}
+
+async function renderBlockNotesSheet({ browser, notes, outDir }) {
+  const template = fs.readFileSync(path.join(TEMPLATES_DIR, BLOCK_NOTES_TEMPLATE_FILE), 'utf8');
+  const injected = `
+    <script>
+      window.__BLOCK_NOTES__ = ${JSON.stringify(notes)};
+    </script>
+  `;
+  const html = template.replace('<!--INJECT-DATA-->', injected);
+
+  const page = await browser.newPage();
+  try {
+    await page.setContent(html, { waitUntil: 'networkidle' });
+    await page.waitForFunction(() => window.__TEMPLATE_READY__ === true, { timeout: 5000 }).catch(() => {});
+    const outPath = path.join(outDir, BLOCK_NOTES_OUTPUT_FILE);
+    // A4 portrait. preferCSSPageSize honours the @page rule in the template.
+    await page.pdf({ format: 'A4', path: outPath, printBackground: true, preferCSSPageSize: true });
+    return outPath;
+  } finally {
+    await page.close();
+  }
+}
+
 function kebab(camel) {
   return String(camel).replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 }
@@ -514,6 +583,18 @@ async function main() {
           process.stderr.write(`  \u2717 ${artefactKey} for ${descriptor.purchaseId}: ${err.message}\n`);
           failed++;
         }
+      }
+    }
+
+    const blockNotes = collectBlockNotes(entries);
+    if (blockNotes.length > 0) {
+      try {
+        const outPath = await renderBlockNotesSheet({ browser, notes: blockNotes, outDir });
+        process.stdout.write(`  \u2713 ${path.basename(outPath)} (${blockNotes.length} block label${blockNotes.length === 1 ? '' : 's'})\n`);
+        ok++;
+      } catch (err) {
+        process.stderr.write(`  \u2717 block-notes-sheet: ${err.message}\n`);
+        failed++;
       }
     }
   } finally {
