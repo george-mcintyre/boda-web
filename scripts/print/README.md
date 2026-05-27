@@ -19,7 +19,28 @@ no Chromium-on-serverless wrangling. Playwright is already in
    - The "Download all artefacts" button at the top downloads every
      purchase as `wedding-print-bundle-<date>.json`.
 
-2. **Run the script**
+2. **Mirror cash gift images to local disk (one-shot)**
+
+   The descriptor bundle no longer embeds cash gift artwork (the per-perk
+   images stored in MongoDB). Run the downloader once to mirror them:
+
+   ```bash
+   # Easiest: paste the JWT from your browser's localStorage on the admin page
+   #   In DevTools console: copy(localStorage.getItem('adminToken'))
+   WEDDING_ADMIN_TOKEN='<paste here>' \
+     node scripts/print/download-gift-images.js ~/Downloads/wedding-print-bundle.json
+
+   # Or log in with the admin password:
+   ADMIN_PASSWORD='<your password>' \
+     node scripts/print/download-gift-images.js ~/Downloads/wedding-print-bundle.json
+   ```
+
+   This populates `scripts/print/gift-images/<imageId>.<ext>` and is
+   idempotent — re-run after each new bundle and only the newly-purchased
+   gifts will be fetched. Skip this step if your bundle has no cash
+   purchases (cube + figurine gifts don't reference any per-gift image).
+
+3. **Run the print script**
 
    ```bash
    # Single descriptor:
@@ -56,7 +77,7 @@ no Chromium-on-serverless wrangling. Playwright is already in
    (`salutation-overrides.<YYYYMMDD-HHMMSS>.json`) so your edits are never
    overwritten.
 
-3. **Send the PDFs to the printer**
+4. **Send the PDFs to the printer**
 
    Output (default `./prints/`) contains one PDF per artefact per purchase,
    plus one aggregate sheet for the block (cube) labels, named like:
@@ -102,7 +123,7 @@ as a finishing option — mention "score and fold to A5" when ordering.
 
 ---
 
-## Descriptor JSON schema (v1)
+## Descriptor JSON schema (v2)
 
 The admin endpoint `/api/admin/gift-purchases/:id/descriptor.json` builds
 this. The bulk endpoint `/api/admin/gift-purchases/descriptors.json`
@@ -111,7 +132,7 @@ each item in `descriptors` has the shape below.
 
 ```jsonc
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "purchaseId": "65f3a...",
   "generatedAt": "2026-05-17T14:32:00.000Z",
 
@@ -133,7 +154,10 @@ each item in `descriptors` has the shape below.
     "title":       { "en": "...", "es": "...", "fr": "...", "de": "..." },
     "description": { "en": "...", "es": "...", "fr": "...", "de": "..." },
     "amount": 150,
-    "imageDataUri": "data:image/jpeg;base64,...",   // cash only
+    "imageId": "65a1b...",           // GiftImage._id; cash only. Resolved
+                                     //   to scripts/print/gift-images/<id>.<ext>
+                                     //   at render time. Run
+                                     //   download-gift-images.js to populate.
     "cubeId": null,                  // 1..38 for cube gifts
     "figurineId": null               // 1..4 for figurine gifts
   },
@@ -141,27 +165,44 @@ each item in `descriptors` has the shape below.
   "couple": { "names": "Iluminada & George" },
 
   "artefacts": {
-    "giftNote":      { "coverImageDataUri": "data:image/jpeg;base64,..." },
-    "thankYouNote":  { "coupleImageDataUri": "data:image/png;base64,..." },
-    "honeymoonCard": { "imageDataUri": "data:image/jpeg;base64,..." }  // only for cash
+    "giftNote":      {},             // no per-purchase fields; cover image
+                                     //   read locally from public/assets/
+                                     //   images/gift-cards/ at render time
+    "thankYouNote":  {},             // same: couple-inside image read locally
+    "honeymoonCard": {}              // present only for cash gifts; image
+                                     //   resolved from gift.imageId
   }
 }
 ```
 
-The descriptor deliberately omits cube face textures and figurine
-thumbnails — they used to be embedded but the print templates moved to
-text-only layouts and the images added ~1-2 MB per cube purchase to
-every bundle download for no gain. If a future template needs those
-images back, add them under `artefacts.<artefactKey>` (where the
-print-only assets live) rather than back onto `gift.*` (which mirrors
-the schema). The live admin block viewer dialog gets its faces from
+### What changed in v2
+
+- **No more embedded image bytes.** v1 base64-embedded `gift.imageDataUri`
+  (cash artwork), `artefacts.giftNote.coverImageDataUri`, and
+  `artefacts.thankYouNote.coupleImageDataUri` in every descriptor. v2
+  emits zero image bytes — the descriptor is now strictly metadata.
+- **Static assets** (gift-note cover, couple-inside portrait) are read
+  from `public/assets/images/gift-cards/` (or `.../print-hires/` if
+  available) by `render-artefacts.js`.
+- **Cash gift artwork** is fetched once with `download-gift-images.js`
+  into `scripts/print/gift-images/<imageId>.<ext>`, then resolved at
+  render time. Idempotent — re-running on a new bundle only downloads
+  newly-purchased gift images.
+
+The descriptor also deliberately omits cube face textures and figurine
+thumbnails — print templates moved to text-only layouts for those and
+the images added ~1-2 MB per purchase to the bundle for no gain. The
+live admin block viewer dialog gets its faces from
 `/api/admin/gift-purchases` directly, not from the descriptor.
 
 ### Notes on the schema
 
-- **Self-contained.** All images are embedded as base64 data URIs. The
-  print script never makes any network call. You could re-run a print
-  job months from now from a USB stick with no internet.
+- **Self-contained AT RENDER TIME, not in the bundle.** v2 trades
+  bundle-self-containment for bundle-size: the bundle JSON now needs to
+  be paired with a repo checkout (for the static images) and a
+  pre-populated `scripts/print/gift-images/` cache (for cash artwork).
+  In return the bundle drops from hundreds of MB to a few hundred KB
+  for a typical wedding.
 - **Localised strings** are kept as `{ en, es, fr, de }` objects. The
   templates choose which language to use per section (the thank-you
   note uses EN/ES side-by-side, the gift note uses EN only — change
@@ -178,7 +219,10 @@ the schema). The live admin block viewer dialog gets its faces from
 
 ```
 scripts/print/
-├── render-artefacts.js          Main CLI
+├── render-artefacts.js          Main CLI — builds PDFs from descriptors
+├── download-gift-images.js      One-shot bulk downloader for cash artwork
+├── gift-images/                 Operator-local cache (gitignored), one
+│                                file per GiftImage._id
 ├── templates/
 │   ├── gift-note.html           Folded card, outside + inside spread
 │   ├── thank-you-note.html      Folded card, bilingual inside

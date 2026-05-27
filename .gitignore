@@ -123,6 +123,11 @@ prints/
 # site keeps using the small originals at the canonical path.
 public/assets/images/gift-cards/print-hires/
 
+# Per-gift cash artwork mirrored from MongoDB by
+# scripts/print/download-gift-images.js for offline print rendering.
+# Operator-local cache, not part of the source tree.
+scripts/print/gift-images/
+
 
 
 

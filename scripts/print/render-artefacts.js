@@ -8,7 +8,12 @@ const { chromium } = require('playwright');
 const SCRIPT_DIR = __dirname;
 const TEMPLATES_DIR = path.join(SCRIPT_DIR, 'templates');
 const DEFAULT_OUT_DIR = path.join(process.cwd(), 'prints');
-const SCHEMA_VERSION_SUPPORTED = 1;
+// Schema bumped to v2 when the server stopped embedding cash gift image
+// bytes in the descriptor. v2 emits gift.imageId (the GiftImage._id) and
+// the operator runs scripts/print/download-gift-images.js once to mirror
+// every GiftImage to local disk before rendering.
+const SCHEMA_VERSION_SUPPORTED = 2;
+const GIFT_IMAGES_DIR_RELATIVE = 'scripts/print/gift-images';
 
 // Per-descriptor artefacts: one PDF emitted per descriptor per key.
 const ARTEFACTS = ['giftNote', 'thankYouNote', 'honeymoonCard'];
@@ -180,37 +185,56 @@ function stripLeadingCoupleSalutation(message, coupleNames) {
 }
 
 /*
- * Swap small originals for AI-upscaled hi-res variants when present locally.
+ * Resolve every image referenced by a descriptor to a base64 data URI
+ * read from local disk.
  *
- * The descriptor bundle comes from the deployed admin server and embeds the
- * small original gift-card images (because Vercel doesn't have the hi-res
- * files). When this script runs on the operator's machine, the upscaled
- * variants do exist under public/assets/images/gift-cards/print-hires/
- * (produced by scripts/upscale-gift-card-images.sh). We read them off
- * disk, base64-encode them, and replace the descriptor's embedded
- * dataUri so the rendered PDF uses the hi-res image data.
+ * Descriptors v2+ never embed image bytes. Two classes of image:
  *
- * Falls through silently when a hi-res file isn't found — the descriptor's
- * existing small image stays in place and the PDF renders fine, just at
- * the lower DPI.
+ *   1. Site-shipped static assets (gift-note cover, couple-inside
+ *      portrait). The script runs from a repo checkout, so it reads
+ *      these off disk, preferring the AI-upscaled hi-res variant
+ *      under .../print-hires/<file> (produced by
+ *      scripts/upscale-gift-card-images.sh; gitignored because the
+ *      files are 10-20 MB each), falling back to the original small
+ *      asset under public/assets/images/gift-cards/.
+ *
+ *   2. Per-gift cash artwork (the honeymoon-perk images stored in
+ *      MongoDB's GiftImage collection). The operator runs
+ *      scripts/print/download-gift-images.js ONCE to mirror every
+ *      GiftImage as scripts/print/gift-images/<imageId>.<ext>. The
+ *      function below resolves descriptor.gift.imageId to whichever
+ *      file extension exists.
+ *
+ * Every read is base64-encoded once and cached so the same image isn't
+ * re-encoded for every descriptor in a bundle (the cover/couple pair
+ * is shared by every purchase; cash artwork is shared whenever multiple
+ * guests bought the same perk).
  */
-const HIRES_SUBSTITUTIONS = [
+const STATIC_IMAGE_SOURCES = [
   {
     descriptorPath: ['artefacts', 'giftNote', 'coverImageDataUri'],
     hiresFilePath: 'public/assets/images/gift-cards/print-hires/gift-note-cover.jpg',
+    originalFilePath: 'public/assets/images/gift-cards/gift-note-cover.jpg',
     mime: 'image/jpeg',
   },
   {
     descriptorPath: ['artefacts', 'thankYouNote', 'coupleImageDataUri'],
     hiresFilePath: 'public/assets/images/gift-cards/print-hires/couple-inside-transparent.png',
+    originalFilePath: 'public/assets/images/gift-cards/couple-inside-transparent.png',
     mime: 'image/png',
   },
 ];
 
-const hiresCache = new Map();
-function readHiresDataUri(relPath, mime) {
-  if (hiresCache.has(relPath)) return hiresCache.get(relPath);
-  const repoRoot = path.resolve(__dirname, '..', '..');
+const CASH_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
+const CASH_IMAGE_MIME_BY_EXT = {
+  jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp',
+};
+
+const repoRoot = path.resolve(__dirname, '..', '..');
+const imageDataUriCache = new Map();
+
+function readDataUriFromDisk(relPath, mime) {
+  if (imageDataUriCache.has(relPath)) return imageDataUriCache.get(relPath);
   const abs = path.join(repoRoot, relPath);
   let value = null;
   try {
@@ -219,15 +243,26 @@ function readHiresDataUri(relPath, mime) {
       value = `data:${mime};base64,${buf.toString('base64')}`;
     }
   } catch (_e) { /* ignore */ }
-  hiresCache.set(relPath, value);
+  imageDataUriCache.set(relPath, value);
   return value;
 }
 
-function substituteHiresImages(descriptor) {
-  let swapped = 0;
-  for (const sub of HIRES_SUBSTITUTIONS) {
-    const hires = readHiresDataUri(sub.hiresFilePath, sub.mime);
-    if (!hires) continue;
+function readCashImageDataUri(imageId) {
+  // Look for any of the supported extensions — the downloader writes
+  // whatever extension matches the GiftImage's contentType, which we
+  // don't know up-front here.
+  for (const ext of CASH_IMAGE_EXTENSIONS) {
+    const rel = path.posix.join(GIFT_IMAGES_DIR_RELATIVE, `${imageId}.${ext}`);
+    const dataUri = readDataUriFromDisk(rel, CASH_IMAGE_MIME_BY_EXT[ext]);
+    if (dataUri) return dataUri;
+  }
+  return null;
+}
+
+function injectImagesFromDisk(descriptor) {
+  const stats = { hires: 0, original: 0, cashLocal: 0, descriptor: 0, missingStatic: 0, missingCash: 0 };
+
+  for (const sub of STATIC_IMAGE_SOURCES) {
     let obj = descriptor;
     for (let i = 0; i < sub.descriptorPath.length - 1; i++) {
       if (!obj || typeof obj !== 'object') { obj = null; break; }
@@ -235,12 +270,36 @@ function substituteHiresImages(descriptor) {
     }
     if (!obj || typeof obj !== 'object') continue;
     const leaf = sub.descriptorPath[sub.descriptorPath.length - 1];
-    if (obj[leaf]) {
-      obj[leaf] = hires;
-      swapped++;
+
+    const hires = readDataUriFromDisk(sub.hiresFilePath, sub.mime);
+    if (hires) { obj[leaf] = hires; stats.hires++; continue; }
+
+    const original = readDataUriFromDisk(sub.originalFilePath, sub.mime);
+    if (original) { obj[leaf] = original; stats.original++; continue; }
+
+    if (obj[leaf]) { stats.descriptor++; continue; }
+
+    stats.missingStatic++;
+  }
+
+  // Cash gift artwork: the templates read both gift.imageDataUri and
+  // artefacts.honeymoonCard.imageDataUri. We populate both so the templates
+  // don't need to know the descriptor changed shape between v1 and v2.
+  const gift = descriptor.gift;
+  if (gift && gift.type === 'cash' && gift.imageId) {
+    const dataUri = readCashImageDataUri(gift.imageId);
+    if (dataUri) {
+      gift.imageDataUri = dataUri;
+      if (descriptor.artefacts && descriptor.artefacts.honeymoonCard) {
+        descriptor.artefacts.honeymoonCard.imageDataUri = dataUri;
+      }
+      stats.cashLocal++;
+    } else {
+      stats.missingCash++;
     }
   }
-  return swapped;
+
+  return stats;
 }
 
 function pickOverridesOutputPath(outDir) {
@@ -531,7 +590,8 @@ async function main() {
   entries.forEach(({ descriptor, source }) => validateDescriptor(descriptor, source));
 
   const salutationDecisions = {};
-  let totalHiresSwapped = 0;
+  const imageStats = { hires: 0, original: 0, cashLocal: 0, descriptor: 0, missingStatic: 0, missingCash: 0 };
+  const missingCashIds = new Set();
   for (const { descriptor } of entries) {
     const params = resolveSalutationParams(descriptor, args, overrides);
     descriptor.salutation = buildSalutation(params);
@@ -553,13 +613,20 @@ async function main() {
       }
     }
 
-    totalHiresSwapped += substituteHiresImages(descriptor);
+    const before = imageStats.missingCash;
+    const s = injectImagesFromDisk(descriptor);
+    for (const k of Object.keys(s)) imageStats[k] += s[k];
+    if (imageStats.missingCash > before && descriptor.gift && descriptor.gift.imageId) {
+      missingCashIds.add(descriptor.gift.imageId);
+    }
   }
 
-  if (totalHiresSwapped > 0) {
-    process.stdout.write(`[hires]     Swapped ${totalHiresSwapped} small image(s) for local print-hires upscales\n`);
-  } else {
-    process.stdout.write(`[hires]     No print-hires/ upscales found locally; PDFs will use the small images embedded in the descriptor\n`);
+  process.stdout.write(`[images]    static: ${imageStats.hires} hires / ${imageStats.original} original / ${imageStats.descriptor} from-descriptor / ${imageStats.missingStatic} missing | cash: ${imageStats.cashLocal} local / ${imageStats.missingCash} missing\n`);
+  if (missingCashIds.size > 0) {
+    process.stdout.write(`[images]    Missing cash gift image(s) on disk. Run:\n`);
+    process.stdout.write(`[images]      node scripts/print/download-gift-images.js ${input}\n`);
+    process.stdout.write(`[images]    to download every referenced GiftImage to scripts/print/gift-images/.\n`);
+    process.stdout.write(`[images]    Missing ids: ${[...missingCashIds].join(', ')}\n`);
   }
 
   const overridesOutPath = writeOverridesTemplate(outDir, salutationDecisions);

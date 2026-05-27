@@ -1171,7 +1171,14 @@ async function updateGiftPurchase(req, res, next) {
 //
 // IMPORTANT: The schemaVersion field is the contract between this server
 // builder and scripts/print/render-artefacts.js. Bump it on breaking changes.
-const DESCRIPTOR_SCHEMA_VERSION = 1;
+// v2: cashImageDataUri removed; gift.imageId emitted instead. The
+// operator runs scripts/print/download-gift-images.js once to mirror
+// every GiftImage to local disk, then render-artefacts.js resolves the
+// id to a local file at render time. This stops the bundle from
+// embedding the same cash-gift artwork five times when five guests
+// bought the same honeymoon perk, and drops the per-purchase bundle
+// size by hundreds of KB on the typical cash gift.
+const DESCRIPTOR_SCHEMA_VERSION = 2;
 const COUPLE_NAMES = 'Iluminada & George';
 
 function slugify(s) {
@@ -1186,61 +1193,6 @@ function slugify(s) {
 function toFourLangs(localized) {
   const get = (lang) => localize(localized, lang) || '';
   return { en: get('en'), es: get('es'), fr: get('fr'), de: get('de') };
-}
-
-// Reads a static asset under public/ and returns it as a base64 data URI.
-// Returns null if the file is missing — the print script should treat a null
-// dataUri as "render a placeholder" rather than crash, so a single missing
-// asset doesn't block the whole batch.
-function readStaticAssetAsDataUri(absoluteUrl) {
-  if (!absoluteUrl || typeof absoluteUrl !== 'string' || !absoluteUrl.startsWith('/')) return null;
-  const publicRoot = path.join(__dirname, '..', '..', 'public');
-  const filePath = path.join(publicRoot, absoluteUrl);
-  if (!filePath.startsWith(publicRoot)) return null;
-  try {
-    const buf = fs.readFileSync(filePath);
-    const ext = path.extname(filePath).toLowerCase();
-    const mimeByExt = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
-    const mime = mimeByExt[ext] || 'application/octet-stream';
-    return `data:${mime};base64,${buf.toString('base64')}`;
-  } catch (_e) {
-    return null;
-  }
-}
-
-/*
- * Print-aware variant of readStaticAssetAsDataUri.
- *
- * For images that appear on the printed gift-card artefacts (gift note,
- * thank-you note, honeymoon card), we prefer an AI-upscaled high-DPI
- * version stored under .../print-hires/<filename> when it exists, so the
- * printed PDF uses ~300 DPI image data even though the live web site
- * keeps using the small, fast-loading originals at the canonical path.
- *
- * The print-hires directory is gitignored (the files are 10-20 MB each
- * and only matter at print time), so this fallback safely degrades to
- * the original whenever the hi-res copy isn't available — for example
- * when running render-artefacts.js on a machine that hasn't run the
- * upscale step. scripts/upscale-gift-card-images.sh produces them.
- */
-function readPrintAssetAsDataUri(absoluteUrl) {
-  if (!absoluteUrl || typeof absoluteUrl !== 'string' || !absoluteUrl.startsWith('/')) return null;
-  const dir = path.posix.dirname(absoluteUrl);
-  const file = path.posix.basename(absoluteUrl);
-  const hires = readStaticAssetAsDataUri(path.posix.join(dir, 'print-hires', file));
-  return hires || readStaticAssetAsDataUri(absoluteUrl);
-}
-
-async function buildGiftImageDataUri(giftImageRef) {
-  if (!giftImageRef) return null;
-  try {
-    const id = (giftImageRef._id || giftImageRef).toString();
-    const img = await GiftImage.findById(id).lean();
-    if (!img || !img.data) return null;
-    return `data:${img.contentType || 'image/jpeg'};base64,${img.data.toString('base64')}`;
-  } catch (_e) {
-    return null;
-  }
 }
 
 async function buildCombinedDescriptor(choice) {
@@ -1261,18 +1213,21 @@ async function buildCombinedDescriptor(choice) {
   const giftTitleLocalised = toFourLangs(gift.title);
   const giftDescriptionLocalised = toFourLangs(gift.description);
 
-  // Image-payload budget rule for the descriptor: include ONLY images that
-  // the print templates in scripts/print/templates/ actually read. Past
-  // revisions also embedded cube face textures and figurine thumbnails for
-  // print, but those templates moved to text-only layouts and the images
-  // are now dead weight (≈1-2 MB per cube purchase). The live admin UI
-  // still reads cubeFaces/cubePosition from getGiftPurchases() — that's a
-  // different endpoint, so removing them from the descriptor here doesn't
-  // affect the live block viewer dialog.
-  const cashImageDataUri = isCash ? await buildGiftImageDataUri(gift.image) : null;
-
-  const giftNoteCoverDataUri = readPrintAssetAsDataUri('/assets/images/gift-cards/gift-note-cover.jpg');
-  const coupleInsideDataUri = readPrintAssetAsDataUri('/assets/images/gift-cards/couple-inside-transparent.png');
+  // Image-payload budget rule for the descriptor: NEVER embed image
+  // bytes. The descriptor carries references — disk paths or Mongo ids
+  // — and scripts/print/render-artefacts.js resolves them to bytes at
+  // render time from the operator's local checkout / pre-downloaded
+  // cache. This stops the bundle from re-shipping the same multi-MB
+  // images once per purchase.
+  //
+  // Cash gifts: gift.imageId is the GiftImage _id. The operator runs
+  // scripts/print/download-gift-images.js ONCE to mirror every
+  // GiftImage to local disk under scripts/print/gift-images/.
+  // Static assets (gift-note-cover, couple-inside-transparent, cube
+  // faces, figurine thumbs): never appear in the descriptor.
+  const cashImageId = isCash && gift.image
+    ? (gift.image._id ? gift.image._id.toString() : gift.image.toString())
+    : null;
 
   const purchaseId = choice._id.toString();
   const guestName = guest ? (guest.name || guest.email || 'Unknown') : 'Unknown';
@@ -1285,23 +1240,17 @@ async function buildCombinedDescriptor(choice) {
     title: giftTitleLocalised,
     description: giftDescriptionLocalised,
     amount,
-    imageDataUri: cashImageDataUri,
+    imageId: cashImageId,
     cubeId: isCube ? gift.cubeId : null,
     figurineId: isFigurine ? gift.figurineId : null,
   };
 
   const artefacts = {
-    giftNote: {
-      coverImageDataUri: giftNoteCoverDataUri,
-    },
-    thankYouNote: {
-      coupleImageDataUri: coupleInsideDataUri,
-    },
+    giftNote: {},
+    thankYouNote: {},
   };
   if (isCash) {
-    artefacts.honeymoonCard = {
-      imageDataUri: cashImageDataUri,
-    };
+    artefacts.honeymoonCard = {};
   }
 
   return {
