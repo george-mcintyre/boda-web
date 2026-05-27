@@ -91,9 +91,16 @@
   .message {
     /*
      * The message text box spans the full cell minus the padding, ending
-     * a few mm above the signer corner so the two never collide on long
+     * just above the signer corner so the two never collide on long
      * messages. Sized by absolute positioning rather than flex so the JS
      * auto-shrink can measure scrollHeight against a stable box.
+     *
+     * The `bottom` reservation is the FALLBACK for the single-line signer
+     * case; the JS layout pass measures the signer's actual rendered
+     * height (which can be 2 lines for very long signer strings like
+     * "Alexander, Jeanine, Samira & Sorays") and overrides this value
+     * on a per-cell basis. Without that override, a wrapped signer
+     * pushes its second line into the bottom of the message area.
      */
     position: absolute;
     top: 5mm;
@@ -109,11 +116,6 @@
     color: #2c1810;
     font-size: 11pt;
   }
-  .message.empty {
-    color: #b0a59b;
-    font-style: italic;
-  }
-
   .signer {
     /*
      * Bottom-right corner signoff in Great Vibes — same font and "—"
@@ -141,17 +143,6 @@
 
   <!--INJECT-DATA-->
   <script>
-    var EMPTY_MESSAGE = {
-      en: '(No message)',
-      es: '(Sin mensaje)',
-      fr: '(Aucun message)',
-      de: '(Keine Nachricht)',
-    };
-
-    function emptyMsgFor(lang) {
-      return EMPTY_MESSAGE[lang] || EMPTY_MESSAGE.en;
-    }
-
     /*
      * Auto-shrink the message font-size until it fits in the cell. The
      * cell is fixed at 60×60 mm and the buyers' messages are free-form
@@ -190,13 +181,13 @@
 
       var msg = document.createElement('div');
       msg.className = 'message';
+      // When no message was provided we deliberately leave the message box
+      // empty rather than printing a "(No message)" placeholder — the
+      // signer line still anchors the bottom-right corner so the label
+      // doesn't look broken, and the buyer/couple can hand-write something
+      // in the blank space later if they want.
       var text = (note && note.message ? String(note.message) : '').trim();
-      if (text) {
-        msg.textContent = text;
-      } else {
-        msg.textContent = emptyMsgFor(note && note.lang);
-        msg.classList.add('empty');
-      }
+      msg.textContent = text;
       cell.appendChild(msg);
 
       var signer = document.createElement('div');
@@ -204,7 +195,43 @@
       signer.textContent = '\u2014 ' + ((note && note.signer) || '');
       cell.appendChild(signer);
 
-      return { cell: cell, msg: msg };
+      return { cell: cell, msg: msg, signer: signer };
+    }
+
+    function reserveSpaceForSigner(msg, signer) {
+      /*
+       * Match the message box's bottom edge to whatever room the signer
+       * actually claims. Without this, a signer that wraps to two lines
+       * (e.g. "Alexander, Jeanine, Samira & Sorays" in the 50mm-wide
+       * Great Vibes 16pt block) renders its second line above the
+       * message box, overlapping the last line of the message text.
+       *
+       * Geometry:
+       *   signer is `bottom: 3mm` from the cell edge and N lines tall.
+       *   We want the message box to end SAFETY mm above the signer's
+       *   top edge.
+       *   Therefore message.bottom = signer.height + signer.bottomOffset
+       *                              + SAFETY
+       *
+       * Falls back silently to the CSS default (12mm) on any measurement
+       * failure — e.g. if the font hasn't loaded yet and signer.offsetHeight
+       * is 0.
+       */
+      var SAFETY_MM = 2;
+      var SIGNER_BOTTOM_MM = 3;
+      var MIN_BOTTOM_MM = 8;
+      var pxPerMm = (function () {
+        var probe = document.createElement('div');
+        probe.style.cssText = 'position:absolute;width:100mm;visibility:hidden;';
+        document.body.appendChild(probe);
+        var px = probe.offsetWidth / 100;
+        probe.remove();
+        return px;
+      })();
+      if (!pxPerMm || !signer.offsetHeight) return;
+      var signerMm = signer.offsetHeight / pxPerMm;
+      var reservedMm = Math.max(MIN_BOTTOM_MM, signerMm + SIGNER_BOTTOM_MM + SAFETY_MM);
+      msg.style.bottom = reservedMm.toFixed(2) + 'mm';
     }
 
     (function () {
@@ -219,7 +246,7 @@
         return;
       }
 
-      var pendingShrink = [];
+      var pendingLayout = [];
       for (var i = 0; i < notes.length; i += CELLS_PER_SHEET) {
         var sheet = document.createElement('section');
         sheet.className = 'sheet';
@@ -238,11 +265,20 @@
           }
           var built = buildCell(note);
           grid.appendChild(built.cell);
-          pendingShrink.push(built.msg);
+          pendingLayout.push(built);
         }
       }
 
-      pendingShrink.forEach(function (el) { shrinkToFit(el, 6); });
+      // Two passes are required and the order matters:
+      //   1. Reserve space for the signer based on its rendered height.
+      //      This shrinks the message box from below for any cell whose
+      //      signer wraps to 2+ lines.
+      //   2. Shrink the message font to fit the (possibly smaller) box.
+      // Running shrink BEFORE the signer reservation would leave the
+      // message sized for the CSS-default bottom (12mm), and the wrapped
+      // signer would still overlap.
+      pendingLayout.forEach(function (b) { reserveSpaceForSigner(b.msg, b.signer); });
+      pendingLayout.forEach(function (b) { shrinkToFit(b.msg, 6); });
 
       window.__TEMPLATE_READY__ = true;
     })();
