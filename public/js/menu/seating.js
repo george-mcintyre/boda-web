@@ -3,30 +3,42 @@
 
 // ============================================================================
 // TABLE_POSITIONS: Hardcoded percentage-based positions for each table
-// on the static seating plan image (seating-plan.png, 1455 x 860 px).
+// on the static seating plan image (seating-plan.png, 1456 x 861 px).
 // Key = table number (1 = Head Table). Values = { x, y } as % from top-left.
-// 12 tables total: Table 1 (high table) + Tables 2–12.
+// 10 tables total: Table 1 (high table) + round Tables 2–10.
+// Centres measured from the rendered image (white table disk centroids).
 // ============================================================================
 // ============================================================================
-// Seat positioning for round tables (2–12).
-// 10 seats per table, evenly spaced clockwise, seat 01 at 12 o'clock.
-// Radius measured from table center to seat center (70 px on 1455×860 image).
+// Seat positioning for round tables (2–10).
+// Seats evenly spaced clockwise, seat 01 at 12 o'clock. The seat ring radius
+// is NOT constant: larger tables (11–12 places) are drawn bigger than the
+// standard 10-place tables, so the radius scales with the table's seat count.
+// Radii measured from the image (seat-box centroids to disk centre):
+//   10 places → 40.1 px;  11–12 places → 47.3 px  (on the 1456×861 image).
 // ============================================================================
 const SEATS_PER_TABLE = 10;
-const SEAT_RADIUS_X = 3.0;   // 43px / 1455px * 100
-const SEAT_RADIUS_Y = 5.0;   // 43px / 860px  * 100
+
+// Seat-ring radius as a % of image width/height, keyed by total places at the
+// table. Falls back to the 10-place radius for any unlisted count.
+const SEAT_RADIUS_BY_SEATS = {
+  10: { x: 2.75, y: 4.66 },   // 40.1px / 1456 , 40.1px / 861
+  11: { x: 3.25, y: 5.49 },   // 47.3px / 1456 , 47.3px / 861
+  12: { x: 3.25, y: 5.49 },   // 11- and 12-place tables share the larger disk
+};
+const SEAT_RADIUS_DEFAULT = SEAT_RADIUS_BY_SEATS[10];
 
 function getSeatPosition(tablePos, seatNumber, totalSeats) {
   const divisor = totalSeats > SEATS_PER_TABLE ? totalSeats : SEATS_PER_TABLE;
   if (!seatNumber || seatNumber < 1 || seatNumber > divisor) return tablePos;
+  const radius = SEAT_RADIUS_BY_SEATS[divisor] || SEAT_RADIUS_DEFAULT;
   const angle = -Math.PI / 2 + (seatNumber - 1) * (2 * Math.PI / divisor);
   return {
-    x: tablePos.x + SEAT_RADIUS_X * Math.cos(angle),
-    y: tablePos.y + SEAT_RADIUS_Y * Math.sin(angle)
+    x: tablePos.x + radius.x * Math.cos(angle),
+    y: tablePos.y + radius.y * Math.sin(angle)
   };
 }
 
-const HEAD_TABLE_HALF_WIDTH = 4.5;
+const HEAD_TABLE_HALF_WIDTH = 4.22;
 const HEAD_TABLE_SEAT_ORDER = [3, 4, 1, 2, 5, 6];
 
 function getHeadTableSeatPosition(tablePos, seatNumber) {
@@ -42,18 +54,16 @@ function getHeadTableSeatPosition(tablePos, seatNumber) {
 }
 
 const TABLE_POSITIONS = {
-  1:  { x: 44.5, y: 76.5 },  // Table 1 (High Table) — bottom center, rectangular
-  2:  { x: 36.0, y: 72.5 },  // Table 2 — left of dance floor, near bottom
-  3:  { x: 52.5, y: 72.5 },  // Table 3 — right of dance floor, near bottom
-  4:  { x: 26.75, y: 76.5 },  // Table 4 — bottom-left
-  5:  { x: 63.0, y: 75.0 },  // Table 5 — right side, lower
-  6:  { x: 27.5, y: 56.5 },  // Table 6 — left-center
-  7:  { x: 61.5, y: 56.5 },  // Table 7 — right of dance floor, mid
-  8:  { x: 19.5, y: 65.0 },  // Table 8 — left side, between 10 and 4
-  9:  { x: 75.0, y: 65.0 },  // Table 9 — far right, mid-lower
-  10: { x: 20.0, y: 47.5 },  // Table 10 — upper left
-  11: { x: 81.5, y: 48.5 },  // Table 11 — far right, upper
-  12: { x: 71.5, y: 40.0 },  // Table 12 — upper right
+  1:  { x: 44.5,  y: 79.5 },  // Table 1 (High Table) — bottom centre, rectangular
+  2:  { x: 36.15, y: 70.85 }, // Table 2 — left of dance floor, near bottom
+  3:  { x: 52.46, y: 71.77 }, // Table 3 — right of dance floor, near bottom (11)
+  4:  { x: 26.65, y: 74.86 }, // Table 4 — bottom-left
+  5:  { x: 62.73, y: 74.08 }, // Table 5 — right side, lower (11)
+  6:  { x: 26.99, y: 56.01 }, // Table 6 — left-centre (12)
+  7:  { x: 61.20, y: 55.89 }, // Table 7 — right of dance floor, mid (11)
+  8:  { x: 19.37, y: 64.50 }, // Table 8 — left side, between 10 and 4
+  9:  { x: 75.09, y: 64.52 }, // Table 9 — far right, mid-lower
+  10: { x: 19.82, y: 47.34 }, // Table 10 — upper left
 };
 
 
