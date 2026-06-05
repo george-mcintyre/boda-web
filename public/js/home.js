@@ -2,27 +2,37 @@
 function updateCountdown() {
     const weddingDate = new Date('2026-06-06T14:00:00+02:00').getTime();
     const now = new Date().getTime();
-    const distance = weddingDate - now;
+    // Clamp at zero so the countdown stops instead of going negative.
+    const distance = Math.max(weddingDate - now, 0);
   
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
   
-    document.getElementById('days').textContent = days.toString().padStart(2, '0');
-    document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-    document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-    document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+    // The countdown elements are removed once the date passes (see below),
+    // so guard against missing elements on later interval ticks.
+    const daysEl = document.getElementById('days');
+    if (daysEl) {
+      daysEl.textContent = days.toString().padStart(2, '0');
+      document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+      document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+      document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+    }
   
-    if (distance < 0) {
+    if (distance <= 0) {
       const currentLang = localStorage.getItem('i18nextLng') || 'es';
       const message = translate('common:countdownMessage', currentLang);
-      document.querySelector('.countdown-container').innerHTML = `<h3>${message}</h3>`;
+      const container = document.querySelector('.countdown-container');
+      if (container) {
+        container.innerHTML = `<h3>${message}</h3>`;
+      }
+      clearInterval(countdownInterval);
     }
   }
   
   // Update countdown every second
-  setInterval(updateCountdown, 1000);
+  const countdownInterval = setInterval(updateCountdown, 1000);
   updateCountdown();
   
   // Scroll animations
