@@ -5,10 +5,10 @@ const translations = {
     // Wedding
     //--------------------------------
     'wedding:title': 'Iluminada & George',
-    'wedding:subtitle': 'We\'re getting married!',
+    'wedding:subtitle': 'We\'re married!',
     'wedding:date': 'June 6th, 2026 • Marbella, Spain',
-    'wedding:hero.description': 'Iluminada and George are getting married on the beach in Marbella this June, and we’re so happy to share it with you. Expect sun, sea and lots of laughter.',
-    'wedding:hero.description2': 'This site is your wedding hub. Log in with your RSVP email to confirm your party, choose your menu, see the schedule, view our gift list and chat with other guests.',
+    'wedding:hero.description': 'Iluminada and George got married on the beach in Marbella, and we’re so happy you were part of it. Sun, sea and lots of laughter — exactly as we’d hoped.',
+    'wedding:hero.description2': 'This site is still your wedding hub. Log in with your RSVP email to relive the day: browse the photos, look back at the schedule, see our gift list and keep chatting with the other guests.',
     'wedding.common.footer:rich': '© 2026 Boda de Iluminada &amp; George',
 
     //--------------------------------
@@ -1013,10 +1013,10 @@ const translations = {
     // Wedding
     //--------------------------------
     'wedding:title': 'Iluminada & George',
-    'wedding:subtitle': '¡Nos casamos!',
+    'wedding:subtitle': '¡Ya estamos casados!',
     'wedding:date': '6 de junio de 2026 • Marbella, España',
-    'wedding:hero.description': 'Iluminada y George se casan en la playa de Marbella este junio y estamos muy felices de compartirlo contigo. Te esperan sol, mar y muchas risas.',
-    'wedding:hero.description2': 'Este sitio es tu centro para la boda. Inicia sesión con el correo de tu RSVP para confirmar tu grupo, elegir tu menú, ver el programa, consultar nuestra lista de regalos y chatear con otros invitados.',
+    'wedding:hero.description': 'Iluminada y George se casaron en la playa de Marbella, y estamos muy felices de que formaras parte de ello. Sol, mar y muchas risas, tal y como lo soñábamos.',
+    'wedding:hero.description2': 'Este sitio sigue siendo tu centro para la boda. Inicia sesión con el correo de tu RSVP para revivir el día: mira las fotos, repasa el programa, consulta nuestra lista de regalos y sigue charlando con los demás invitados.',
     'wedding.common.footer:rich': '© 2026 Boda de Iluminada &amp; George',
 
     //--------------------------------
@@ -2020,10 +2020,10 @@ const translations = {
     // Wedding
     //--------------------------------
     'wedding:title': 'Iluminada & George',
-    'wedding:subtitle': 'Nous nous marions !',
+    'wedding:subtitle': 'Nous sommes mariés !',
     'wedding:date': '6 juin 2026 • Marbella, Espagne',
-    'wedding:hero.description': 'Iluminada et George se marient sur la plage de Marbella en juin, et nous sommes ravis de partager ce moment avec vous. Attendez-vous à du soleil, à la mer et à beaucoup de rires.',
-    'wedding:hero.description2': 'Ce site est votre espace mariage. Connectez-vous avec l’email de votre RSVP pour confirmer votre groupe, choisir votre menu, voir le programme, consulter notre liste de cadeaux et discuter avec les autres invités.',
+    'wedding:hero.description': 'Iluminada et George se sont mariés sur la plage de Marbella, et nous sommes ravis que vous en ayez fait partie. Du soleil, la mer et beaucoup de rires, exactement comme nous l’espérions.',
+    'wedding:hero.description2': 'Ce site reste votre espace mariage. Connectez-vous avec l’email de votre RSVP pour revivre la journée : parcourez les photos, revoyez le programme, consultez notre liste de cadeaux et continuez à discuter avec les autres invités.',
     'wedding.common.footer:rich': '© 2026 Mariage d’Iluminada &amp; George',
   
     //--------------------------------
@@ -3027,10 +3027,10 @@ const translations = {
     // Wedding
     //--------------------------------
     'wedding:title': 'Iluminada & George',
-    'wedding:subtitle': 'Wir heiraten!',
+    'wedding:subtitle': 'Wir sind verheiratet!',
     'wedding:date': '6. Juni 2026 • Marbella, Spanien',
-    'wedding:hero.description': 'Iluminada und George heiraten diesen Juni am Strand von Marbella, und wir freuen uns sehr, das mit dir zu teilen. Dich erwarten Sonne, Meer und jede Menge Lachen.',
-    'wedding:hero.description2': 'Diese Seite ist dein Hochzeitsportal. Melde dich mit der E-Mail aus deinem RSVP an, um deine Gruppe zu bestätigen, dein Menü zu wählen, den Ablauf zu sehen, unsere Geschenkliste anzuschauen und mit anderen Gästen zu chatten.',
+    'wedding:hero.description': 'Iluminada und George haben am Strand von Marbella geheiratet, und wir freuen uns sehr, dass du dabei warst. Sonne, Meer und jede Menge Lachen – genau so, wie wir es uns erträumt haben.',
+    'wedding:hero.description2': 'Diese Seite bleibt dein Hochzeitsportal. Melde dich mit der E-Mail aus deinem RSVP an, um den Tag noch einmal zu erleben: Sieh dir die Fotos an, schau dir den Ablauf noch einmal an, wirf einen Blick auf unsere Geschenkliste und chatte weiter mit den anderen Gästen.',
     'wedding.common.footer:rich': '© 2026 Hochzeit von Iluminada &amp; George',
   
     //--------------------------------

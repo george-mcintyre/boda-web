@@ -21,11 +21,11 @@ function updateCountdown() {
     }
   
     if (distance <= 0) {
-      const currentLang = localStorage.getItem('i18nextLng') || 'es';
-      const message = translate('common:countdownMessage', currentLang);
+      // The wedding has happened: the "We're married!" headline already says it,
+      // so just remove the countdown rather than showing a duplicate message.
       const container = document.querySelector('.countdown-container');
       if (container) {
-        container.innerHTML = `<h3>${message}</h3>`;
+        container.remove();
       }
       clearInterval(countdownInterval);
     }
